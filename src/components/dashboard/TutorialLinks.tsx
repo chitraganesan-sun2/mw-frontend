@@ -23,7 +23,7 @@ const TutorialLinks = () => {
     const { data: links = [], isLoading } = useQuery<TutorialLink[]>({
         queryKey: ["tutorial-links"],
         queryFn: async () => {
-            const res = await GET_API((endpoints as any).tutorialLinks.getAll);
+            const res = await GET_API(endpoints.tutorialLinks.getAll);
             return res?.data || [];
         },
     });

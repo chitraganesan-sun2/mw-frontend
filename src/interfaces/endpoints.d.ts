@@ -143,6 +143,9 @@ export type EndpointProps = {
         volunteerPermission: (id: string) => string;
         learnerPermission: (id: string) => string;
     };
+    tutorialLinks: {
+        getAll: string;
+    };
 };
 
 type CommonPath = "skills" | "languages" | "subjects" | "media" | "categories";
