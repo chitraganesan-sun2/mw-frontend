@@ -17,6 +17,7 @@ import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import InnerWidth from "@/utils/innerWidth";
 import MobileCalender from "@/components/schedule/MobileCalender";
+import TutorialLinks from "@/components/dashboard/TutorialLinks";
 
 export default function LearnerSchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
@@ -94,6 +95,9 @@ export default function LearnerSchedulePage() {
                 ) : (
                     <Calendar events={data || []} />
                 )}
+                <div className="p-4">
+                    <TutorialLinks />
+                </div>
                 <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleNavigate} />
                 <FeedbackModal
                     mode="create"
