@@ -129,6 +129,32 @@ export const VolunteerProfileFormConstants: FormField[] = [
         showSearch: true,
         required: true,
     },
+    {
+        name: "volunteer_birth_date",
+        label: "Date of Birth",
+        inputType: "birthdatepicker",
+        placeholder: "DD/MM/YYYY",
+        format: "DD-MM-YYYY",
+        required: false,
+    },
+    {
+        name: "volunteer_higher_education",
+        label: "Highest Education",
+        inputType: "select",
+        placeholder: "Select education level",
+        options: [
+            { label: "Bachelor's Degree", value: "bachelors" },
+            { label: "High School", value: "high_school" },
+            { label: "Middle School", value: "middle_school" },
+            { label: "Elementary School", value: "elementary_school" },
+            { label: "Master's Degree", value: "masters" },
+            { label: "PhD", value: "phd" },
+            { label: "Others", value: "others" },
+            { label: "N/A", value: "N/A" },
+        ],
+        showSearch: true,
+        required: false,
+    },
 ];
 
 // Learner:
