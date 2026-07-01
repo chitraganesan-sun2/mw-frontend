@@ -204,7 +204,7 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
             tags: volunteerData?.volunteer_languages?.map((lang) => lang?.language_name),
         },
         {
-            title: "Skills",
+            title: "Skills You Can Share with Learners",
             tags: volunteerData?.volunteer_skills?.map((skill) => skill?.skill_name),
         },
     ];

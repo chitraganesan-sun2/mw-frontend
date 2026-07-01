@@ -112,7 +112,15 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
         { title: "Education and Background", sectionData: data.education },
         { title: "Behavior and Social Skills", sectionData: data.social_skills },
         { title: "Current Interests and Hobbies", sectionData: data.current_interests },
-        { title: "Expectations and Goals", sectionData: { ...data?.learner_goals, skills_to_learn } },
+        {
+            title: "Expectations and Goals",
+            sectionData: {
+                ...data?.learner_goals,
+                // Rename key so it displays with the correct label
+                "Skills and Expertise to Learn from Volunteers": skills_to_learn,
+                skills_to_learn: undefined,
+            }
+        },
     ].filter(section => section.sectionData && Object.keys(section.sectionData).length);
 
     const renderValue = (value: string | string[] | { value: string }) => {
