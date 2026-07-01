@@ -158,6 +158,6 @@ export const endpoints: EndpointProps = {
         learnerPermission: (id: string) => `learner/${id}/chat_permission`,
     },
     tutorialLinks: {
-        getAll: "tutorial-links",
+        getAll: "tutorial-links/",
     },
 };
