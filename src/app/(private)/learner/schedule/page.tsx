@@ -87,7 +87,7 @@ export default function LearnerSchedulePage() {
 
     return (
         <>
-            <div className="w-full h-full animate-fadeIn">
+            <div className="w-full h-full animate-fadeIn overflow-y-auto flex flex-col">
                 {isFetching ? (
                     <LottieLoader isLoading={true} fullscreen={false} />
                 ) : isMobileOrTabScreen ? (
@@ -95,7 +95,8 @@ export default function LearnerSchedulePage() {
                 ) : (
                     <Calendar events={data || []} />
                 )}
-                <div className="p-4">
+                {/* Tutorial links shown below calendar */}
+                <div className="p-4 pb-8">
                     <TutorialLinks />
                 </div>
                 <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleNavigate} />

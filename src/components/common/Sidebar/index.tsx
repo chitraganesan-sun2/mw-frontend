@@ -2,6 +2,7 @@ import Divider from "@/components/common/Divider";
 import Logo from "@/components/common/Logo";
 import Avatar from "./Avatar";
 import SectionCard from "./SectionCard";
+import TutorialLinks from "@/components/dashboard/TutorialLinks";
 import {
     CalendarIcon,
     CommunityIcon,
@@ -126,7 +127,10 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     ))}
                 </div>
             </div>
-            <button onClick={handleSignOut} className="flex gap-1 mt-2">
+            <div className="w-full flex flex-col gap-3 mt-4">
+                {/* Tutorial links section in sidebar */}
+                <TutorialLinks />
+                <button onClick={handleSignOut} className="flex gap-1 mt-2">
                 <span className={`text-[1.25rem] transition-all duration-300 "text-black"`}>
                     <SignOutIcon />
                 </span>
@@ -137,7 +141,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     Sign Out
                 </p>
             </button>
-        </div>
+            </div>
     );
 };
 
