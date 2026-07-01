@@ -28,7 +28,14 @@ const TutorialLinks = () => {
         },
     });
 
-    if (isLoading || links.length === 0) return null;
+    if (isLoading) return (
+        <div className="bg-white rounded-2xl p-5 shadow-sm animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
+            <div className="h-10 bg-gray-100 rounded-xl" />
+        </div>
+    );
+
+    if (links.length === 0) return null;
 
     return (
         <div className="bg-white rounded-2xl p-5 shadow-sm">
