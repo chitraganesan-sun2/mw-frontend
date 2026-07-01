@@ -22,6 +22,7 @@ import SectionWrapper from "@/components/resources/SectionWrapper";
 import TopicCard, { TopicCardSkeleton } from "@/components/resources/TopicCard";
 import CategorySection from "@/components/resources/CategorySection";
 import { useDebounce } from "use-debounce";
+import TutorialLinks from "@/components/dashboard/TutorialLinks";
 
 interface ResourcesPageWrapperProps {
     variant: 'learner' | 'volunteer';
@@ -186,6 +187,9 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
                     ))}
                 </div>
             )}
+
+            {/* Tutorial Links — shown at top of Resources page */}
+            {!category && <TutorialLinks />}
 
             {/* Topics Section */}
             {isMobile && activeTab === "topics" && (category !== "my-resources") && (ResourceCategories?.length === 0 && !isFetchingCategories) ? (

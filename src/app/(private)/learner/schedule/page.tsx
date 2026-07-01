@@ -17,7 +17,6 @@ import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import InnerWidth from "@/utils/innerWidth";
 import MobileCalender from "@/components/schedule/MobileCalender";
-import TutorialLinks from "@/components/dashboard/TutorialLinks";
 
 export default function LearnerSchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
@@ -87,7 +86,7 @@ export default function LearnerSchedulePage() {
 
     return (
         <>
-            <div className="w-full h-full animate-fadeIn overflow-y-auto flex flex-col">
+            <div className="w-full h-full animate-fadeIn">
                 {isFetching ? (
                     <LottieLoader isLoading={true} fullscreen={false} />
                 ) : isMobileOrTabScreen ? (
@@ -95,10 +94,6 @@ export default function LearnerSchedulePage() {
                 ) : (
                     <Calendar events={data || []} />
                 )}
-                {/* Tutorial links shown below calendar */}
-                <div className="p-4 pb-8">
-                    <TutorialLinks />
-                </div>
                 <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleNavigate} />
                 <FeedbackModal
                     mode="create"
