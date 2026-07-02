@@ -88,7 +88,32 @@ const InstantSessions = () => {
     });
 
     // Don't render section if no sessions and not loading
-    if (!isLoading && sessions.length === 0) return null;
+    if (!isLoading && sessions.length === 0) {
+        return (
+            <ContainerWrapper>
+                <div className="flex flex-col gap-10 w-full">
+                    <ContainerHeader
+                        title="Live Now"
+                        subTitle="Instant Sessions"
+                        description="Browse available volunteer sessions and connect instantly — no scheduling needed."
+                    />
+                    <div className="bg-gray-50 rounded-2xl p-8 text-center">
+                        <p className="text-4xl mb-3">📺</p>
+                        <p className="text-gray-600 font-medium mb-1">No live sessions right now</p>
+                        <p className="text-gray-400 text-sm">Volunteers host sessions throughout the week. Sign up to get notified!</p>
+                    </div>
+                    <div className="flex justify-center">
+                        <Link
+                            href="/join-us?signup_as=learner"
+                            className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors text-sm"
+                        >
+                            Sign up to get notified
+                        </Link>
+                    </div>
+                </div>
+            </ContainerWrapper>
+        );
+    }
 
     return (
         <ContainerWrapper>
