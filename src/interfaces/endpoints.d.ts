@@ -146,6 +146,9 @@ export type EndpointProps = {
     tutorialLinks: {
         getAll: string;
     };
+    publicSessions: {
+        getInstantSessions: (limit?: number) => string;
+    };
 };
 
 type CommonPath = "skills" | "languages" | "subjects" | "media" | "categories";

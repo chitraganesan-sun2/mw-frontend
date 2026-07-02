@@ -160,4 +160,7 @@ export const endpoints: EndpointProps = {
     tutorialLinks: {
         getAll: "tutorial-links/",
     },
+    publicSessions: {
+        getInstantSessions: (limit?: number) => `session/public/instant_sessions${limit ? `?limit=${limit}` : ""}`,
+    },
 };
