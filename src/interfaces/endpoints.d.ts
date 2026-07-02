@@ -47,6 +47,7 @@ export type EndpointProps = {
         bookSession: string;
         createInstantSession: string;
         claimInstantSession: string;
+        getInstantSessions: string;
         validateInstantSession: (session_date: string, session_start_time: string, session_end_time: string) => string;
         getVolunteerInstantSession: (volunteer_slot_id: string, date: string, volunteer_id: string) => string;
         getLearnerInstantSession: (date: string, isAccepted?: boolean) => string;
