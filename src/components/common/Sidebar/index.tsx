@@ -28,7 +28,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
 
     // Instant Sessions - for both learners and volunteers
     const instantSessionsLink = {
-        href: role === "volunteer" ? "/instant-sessions" : "/instant-sessions",
+        href: "/instant-sessions",
         text: "Instant Sessions",
         icon: <InstantSessionIcon />,
     };

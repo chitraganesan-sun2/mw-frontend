@@ -115,9 +115,16 @@ export function calculateLearnerCompletion(data: any): { percentage: number; mis
     let completed = 0;
 
     for (const field of fields) {
-        const hasValue = Array.isArray(field.value)
-            ? field.value.length > 0
-            : !!field.value && Object.keys(field.value).length > 0 || (typeof field.value === "string" && field.value.length > 0);
+        let hasValue = false;
+        if (Array.isArray(field.value)) {
+            hasValue = field.value.length > 0;
+        } else if (typeof field.value === "string") {
+            hasValue = field.value.length > 0;
+        } else if (field.value && typeof field.value === "object") {
+            hasValue = Object.keys(field.value).length > 0;
+        } else {
+            hasValue = !!field.value;
+        }
         if (hasValue) {
             completed++;
         } else {

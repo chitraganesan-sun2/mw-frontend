@@ -104,19 +104,6 @@ export const getFileData = async (
     // Validate before uploading
     validateFile(file);
 
-    const config = onProgress
-        ? {
-              onUploadProgress: (progressEvent: any) => {
-                  if (progressEvent.total) {
-                      const percent = Math.round(
-                          (progressEvent.loaded * 100) / progressEvent.total
-                      );
-                      onProgress(percent);
-                  }
-              },
-          }
-        : undefined;
-
     try {
         if (file.type.startsWith("image/")) {
             const formData = new FormData();
