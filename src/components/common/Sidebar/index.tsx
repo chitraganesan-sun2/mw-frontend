@@ -26,15 +26,12 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const role = Cookies.get("role");
     const isMobileOrTabScreen = InnerWidth() < 1024;
 
-    // Instant Sessions - only for learners
-    const instantSessionsLink =
-        role === "learner"
-            ? {
-                  href: "/instant-sessions",
-                  text: "Instant Sessions",
-                  icon: <InstantSessionIcon />,
-              }
-            : null;
+    // Instant Sessions - for both learners and volunteers
+    const instantSessionsLink = {
+        href: role === "volunteer" ? "/instant-sessions" : "/instant-sessions",
+        text: "Instant Sessions",
+        icon: <InstantSessionIcon />,
+    };
 
     const baseLinksData = [
         {
@@ -82,11 +79,8 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     ];
 
     // Combine all links in the desired order
-    // For learners: Instant Sessions, My Schedule, Seek Volunteer, Resources, Community, Messages, Settings
-    // For volunteers: My Schedule, Learners, Resources, Community, Messages, Settings
-    const linksData = instantSessionsLink
-        ? [instantSessionsLink, ...baseLinksData, roleBasedLink, ...remainingLinks]
-        : [...baseLinksData, roleBasedLink, ...remainingLinks];
+    // For both roles: Instant Sessions, My Schedule, Role-based link, Resources, Community, Messages, Settings
+    const linksData = [instantSessionsLink, ...baseLinksData, roleBasedLink, ...remainingLinks];
 
     const handleSignOut = () => {
         clearCookies();
