@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "443739955554",
+    "project_id": "melodywings-fc209",
+    "storage_bucket": "melodywings-fc209.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443739955554:android:d03397e06b1e2a57de8c3b",
+        "android_client_info": {
+          "package_name": "org.melodywings.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM7ZxB3oC_KuRGrIZLcb3sEePRkmlDGCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

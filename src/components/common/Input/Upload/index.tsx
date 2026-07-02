@@ -4,7 +4,7 @@ import ImageUpload from "./ImageUpload";
 import FileUpload from "./FileUpload";
 import SingleImageUpload from "./SingleUpload";
 import { useSendData } from "@/hooks/useReactQuery";
-import { getFileData, handleConvertBasedOnContentType } from "./helper";
+import { getFileData, handleConvertBasedOnContentType, validateFile } from "./helper";
 import { useAppStore } from "@/store/useAppStore";
 import { DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -12,9 +12,13 @@ import { showToast } from "../../Toast";
 
 const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadError, setUploadError] = useState<string | null>(null);
     const { imageId, setImageId, videoId, setVideoId, documentId, setDocumentId } = useAppStore();
 
     const handleSuccess = (data: any) => {
+        setUploadProgress(0);
+        setUploadError(null);
         const convertedData = handleConvertBasedOnContentType(data, props.fileType);
         if (maxFiles === 1) {
             if (props.fileType === "image/*") {
@@ -33,14 +37,18 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
     };
 
     const { mutate: handleUpload, isPending } = useSendData({
-        fn: (file: any) => getFileData(file),
+        fn: (file: any) => getFileData(file, (progress) => setUploadProgress(progress)),
         success: handleSuccess,
-        error: () => {
-            showToast({ message: "Error submitting form", type: "error" });
+        error: (err: any) => {
+            setUploadProgress(0);
+            const message = err?.message || "Upload failed. Please try again.";
+            setUploadError(message);
+            showToast({ message, type: "error" });
         },
     });
 
     const handleClick = () => {
+        setUploadError(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
@@ -62,6 +70,20 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
         }
 
         const filesToUpload = Array.from(files).slice(0, remainingSlots);
+
+        // Validate files before upload
+        for (const file of filesToUpload) {
+            try {
+                validateFile(file);
+            } catch (err: any) {
+                setUploadError(err.message);
+                showToast({ message: err.message, type: "error" });
+                return;
+            }
+        }
+
+        setUploadError(null);
+        setUploadProgress(0);
 
         await Promise.all(
             filesToUpload.map(async (file) => {
@@ -114,6 +136,8 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
                         handleRemove={handleRemove}
                         handleClick={handleClick}
                         isLoading={isPending}
+                        uploadProgress={uploadProgress}
+                        errorMessage={uploadError || undefined}
                     />
                 );
             case "profile-image":
