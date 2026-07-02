@@ -261,6 +261,20 @@ export const testimonialsLearners: TestimonialData[] = [
         author: "",
         role: "Parent of a 10-year-old autistic learner",
         image: TestimonialDummyImg,
+    },
+    {
+        category: "Learners",
+        quote: "The patience and creativity of our volunteer has been remarkable. My son now looks forward to learning sessions and has built confidence he never had before.",
+        author: "",
+        role: "Parent of a 7-year-old learner",
+        image: TestimonialDummyImg,
+    },
+    {
+        category: "Learners",
+        quote: "Finding the right learning support for my child with special needs was always a challenge. MelodyWings matched us with a wonderful volunteer. The progress in just three months is incredible.",
+        author: "",
+        role: "Guardian of a 12-year-old learner",
+        image: TestimonialDummyImg,
     }
 ];
 
@@ -269,6 +283,20 @@ export const testimonialsVolunteers: TestimonialData[] = [
         category: "Volunteers",
         quote: "Sharing songs and playful moments with the kids has been such a joy. Watching their faces light up, even the shy ones joining in, is heartwarming. Music really helps their personalities shine, and those small milestones-a new word, a giggle, a high five-mean everything.",
         author: "Aanya K",
+        role: "Volunteer",
+        image: TestimonialDummyImg,
+    },
+    {
+        category: "Volunteers",
+        quote: "I have volunteered at many places, but MelodyWings is special. The platform makes it easy to connect with learners, and the impact you see week after week keeps you coming back.",
+        author: "Ravi M",
+        role: "Volunteer",
+        image: TestimonialDummyImg,
+    },
+    {
+        category: "Volunteers",
+        quote: "Teaching children with special needs has taught me more about empathy than anything else. The MelodyWings team supports volunteers brilliantly from training to scheduling.",
+        author: "Priya S",
         role: "Volunteer",
         image: TestimonialDummyImg,
     },

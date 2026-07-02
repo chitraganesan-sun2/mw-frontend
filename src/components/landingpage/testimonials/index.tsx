@@ -23,20 +23,10 @@ const Testimonials = () => {
             />
             <div className="lg:bg-[#f4f7fb] lg:shadow-inner rounded-3xl md:p-6 md:py-20 grid lg:grid-cols-2 grid-cols-1 gap-4 place-items-center w-full mt-10 lg:mt-0">
                 <div className="w-[90%] md:w-[80%]">
-                    {
-                        testimonialsLearners.length > 1 ?
-                            <Testimonial testimonials={testimonialsLearners} />
-                            :
-                            <TestimonialCard testimonial={testimonialsLearners[0]} />
-                    }
+                    <Testimonial testimonials={testimonialsLearners} />
                 </div>
                 <div className="w-[90%] md:w-[80%]">
-                    {
-                        testimonialsVolunteers.length > 1 ?
-                            <Testimonial testimonials={testimonialsVolunteers} />
-                            :
-                            <TestimonialCard testimonial={testimonialsVolunteers[0]} />
-                    }
+                    <Testimonial testimonials={testimonialsVolunteers} />
                 </div>
             </div>
         </ContainerWrapper>
