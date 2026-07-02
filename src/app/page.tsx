@@ -13,6 +13,7 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import SkillsToLearn from "@/components/landingpage/SkillsToLearn";
 import InstantSessions from "@/components/landingpage/InstantSessions";
+import GoogleReviews from "@/components/landingpage/GoogleReviews";
 
 export default function Page() {
     const [_, setParamMode] = useQueryState("signup_as");
@@ -75,6 +76,9 @@ export default function Page() {
                 </div>
                 <div className="reveal">
                     <Testimonials />
+                </div>
+                <div className="reveal">
+                    <GoogleReviews />
                 </div>
                 <div className="reveal px-[4%] lg:px-[9%]">
                     <Celebrate />
