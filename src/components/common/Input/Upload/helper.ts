@@ -121,21 +121,25 @@ export const getFileData = async (
         if (file.type.startsWith("image/")) {
             const formData = new FormData();
             formData.append("image", file);
-            const response = await POST_API(endpoints.media_uploader.image, formData, config);
+            const response = await POST_API(endpoints.media_uploader.image, formData);
+            if (onProgress) onProgress(100);
             return response.data;
         }
 
         if (file.type.startsWith("video/")) {
             const formData = new FormData();
             formData.append("video", file);
-            const response = await POST_API(endpoints.media_uploader.video, formData, config);
+            if (onProgress) onProgress(10); // Show initial progress for large files
+            const response = await POST_API(endpoints.media_uploader.video, formData);
+            if (onProgress) onProgress(100);
             return response.data;
         }
 
         if (file.type.startsWith("application/") || file.type.startsWith("text/")) {
             const formData = new FormData();
             formData.append("document", file);
-            const response = await POST_API(endpoints.media_uploader.document, formData, config);
+            const response = await POST_API(endpoints.media_uploader.document, formData);
+            if (onProgress) onProgress(100);
             return response.data;
         }
 
