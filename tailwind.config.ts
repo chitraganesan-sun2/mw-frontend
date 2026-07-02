@@ -42,6 +42,15 @@ const config: Config = {
                 semibold: "var(--font-semibold)",
                 bold: "var(--font-bold)",
             },
+            animation: {
+                "marquee-reviews": "marquee-reviews 30s linear infinite",
+            },
+            keyframes: {
+                "marquee-reviews": {
+                    "0%": { transform: "translateX(0)" },
+                    "100%": { transform: "translateX(-50%)" },
+                },
+            },
         },
     },
     plugins: [],
