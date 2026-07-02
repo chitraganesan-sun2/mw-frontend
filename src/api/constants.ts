@@ -53,6 +53,8 @@ export const endpoints: EndpointProps = {
         bookSession: "session",
         createInstantSession: "session/instant_session",
         claimInstantSession: "session/instant_session/claim",
+        /** GET all active instant sessions (for dedicated instant sessions page) */
+        getInstantSessions: "session/instant_session/active",
         validateInstantSession: (session_date: string, session_start_time: string, session_end_time: string) =>
             `session/instant_session/validate?session_date=${encodeURIComponent(session_date)}&session_start_time=${encodeURIComponent(session_start_time)}&session_end_time=${encodeURIComponent(session_end_time)}`,
         /** GET instant session by slot (query: volunteer_slot_id, date YYYY-MM-DD, volunteer_id) */
