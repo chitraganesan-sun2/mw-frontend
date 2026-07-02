@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /about-us
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+
+# Sitemap location
+Sitemap: https://melodywings.org/sitemap.xml
