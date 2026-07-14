@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FaLinkedin, FaInstagram, FaWhatsapp, FaFacebook } from "react-icons/fa";
+import { FaLinkedin, FaInstagram, FaWhatsapp, FaFacebook, FaGoogle } from "react-icons/fa";
 import { IconType } from "react-icons";
 import Logo from "@/components/common/Logo";
 // import { FaSquareXTwitter } from "react-icons/fa6";
@@ -43,6 +43,11 @@ const Footer = (props: Props) => {
             label: "Facebook",
             icon: FaFacebook,
             href: "https://www.facebook.com/profile.php?id=61575239913366",
+        },
+        {
+            label: "Google Reviews",
+            icon: FaGoogle,
+            href: "https://share.google/gfwJSERksSJ5bpTib",
         },
         // { label: "X", icon: FaSquareXTwitter, href: "https://x.com" },
         // { label: "WhatsApp", icon: FaWhatsapp, href: "https://wa.me/1234567890" },
