@@ -64,15 +64,17 @@ const Testimonials = () => {
     const marqueeItems = [...allTestimonials, ...allTestimonials];
 
     return (
-        <ContainerWrapper>
-            <ContainerHeader
-                title="Testimonials"
-                subTitle="What our community says"
-                description="Heartwarming stories from volunteers and families who've experienced the joy of learning together."
-            />
+        <div className="w-full">
+            <ContainerWrapper>
+                <ContainerHeader
+                    title="Testimonials"
+                    subTitle="What our community says"
+                    description="Heartwarming stories from volunteers and families who've experienced the joy of learning together."
+                />
+            </ContainerWrapper>
 
-            {/* Marquee container */}
-            <div className="relative mt-10 group">
+            {/* Marquee container - full-bleed, runs edge-to-edge of the screen */}
+            <div className="relative mt-10 group w-full">
                 {/* Fade edges */}
                 <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-background-input to-transparent z-10 pointer-events-none" />
                 <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-background-input to-transparent z-10 pointer-events-none" />
@@ -86,7 +88,7 @@ const Testimonials = () => {
                     </div>
                 </div>
             </div>
-        </ContainerWrapper>
+        </div>
     );
 };
 
