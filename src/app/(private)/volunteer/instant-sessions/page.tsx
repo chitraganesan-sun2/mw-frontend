@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { IoIosArrowBack } from "react-icons/io";
-import { GET_API, POST_API } from "@/api/request";
+import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { showToast } from "@/components/common/Toast";
 import Cookies from "js-cookie";
 import LottieLoader from "@/components/common/Loader/Lottie";
+import NewEventModal from "@/components/schedule/Modals/NewEventModal";
 
 interface InstantSession {
     session_id: string;
@@ -29,15 +29,8 @@ export default function VolunteerInstantSessionsPage() {
     const router = useRouter();
     const [sessions, setSessions] = useState<InstantSession[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isCreating, setIsCreating] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const role = Cookies.get("role") || "volunteer";
-
-    const [formData, setFormData] = useState({
-        subject: "",
-        description: "",
-        duration_minutes: 30,
-    });
 
     useEffect(() => {
         setHeaderOptions({
@@ -68,26 +61,6 @@ export default function VolunteerInstantSessionsPage() {
         return () => clearInterval(interval);
     }, [loadSessions]);
 
-    const handleCreateSession = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!formData.subject.trim()) {
-            showToast({ message: "Please enter a subject", type: "error" });
-            return;
-        }
-        setIsCreating(true);
-        try {
-            await POST_API(endpoints.session.createInstantSession, formData);
-            showToast({ message: "Instant session created! Learners can now join.", type: "success" });
-            setShowCreateForm(false);
-            setFormData({ subject: "", description: "", duration_minutes: 30 });
-            await loadSessions();
-        } catch (error) {
-            showToast({ message: "Failed to create instant session", type: "error" });
-        } finally {
-            setIsCreating(false);
-        }
-    };
-
     if (isLoading) {
         return (
             <div className="h-full w-full flex-center">
@@ -107,68 +80,18 @@ export default function VolunteerInstantSessionsPage() {
                     </p>
                 </div>
                 <button
-                    onClick={() => setShowCreateForm(!showCreateForm)}
+                    onClick={() => setShowCreateForm(true)}
                     className="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
                 >
-                    {showCreateForm ? "Cancel" : "+ Start Instant Session"}
+                    + Start Instant Session
                 </button>
             </div>
 
-            {/* Create Session Form */}
-            {showCreateForm && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 animate-fadeIn">
-                    <h3 className="text-lg font-semibold mb-4">Start a New Instant Session</h3>
-                    <form onSubmit={handleCreateSession} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Subject / Topic *
-                            </label>
-                            <input
-                                type="text"
-                                required
-                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                placeholder="e.g., Math Homework Help, English Conversation"
-                                value={formData.subject}
-                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Description (optional)
-                            </label>
-                            <textarea
-                                rows={3}
-                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
-                                placeholder="Brief description of what you'll cover..."
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Expected Duration
-                            </label>
-                            <select
-                                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                                value={formData.duration_minutes}
-                                onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
-                            >
-                                <option value={15}>15 minutes</option>
-                                <option value={30}>30 minutes</option>
-                                <option value={45}>45 minutes</option>
-                                <option value={60}>60 minutes</option>
-                            </select>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={isCreating}
-                            className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isCreating ? "Creating..." : "Go Live 🔴"}
-                        </button>
-                    </form>
-                </div>
-            )}
+            <NewEventModal
+                isOpen={showCreateForm}
+                onClose={() => setShowCreateForm(false)}
+                onSubmit={loadSessions}
+            />
 
             {/* Live Indicator */}
             <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center justify-between mb-6">
