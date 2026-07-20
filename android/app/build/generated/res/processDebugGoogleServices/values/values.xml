@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="gcm_defaultSenderId" translatable="false">443739955554</string>
-    <string name="google_api_key" translatable="false">AIzaSyAM7ZxB3oC_KuRGrIZLcb3sEePRkmlDGCI</string>
-    <string name="google_app_id" translatable="false">1:443739955554:android:d03397e06b1e2a57de8c3b</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAM7ZxB3oC_KuRGrIZLcb3sEePRkmlDGCI</string>
-    <string name="google_storage_bucket" translatable="false">melodywings-fc209.firebasestorage.app</string>
-    <string name="project_id" translatable="false">melodywings-fc209</string>
-</resources>
