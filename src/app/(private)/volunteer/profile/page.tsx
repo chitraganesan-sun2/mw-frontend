@@ -11,6 +11,7 @@ import { getIndividualVolunteer } from "@/api/volunteers";
 import { useAppStore } from "@/store/useAppStore";
 import { endpoints } from "@/api/constants";
 import LottieLoader from "@/components/common/Loader/Lottie";
+import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import MobileProfileView from "@/components/profile/MobileProfileView";
 import InnerWidth from "@/utils/innerWidth";
 import { useQueryState } from "nuqs";
@@ -104,11 +105,18 @@ export default function ProfilePage() {
     }, [data]);
 
     if (isLoading) {
-        return <>
-            <div className="h-full w-full flex-center">
-                <LottieLoader isLoading={isLoading} />
+        return (
+            <div className="h-full w-full flex gap-4 p-4">
+                <div className="flex-1"><ProfileSkeleton /></div>
+                <div className="w-80 hidden lg:block">
+                    <div className="bg-white rounded-3xl h-[83vh] animate-pulse p-5">
+                        <div className="h-5 bg-gray-200 rounded w-24 mb-4" />
+                        <div className="h-20 bg-gray-200 rounded-xl mb-3" />
+                        <div className="h-20 bg-gray-200 rounded-xl" />
+                    </div>
+                </div>
             </div>
-        </>
+        );
     }
 
     return (

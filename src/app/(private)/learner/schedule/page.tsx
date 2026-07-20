@@ -1,8 +1,10 @@
 "use client";
 
-import Calendar from "@/components/schedule/Calender";
+import dynamic from "next/dynamic";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
+
+const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useAppStore } from "@/store/useAppStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

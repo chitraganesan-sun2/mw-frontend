@@ -6,13 +6,15 @@ import { GET_API } from "@/api/request";
 import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const HeaderNotificationBell = () => {
     const role = Cookies.get("role");
     const volunteerId = Cookies.get("volunteer_id");
     const learnerId = Cookies.get("learner_id");
     const [isOpen, setIsOpen] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const prevCount = useRef<number>(0);
 
     const { data } = useQuery({
         queryKey: ["unread-count"],
@@ -21,12 +23,23 @@ const HeaderNotificationBell = () => {
             return res?.data;
         },
         enabled: role === "volunteer" && Boolean(volunteerId),
+        refetchInterval: 30000, // poll every 30s
     });
+
+    const unreadCount = Number(data?.unread_count || 0);
+
+    // Show popup when count increases
+    useEffect(() => {
+        if (unreadCount > prevCount.current && prevCount.current !== 0) {
+            setShowToast(true);
+            const timer = setTimeout(() => setShowToast(false), 5000);
+            return () => clearTimeout(timer);
+        }
+        prevCount.current = unreadCount;
+    }, [unreadCount]);
 
     // Show the bell for all authenticated users (volunteer + learner)
     if (!role || !["volunteer", "learner"].includes(role)) return null;
-
-    const unreadCount = Number(data?.unread_count || 0);
 
     return (
         <>
@@ -43,6 +56,30 @@ const HeaderNotificationBell = () => {
                     </span>
                 )}
             </button>
+
+            {/* Notification toast popup */}
+            {showToast && (
+                <div
+                    className="fixed top-5 right-5 z-[9999] flex items-center gap-3 rounded-2xl bg-white border border-gray-100 shadow-lg px-4 py-3 animate-slide-in-right"
+                    style={{ minWidth: 260, maxWidth: 340 }}
+                >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                        <NotificationIcon width={16} height={16} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900">New Notification</p>
+                        <p className="text-xs text-gray-500 truncate">You have a new session request waiting.</p>
+                    </div>
+                    <button
+                        type="button"
+                        aria-label="Dismiss"
+                        onClick={() => setShowToast(false)}
+                        className="shrink-0 text-gray-400 hover:text-gray-600 text-lg leading-none"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
 
             <ApprovalModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </>

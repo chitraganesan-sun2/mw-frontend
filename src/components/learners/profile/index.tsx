@@ -3,20 +3,21 @@
 import BioHeader from "@/components/profile/Bio/BioHeader";
 import Divider from "@/components/common/Divider";
 import TagComponent from "@/components/common/Tag";
-import { useState, useRef, useEffect } from "react";
+import ProfileCompletionBar, { calculateLearnerCompletion } from "@/components/profile/ProfileCompletionBar";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { ParentGuardianInformation, ProfileDetails, LearnerInformation, AdditionalInformation } from "./tabs";
 
 const tabs = [
     { id: "profile-details", title: "Profile Details" },
-    { id: "parent-guardian-information", title: "Parent/Guardian Information" },
+    { id: "parent-guardian-information", title: "Guardian Info" },
     { id: "learner-information", title: "Personal Info" },
-    { id: "additional-information", title: "Additional Information" },
-]
+    { id: "additional-information", title: "Additional Info" },
+];
 
 const LearnerProfileBio = ({ data }: any) => {
     const tabContentRef = useRef<HTMLDivElement>(null);
     const [activeTab, setActiveTab] = useState(tabs[0].id);
-    
+
     const learner_first_name = data?.learner_personal_info?.learner_first_name;
     const learner_last_name = data?.learner_personal_info?.learner_last_name;
     const contactDetail = data?.learner_personal_info?.learner_contact_details;
@@ -29,7 +30,9 @@ const LearnerProfileBio = ({ data }: any) => {
         gender: data?.learner_personal_info?.learner_gender,
         timezone: timezone,
         profile_video: data?.profile_video,
-    }
+    };
+
+    const completion = useMemo(() => calculateLearnerCompletion(data), [data]);
 
     useEffect(() => {
         if (tabContentRef.current) {
@@ -40,36 +43,63 @@ const LearnerProfileBio = ({ data }: any) => {
     const renderTabContent = () => {
         switch (activeTab) {
             case "profile-details":
-                return <ProfileDetails data={data?.learner_personal_info} />
+                return <ProfileDetails data={data?.learner_personal_info} />;
             case "parent-guardian-information":
-                return <ParentGuardianInformation data={data?.parent_info} />
+                return <ParentGuardianInformation data={data?.parent_info} />;
             case "learner-information":
-                return <LearnerInformation data={data} />
+                return <LearnerInformation data={data} />;
             case "additional-information":
-                return <AdditionalInformation data={data?.additional_info} />
+                return <AdditionalInformation data={data?.additional_info} />;
         }
-    }
+    };
 
     return (
-        <div className="bg-white rounded-3xl w-full flex flex-col gap-6 py-5 h-[83vh]">
+        <div className="bg-white rounded-3xl w-full flex flex-col gap-4 py-5 h-[83vh]">
             <BioHeader data={profileHeader} />
-            <div className="flex flex-wrap gap-2 px-4">
-                {
-                    tabs.map((tab) => (
-                        <div key={tab.id} className="cursor-pointer">
-                            <TagComponent 
-                            text={tab.title} 
-                            className={`!text-sm py-1 px-3 border ${activeTab === tab.id ? "bg-background border-primary" : "bg-background-input text-gray-dark border-gray-dark"}`} 
-                            onClick={() => setActiveTab(tab.id)} 
-                            />
-                        </div>
-                    ))
-                }
+
+            {/* Profile Completion */}
+            {completion.percentage < 100 && (
+                <ProfileCompletionBar
+                    percentage={completion.percentage}
+                    missingFields={completion.missingFields}
+                />
+            )}
+
+            {/* Stats Overview */}
+            <div className="flex items-center gap-4 px-5">
+                <div className="flex items-center gap-2 bg-blue-50 rounded-lg px-3 py-2">
+                    <span className="text-lg font-bold text-blue-700">{data?.total_volunteers_connected || 0}</span>
+                    <span className="text-xs text-blue-600">Volunteers</span>
+                </div>
+                <div className="flex items-center gap-2 bg-green-50 rounded-lg px-3 py-2">
+                    <span className="text-lg font-bold text-green-700">{data?.total_attended_hours || 0}</span>
+                    <span className="text-xs text-green-600">Hours</span>
+                </div>
             </div>
+
+            {/* Tabs */}
+            <div className="flex flex-wrap gap-2 px-4">
+                {tabs.map((tab) => (
+                    <div key={tab.id} className="cursor-pointer">
+                        <TagComponent
+                            text={tab.title}
+                            className={`!text-sm py-1.5 px-4 border rounded-lg transition-colors ${
+                                activeTab === tab.id
+                                    ? "bg-background border-primary font-medium"
+                                    : "bg-background-input text-gray-dark border-gray-dark hover:border-primary/50"
+                            }`}
+                            onClick={() => setActiveTab(tab.id)}
+                        />
+                    </div>
+                ))}
+            </div>
+
             <Divider />
+
+            {/* Tab Content */}
             <div className="px-5 h-full overflow-y-auto no-scrollbar">
                 <div ref={tabContentRef} />
-                { renderTabContent() }
+                {renderTabContent()}
             </div>
         </div>
     );
