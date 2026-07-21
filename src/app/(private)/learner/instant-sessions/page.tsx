@@ -350,10 +350,7 @@ export default function InstantSessionsPage() {
             centerComponent: (
                 <DaySlider selectedDate={selectedDate} onDateChange={setSelectedDate} />
             ),
-            actionButtonTitle: "Request a Session",
-            actionButtonOnClick: () => setIsRequestModalOpen(true),
-            actionButtonClassName: "!bg-black !text-white !border-none !font-medium !rounded-full !px-6 !py-2.5",
-            showButton: true,
+            showButton: false,
         });
     }, [setHeaderOptions, pathname, selectedDate]);
 
@@ -375,6 +372,15 @@ export default function InstantSessionsPage() {
                     <LottieLoader isLoading={true} />
                 </div>
             )}
+
+            <div className="flex justify-end mb-4">
+                <button
+                    onClick={() => setIsRequestModalOpen(true)}
+                    className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+                >
+                    Request a Session
+                </button>
+            </div>
 
             {/* Pending Requests Section */}
             {pendingRequests.length > 0 && (
