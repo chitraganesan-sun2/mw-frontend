@@ -79,7 +79,8 @@ export const endpoints: EndpointProps = {
             }`,
         updateNotificationStatus: (id: string) => `session/${id}`,
         markAsCompleted: (id: string) => `session/${id}/mark_as_completed`,
-        getUnreadCount: (id: string) => `session/unread_count`,
+        getUnreadCount: (userType: "volunteer" | "learner" = "volunteer") =>
+            `session/unread_count?user_type=${userType}`,
         updateReadsNotifications: `session/mark_as_read`,
     },
     volunteer_chat: {

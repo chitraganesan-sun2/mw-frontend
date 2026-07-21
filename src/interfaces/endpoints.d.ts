@@ -65,7 +65,7 @@ export type EndpointProps = {
             status?: string
         ) => string;
         markAsCompleted: (id: string) => string;
-        getUnreadCount: (id: string) => string;
+        getUnreadCount: (userType?: "volunteer" | "learner") => string;
         updateReadsNotifications: string;
     };
     volunteer_chat: {

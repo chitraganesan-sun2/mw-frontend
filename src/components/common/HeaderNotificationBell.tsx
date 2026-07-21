@@ -16,13 +16,18 @@ const HeaderNotificationBell = () => {
     const [showToast, setShowToast] = useState(false);
     const prevCount = useRef<number>(0);
 
+    const isLearner = role === "learner";
+    const currentUserId = isLearner ? learnerId : volunteerId;
+
     const { data } = useQuery({
-        queryKey: ["unread-count"],
+        queryKey: ["unread-count", role],
         queryFn: async () => {
-            const res: any = await GET_API(endpoints.session.getUnreadCount(volunteerId as string));
+            const res: any = await GET_API(
+                endpoints.session.getUnreadCount(isLearner ? "learner" : "volunteer")
+            );
             return res?.data;
         },
-        enabled: role === "volunteer" && Boolean(volunteerId),
+        enabled: ["volunteer", "learner"].includes(role || "") && Boolean(currentUserId),
         refetchInterval: 30000, // poll every 30s
     });
 
