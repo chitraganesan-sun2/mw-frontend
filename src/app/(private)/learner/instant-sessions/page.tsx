@@ -399,14 +399,26 @@ export default function InstantSessionsPage() {
                                     <h3 className="font-semibold text-lg">{req.session_type === 'academic' ? 'Academic Session' : 'Non-Academic Session'}</h3>
                                     <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">Pending</span>
                                 </div>
-                                <p className="text-sm text-gray-600 mb-4">Level: {req.grade_level || req.expertise_level}</p>
+                                <p className="text-sm text-gray-600 mb-2">Level: {req.grade_level || req.expertise_level}</p>
+                                {Array.isArray(req.skills) && req.skills.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 mb-3">
+                                        {req.skills.map((skill: string) => (
+                                            <span
+                                                key={skill}
+                                                className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] rounded-full font-medium capitalize"
+                                            >
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-2 text-sm text-gray-700">
                                     <span className="font-medium">Time:</span>
                                     <span>{dayjs(req.availability_start_time, "HH:mm").format("h:mm a")}</span>
                                     <span className="text-gray-400">({req.duration} mins)</span>
                                 </div>
                                 <div className="mt-4 flex justify-end">
-                                    <button 
+                                    <button
                                         className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors"
                                         onClick={async () => {
                                             if(confirm("Are you sure you want to cancel this request?")) {
