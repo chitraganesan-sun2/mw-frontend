@@ -44,7 +44,7 @@ const config: Config = {
             },
             animation: {
                 "marquee-reviews": "marquee-reviews 30s linear infinite",
-                "marquee-testimonials": "marquee-testimonials 40s linear infinite",
+                "marquee-testimonials": "marquee-testimonials 28s linear infinite",
             },
             keyframes: {
                 "marquee-reviews": {
