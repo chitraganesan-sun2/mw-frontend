@@ -1,7 +1,6 @@
 import { getAPI_URL } from "@/definitions";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import Cookies from "js-cookie";
-import { getCookie } from "@/utils/auth";
+import { getCookie, clearCookies } from "@/utils/auth";
 
 // Define custom error interface
 interface ApiError {
@@ -55,10 +54,13 @@ axiosInstance.interceptors.response.use(
             switch (error.response.status) {
                 case 401:
                     apiError.message = "Unauthorized access";
-                    // Handle token expiration
-                    // Cookies.remove("access_token");
-                    // window.location.href = "/";
-                    // You might want to redirect to login here
+                    // Session expired/invalid — force a clean re-login instead of
+                    // leaving the UI silently broken. Guard against redirect loops
+                    // by skipping it if we're already at the landing/login page.
+                    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+                        clearCookies();
+                        window.location.href = "/";
+                    }
                     break;
                 case 403:
                     apiError.message = "Access forbidden";
