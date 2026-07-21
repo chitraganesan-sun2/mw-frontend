@@ -4,11 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { IoIosArrowBack } from "react-icons/io";
-import { GET_API } from "@/api/request";
+import { POST_API, GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import Cookies from "js-cookie";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import NewEventModal from "@/components/schedule/Modals/NewEventModal";
+import { showToast } from "@/components/common/Toast";
+import dayjs from "dayjs";
 
 interface InstantSession {
     session_id: string;
@@ -28,7 +30,9 @@ export default function VolunteerInstantSessionsPage() {
     const { setHeaderOptions } = useComponentStore();
     const router = useRouter();
     const [sessions, setSessions] = useState<InstantSession[]>([]);
+    const [learnerRequests, setLearnerRequests] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const role = Cookies.get("role") || "volunteer";
 
@@ -47,12 +51,28 @@ export default function VolunteerInstantSessionsPage() {
         try {
             const response = await GET_API(endpoints.session.getInstantSessions);
             setSessions(response?.data || []);
+            
+            const reqResponse = await GET_API(endpoints.session.getVolunteerLearnerRequests);
+            setLearnerRequests(reqResponse?.data || []);
         } catch (error) {
             console.error("Failed to load instant sessions:", error);
         } finally {
             setIsLoading(false);
         }
     }, []);
+
+    const handleAcceptRequest = async (requestId: string) => {
+        setIsActionLoading(true);
+        try {
+            await POST_API(endpoints.session.acceptLearnerRequest(requestId));
+            showToast({ message: "Request accepted! A session has been created.", type: "success" });
+            loadSessions();
+        } catch (error: any) {
+            showToast({ message: error?.response?.data?.detail || "Failed to accept request", type: "error" });
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
 
     useEffect(() => {
         loadSessions();
@@ -92,6 +112,45 @@ export default function VolunteerInstantSessionsPage() {
                 onClose={() => setShowCreateForm(false)}
                 onSubmit={loadSessions}
             />
+            
+            {/* Learner Requests Section */}
+            {learnerRequests.length > 0 && (
+                <div className="mb-10">
+                    <div className="flex items-center my-6">
+                        <div className="flex-1 border-t border-gray-200" />
+                        <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
+                            Learner Requests
+                        </span>
+                        <div className="flex-1 border-t border-gray-200" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {learnerRequests.map((req) => (
+                            <div key={req.request_id} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-semibold text-lg">{req.learner_name}</h3>
+                                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">Pending Request</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === 'academic' ? 'Academic' : 'Non-Academic'}</p>
+                                <p className="text-sm text-gray-600 mb-4">Level: {req.grade_level || req.expertise_level}</p>
+                                <div className="flex items-center gap-2 text-sm text-gray-700">
+                                    <span className="font-medium">Time:</span>
+                                    <span>{dayjs(req.availability_start_time, "HH:mm").format("h:mm a")}</span>
+                                    <span className="text-gray-400">({req.duration} mins)</span>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <button 
+                                        className="bg-black text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
+                                        disabled={isActionLoading}
+                                        onClick={() => handleAcceptRequest(req.request_id)}
+                                    >
+                                        Accept Request
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Live Indicator */}
             <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center justify-between mb-6">

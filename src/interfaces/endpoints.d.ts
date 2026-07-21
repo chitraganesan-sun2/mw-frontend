@@ -67,6 +67,11 @@ export type EndpointProps = {
         markAsCompleted: (id: string) => string;
         getUnreadCount: (id: string) => string;
         updateReadsNotifications: string;
+        createLearnerInstantSessionRequest: string;
+        getLearnerRequests: string;
+        cancelLearnerRequest: (id: string) => string;
+        getVolunteerLearnerRequests: string;
+        acceptLearnerRequest: (id: string) => string;
     };
     volunteer_chat: {
         sendMessage: (id: string) => string;

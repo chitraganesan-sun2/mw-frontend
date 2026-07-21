@@ -81,6 +81,11 @@ export const endpoints: EndpointProps = {
         markAsCompleted: (id: string) => `session/${id}/mark_as_completed`,
         getUnreadCount: (id: string) => `session/unread_count`,
         updateReadsNotifications: `session/mark_as_read`,
+        createLearnerInstantSessionRequest: "session/learner/request_instant_session",
+        getLearnerRequests: "session/learner/my_requests",
+        cancelLearnerRequest: (id: string) => `session/learner/request/${id}`,
+        getVolunteerLearnerRequests: "session/volunteer/learner_requests",
+        acceptLearnerRequest: (id: string) => `session/volunteer/accept_learner_request/${id}`,
     },
     volunteer_chat: {
         sendMessage: (id: string) => `chat/message/learner/${id}`,

@@ -8,6 +8,7 @@ import SessionCard from "@/components/learners/SessionCard";
 dayjs.extend(customParseFormat);
 import { InstantSessionDetailModal } from "@/components/learners/Modals";
 import ConfirmationSuccessfulModal from "@/components/learners/Modals/ConfirmationSuccessfulModal";
+import RequestInstantSessionModal from "@/components/learners/RequestInstantSessionModal";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { getHeaderIcon } from "@/layouts/helper";
 import { usePathname } from "next/navigation";
@@ -125,6 +126,10 @@ export default function InstantSessionsPage() {
     const [claimedSessionDetails, setClaimedSessionDetails] = useState<any>(null);
     const [isLoadingClaimedDetails, setIsLoadingClaimedDetails] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
+    
+    // New states for learner requests
+    const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+    
     const queryClient = useQueryClient();
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
@@ -165,6 +170,28 @@ export default function InstantSessionsPage() {
         refetchOnMount: true,
         refetchOnWindowFocus: false,
     });
+
+    // Query for learner's own pending requests
+    const {
+        data: pendingRequestsData,
+        isLoading: isPendingRequestsLoading,
+    } = useQuery({
+        queryKey: ["learner-pending-requests", selectedDate],
+        queryFn: async () => {
+            const res = await GET_API(endpoints.session.getLearnerRequests);
+            return res?.data;
+        },
+        refetchOnMount: true,
+        refetchOnWindowFocus: false,
+    });
+
+    const pendingRequests = useMemo(() => {
+        if (!pendingRequestsData) return [];
+        return (Array.isArray(pendingRequestsData) ? pendingRequestsData : []).filter(
+            (req: any) => req.status === "pending" && req.availability_date === selectedDate
+        );
+    }, [pendingRequestsData, selectedDate]);
+
 
     const availableSessions: Session[] = useMemo(() => {
         if (!apiData) return [];
@@ -323,6 +350,9 @@ export default function InstantSessionsPage() {
             centerComponent: (
                 <DaySlider selectedDate={selectedDate} onDateChange={setSelectedDate} />
             ),
+            actionButtonTitle: "Request a Session",
+            actionButtonOnClick: () => setIsRequestModalOpen(true),
+            actionButtonClassName: "!bg-black !text-white !border-none !font-medium !rounded-full !px-6 !py-2.5",
         });
     }, [setHeaderOptions, pathname, selectedDate]);
 
@@ -344,8 +374,66 @@ export default function InstantSessionsPage() {
                     <LottieLoader isLoading={true} />
                 </div>
             )}
+
+            {/* Pending Requests Section */}
+            {pendingRequests.length > 0 && (
+                <div className="mb-8">
+                    <div className="flex items-center my-6">
+                        <div className="flex-1 border-t border-gray-200" />
+                        <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
+                            Your Pending Requests
+                        </span>
+                        <div className="flex-1 border-t border-gray-200" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {pendingRequests.map((req: any) => (
+                            <div key={req.request_id} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-semibold text-lg">{req.session_type === 'academic' ? 'Academic Session' : 'Non-Academic Session'}</h3>
+                                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">Pending</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-4">Level: {req.grade_level || req.expertise_level}</p>
+                                <div className="flex items-center gap-2 text-sm text-gray-700">
+                                    <span className="font-medium">Time:</span>
+                                    <span>{dayjs(req.availability_start_time, "HH:mm").format("h:mm a")}</span>
+                                    <span className="text-gray-400">({req.duration} mins)</span>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <button 
+                                        className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors"
+                                        onClick={async () => {
+                                            if(confirm("Are you sure you want to cancel this request?")) {
+                                                setIsActionLoading(true);
+                                                try {
+                                                    await DELETE_API(endpoints.session.cancelLearnerRequest(req.request_id));
+                                                    queryClient.invalidateQueries({ queryKey: ["learner-pending-requests"] });
+                                                    showToast({ message: "Request cancelled successfully", type: "success" });
+                                                } catch (e) {
+                                                    showToast({ message: "Failed to cancel request", type: "error" });
+                                                } finally {
+                                                    setIsActionLoading(false);
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        Cancel Request
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {availableSessions.length > 0 && (
                 <div className="mb-8">
+                    <div className="flex items-center my-6">
+                        <div className="flex-1 border-t border-gray-200" />
+                        <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
+                            Available Sessions to Claim
+                        </span>
+                        <div className="flex-1 border-t border-gray-200" />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {availableSessions.map((session) => (
                             <SessionCard
@@ -417,6 +505,15 @@ export default function InstantSessionsPage() {
                     onCancelMeeting={handleCancelMeeting}
                 />
             )} */}
+
+            {/* Request Session Modal */}
+            <RequestInstantSessionModal 
+                isOpen={isRequestModalOpen}
+                onClose={() => setIsRequestModalOpen(false)}
+                onSuccess={() => {
+                    queryClient.invalidateQueries({ queryKey: ["learner-pending-requests"] });
+                }}
+            />
         </div>
     );
 }
