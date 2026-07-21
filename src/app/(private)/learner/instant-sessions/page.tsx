@@ -353,6 +353,7 @@ export default function InstantSessionsPage() {
             actionButtonTitle: "Request a Session",
             actionButtonOnClick: () => setIsRequestModalOpen(true),
             actionButtonClassName: "!bg-black !text-white !border-none !font-medium !rounded-full !px-6 !py-2.5",
+            showButton: true,
         });
     }, [setHeaderOptions, pathname, selectedDate]);
 
