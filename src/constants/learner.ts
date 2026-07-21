@@ -741,3 +741,9 @@ export const LearnerThankyouCardConstants = {
     description:
         "We're excited to have you join our community. Our team will review your details and get back to you shortly with the next steps. We appreciate your trust in us, and we look forward to helping you on this learning journey.",
 };
+
+export const LearnerRejectedMessage = {
+    title: "Thank you for your interest!",
+    description:
+        "At this time, we're unable to move forward with your enrollment. If you believe this was a mistake or have questions, please reach out to support@melodywings.org — we're happy to help.",
+};

@@ -3,7 +3,7 @@
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import ThankyouCard from "@/components/landingpage/ThankyouCard";
-import { LearnerThankyouCardConstants } from "@/constants/learner";
+import { LearnerRejectedMessage, LearnerThankyouCardConstants } from "@/constants/learner";
 import { VolunteerRejectedMessage, VolunteerThankyouCardConstants } from "@/constants/volunteer";
 import { getCookie } from "@/utils/auth";
 import { useQuery } from "@tanstack/react-query";
@@ -55,7 +55,15 @@ export default function VerificationPage() {
         );
     }
 
-    const verificationContent = role === "learner" ? LearnerThankyouCardConstants : (onboarded_status === "verification_pending") ? VolunteerThankyouCardConstants : VolunteerRejectedMessage;
+    const isRejected = onboarded_status === "verification_rejected";
+    const verificationContent =
+        role === "learner"
+            ? isRejected
+                ? LearnerRejectedMessage
+                : LearnerThankyouCardConstants
+            : isRejected
+                ? VolunteerRejectedMessage
+                : VolunteerThankyouCardConstants;
     const verificationTheme =
         role === "learner"
             ? { iconBgColor: "#DFF5FF", iconAccentColor: "#09BAEE" }
