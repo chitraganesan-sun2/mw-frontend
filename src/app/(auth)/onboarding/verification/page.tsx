@@ -40,7 +40,7 @@ export default function VerificationPage() {
         return data;
     }
 
-    const { isLoading } = useQuery<OnboardingStatus, Error>({
+    const { isLoading, isError } = useQuery<OnboardingStatus, Error>({
         queryKey: ["onboardingStatus", id, role],
         queryFn: getOnboardingStatus,
         enabled: !!id,
@@ -51,6 +51,14 @@ export default function VerificationPage() {
         return (
             <div className="flex h-[60dvh] bg-background-input items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="flex h-[60dvh] bg-background-input items-center justify-center">
+                <p className="text-gray-500 text-lg">Failed to check your verification status. Please try again.</p>
             </div>
         );
     }
