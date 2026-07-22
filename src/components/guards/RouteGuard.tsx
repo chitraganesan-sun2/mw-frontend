@@ -4,30 +4,17 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { isAuthenticated, getCookie } from '@/utils/auth';
 import { isNativePlatform } from '@/utils/platform';
+import { getRedirectForRoute, type OnboardedStatus, type Role } from '@/utils/routeGuard';
 
 /**
  * Client-side Route Guard for Capacitor mobile app.
- * 
- * Replicates the logic from middleware.ts on the client side,
- * since Next.js middleware doesn't run in static exports.
- * 
+ *
+ * Consumes the same routing decision logic as middleware.ts (via
+ * utils/routeGuard.ts), since Next.js middleware doesn't run in static
+ * exports.
+ *
  * Only activates on native platforms — web continues using server middleware.
  */
-
-const LANDING_ROUTES = [
-  '/',
-  '/about-us',
-  '/donate',
-  '/join-us',
-  '/join-us/step-1',
-  '/join-us/step-2',
-  '/join-us/step-3',
-  '/join-us/success',
-  '/privacy-policy',
-  '/terms-and-conditions',
-];
-
-const ALWAYS_ACCESSIBLE = ['/donate', '/privacy-policy', '/terms-and-conditions'];
 
 export default function RouteGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -41,65 +28,22 @@ export default function RouteGuard({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    const checkAuth = () => {
-      const authenticated = isAuthenticated();
-      const role = getCookie('role');
-      const onboardedStatus = getCookie('onboarded_status');
+    const role = getCookie('role') as Role;
+    const onboardedStatus = (getCookie('onboarded_status') || '') as OnboardedStatus;
 
-      // Not authenticated
-      if (!authenticated) {
-        if (LANDING_ROUTES.includes(pathname)) {
-          setAuthorized(true);
-        } else {
-          router.replace('/');
-          setAuthorized(false);
-        }
-        return;
-      }
+    const redirectTo = getRedirectForRoute(pathname, {
+      isAuthenticated: Boolean(isAuthenticated()),
+      role,
+      onboardedStatus,
+    });
 
-      // Authenticated but not onboarded
-      if (onboardedStatus === 'details_pending' || onboardedStatus === 'partially_filled') {
-        if (pathname !== '/onboarding') {
-          router.replace('/onboarding');
-          setAuthorized(false);
-          return;
-        }
-        setAuthorized(true);
-        return;
-      }
+    if (redirectTo && redirectTo !== pathname) {
+      router.replace(redirectTo);
+      setAuthorized(false);
+      return;
+    }
 
-      // Verification pending
-      if (onboardedStatus === 'verification_pending' || onboardedStatus === 'verification_rejected') {
-        if (role === 'learner' && pathname !== '/onboarding/verification') {
-          router.replace('/onboarding/verification');
-          setAuthorized(false);
-          return;
-        }
-        // Volunteers can access private routes while pending
-        setAuthorized(true);
-        return;
-      }
-
-      // Fully verified
-      if (onboardedStatus === 'verification_completed') {
-        if (ALWAYS_ACCESSIBLE.includes(pathname)) {
-          setAuthorized(true);
-          return;
-        }
-        if (LANDING_ROUTES.includes(pathname)) {
-          const defaultRoute = role === 'learner'
-            ? '/learner/instant-sessions'
-            : '/volunteer/schedule';
-          router.replace(defaultRoute);
-          setAuthorized(false);
-          return;
-        }
-      }
-
-      setAuthorized(true);
-    };
-
-    checkAuth();
+    setAuthorized(true);
   }, [pathname, router]);
 
   if (!authorized) {

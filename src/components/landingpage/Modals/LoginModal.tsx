@@ -13,6 +13,7 @@ import { showToast } from "@/components/common/Toast"
 import ModalLoader from "@/components/common/Loader/Modal"
 import { isNativePlatform } from "@/utils/platform"
 import { nativeGoogleSignIn } from "@/services/native-auth"
+import { getDefaultRouteForRole } from "@/utils/routeGuard"
 
 export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     const router = useRouter();
@@ -30,8 +31,8 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             .then((response: any) => {
                 setModalLoader(true);
                 const { onboarded_status } = response;
-                const role = getCookie("role");
-                const defaultRoute = role === "learner" ? `/${role}/instant-sessions` : `/${role}/schedule`;
+                const role = getCookie("role") as "learner" | "volunteer" | undefined;
+                const defaultRoute = getDefaultRouteForRole(role);
                 const routes: Record<string, string> = {
                     details_pending: "/onboarding",
                     partially_filled: "/onboarding",

@@ -8,6 +8,7 @@ import { useQueryState } from "nuqs";
 import Button from "@/components/common/Button";
 import { useQuery } from "@tanstack/react-query";
 import { jwtDecode } from "jwt-decode";
+import { getDefaultRouteForRole } from "@/utils/routeGuard";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -57,8 +58,7 @@ const LoginPage = () => {
         } else if (data.onboarded_status === "partially_filled") {
             router.push("/onboarding");
         } else if (data.onboarded_status === "verification_completed") {
-            const defaultRoute = role === "learner" ? `/${role}/instant-sessions` : `/${role}/schedule`;
-            router.push(defaultRoute);
+            router.push(getDefaultRouteForRole(role));
         }
     };
 

@@ -1,21 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isCookiesFound, isTokenValid } from "./utils/auth";
+import { LANDING_PAGE_ROUTES, getRedirectForRoute, type OnboardedStatus } from "./utils/routeGuard";
 
-const PROTECTED_ROUTES = ["/learner", "/volunteer"];
-const LANDING_PAGE_ROUTES = [
-  "/",
-  "/about-us",
-  "/donate",
-  "/join-us",
-  "/join-us/step-1",
-  "/join-us/step-2",
-  "/join-us/step-3",
-  "/join-us/success",
-  "/privacy-policy",
-  "/terms-and-conditions",
-];
-const ALWAYS_ACCESSIBLE_ROUTES = ["/donate", "/privacy-policy", "/terms-and-conditions"];
 const EXCLUDED_PATHS = ["/favicon.ico", "/logo.png"];
 
 // List of search engine crawler user agents
@@ -55,20 +42,7 @@ export default function middleware(req: NextRequest) {
 
   // Allow search engine bots to access public pages
   const isBot = isSearchEngineBot(userAgent);
-  const PUBLIC_ROUTES = [
-    "/",
-    "/about-us",
-    "/donate",
-    "/join-us",
-    "/join-us/step-1",
-    "/join-us/step-2",
-    "/join-us/step-3",
-    "/join-us/success",
-    "/privacy-policy",
-    "/terms-and-conditions",
-    "/robots.txt",
-    "/sitemap.xml",
-  ];
+  const PUBLIC_ROUTES = [...LANDING_PAGE_ROUTES, "/robots.txt", "/sitemap.xml"];
 
   if (isBot && PUBLIC_ROUTES.includes(pathname)) {
     return NextResponse.next();
@@ -81,52 +55,17 @@ export default function middleware(req: NextRequest) {
   const { cookies } = req;
   const isUserCookiesFound = isCookiesFound(cookies);
   const isUserTokenValid = isTokenValid(cookies);
-  const role = cookies.get("role")?.value;
-  const onboardedStatus = cookies.get("onboarded_status")?.value || "";
+  const role = cookies.get("role")?.value as "learner" | "volunteer" | undefined;
+  const onboardedStatus = (cookies.get("onboarded_status")?.value || "") as OnboardedStatus;
 
-  if (!isUserCookiesFound || !isUserTokenValid) {
-    // Allow bots to access landing pages
-    if (isBot && PUBLIC_ROUTES.includes(pathname)) {
-      return NextResponse.next();
-    }
-    if (!LANDING_PAGE_ROUTES.includes(pathname)) return NextResponse.redirect(new URL("/", origin));
-    return NextResponse.next();
-  }
+  const redirectTo = getRedirectForRoute(pathname, {
+    isAuthenticated: isUserCookiesFound && isUserTokenValid,
+    role,
+    onboardedStatus,
+  });
 
-  if (onboardedStatus !== "verification_completed" && LANDING_PAGE_ROUTES.includes(pathname)) return NextResponse.next();
-
-  if (onboardedStatus === "details_pending" && pathname !== "/onboarding") {
-    return NextResponse.redirect(new URL("/onboarding", origin));
-  }
-
-  if (onboardedStatus === "partially_filled" && pathname !== "/onboarding") {
-    return NextResponse.redirect(new URL("/onboarding", origin));
-  }
-
-  if (["verification_pending", "verification_rejected"].includes(onboardedStatus)) {
-    // Learner flow: lock all internal routes until approved.
-    if (role === "learner" && pathname !== "/onboarding/verification") {
-      return NextResponse.redirect(new URL("/onboarding/verification", origin));
-    }
-
-    // Volunteer flow: allow private routes and render pending state in-app.
-    if (LANDING_PAGE_ROUTES.includes(pathname) && !pathname.startsWith("/onboarding")) {
-      const defaultRoute = role === "learner" ? `/${role}/instant-sessions` : `/${role}/schedule`;
-      return NextResponse.redirect(new URL(defaultRoute, origin));
-    }
-    return NextResponse.next();
-  }
-
-  if (onboardedStatus === "verification_completed") {
-    // Allow access to privacy policy and terms and conditions even when logged in
-    if (ALWAYS_ACCESSIBLE_ROUTES.includes(pathname)) {
-      return NextResponse.next();
-    }
-    if (LANDING_PAGE_ROUTES.includes(pathname) || !pathname.startsWith(`/${role}`) || PROTECTED_ROUTES.includes(pathname)) {
-      // Redirect learners to instant-sessions, volunteers to schedule
-      const defaultRoute = role === "learner" ? `/${role}/instant-sessions` : `/${role}/schedule`;
-      return NextResponse.redirect(new URL(defaultRoute, origin));
-    }
+  if (redirectTo) {
+    return NextResponse.redirect(new URL(redirectTo, origin));
   }
 
   return NextResponse.next();

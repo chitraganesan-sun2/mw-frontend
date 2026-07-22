@@ -47,6 +47,16 @@ const readAuthValue = (key: string): string | undefined => {
     return undefined;
 };
 
+const isJwtExpired = (token: string): boolean => {
+    try {
+        const decodedToken: any = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+        return Boolean(decodedToken.exp && decodedToken.exp < currentTime);
+    } catch {
+        return true;
+    }
+};
+
 export const isAuthenticated = () => {
     const token = readAuthValue("token");
     const role = readAuthValue("role");
@@ -54,7 +64,13 @@ export const isAuthenticated = () => {
     const learner_id = readAuthValue("learner_id");
     const volunteer_id = readAuthValue("volunteer_id");
 
-    return token && onboarded_status && (role === "learner" || role === "volunteer") && (role === "learner" ? learner_id : volunteer_id);
+    return Boolean(
+        token &&
+        !isJwtExpired(token) &&
+        onboarded_status &&
+        (role === "learner" || role === "volunteer") &&
+        (role === "learner" ? learner_id : volunteer_id)
+    );
 };
 
 export const isCookiesFound = (cookies: any) => {
@@ -70,17 +86,8 @@ export const isCookiesFound = (cookies: any) => {
 
 export const isTokenValid = (cookies: any) => {
     const token = cookies.get("token")?.value;
-    try {
-        if (!token) return false;
-        const decodedToken: any = jwtDecode(token);
-
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (decodedToken.exp && decodedToken.exp < currentTime) return false;
-
-        return true;
-    } catch {
-        return false;
-    }
+    if (!token) return false;
+    return !isJwtExpired(token);
 };
 
 export const getCookie = (key: string) => {

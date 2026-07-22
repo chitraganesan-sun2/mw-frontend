@@ -16,6 +16,7 @@ import { handleCookie } from "@/api/auth";
 import dayjs from "dayjs";
 import { isNativePlatform } from "@/utils/platform";
 import { nativeGoogleSignIn } from "@/services/native-auth";
+import { getDefaultRouteForRole } from "@/utils/routeGuard";
 
 const learnerOptions = [
     { label: "I am a parent filling this profile", value: "parent" },
@@ -157,8 +158,8 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 setModalLoader(true);
                 const { onboarded_status } = response;
                 console.log("response from signup", onboarded_status);
-                const role = getCookie("role");
-                const defaultRoute = role === "learner" ? `/${role}/instant-sessions` : `/${role}/schedule`;
+                const role = getCookie("role") as "learner" | "volunteer" | undefined;
+                const defaultRoute = getDefaultRouteForRole(role);
                 const routes: Record<string, string> = {
                     details_pending: "/onboarding",
                     partially_filled: "/onboarding",

@@ -6,6 +6,7 @@ import ThankyouCard from "@/components/landingpage/ThankyouCard";
 import { LearnerRejectedMessage, LearnerThankyouCardConstants } from "@/constants/learner";
 import { VolunteerRejectedMessage, VolunteerThankyouCardConstants } from "@/constants/volunteer";
 import { getCookie } from "@/utils/auth";
+import { getDefaultRouteForRole } from "@/utils/routeGuard";
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -32,8 +33,7 @@ export default function VerificationPage() {
         const currentStatus = data?.onboarded_status;
         if (currentStatus === "verification_completed") {
             Cookies.set("onboarded_status", "verification_completed", { expires: 1 });
-            const defaultRoute = role === "learner" ? "/learner/instant-sessions" : "/volunteer/schedule";
-            router.push(defaultRoute);
+            router.push(getDefaultRouteForRole(role));
         }else if(currentStatus === "verification_rejected"){
             Cookies.set("onboarded_status", "verification_rejected", { expires: 1 });
         }
