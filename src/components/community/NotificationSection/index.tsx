@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { getNotifications, markNotificationsAsRead } from "@/api/community";
 import NotificationProfileImg from "@/assets/images/NotificationProfileImg.png";
@@ -8,6 +9,9 @@ import { Spin } from "antd";
 import ErrorMsg from "@/components/common/Messages/ErrorMsg";
 import { timesAgo } from "@/utils/timeFunctions";
 import { useQueryState } from "nuqs";
+import Cookies from "js-cookie";
+
+const POST_NOTIFICATION_TYPES = ["like", "comment", "liked_on_your_comment", "replied_to_your_comment"];
 
 interface Author {
     name: string;
@@ -19,15 +23,17 @@ interface Author {
 
 interface Notification {
     notification_id: string;
-    author_id: string;
+    author_id?: string;
     notification_type: string;
     read: boolean;
     user_id: string;
     created_by: string;
     created_at: string;
-    post_id: string;
-    post_image: string;
-    author: Author;
+    post_id?: string;
+    post_image?: string;
+    reference_id?: string;
+    title?: string;
+    author?: Author;
 }
 
 interface NotificationPage {
@@ -38,10 +44,13 @@ interface NotificationPage {
 }
 
 const NotificationCard: React.FC<{ notification: Notification }> = ({ notification }) => {
+    const router = useRouter();
     const [_, setPostId] = useQueryState("id");
     const [mode, setMode] = useQueryState("mode");
+    const role = Cookies.get("role");
+    const isPostNotification = POST_NOTIFICATION_TYPES.includes(notification.notification_type);
 
-    const getNotificationMessage = (type: string, createdBy: string) => {
+    const getNotificationMessage = (type: string, createdBy?: string) => {
         switch (type) {
             case "like":
                 return `${createdBy} liked your post`;
@@ -56,14 +65,29 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
         }
     };
 
-    const handleViewPost = (postId: string) => {
-        setPostId(postId);
-        setMode("view");
-    }
+    const handleClick = () => {
+        switch (notification.notification_type) {
+            case "new_message":
+                router.push(`/${role}/messages${notification.reference_id ? `?chatId=${notification.reference_id}` : ""}`);
+                break;
+            case "session_booked":
+            case "session_accepted":
+            case "session_rejected":
+            case "session_cancelled":
+                router.push(`/${role}/schedule`);
+                break;
+            default:
+                if (notification.post_id) {
+                    setPostId(notification.post_id);
+                    setMode("view");
+                }
+        }
+    };
 
     return (
         <div
-            className={`flex gap-2 sm:gap-3 items-start sm:items-center justify-between pb-3 ${notification.read ? "opacity-50" : ""}`}
+            onClick={handleClick}
+            className={`flex gap-2 sm:gap-3 items-start sm:items-center justify-between pb-3 cursor-pointer ${notification.read ? "opacity-50" : ""}`}
         >
             <div className="flex items-center gap-2 sm:gap-3 flex-1">
                 <div className="w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] relative flex-shrink-0">
@@ -76,10 +100,11 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
                 </div>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2 md:gap-3">
                     <p className="text-gray-light font-medium text-sm sm:text-base">
-                        {getNotificationMessage(
-                            notification.notification_type,
-                            notification?.author?.name
-                        )}
+                        {notification.title ||
+                            getNotificationMessage(
+                                notification.notification_type,
+                                notification?.author?.name
+                            )}
                     </p>
                     <div className="w-2 h-2 bg-gray-300 rounded-full" />
                     <p className="text-gray-light font-medium text-sm sm:text-base">
@@ -87,10 +112,11 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
                     </p>
                 </div>
             </div>
-            {/* Optional: Add post preview image if available */}
-            <div onClick={() => handleViewPost(notification?.post_id)} className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] cursor-pointer border border-gray-100 relative flex-shrink-0">
-                <Image src={notification?.post_image || PostImg} alt="Post preview" fill className="rounded-md object-cover" />
-            </div>
+            {isPostNotification && (
+                <div className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] relative flex-shrink-0">
+                    <Image src={notification?.post_image || PostImg} alt="Post preview" fill className="rounded-md object-cover" />
+                </div>
+            )}
         </div>
     );
 };
