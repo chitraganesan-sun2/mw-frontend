@@ -52,7 +52,7 @@ type BaseFormField = Omit<InputProps, "value" | "onChange" | "inputType"> & {
     required?: boolean;
     sublabel?: string;
     sublabelAlignment?: "right" | "bottom";
-    variant?: "rating" | "cover-image" | "default" | "profile-image" | "multi" | "single";
+    variant?: "rating" | "cover-image" | "default" | "profile-image" | "multi" | "single" | "file";
     maxFiles?: number;
     rows?: number;
     error?: any;

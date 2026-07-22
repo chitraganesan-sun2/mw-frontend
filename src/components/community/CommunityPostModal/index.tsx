@@ -45,12 +45,12 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
         reset,
     } = useForm<FormData>({
         resolver: zodResolver(PostFormSchema),
-        defaultValues: { description: "", images: [] },
+        defaultValues: { description: "", images: [], video: null },
     });
 
     useEffect(() => {
         if (currentMode === "add") {
-            reset({ description: "", images: [] });
+            reset({ description: "", images: [], video: null });
         }
     }, [currentMode, reset]);
 
@@ -61,7 +61,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
             if (!postId) return null;
             const post = await getSinglePost(postId);
             if (post && isEditMode) {
-                reset({ description: post.description || "", images: post.images || [] });
+                reset({ description: post.description || "", images: post.images || [], video: post.video || null });
             }
             return post;
         },
@@ -84,7 +84,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
 
             queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab] });
             onClose();
-            reset({ description: "", images: [] });
+            reset({ description: "", images: [], video: null });
         } catch (error) {
             showToast({ message: "Something went wrong!", type: "error" });
         } finally {
@@ -99,6 +99,9 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
                 image_url: image.image_url,
                 image_id: image.image_id,
             })),
+            video: data.video
+                ? { video_url: data.video.video_url, video_id: data.video.video_id }
+                : null,
             created_by: role,
         };
 

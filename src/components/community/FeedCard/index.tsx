@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import VideoPlayer from "@/components/common/VideoPlayer";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import TagComponent from "@/components/common/Tag";
 import { HeartLikeIcon, UnlikeHeartIcon } from "@/assets/icons";
@@ -47,6 +48,7 @@ interface PostData {
     created_at: string;
     created_by: string;
     images: Array<{ image_url: string }>;
+    video?: { video_url: string; video_id: string } | null;
     is_liked: boolean;
     is_saved: boolean;
     total_likes: number;
@@ -348,6 +350,12 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                         {post?.images?.length > 1 && (
                                             <button onClick={() => onClick(post?.post_id)} className="absolute text-sm h-[30px] w-[30px] bottom-[10px] right-[10px] bg-white rounded-full flex-center">+{post?.images?.length - 1}</button>
                                         )}
+                                    </div>
+                                )}
+
+                                {post.images.length === 0 && post.video?.video_url && (
+                                    <div className="relative mt-2 md:mt-3 w-full sm:rounded-xl min-h-[260px] max-h-[350px] sm:min-h-[300px] md:min-h-[360px] md:max-h-[420px] 2xl:min-h-[400px] 2xl:max-h-[450px]">
+                                        <VideoPlayer src={post.video.video_url} className="w-full h-full max-h-[420px] sm:rounded-xl" />
                                     </div>
                                 )}
 

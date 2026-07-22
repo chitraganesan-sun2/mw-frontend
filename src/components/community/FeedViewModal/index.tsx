@@ -2,6 +2,7 @@
 
 import ViewModal from "@/components/common/Modals/ViewModal";
 import Image from "next/image";
+import VideoPlayer from "@/components/common/VideoPlayer";
 import TagComponent from "@/components/common/Tag";
 import Divider from "@/components/common/Divider";
 import CommentCard from "@/components/community/CommentCard";
@@ -80,6 +81,7 @@ interface PostData {
         image_url: string;
         image_id: string;
     }[];
+    video?: { video_url: string; video_id: string } | null;
     created_by: string;
     post_id: string;
     author: {
@@ -242,18 +244,24 @@ const FeedViewModal = ({
             ) : (
                 <div className="h-full lg:h-[720px] flex max-lg:!flex-col">
                     <div className="lg:w-[55%] relative bg-gray-300 w-full h-[300px] md:h-[400px] lg:h-[720px] max-md:!max-h-[40%] overflow-hidden">
-                        <Slider className="flex gap-20" {...sliderSettings}>
-                            {post?.images?.map((image) => (
-                                <div key={image?.image_id} className="relative w-full h-[300px] md:h-[400px] lg:h-[720px]">
-                                    <Image
-                                        src={image?.image_url}
-                                        alt="feed image"
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
-                            ))}
-                        </Slider>
+                        {post?.images?.length > 0 ? (
+                            <Slider className="flex gap-20" {...sliderSettings}>
+                                {post?.images?.map((image) => (
+                                    <div key={image?.image_id} className="relative w-full h-[300px] md:h-[400px] lg:h-[720px]">
+                                        <Image
+                                            src={image?.image_url}
+                                            alt="feed image"
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </div>
+                                ))}
+                            </Slider>
+                        ) : post?.video?.video_url ? (
+                            <div className="relative w-full h-[300px] md:h-[400px] lg:h-[720px]">
+                                <VideoPlayer src={post.video.video_url} className="w-full h-full" />
+                            </div>
+                        ) : null}
                         <div className="lg:hidden absolute top-0 left-0 !w-full flex justify-between items-center px-5 pb-2 pt-5 gap-3">
                             <FeedModalCloseIcon
                                 className="cursor-pointer"
