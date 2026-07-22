@@ -350,12 +350,21 @@ const Messages = () => {
                 const responseData = res?.data;
                 const messageData = responseData?.data || responseData;
 
-                // Replace optimistic message with real message from server (with correct backend time)
+                // Replace optimistic message with real message from server (with correct backend
+                // time). The send endpoint doesn't return profile picture fields, so carry them
+                // over from the optimistic message to avoid the avatar briefly disappearing.
                 if (messageData && messageData.message_id) {
+                    const enrichedMessageData = {
+                        ...messageData,
+                        sender_profile_picture: optimisticMessage.sender_profile_picture,
+                        receiver_profile_picture: optimisticMessage.receiver_profile_picture,
+                        learner_profile_picture: optimisticMessage.learner_profile_picture,
+                        volunteer_profile_picture: optimisticMessage.volunteer_profile_picture,
+                    };
                     setIndividualChat((prev) => {
                         const filtered = prev.filter((msg) => msg.message_id !== tempMessageId);
                         // Sort by created_at to maintain chronological order
-                        const updated = [...filtered, messageData].sort(
+                        const updated = [...filtered, enrichedMessageData].sort(
                             (a, b) =>
                                 new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
                         );
