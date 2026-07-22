@@ -136,7 +136,6 @@ export default function InstantSessionsPage() {
     const {
         data: apiData,
         isLoading,
-        isFetching,
         isError,
     } = useQuery({
         queryKey: ["learner-instant-sessions", selectedDate],
@@ -144,7 +143,7 @@ export default function InstantSessionsPage() {
             const res = await GET_API(endpoints.session.getLearnerInstantSession(selectedDate));
             return res?.data;
         },
-        refetchOnMount: true,
+        staleTime: 30000,
         refetchOnWindowFocus: false,
     });
 
@@ -152,7 +151,6 @@ export default function InstantSessionsPage() {
     const {
         data: claimedApiData,
         isLoading: isClaimedLoading,
-        isFetching: isClaimedFetching,
         isError: isClaimedError,
     } = useQuery({
         queryKey: ["learner-accepted-instant-sessions", selectedDate],
@@ -162,7 +160,7 @@ export default function InstantSessionsPage() {
             );
             return res?.data;
         },
-        refetchOnMount: true,
+        staleTime: 30000,
         refetchOnWindowFocus: false,
     });
 
@@ -326,8 +324,9 @@ export default function InstantSessionsPage() {
         });
     }, [setHeaderOptions, pathname, selectedDate]);
 
-    // Show loader when loading initially or fetching (when switching to page)
-    const isPageLoading = isLoading || isClaimedLoading || isFetching || isClaimedFetching;
+    // Only block the whole page on the very first load; background refetches (isFetching)
+    // should update data quietly without hiding already-rendered sessions.
+    const isPageLoading = isLoading || isClaimedLoading;
 
     if (isError || isClaimedError) {
         return (

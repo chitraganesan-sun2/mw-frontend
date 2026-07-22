@@ -7,7 +7,7 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayjs from "dayjs";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import MeetingPreviewModal from "../MeetingPreviewModal";
 import { AlertModal, AllEventsModal } from "../Modals";
 import DayCellContent from "./DayCellContent";
@@ -274,25 +274,31 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
         }
     };
 
-    // Preprocess events: fix midnight-crossing (end before start on same day)
-    let processedEvents =
-        events?.map((event: any) => {
-            if (event.start && event.end) {
-                const startDayjs = dayjs(event.start);
-                const endDayjs = dayjs(event.end);
-                if (
-                    startDayjs.isValid() &&
-                    endDayjs.isValid() &&
-                    endDayjs.isBefore(startDayjs)
-                ) {
-                    return {
-                        ...event,
-                        end: endDayjs.add(1, "day").toISOString(),
-                    };
+    // Preprocess events: fix midnight-crossing (end before start on same day).
+    // Memoized so hover/click state changes (showPreview, selectedEvent, etc.) don't
+    // produce a new array identity on every render, which defeated FullCalendar's
+    // internal event-diffing and forced a full re-render of the calendar each time.
+    const processedEvents = useMemo(
+        () =>
+            events?.map((event: any) => {
+                if (event.start && event.end) {
+                    const startDayjs = dayjs(event.start);
+                    const endDayjs = dayjs(event.end);
+                    if (
+                        startDayjs.isValid() &&
+                        endDayjs.isValid() &&
+                        endDayjs.isBefore(startDayjs)
+                    ) {
+                        return {
+                            ...event,
+                            end: endDayjs.add(1, "day").toISOString(),
+                        };
+                    }
                 }
-            }
-            return event;
-        }) || [];
+                return event;
+            }) || [],
+        [events]
+    );
 
     return (
         <>

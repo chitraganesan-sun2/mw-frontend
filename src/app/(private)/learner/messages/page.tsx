@@ -141,7 +141,8 @@ const Messages = () => {
     };
 
     const getIndividualChat = async () => {
-        setIsIndividualLoading(true);
+        const isFirstLoadForThisChat = individualChat.length === 0;
+        if (isFirstLoadForThisChat) setIsIndividualLoading(true);
         try {
             const response = await GET_API(
                 endpoints.chat.getIndividualChat(chatId as string, "learner")
@@ -218,11 +219,11 @@ const Messages = () => {
                 );
             });
 
-            setIsIndividualLoading(false);
+            if (isFirstLoadForThisChat) setIsIndividualLoading(false);
             return response.data;
         } catch (error) {
             console.log(error);
-            setIsIndividualLoading(false);
+            if (isFirstLoadForThisChat) setIsIndividualLoading(false);
         }
     };
 
@@ -233,14 +234,14 @@ const Messages = () => {
     } = useQuery({
         queryKey: ["chats"],
         queryFn: () => getAllChatsForLearners(),
-        // refetchInterval: 1000,
+        refetchInterval: 8000,
     });
 
     const { data: individualChatData, refetch: refetchIndividualChat } = useQuery({
         queryKey: ["individualChat", chatId],
         queryFn: () => getIndividualChat(),
         enabled: !!chatId,
-        // refetchInterval: 1000,
+        refetchInterval: 4000,
     });
 
     const handleSearch = (value: string) => {
