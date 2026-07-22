@@ -1,5 +1,6 @@
 import { z } from "zod";
 import CenterModal from "@/components/common/Modals/CenterModal";
+import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 import { useEffect, useState, useRef } from "react";
 import Cookies from "js-cookie";
 import { useForm } from "react-hook-form";
@@ -30,6 +31,7 @@ const EditProfileModal = ({
   onClose,
 }: EditProfileModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const isMobile = useMediaQuery("(max-width: 767px)");
   const formRef = useRef<any>(null);
 
@@ -89,17 +91,17 @@ const EditProfileModal = ({
   // ✅ handle cancel or close
   const handleClose = () => {
     if (isDirty) {
-      const confirmed = window.confirm(
-        "You have unsaved changes. Are you sure you want to close without saving?"
-      );
-      if (confirmed) {
-        formRef.current?.resetTabs?.(); // ✅ reset tabs before close
-        onClose();
-      }
+      setShowDiscardConfirm(true);
     } else {
       formRef.current?.resetTabs?.();
       onClose();
     }
+  };
+
+  const confirmDiscardChanges = () => {
+    setShowDiscardConfirm(false);
+    formRef.current?.resetTabs?.(); // ✅ reset tabs before close
+    onClose();
   };
 
   const buttonProps = {
@@ -119,6 +121,7 @@ const EditProfileModal = ({
   };
 
   return (
+    <>
     <CenterModal
       isOpen={isOpen}
       onClose={handleClose}
@@ -160,6 +163,16 @@ const EditProfileModal = ({
         isLoading={isSubmitting}
       />
     </CenterModal>
+    <ConfirmModal
+      isOpen={showDiscardConfirm}
+      title="Discard changes"
+      description="You have unsaved changes. Are you sure you want to close without saving?"
+      confirmText="Discard"
+      danger
+      onConfirm={confirmDiscardChanges}
+      onCancel={() => setShowDiscardConfirm(false)}
+    />
+    </>
   );
 };
 

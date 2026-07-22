@@ -47,14 +47,14 @@ const SideModal: React.FC<SideModalProps> = ({
                         {title ? (
                             <>
                                 <h3 className="text-xl font-medium">{title}</h3>
-                                <span onClick={onClose} className="cursor-pointer">
+                                <button type="button" aria-label="Close" onClick={onClose} className="cursor-pointer bg-transparent border-0 p-0">
                                     <ModalCloseIcon />
-                                </span>
+                                </button>
                             </>
                         ) : (
-                            <span onClick={onClose} className="cursor-pointer">
+                            <button type="button" aria-label="Close" onClick={onClose} className="cursor-pointer bg-transparent border-0 p-0">
                                 <ModalCloseIcon />
-                            </span>
+                            </button>
                         )}
                     </div>
                     <Divider

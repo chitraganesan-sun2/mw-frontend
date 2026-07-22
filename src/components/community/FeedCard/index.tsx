@@ -27,6 +27,7 @@ import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { BsFillBookmarkFill, BsBookmark } from "react-icons/bs";
 import { useDebounce } from "use-debounce";
+import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 
 interface FeedCardProps {
     onClick: (postId: string) => void;
@@ -69,6 +70,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
     const [_, setId] = useQueryState("id");
     const { ref, inView } = useInView();
     const [selectedSort, setSelectedSort] = useState<string>("recent");
+    const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
     const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
@@ -217,15 +219,20 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
     };
 
     const hanldeDeleteEvent = (postId: string) => {
-        if (!confirm("Are you Sure?")) return;
+        setDeleteTargetId(postId);
+    };
+
+    const confirmDeletePost = () => {
+        if (!deleteTargetId) return;
         callbackToast({
-            apiCall: DELETE_API(endpoints.post.deletePost(postId)),
+            apiCall: DELETE_API(endpoints.post.deletePost(deleteTargetId)),
             loadingMsg: "Deleting Post",
             errorMsg: "Post not Deleted",
             successMsg: "Post Deleted",
         }).then(() => {
             queryClient.invalidateQueries({ queryKey: ["get-posts", "manage_your_posts"] });
         });
+        setDeleteTargetId(null);
     };
 
     if (isError) return <ErrorMsg />;
@@ -287,20 +294,24 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                             <div className="flex items-center gap-2">
                                                 {isManagePost ? (
                                                     <div className="flex items-center gap-2">
-                                                        <div
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Edit post"
                                                             onClick={(e) =>
                                                                 handleEditClick(post.post_id, e)
                                                             }
-                                                            className="cursor-pointer"
+                                                            className="cursor-pointer bg-transparent border-0 p-0"
                                                         >
                                                             <EditIcon width={40} height={40} />
-                                                        </div>
-                                                        <div
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Delete post"
                                                             onClick={() => hanldeDeleteEvent(post?.post_id)}
-                                                            className="cursor-pointer"
+                                                            className="cursor-pointer bg-transparent border-0 p-0"
                                                         >
                                                             <DeleteIcon width={40} height={40} />
-                                                        </div>
+                                                        </button>
                                                         {/* <div
                                                             onClick={() => {}}
                                                             className="cursor-pointer hidden md:block"
@@ -309,12 +320,14 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                         </div> */}
                                                     </div>
                                                 ) : (
-                                                    <span
+                                                    <button
+                                                        type="button"
+                                                        aria-label="Report post"
                                                         onClick={() => handleReportClick?.(post?.post_id)}
-                                                        className="cursor-pointer border rounded-full"
+                                                        className="cursor-pointer border rounded-full bg-transparent"
                                                     >
                                                         <ReportIcon />
-                                                    </span>
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
@@ -328,12 +341,13 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                     <p className="text-xs md:text-sm font-normal">
                                         {post.description}
                                         {post.description.length > 150 && (
-                                            <span
+                                            <button
+                                                type="button"
                                                 onClick={() => onClick(post.post_id)}
-                                                className="cursor-pointer text-primary font-medium text-[#ffac71]"
+                                                className="cursor-pointer text-primary font-medium text-[#ffac71] bg-transparent border-0 p-0 inline"
                                             >
                                                 See More
-                                            </span>
+                                            </button>
                                         )}
                                     </p>
                                 </div>
@@ -363,7 +377,12 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                     <div className="flex justify-between items-center gap-2">
                                         <div className="flex items-center gap-6">
                                             {/* Like button section */}
-                                            <div className="flex items-center gap-1 cursor-pointer w-10">
+                                            <button
+                                                type="button"
+                                                aria-label={post.is_liked ? "Unlike post" : "Like post"}
+                                                onClick={() => handleLikeAction(post.post_id, post.is_liked)}
+                                                className="flex items-center gap-1 cursor-pointer w-10 bg-transparent border-0 p-0"
+                                            >
                                                 <div>
                                                     <AnimatePresence mode="wait">
                                                         {post.is_liked ? (
@@ -376,9 +395,6 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                                     duration: 0.2,
                                                                     ease: "easeInOut",
                                                                 }}
-                                                                onClick={() =>
-                                                                    handleLikeAction(post.post_id, true)
-                                                                }
                                                             >
                                                                 <HeartLikeIcon />
                                                             </motion.div>
@@ -392,9 +408,6 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                                     duration: 0.2,
                                                                     ease: "easeInOut",
                                                                 }}
-                                                                onClick={() =>
-                                                                    handleLikeAction(post.post_id, false)
-                                                                }
                                                             >
                                                                 <UnlikeHeartIcon />
                                                             </motion.div>
@@ -411,11 +424,13 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                 >
                                                     {post?.total_likes}
                                                 </motion.p>
-                                            </div>
+                                            </button>
                                             {/* Comment button section */}
-                                            <div
+                                            <button
+                                                type="button"
+                                                aria-label="View comments"
                                                 onClick={() => handleCommentClick(post.post_id)}
-                                                className="flex items-center gap-1 cursor-pointer"
+                                                className="flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
                                             >
                                                 <motion.div
                                                     whileHover={{ scale: 1.1 }}
@@ -439,10 +454,12 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                 >
                                                     {post.total_comments}
                                                 </motion.p>
-                                            </div>
+                                            </button>
                                         </div>
-                                        <div
-                                            className="cursor-pointer"
+                                        <button
+                                            type="button"
+                                            aria-label={post?.is_saved ? "Unsave post" : "Save post"}
+                                            className="cursor-pointer bg-transparent border-0 p-0"
                                             onClick={() =>
                                                 handleSave(post?.post_id, post?.is_saved)
                                             }
@@ -452,7 +469,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                             ) : (
                                                 <BsBookmark size={24} />
                                             )}
-                                        </div>
+                                        </button>
                                     </div>
                                     {/* Only show comment input on desktop */}
                                     <div className="hidden md:block mt-4">
@@ -507,6 +524,15 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
 
                 </div>
             )}
+            <ConfirmModal
+                isOpen={!!deleteTargetId}
+                title="Delete post"
+                description="Are you sure you want to delete this post? This cannot be undone."
+                confirmText="Delete"
+                danger
+                onConfirm={confirmDeletePost}
+                onCancel={() => setDeleteTargetId(null)}
+            />
         </div>
     );
 };

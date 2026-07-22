@@ -115,9 +115,14 @@ const MobileCommentPanel = ({
                         <p className="text-sm font-medium text-gray-light">
                             Replying to {replyTo.name}
                         </p>
-                        <span onClick={handleReplyClose} className="cursor-pointer text-gray-light">
+                        <button
+                            type="button"
+                            aria-label="Cancel reply"
+                            onClick={handleReplyClose}
+                            className="cursor-pointer text-gray-light bg-transparent border-0 p-0"
+                        >
                             <IoIosClose />
-                        </span>
+                        </button>
                     </div>
                 )}
                 <CommentInput

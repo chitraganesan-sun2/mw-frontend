@@ -87,7 +87,12 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
                     </div>
                 </div>
                 <div className="flex flex-col items-center">
-                    <div className="cursor-pointer scale-75">
+                    <button
+                        type="button"
+                        aria-label={isLiked ? "Unlike comment" : "Like comment"}
+                        onClick={handleCommentLikes}
+                        className="cursor-pointer scale-75 bg-transparent border-0 p-0"
+                    >
                         <AnimatePresence mode="wait">
                             {isLiked ? (
                                 <motion.div
@@ -99,7 +104,6 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
                                         duration: 0.2,
                                         ease: "easeInOut",
                                     }}
-                                    onClick={handleCommentLikes}
                                 >
                                     <HeartLikeIcon className="w-7 h-7" />
                                 </motion.div>
@@ -113,13 +117,12 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
                                         duration: 0.2,
                                         ease: "easeInOut",
                                     }}
-                                    onClick={handleCommentLikes}
                                 >
                                     <UnlikeHeartIcon className="w-7 h-7" />
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
+                    </button>
                     <motion.p
                         className="text-[12px] font-medium text-[#EF4444]"
                         animate={{
@@ -133,12 +136,13 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
             </div>
             <div className="flex items-center gap-1">
                 <div className="w-[36px] h-[32px]"></div>
-                <p
+                <button
+                    type="button"
                     onClick={() => handleReply(comment)}
-                    className="text-sm font-medium text-gray-light cursor-pointer"
+                    className="text-sm font-medium text-gray-light cursor-pointer bg-transparent border-0 p-0"
                 >
                     Reply
-                </p>
+                </button>
             </div>
         </div>
     );

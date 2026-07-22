@@ -23,6 +23,7 @@ import CommentSkeleton from "../CommentCard/skeleton";
 import ErrorMsg from "@/components/common/Messages/ErrorMsg";
 import { useQueryState } from "nuqs";
 import { BsFillBookmarkFill, BsBookmark } from "react-icons/bs";
+import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 import { useMediaQuery } from "@mui/material";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toUserTimeZone } from "@/utils/timeFunctions";
@@ -156,16 +157,23 @@ const FeedViewModal = ({
         setId(postId);
     };
 
+    const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
     const hanldeDeleteEvent = (postId: string) => {
-        if (!confirm("Are you Sure?")) return;
+        setDeleteTargetId(postId);
+    };
+
+    const confirmDeletePost = () => {
+        if (!deleteTargetId) return;
         callbackToast({
-            apiCall: DELETE_API(endpoints.post.deletePost(postId)),
+            apiCall: DELETE_API(endpoints.post.deletePost(deleteTargetId)),
             loadingMsg: "Deleting Post",
             errorMsg: "Post not Deleted",
             successMsg: "Post Deleted",
         }).then(() => {
             queryClient.invalidateQueries({ queryKey: ["get-posts", "manage_your_posts"] });
         });
+        setDeleteTargetId(null);
     };
 
     const handleSavePost = (postId: string, currentSaveStatus: boolean) => {
@@ -227,6 +235,7 @@ const FeedViewModal = ({
     const isTablet = useMediaQuery("(max-width: 1024px)");
 
     return (
+        <>
         <ViewModal
             className="max-md:!w-full max-md:!max-w-none max-md:!h-full lg:!h-[720px] md:!rounded-xl"
             modalOpen={isOpen}
@@ -263,28 +272,33 @@ const FeedViewModal = ({
                             </div>
                         ) : null}
                         <div className="lg:hidden absolute top-0 left-0 !w-full flex justify-between items-center px-5 pb-2 pt-5 gap-3">
-                            <FeedModalCloseIcon
-                                className="cursor-pointer"
-                                onClick={handleCloseModal}
-                            />
+                            <button type="button" aria-label="Close" onClick={handleCloseModal} className="bg-transparent border-0 p-0">
+                                <FeedModalCloseIcon className="cursor-pointer" />
+                            </button>
                             {isManagePost ? (
                                 <div className="flex items-center gap-2">
-                                    <span
+                                    <button
+                                        type="button"
+                                        aria-label="Edit post"
                                         onClick={(e) => handleEditClick(post.post_id, e)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer bg-transparent border-0 p-0"
                                     >
                                         <EditIcon width={40} height={40} />
-                                    </span>
-                                    <span
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-label="Delete post"
                                         onClick={() => hanldeDeleteEvent(post.post_id)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer bg-transparent border-0 p-0"
                                     >
                                         <DeleteIcon width={40} height={40} />
-                                    </span>
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-3">
-                                    <span
+                                    <button
+                                        type="button"
+                                        aria-label={post?.is_saved ? "Unsave post" : "Save post"}
                                         className="cursor-pointer bg-white rounded-full p-2.5 border border-gray-100"
                                         onClick={() =>
                                             handleSavePost(post?.post_id, post?.is_saved)
@@ -295,13 +309,15 @@ const FeedViewModal = ({
                                         ) : (
                                             <BsBookmark size={20} />
                                         )}
-                                    </span>
-                                    <span
-                                        className="cursor-pointer border rounded-full"
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-label="Report post"
+                                        className="cursor-pointer border rounded-full bg-transparent"
                                         onClick={() => handleReportClick?.(post?.post_id)}
                                     >
                                         <ReportIcon />
-                                    </span>
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -310,23 +326,29 @@ const FeedViewModal = ({
                         <div className="max-lg:hidden flex justify-end items-center px-5 pb-2 pt-5 gap-3">
                             {isManagePost ? (
                                 <div className="flex items-center gap-2">
-                                    <span
+                                    <button
+                                        type="button"
+                                        aria-label="Edit post"
                                         onClick={(e) => handleEditClick(post.post_id, e)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer bg-transparent border-0 p-0"
                                     >
                                         <EditIcon width={40} height={40} />
-                                    </span>
-                                    <span
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-label="Delete post"
                                         onClick={() => hanldeDeleteEvent(post.post_id)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer bg-transparent border-0 p-0"
                                     >
                                         <DeleteIcon width={40} height={40} />
-                                    </span>
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-3">
-                                    <span
-                                        className="cursor-pointer"
+                                    <button
+                                        type="button"
+                                        aria-label={post?.is_saved ? "Unsave post" : "Save post"}
+                                        className="cursor-pointer bg-transparent border-0 p-0"
                                         onClick={() =>
                                             handleSavePost(post?.post_id, post?.is_saved)
                                         }
@@ -336,19 +358,20 @@ const FeedViewModal = ({
                                         ) : (
                                             <BsBookmark size={20} />
                                         )}
-                                    </span>
-                                    <span
-                                        className="cursor-pointer border rounded-full"
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-label="Report post"
+                                        className="cursor-pointer border rounded-full bg-transparent"
                                         onClick={() => handleReportClick?.(post?.post_id)}
                                     >
                                         <ReportIcon />
-                                    </span>
+                                    </button>
                                 </div>
                             )}
-                            <FeedModalCloseIcon
-                                className="cursor-pointer"
-                                onClick={handleCloseModal}
-                            />
+                            <button type="button" aria-label="Close" onClick={handleCloseModal} className="bg-transparent border-0 p-0">
+                                <FeedModalCloseIcon className="cursor-pointer" />
+                            </button>
                         </div>
                         <Divider />
                         <div className="px-4 md:px-7 flex flex-col mt-3 overflow-y-auto relative">
@@ -424,12 +447,14 @@ const FeedViewModal = ({
                                     <p className="text-sm font-medium text-gray-light">
                                         Replying to {replyTo.name}
                                     </p>
-                                    <span
+                                    <button
+                                        type="button"
+                                        aria-label="Cancel reply"
                                         onClick={handleReplyClose}
-                                        className="cursor-pointer text-gray-light"
+                                        className="cursor-pointer text-gray-light bg-transparent border-0 p-0"
                                     >
                                         <IoIosClose />
-                                    </span>
+                                    </button>
                                 </div>
                             )}
                             <CommentInput
@@ -448,6 +473,16 @@ const FeedViewModal = ({
                 </div>
             )}
         </ViewModal>
+        <ConfirmModal
+            isOpen={!!deleteTargetId}
+            title="Delete post"
+            description="Are you sure you want to delete this post? This cannot be undone."
+            confirmText="Delete"
+            danger
+            onConfirm={confirmDeletePost}
+            onCancel={() => setDeleteTargetId(null)}
+        />
+        </>
     );
 };
 

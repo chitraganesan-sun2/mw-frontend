@@ -9,11 +9,13 @@ import { useAppStore } from "@/store/useAppStore";
 import { DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "../../Toast";
+import ConfirmModal from "../../Modals/ConfirmModal";
 
 const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    const [pendingRemoval, setPendingRemoval] = useState<{ index: number; type?: string; image_id?: string } | null>(null);
     const { imageId, setImageId, videoId, setVideoId, documentId, setDocumentId } = useAppStore();
 
     const handleSuccess = (data: any) => {
@@ -93,7 +95,13 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
     };
 
     const handleRemove = (index: number, type?: string, image_id?: string) => {
-        if (!confirm("Are you sure?")) return null;
+        setPendingRemoval({ index, type, image_id });
+    };
+
+    const confirmRemove = () => {
+        if (!pendingRemoval) return;
+        const { index, type, image_id } = pendingRemoval;
+        setPendingRemoval(null);
 
         if (type === "image/*") {
             const idToDelete = (imageId as string) || (image_id as string) || props.value?.image_id;
@@ -178,6 +186,15 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
                 disabled={props.disabled || isPending}
                 aria-hidden="true"
                 tabIndex={-1}
+            />
+            <ConfirmModal
+                isOpen={!!pendingRemoval}
+                title="Remove file"
+                description="Are you sure you want to remove this file?"
+                confirmText="Remove"
+                danger
+                onConfirm={confirmRemove}
+                onCancel={() => setPendingRemoval(null)}
             />
         </div>
     );
