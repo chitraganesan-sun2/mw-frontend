@@ -4,12 +4,12 @@ import ContainerHeader from "../components/ContainerHeader";
 import ContainerWrapper from "../components/ContainerWrapper";
 import StepsChart from "../components/StepsChart";
 import LandingPageButton from "../components/Button";
+import { useQueryState } from "nuqs";
 
-interface ForVolunteerProps {
-    handleSignUp: () => void;
-}
+const ForVolunteer = () => {
+    const [, setParamMode] = useQueryState("signup_as");
+    const handleSignUp = () => setParamMode("volunteer");
 
-const ForVolunteer = ({ handleSignUp }: ForVolunteerProps) => {
     return (
         <ContainerWrapper className="bg-white py-10 px-5">
             <ContainerHeader

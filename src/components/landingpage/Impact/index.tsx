@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import ContainerWrapper from "../components/ContainerWrapper";
 import ContainerHeader from "../components/ContainerHeader";

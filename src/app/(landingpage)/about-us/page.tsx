@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import MeetOurTeam from "@/components/landingpage/AboutUs/MeetOurTeam";
 import TitleSection from "@/components/onboarding/TitleSection";
 import AboutSectionCard from "@/components/landingpage/AboutUs/AboutSectionCard";
