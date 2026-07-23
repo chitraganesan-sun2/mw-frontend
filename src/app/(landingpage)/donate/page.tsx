@@ -7,7 +7,7 @@ import RadioInput from "@/components/common/Input/RadioButton";
 import { Input } from "@/components/common/Input";
 import Button from "@/components/common/Button";
 import Accordian from "@/components/landingpage/components/Accordian";
-import { getCountries, getStates } from "@/api/common";
+import { useCountryOptions, useStateOptions } from "@/hooks/useCountriesAndStates";
 import { getDonationAmountPresets, getDedicationOptions, getFundDestinations, getHowDidYouHearOptions } from "@/api/donation";
 import { getDonorWall } from "@/api/donation";
 import { getDonationFaqs } from "@/api/donation";
@@ -59,10 +59,8 @@ const Donate = () => {
 
     const [country, setCountry] = useState<string | number>("");
     const [state, setState] = useState<string | number>("");
-    const [countryOptions, setCountryOptions] = useState<{ label: string; value: string }[]>([]);
-    const [stateOptions, setStateOptions] = useState<{ label: string; value: string }[]>([]);
-    const [countriesLoading, setCountriesLoading] = useState(false);
-    const [statesLoading, setStatesLoading] = useState(false);
+    const { countryOptions, countriesLoading } = useCountryOptions();
+    const { stateOptions, statesLoading } = useStateOptions(country);
 
     const [dedication, setDedication] = useState<string | number>("none");
     const [fundDesignation, setFundDesignation] = useState<string | number>("general-fund");
@@ -106,42 +104,6 @@ const Donate = () => {
         setTopCardsIndex(Math.max(0, Math.min(idx, children.length - 1)));
     };
 
-    useEffect(() => {
-        const fetchCountries = async () => {
-            setCountriesLoading(true);
-            try {
-                const res: unknown = await getCountries();
-                const data = (res as { data?: unknown })?.data ?? res;
-                if (Array.isArray(data)) {
-                    setCountryOptions(
-                        (data as { country_name: string; country_code: string }[]).map((c) => ({
-                            label: c.country_name,
-                            value: c.country_code,
-                        }))
-                    );
-                } else if (
-                    data &&
-                    typeof data === "object" &&
-                    "data" in data &&
-                    Array.isArray((data as { data: unknown }).data)
-                ) {
-                    setCountryOptions(
-                        (
-                            data as { data: { country_name: string; country_code: string }[] }
-                        ).data.map((c) => ({
-                            label: c.country_name,
-                            value: c.country_code,
-                        }))
-                    );
-                }
-            } catch (e) {
-                console.error("Failed to fetch countries", e);
-            } finally {
-                setCountriesLoading(false);
-            }
-        };
-        fetchCountries();
-    }, []);
     // FAQs
     useEffect(() => {
         getDonationFaqs()
@@ -261,46 +223,6 @@ const Donate = () => {
             .catch((e) => console.error("Failed to load name visibility options", e));
     }, []);
 
-    useEffect(() => {
-        const fetchStates = async () => {
-            if (!country) {
-                setStateOptions([]);
-                return;
-            }
-            setStatesLoading(true);
-            try {
-                const res: unknown = await getStates(country.toString());
-                const data = (res as { data?: unknown })?.data ?? res;
-                if (Array.isArray(data)) {
-                    setStateOptions(
-                        (data as { state_name: string; state_code: string }[]).map((s) => ({
-                            label: s.state_name,
-                            value: s.state_code,
-                        }))
-                    );
-                } else if (
-                    data &&
-                    typeof data === "object" &&
-                    "data" in data &&
-                    Array.isArray((data as { data: unknown }).data)
-                ) {
-                    setStateOptions(
-                        (data as { data: { state_name: string; state_code: string }[] }).data.map(
-                            (s) => ({
-                                label: s.state_name,
-                                value: s.state_code,
-                            })
-                        )
-                    );
-                }
-            } catch (e) {
-                console.error("Failed to fetch states", e);
-            } finally {
-                setStatesLoading(false);
-            }
-        };
-        fetchStates();
-    }, [country]);
 
     const handleDonateAmount = (value: string | number) => {
         const v = String(value);

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useJoinUsStore } from '@/store/useJoinUsStore';
 import { submitStep1, updateStep1 } from '@/api/join-us';
-import { getCountries, getStates } from '@/api/common';
+import { useCountryOptions, useStateOptions } from '@/hooks/useCountriesAndStates';
 import { showToast } from '@/components/common/Toast';
 import Button from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
@@ -17,9 +17,6 @@ const JoinUsStep1Page = () => {
     const [loading, setLoading] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    const [countriesLoading, setCountriesLoading] = useState(false);
-    const [statesLoading, setStatesLoading] = useState(false);
 
     const [compensationPreference, setCompensationPreference] = useState<'unpaid_ok' | 'paid_only' | ''>(step1Data?.compensation_preference || '');
     const [fullName, setFullName] = useState(step1Data?.full_name || '');
@@ -35,66 +32,8 @@ const JoinUsStep1Page = () => {
     const [employmentDetails, setEmploymentDetails] = useState(step1Data?.current_employment_details || '');
     const [compensation, setCompensation] = useState(step1Data?.compensation_expectation || '');
 
-    // Store for dropdown options
-    const [countryOptions, setCountryOptions] = useState<{ label: string; value: string }[]>([]);
-    const [stateOptions, setStateOptions] = useState<{ label: string; value: string }[]>([]);
-
-    useEffect(() => {
-        const fetchCountries = async () => {
-            setCountriesLoading(true);
-            try {
-                const res: any = await getCountries();
-                const data = res?.data || res;
-                if (Array.isArray(data)) {
-                    setCountryOptions(data.map((c: any) => ({
-                        label: c.country_name,
-                        value: c.country_code
-                    })));
-                } else if (data?.data && Array.isArray(data.data)) {
-                    setCountryOptions(data.data.map((c: any) => ({
-                        label: c.country_name,
-                        value: c.country_code
-                    })));
-                }
-            } catch (err) {
-                console.error("Failed to fetch countries", err);
-            } finally {
-                setCountriesLoading(false);
-            }
-        };
-        fetchCountries();
-    }, []);
-
-    useEffect(() => {
-        const fetchStates = async () => {
-            if (!country) {
-                setStateOptions([]);
-                setStatesLoading(false);
-                return;
-            }
-            setStatesLoading(true);
-            try {
-                const res: any = await getStates(country.toString());
-                const data = res?.data || res;
-                if (Array.isArray(data)) {
-                    setStateOptions(data.map((s: any) => ({
-                        label: s.state_name,
-                        value: s.state_code
-                    })));
-                } else if (data?.data && Array.isArray(data.data)) {
-                    setStateOptions(data.data.map((s: any) => ({
-                        label: s.state_name,
-                        value: s.state_code
-                    })));
-                }
-            } catch (err) {
-                console.error("Failed to fetch states", err);
-            } finally {
-                setStatesLoading(false);
-            }
-        };
-        fetchStates();
-    }, [country]);
+    const { countryOptions, countriesLoading } = useCountryOptions();
+    const { stateOptions, statesLoading } = useStateOptions(country);
 
     // Update phone country code automatically when country changes
     useEffect(() => {
