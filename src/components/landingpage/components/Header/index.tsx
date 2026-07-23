@@ -11,6 +11,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { LoginModal } from "../../Modals/LoginModal";
 import SignUpAsModal from "../../Modals/SignUpAsModal";
 import { useQueryState } from "nuqs";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GOOGLE_WEB_CLIENT_ID } from "@/definitions";
 
 const Header = () => {
     const router = useRouter();
@@ -106,7 +108,12 @@ const Header = () => {
                 )}
             </div>
             {mounted && (
-                <>
+                // Google OAuth is only ever needed here - Header is only rendered on
+                // logged-out landing pages (this file, via Hero on the homepage, and via
+                // LandingpageLayout elsewhere), never on authenticated routes. Scoping the
+                // provider to this subtree keeps its script/context out of every route
+                // that never uses it again once a user is logged in.
+                <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID || ""}>
                     <SideNavBar isOpen={isSideNavBarOpen} onClose={handleCloseSideNavBar}>
                         <div className="flex justify-between items-center px-4">
                             <Link
@@ -152,7 +159,7 @@ const Header = () => {
                         isOpen={paramMode === "learner" || paramMode === "volunteer"}
                         onClose={() => setParamMode(null)}
                     />
-                </>
+                </GoogleOAuthProvider>
             )}
         </div>
     );
