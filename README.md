@@ -101,7 +101,7 @@ sequenceDiagram
 
     U->>Gate: request any route
     Gate->>RG: getRedirectForRoute(pathname, auth state)
-    RG-->>Gate: no token -&gt; only landing routes allowed
+    RG-->>Gate: no token, only landing routes allowed
     Gate-->>U: render landing page
 
     U->>Modal: click Sign in / Sign up
