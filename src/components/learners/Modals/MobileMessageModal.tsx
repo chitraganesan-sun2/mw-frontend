@@ -12,6 +12,8 @@ import InnerWidth from "@/utils/innerWidth";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
 import { FeedModalCloseIcon } from "@/assets/icons";
 import { BsFillSendFill } from "react-icons/bs";
+import Image from "next/image";
+import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 
 type MobileMessageModalProps = {
     receiverId?: string | null;
@@ -103,7 +105,14 @@ const MobileMessageModal = ({ receiverId, isOpen, onClose }: MobileMessageModalP
             </div>
         </div> :
         <div className="flex gap-2 w-full border-stroke items-center">
-            <img src={userData?.profile_picture} alt={userData?.fullName} className="h-[40px] w-[40px] object-cover border rounded-full" />
+            <div className="h-[40px] w-[40px] relative flex-shrink-0 border rounded-full overflow-hidden">
+                <Image
+                    src={userData?.profile_picture || DummyProfileImg}
+                    alt={userData?.fullName || "profile picture"}
+                    fill
+                    className="object-cover"
+                />
+            </div>
             <div>
                 <h5 className="font-medium !text-sm">{userData?.fullName}</h5>
                 <p className="!text-xs">From <span className="capitalize">{userData?.country}</span></p>

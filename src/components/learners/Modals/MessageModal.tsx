@@ -10,6 +10,8 @@ import { toUserTimeZone } from "@/utils/timeFunctions";
 import Loader from "@/components/common/Loader";
 import { useAppStore } from "@/store/useAppStore"
 import InnerWidth from "@/utils/innerWidth";
+import Image from "next/image";
+import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 
 type MessageModalProps = {
     receiverId?: string | null;
@@ -102,7 +104,14 @@ const MessageModal = ({ receiverId, isOpen, onClose }: MessageModalProps) => {
             </div>
         </div> :
         <div className="flex gap-2 w-full items-center">
-            <img src={userData?.profile_picture} alt={userData?.fullName} className="h-[50px] w-[50px] object-cover border rounded-full" />
+            <div className="h-[50px] w-[50px] relative flex-shrink-0 border rounded-full overflow-hidden">
+                <Image
+                    src={userData?.profile_picture || DummyProfileImg}
+                    alt={userData?.fullName || "profile picture"}
+                    fill
+                    className="object-cover"
+                />
+            </div>
             <div>
                 <h5 className="font-medium !text-xl">{userData?.fullName}</h5>
                 <p className="!text-sm">From <span className="capitalize">{userData?.country}</span></p>

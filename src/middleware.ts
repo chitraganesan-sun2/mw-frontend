@@ -70,3 +70,10 @@ export default function middleware(req: NextRequest) {
 
   return NextResponse.next();
 }
+
+// Next.js skips invoking the middleware function entirely for excluded paths (a routing-
+// level filter, cheaper than the previous behavior of always running bot-detection string
+// matching first and only short-circuiting on the /_next prefix check inside the function).
+export const config = {
+  matcher: ["/((?!_next/static|_next/image).*)"],
+};

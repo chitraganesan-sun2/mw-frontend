@@ -5,6 +5,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    images: {
+        remotePatterns: [
+            {
+                protocol: "http",
+                hostname: "res.cloudinary.com",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "res.cloudinary.com",
+                pathname: "/**",
+            },
+        ],
+    },
     webpack: (config) => {
         config.resolve.alias["@"] = path.resolve(__dirname, "src");
         return config;
