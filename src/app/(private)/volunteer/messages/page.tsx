@@ -83,8 +83,13 @@ const Messages = () => {
     const [message, setMessage] = useState("");
     const volunteerId = Cookies.get("volunteer_id");
     const [chats, setChats] = useState<VolunteerChatItem[]>([]);
-    const chatId = useSearchParams().get("chatId");
-    const learnerId = useSearchParams().get("learnerId");
+    const urlChatId = useSearchParams().get("chatId");
+    const urlLearnerId = useSearchParams().get("learnerId");
+    // Fall back to the first chat before the URL has synced, so the individual-chat
+    // fetch can start immediately instead of waiting on a navigation round trip.
+    const firstChat = !isMobile ? chats[0] : undefined;
+    const chatId = urlChatId ?? firstChat?.chat_id ?? null;
+    const learnerId = urlLearnerId ?? firstChat?.learner_id ?? null;
     const [individualChat, setIndividualChat] = useState<ChatMessage[]>([]);
     const [recieverName, setRecieverName] = useState("");
     const [recieverImage, setRecieverImage] = useState("");
@@ -107,37 +112,33 @@ const Messages = () => {
         scrollToBottom();
     }, [individualChat]);
 
-    const getAllChatsForLearners = () => {
+    const getAllChatsForLearners = async () => {
         setIsLoading(true);
-        GET_API(endpoints.chat.getAllchatsOfVolunteer(volunteerId as string))
-            .then((res: any) => {
-                setChats(res.data);
+        try {
+            const res: any = await GET_API(endpoints.chat.getAllchatsOfVolunteer(volunteerId as string));
+            setChats(res.data);
+            setNoChats(res.data.length === 0);
 
-                if (res.data.length === 0) {
-                    setNoChats(true);
-                } else {
-                    setNoChats(false);
+            // Find matching chat and update receiver details
+            if (chatId) {
+                const matchingChat = res.data.find((chat: any) => chat.chat_id === chatId);
+                if (matchingChat) {
+                    setRecieverName(matchingChat.learner_name);
+                    setRecieverImage(matchingChat.learner_profile_picture.image_url);
+                    setChatPermission(matchingChat.chat_permission);
+                    setLocation(matchingChat.learner_country);
                 }
-                // Find matching chat and update receiver details
-                if (chatId) {
-                    const matchingChat = res.data.find((chat: any) => chat.chat_id === chatId);
-                    if (matchingChat) {
-                        setRecieverName(matchingChat.learner_name);
-                        setRecieverImage(matchingChat.learner_profile_picture.image_url);
-                        setChatPermission(matchingChat.chat_permission);
-                        setLocation(matchingChat.learner_country);
-                    }
-                }
-                // Do not redirect here; desktop auto-open is handled in useEffect (mobile stays on list)
-            })
-            .catch((err: any) => {
-                console.log(err);
-                setNoChats(true);
-            })
-            .finally(() => {
-                setIsLoading(false);
-                setIsRefetching(false);
-            });
+            }
+            // Do not redirect here; desktop auto-open is handled in useEffect (mobile stays on list)
+            return res.data;
+        } catch (err: any) {
+            console.log(err);
+            setNoChats(true);
+            return [];
+        } finally {
+            setIsLoading(false);
+            setIsRefetching(false);
+        }
     };
 
     const getIndividualChat = async () => {
@@ -425,14 +426,14 @@ const Messages = () => {
         }
     }, [messageId]);
 
-    // Desktop: auto-open first chat when none selected; mobile: show list first
+    // Desktop: sync the URL to the auto-selected first chat once loaded (data fetching
+    // itself doesn't wait on this - see the chatId/learnerId derivation above).
     useEffect(() => {
-        if (isMobile || !chats.length || chatId || learnerId) return;
-        const firstChat = chats[0];
+        if (isMobile || !chats.length || urlChatId || urlLearnerId) return;
         router.push(
-            `/volunteer/messages?chatId=${firstChat.chat_id}&learnerId=${firstChat.learner_id}`
+            `/volunteer/messages?chatId=${chats[0].chat_id}&learnerId=${chats[0].learner_id}`
         );
-    }, [isMobile, chats, chatId, learnerId, router]);
+    }, [isMobile, chats, urlChatId, urlLearnerId, router]);
 
     if (noChats === null) {
         return <LottieLoader isLoading={true} />;
