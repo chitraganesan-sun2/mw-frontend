@@ -2,13 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { IoIosArrowBack } from "react-icons/io";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import Cookies from "js-cookie";
 import LottieLoader from "@/components/common/Loader/Lottie";
-import NewEventModal from "@/components/schedule/Modals/NewEventModal";
+
+// NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
+const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
 
 interface InstantSession {
     session_id: string;

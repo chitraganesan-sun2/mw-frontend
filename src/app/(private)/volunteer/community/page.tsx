@@ -2,15 +2,19 @@
 
 import ActionPanel from "@/components/community/ActionPanel";
 import FeedCard from "@/components/community/FeedCard";
-import FeedViewModal from "@/components/community/FeedViewModal";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
-import CommunityReportModal from "@/components/community/ReportsModal";
-import NotificationSection from "@/components/community/NotificationSection";
-import CommunityPostModal from "@/components/community/CommunityPostModal";
+import dynamic from "next/dynamic";
+
+// Code-split: these modals pull in react-slick/@mui/material/react-hook-form/zod,
+// which otherwise ship on every Community page visit even for users who never open one.
+const FeedViewModal = dynamic(() => import("@/components/community/FeedViewModal"), { ssr: false });
+const CommunityReportModal = dynamic(() => import("@/components/community/ReportsModal"), { ssr: false });
+const NotificationSection = dynamic(() => import("@/components/community/NotificationSection"), { ssr: false });
+const CommunityPostModal = dynamic(() => import("@/components/community/CommunityPostModal"), { ssr: false });
 
 export default function CommunityPage() {
     const { setHeaderOptions } = useComponentStore();
