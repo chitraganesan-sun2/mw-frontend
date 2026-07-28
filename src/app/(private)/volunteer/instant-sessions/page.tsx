@@ -8,6 +8,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { POST_API, GET_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import Cookies from "js-cookie";
+import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import Button from "@/components/common/Button";
@@ -302,8 +303,8 @@ export default function VolunteerInstantSessionsPage() {
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
             {(isLearnerRequestsFetching || isMySessionsFetching || isActionLoading) && (
-                <div className="fixed top-4 right-4 z-20">
-                    <LottieLoader isLoading={true} />
+                <div className="fixed top-4 right-4 z-20 bg-white rounded-full shadow-md p-2">
+                    <Spin size="small" />
                 </div>
             )}
 

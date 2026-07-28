@@ -19,6 +19,7 @@ import { GET_API, DELETE_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showToast } from "@/components/common/Toast";
+import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import DaySlider from "@/components/learners/DaySlider/index";
 import { useQueryState } from "nuqs";
@@ -449,8 +450,8 @@ export default function InstantSessionsPage() {
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
             {(isPageLoading || isActionLoading || isDetailLoading) && (
-                <div className="fixed top-4 right-4 z-20">
-                    <LottieLoader isLoading={true} />
+                <div className="fixed top-4 right-4 z-20 bg-white rounded-full shadow-md p-2">
+                    <Spin size="small" />
                 </div>
             )}
 
