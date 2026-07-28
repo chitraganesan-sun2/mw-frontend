@@ -61,9 +61,9 @@ export const endpoints: EndpointProps = {
         /** GET instant session by slot (query: volunteer_slot_id, date YYYY-MM-DD, volunteer_id) */
         getVolunteerInstantSession: (volunteer_slot_id: string, date: string, volunteer_id: string) =>
             `session/volunteer/instant_session?volunteer_slot_id=${encodeURIComponent(volunteer_slot_id)}&date=${encodeURIComponent(date)}&volunteer_id=${encodeURIComponent(volunteer_id)}`,
-        /** GET learner instant sessions (query: date YYYY-MM-DD, is_accepted boolean) */
-        getLearnerInstantSession: (date: string, isAccepted?: boolean) =>
-            `session/learner/instant_session?date=${encodeURIComponent(date)}${isAccepted !== undefined ? `&is_accepted=${isAccepted}` : ""}`,
+        /** GET learner instant sessions (query: date YYYY-MM-DD, is_accepted boolean, free-text search) */
+        getLearnerInstantSession: (date: string, isAccepted?: boolean, query?: string) =>
+            `session/learner/instant_session?date=${encodeURIComponent(date)}${isAccepted !== undefined ? `&is_accepted=${isAccepted}` : ""}${query ? `&query=${encodeURIComponent(query)}` : ""}`,
         /** GET accepted instant sessions by date (path: date YYYY-MM-DD) */
         getAcceptedInstantSessionsByDate: (date: string) =>
             `session/learner/instant_session/accepted/${encodeURIComponent(date)}`,
@@ -82,10 +82,17 @@ export const endpoints: EndpointProps = {
         getUnreadCount: (id: string) => `session/unread_count`,
         updateReadsNotifications: `session/mark_as_read`,
         createLearnerInstantSessionRequest: "session/learner/request_instant_session",
-        getLearnerRequests: "session/learner/my_requests",
+        getLearnerRequests: (page?: number, size?: number, query?: string, requestStatus?: string) =>
+            `session/learner/my_requests?page=${page ?? 1}&size=${size ?? 20}${query ? `&query=${encodeURIComponent(query)}` : ""}${requestStatus ? `&request_status=${requestStatus}` : ""}`,
         cancelLearnerRequest: (id: string) => `session/learner/request/${id}`,
-        getVolunteerLearnerRequests: "session/volunteer/learner_requests",
+        getVolunteerLearnerRequests: (page?: number, size?: number, query?: string) =>
+            `session/volunteer/learner_requests?page=${page ?? 1}&size=${size ?? 20}${query ? `&query=${encodeURIComponent(query)}` : ""}`,
         acceptLearnerRequest: (id: string) => `session/volunteer/accept_learner_request/${id}`,
+        /** GET the calling volunteer's own instant sessions (accepted/active/completed/cancelled/expired) - replaces the old broken instant_session/active call */
+        getMyInstantSessions: (page?: number, size?: number, query?: string, requestStatus?: string) =>
+            `session/volunteer/my_instant_sessions?page=${page ?? 1}&size=${size ?? 20}${query ? `&query=${encodeURIComponent(query)}` : ""}${requestStatus ? `&request_status=${requestStatus}` : ""}`,
+        /** GET full detail for a single session by session_id (ownership-checked, works for both learner and volunteer callers) */
+        getSessionDetail: (sessionId: string) => `session/${sessionId}`,
     },
     volunteer_chat: {
         sendMessage: (id: string) => `chat/message/learner/${id}`,

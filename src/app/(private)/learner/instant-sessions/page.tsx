@@ -7,18 +7,22 @@ import SessionCard from "@/components/learners/SessionCard";
 
 dayjs.extend(customParseFormat);
 import { InstantSessionDetailModal } from "@/components/learners/Modals";
-import ConfirmationSuccessfulModal from "@/components/learners/Modals/ConfirmationSuccessfulModal";
 import RequestInstantSessionModal from "@/components/learners/RequestInstantSessionModal";
+import CenterModal from "@/components/common/Modals/CenterModal";
+import Button from "@/components/common/Button";
+import TagComponent from "@/components/common/Tag";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { getHeaderIcon } from "@/layouts/helper";
 import { usePathname } from "next/navigation";
 import { InstantSessionIcon } from "@/assets/icons";
-import { GET_API, DELETE_API } from "@/api/request";
+import { GET_API, DELETE_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showToast } from "@/components/common/Toast";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import DaySlider from "@/components/learners/DaySlider/index";
+import { useQueryState } from "nuqs";
+import { useDebounce } from "use-debounce";
 
 export interface Session {
     id: string;
@@ -118,18 +122,106 @@ function formatDuration(start: string, end: string): string {
     return `${mins} mins`;
 }
 
+const REQUEST_STATUS_LABELS: Record<string, string> = {
+    pending: "Pending",
+    accepted: "Accepted",
+    active: "Active",
+    completed: "Completed",
+    cancelled: "Cancelled",
+    expired: "Expired",
+};
+
+const REQUEST_STATUS_STYLES: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-800",
+    accepted: "bg-blue-100 text-blue-800",
+    active: "bg-green-100 text-green-700",
+    completed: "bg-gray-100 text-gray-700",
+    cancelled: "bg-red-100 text-red-700",
+    expired: "bg-gray-100 text-gray-500",
+};
+
+const REQUEST_STATUS_FILTERS = ["", "pending", "accepted", "active", "completed", "cancelled", "expired"];
+const REQUESTS_PAGE_SIZE = 5;
+
+function RequestedSessionCard({
+    request,
+    isActionLoading,
+    onCancel,
+    onView,
+}: {
+    request: any;
+    isActionLoading: boolean;
+    onCancel: (requestId: string) => void;
+    onView: (sessionId: string) => void;
+}) {
+    const statusClass = REQUEST_STATUS_STYLES[request.status] ?? "bg-gray-100 text-gray-700";
+    const statusLabel = REQUEST_STATUS_LABELS[request.status] ?? request.status;
+    const canCancelPending = request.status === "pending";
+    const canView = Boolean(request.session_id) && request.status !== "pending";
+
+    return (
+        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start mb-2">
+                <h3 className="font-semibold text-lg">
+                    {request.session_type === "academic" ? "Academic Session" : "Non-Academic Session"}
+                </h3>
+                <span className={`${statusClass} text-xs px-2 py-1 rounded-full font-medium`}>
+                    {statusLabel}
+                </span>
+            </div>
+            <p className="text-sm text-gray-600 mb-2">
+                Level: {request.grade_level || request.expertise_level || "N/A"}
+            </p>
+            {Array.isArray(request.skills) && request.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                    {request.skills.map((skill: string) => (
+                        <TagComponent
+                            key={skill}
+                            text={skill}
+                            tagClassName="!bg-blue-50 !border-none !text-blue-700 !px-2 !py-0.5 !text-[10px] capitalize"
+                        />
+                    ))}
+                </div>
+            )}
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+                <span className="font-medium">
+                    {dayjs(request.availability_date).format("MMM D")} @{" "}
+                    {dayjs(request.availability_start_time, "HH:mm").format("h:mm a")}
+                </span>
+                <span className="text-gray-400">({request.duration} mins)</span>
+            </div>
+            <div className="mt-4 flex justify-end gap-3">
+                {canView && (
+                    <button
+                        className="text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors disabled:opacity-50"
+                        disabled={isActionLoading}
+                        onClick={() => onView(request.session_id)}
+                    >
+                        {request.status === "accepted" || request.status === "active" ? "View / Join" : "View"}
+                    </button>
+                )}
+                {canCancelPending && (
+                    <button
+                        className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors disabled:opacity-50"
+                        disabled={isActionLoading}
+                        onClick={() => onCancel(request.request_id)}
+                    >
+                        Cancel Request
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function InstantSessionsPage() {
     const [selectedSession, setSelectedSession] = useState<Session | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedClaimedSession, setSelectedClaimedSession] = useState<Session | null>(null);
-    const [isClaimedModalOpen, setIsClaimedModalOpen] = useState(false);
-    const [claimedSessionDetails, setClaimedSessionDetails] = useState<any>(null);
-    const [isLoadingClaimedDetails, setIsLoadingClaimedDetails] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
-    
-    // New states for learner requests
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-    
+    const [sessionDetail, setSessionDetail] = useState<any>(null);
+    const [isDetailLoading, setIsDetailLoading] = useState(false);
+
     const queryClient = useQueryClient();
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
@@ -137,23 +229,29 @@ export default function InstantSessionsPage() {
     const todayStr = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
     const [selectedDate, setSelectedDate] = useState(todayStr);
 
-    // Query for available sessions
+    const [query] = useQueryState("query");
+    const [debouncedQuery] = useDebounce(query, 400);
+    const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
+    const [requestStatus, setRequestStatus] = useQueryState("request_status", { defaultValue: "" });
+
+    // Available Instant Sessions (volunteer-opened slots, browsed by date)
     const {
         data: apiData,
         isLoading,
         isFetching,
         isError,
     } = useQuery({
-        queryKey: ["learner-instant-sessions", selectedDate],
+        queryKey: ["learner-instant-sessions", selectedDate, debouncedQuery],
         queryFn: async () => {
-            const res = await GET_API(endpoints.session.getLearnerInstantSession(selectedDate));
+            const res = await GET_API(
+                endpoints.session.getLearnerInstantSession(selectedDate, undefined, debouncedQuery || undefined)
+            );
             return res?.data;
         },
         refetchOnMount: true,
         refetchOnWindowFocus: false,
     });
 
-    // Query for accepted/claimed sessions using the new API endpoint
     const {
         data: claimedApiData,
         isLoading: isClaimedLoading,
@@ -171,27 +269,30 @@ export default function InstantSessionsPage() {
         refetchOnWindowFocus: false,
     });
 
-    // Query for learner's own pending requests
+    // My Requested Sessions (the learner-initiated request flow - any volunteer can accept)
     const {
-        data: pendingRequestsData,
-        isLoading: isPendingRequestsLoading,
+        data: myRequestsData,
+        isLoading: isMyRequestsLoading,
+        isFetching: isMyRequestsFetching,
     } = useQuery({
-        queryKey: ["learner-pending-requests", selectedDate],
+        queryKey: ["learner-my-requests", requestsPage, requestStatus, debouncedQuery],
         queryFn: async () => {
-            const res = await GET_API(endpoints.session.getLearnerRequests);
+            const res = await GET_API(
+                endpoints.session.getLearnerRequests(
+                    Number(requestsPage) || 1,
+                    REQUESTS_PAGE_SIZE,
+                    debouncedQuery || undefined,
+                    requestStatus || undefined
+                )
+            );
             return res?.data;
         },
-        refetchOnMount: true,
-        refetchOnWindowFocus: false,
+        refetchInterval: 15000,
+        refetchOnWindowFocus: true,
     });
-
-    const pendingRequests = useMemo(() => {
-        if (!pendingRequestsData) return [];
-        return (Array.isArray(pendingRequestsData) ? pendingRequestsData : []).filter(
-            (req: any) => req.status === "pending" && req.availability_date === selectedDate
-        );
-    }, [pendingRequestsData, selectedDate]);
-
+    const myRequests: any[] = myRequestsData?.items ?? [];
+    const myRequestsTotal: number = myRequestsData?.total ?? 0;
+    const myRequestsHasMore = Number(requestsPage) * REQUESTS_PAGE_SIZE < myRequestsTotal;
 
     const availableSessions: Session[] = useMemo(() => {
         if (!apiData) return [];
@@ -226,110 +327,91 @@ export default function InstantSessionsPage() {
         setSelectedSession(null);
     };
 
-    const handleClaim = () => {
-        console.log("Claiming session:", selectedSession?.id);
-    };
-
+    /** Claimed volunteer-opened slots live in instant_session_collection, keyed by
+     * volunteer_slot_id, and are un-joined via the unclaim endpoint. */
     const handleClaimedSessionClick = async (session: Session) => {
-        setSelectedClaimedSession(session);
-        setIsLoadingClaimedDetails(true);
-        setIsClaimedModalOpen(true);
-
+        setIsDetailLoading(true);
         try {
-            const response = await GET_API(
-                endpoints.session.getLearnerInstantSessionDetail(session.id)
-            );
-            const apiData = response.data;
-
-            if (apiData) {
-                const formattedSession = {
-                    id: apiData.volunteer_slot_id ?? session.id,
-                    title: apiData.title ?? session.title,
-                    startTime: apiData.start_time
-                        ? dayjs(apiData.start_time, "HH:mm").format("h:mm a")
-                        : session.startTime,
-                    endTime: apiData.end_time
-                        ? dayjs(apiData.end_time, "HH:mm").format("h:mm a")
-                        : session.endTime,
-                    timezone:
-                        (apiData.volunteer_timezone || session.timezone)?.split(" - ")[0] ??
-                        session.timezone,
-                    duration: apiData.duration ? `${apiData.duration} Mins` : session.duration,
-                    instructor: {
-                        name: apiData.volunteer_name ?? session.instructor.name,
-                        profilePicture:
-                            apiData.volunteer_image?.image_url ?? session.instructor.profilePicture,
-                    },
-                    meetingLink: apiData.meet_link,
-                    guests:
-                        apiData.volunteer_email && apiData.learner_email
-                            ? [apiData.volunteer_email, apiData.learner_email]
-                            : [],
-                    is_learner: apiData.is_learner ?? false,
-                };
-                setClaimedSessionDetails(formattedSession);
-            } else {
-                // Fallback to basic session data
-                setClaimedSessionDetails({
-                    ...session,
-                    meetingLink: undefined,
-                    guests: [],
-                    is_learner: false,
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch session details:", error);
-            // Fallback to basic session data
-            setClaimedSessionDetails({
-                ...session,
-                meetingLink: undefined,
-                guests: [],
-                is_learner: false,
+            const res = await GET_API(endpoints.session.getLearnerInstantSessionDetail(session.id));
+            const apiData = res?.data;
+            setSessionDetail({
+                title: apiData?.title ?? session.title,
+                description: apiData?.description ?? session.description,
+                dateLabel: apiData?.date ?? session.date,
+                timeLabel: apiData?.start_time && apiData?.end_time
+                    ? `${formatTime12h(apiData.start_time)} - ${formatTime12h(apiData.end_time)}`
+                    : `${session.startTime} - ${session.endTime}`,
+                hostName: apiData?.volunteer_name ?? session.instructor.name,
+                meetLink: apiData?.meet_link,
+                status: "accepted",
+                cancelAction: "unclaim",
+                identifier: session.id,
             });
+        } catch (error) {
+            showToast({ message: "Failed to load session details", type: "error" });
         } finally {
-            setIsLoadingClaimedDetails(false);
+            setIsDetailLoading(false);
         }
     };
 
-    const handleCloseClaimedModal = () => {
-        setIsClaimedModalOpen(false);
-        setSelectedClaimedSession(null);
-        setClaimedSessionDetails(null);
+    /** Sessions created from an accepted learner request live in sessions_collection,
+     * keyed by session_id, and are cancelled via the generic PUT /session/{id} endpoint. */
+    const handleViewRequestedSession = async (sessionId: string) => {
+        setIsDetailLoading(true);
+        try {
+            const res = await GET_API(endpoints.session.getSessionDetail(sessionId));
+            const apiData = res?.data;
+            setSessionDetail({
+                title: apiData?.session_title,
+                description: apiData?.session_description,
+                dateLabel: apiData?.learner_start_date,
+                timeLabel: apiData?.learner_start_time && apiData?.learner_end_time
+                    ? `${formatTime12h(apiData.learner_start_time)} - ${formatTime12h(apiData.learner_end_time)}`
+                    : undefined,
+                hostName: apiData?.volunteer_full_name,
+                meetLink: apiData?.meet_link,
+                status: apiData?.status,
+                cancelAction: ["completed", "cancelled", "expired"].includes(apiData?.status) ? "none" : "cancel",
+                identifier: sessionId,
+            });
+        } catch (error) {
+            showToast({ message: "Failed to load session details", type: "error" });
+        } finally {
+            setIsDetailLoading(false);
+        }
     };
 
-    const handleCancelMeeting = async () => {
-        if (!claimedSessionDetails?.id) return;
-
+    const handleCancelRequest = async (requestId: string) => {
+        if (!confirm("Are you sure you want to cancel this request?")) return;
         setIsActionLoading(true);
         try {
-            const res = await DELETE_API(
-                endpoints.session.unclaimInstantSession(claimedSessionDetails.id)
-            );
-            if (res.status === 200 || res.status === 201) {
-                showToast({ message: "Session unclaimed successfully", type: "success" });
+            await DELETE_API(endpoints.session.cancelLearnerRequest(requestId));
+            queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
+            showToast({ message: "Request cancelled successfully", type: "success" });
+        } catch (e: any) {
+            showToast({ message: e?.response?.data?.detail || "Failed to cancel request", type: "error" });
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
 
-                // Invalidate and refetch queries to update the UI immediately
-                // This ensures the cancelled session appears in available sessions
-                await queryClient.invalidateQueries({ queryKey: ["learner-instant-sessions"] });
-                await queryClient.invalidateQueries({
-                    queryKey: ["learner-accepted-instant-sessions"],
-                });
-
-                // Refetch to ensure fresh data
-                await queryClient.refetchQueries({
-                    queryKey: ["learner-instant-sessions", selectedDate],
-                });
-                await queryClient.refetchQueries({
-                    queryKey: ["learner-accepted-instant-sessions", selectedDate],
-                });
-
-                handleCloseClaimedModal();
+    const handleCancelDetail = async () => {
+        if (!sessionDetail?.identifier || sessionDetail.cancelAction === "none") return;
+        if (!confirm("Are you sure you want to cancel this session?")) return;
+        setIsActionLoading(true);
+        try {
+            if (sessionDetail.cancelAction === "unclaim") {
+                await DELETE_API(endpoints.session.unclaimInstantSession(sessionDetail.identifier));
             } else {
-                showToast({ message: "Failed to unclaim session", type: "error" });
+                await PUT_API(endpoints.session.cancelSession(sessionDetail.identifier), { status: "cancelled" });
             }
-        } catch (error) {
-            console.error("Error unclaiming session:", error);
-            showToast({ message: "Failed to unclaim session", type: "error" });
+            showToast({ message: "Session cancelled successfully", type: "success" });
+            queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
+            queryClient.invalidateQueries({ queryKey: ["learner-instant-sessions"] });
+            queryClient.invalidateQueries({ queryKey: ["learner-accepted-instant-sessions"] });
+            setSessionDetail(null);
+        } catch (error: any) {
+            showToast({ message: error?.response?.data?.detail || "Failed to cancel session", type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -339,7 +421,7 @@ export default function InstantSessionsPage() {
         setHeaderOptions({
             title: "Instant Sessions",
             titleIcon: getHeaderIcon(pathname),
-            searchPlaceholder: "Search",
+            searchPlaceholder: "Search sessions",
             leftButton: {
                 buttonTitle: "Events",
                 buttonIcon: <InstantSessionIcon />,
@@ -354,7 +436,6 @@ export default function InstantSessionsPage() {
         });
     }, [setHeaderOptions, pathname, selectedDate]);
 
-    // Show loader when loading initially or fetching (when switching to page)
     const isPageLoading = isLoading || isClaimedLoading || isFetching || isClaimedFetching;
 
     if (isError || isClaimedError) {
@@ -366,94 +447,40 @@ export default function InstantSessionsPage() {
     }
 
     return (
-        <div className="relative p-4 md:p-6 min-h-full">
-            {isPageLoading && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-background-input">
+        <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
+            {(isPageLoading || isActionLoading || isDetailLoading) && (
+                <div className="fixed top-4 right-4 z-20">
                     <LottieLoader isLoading={true} />
                 </div>
             )}
 
-            <div className="flex justify-end mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Instant Sessions</h1>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Browse live sessions or request one for a time that works for you
+                    </p>
+                </div>
                 <button
                     onClick={() => setIsRequestModalOpen(true)}
-                    className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+                    className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
                 >
-                    Request a Session
+                    + Request a Session
                 </button>
             </div>
 
-            {/* Pending Requests Section */}
-            {pendingRequests.length > 0 && (
-                <div className="mb-8">
-                    <div className="flex items-center my-6">
-                        <div className="flex-1 border-t border-gray-200" />
-                        <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                            Your Pending Requests
-                        </span>
-                        <div className="flex-1 border-t border-gray-200" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {pendingRequests.map((req: any) => (
-                            <div key={req.request_id} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-semibold text-lg">{req.session_type === 'academic' ? 'Academic Session' : 'Non-Academic Session'}</h3>
-                                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">Pending</span>
-                                </div>
-                                <p className="text-sm text-gray-600 mb-2">Level: {req.grade_level || req.expertise_level}</p>
-                                {Array.isArray(req.skills) && req.skills.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 mb-3">
-                                        {req.skills.map((skill: string) => (
-                                            <span
-                                                key={skill}
-                                                className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] rounded-full font-medium capitalize"
-                                            >
-                                                {skill}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-                                <div className="flex items-center gap-2 text-sm text-gray-700">
-                                    <span className="font-medium">Time:</span>
-                                    <span>{dayjs(req.availability_start_time, "HH:mm").format("h:mm a")}</span>
-                                    <span className="text-gray-400">({req.duration} mins)</span>
-                                </div>
-                                <div className="mt-4 flex justify-end">
-                                    <button
-                                        className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors"
-                                        onClick={async () => {
-                                            if(confirm("Are you sure you want to cancel this request?")) {
-                                                setIsActionLoading(true);
-                                                try {
-                                                    await DELETE_API(endpoints.session.cancelLearnerRequest(req.request_id));
-                                                    queryClient.invalidateQueries({ queryKey: ["learner-pending-requests"] });
-                                                    showToast({ message: "Request cancelled successfully", type: "success" });
-                                                } catch (e) {
-                                                    showToast({ message: "Failed to cancel request", type: "error" });
-                                                } finally {
-                                                    setIsActionLoading(false);
-                                                }
-                                            }
-                                        }}
-                                    >
-                                        Cancel Request
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+            {/* Available Instant Sessions (volunteer-opened slots, browse by date + join) */}
+            <div className="mb-10">
+                <div className="flex items-center my-6">
+                    <div className="flex-1 border-t border-gray-200" />
+                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
+                        Available Instant Sessions
+                    </span>
+                    <div className="flex-1 border-t border-gray-200" />
                 </div>
-            )}
 
-            {availableSessions.length > 0 && (
-                <div className="mb-8">
-                    <div className="flex items-center my-6">
-                        <div className="flex-1 border-t border-gray-200" />
-                        <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                            Available Sessions to Claim
-                        </span>
-                        <div className="flex-1 border-t border-gray-200" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {availableSessions.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {availableSessions.map((session) => (
                             <SessionCard
                                 key={session.id}
@@ -462,19 +489,9 @@ export default function InstantSessionsPage() {
                             />
                         ))}
                     </div>
-                </div>
-            )}
+                )}
 
-            {claimedSessions.length > 0 && (
-                <>
-                    <div className="flex items-center my-6">
-                        <div className="flex-1 border-t border-gray-200" />
-                        <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                            {/* {selectedDate === todayStr ? "Today's" : "Tomorrow's"} claimed session */}
-                            claimed session
-                        </span>
-                        <div className="flex-1 border-t border-gray-200" />
-                    </div>
+                {claimedSessions.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {claimedSessions.map((session) => (
                             <SessionCard
@@ -484,21 +501,111 @@ export default function InstantSessionsPage() {
                             />
                         ))}
                     </div>
-                </>
-            )}
+                )}
 
-            {availableSessions.length === 0 && claimedSessions.length === 0 && (
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <p className="text-gray-500 text-lg">No sessions available at the moment.</p>
+                {availableSessions.length === 0 && claimedSessions.length === 0 && (
+                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                        <div className="text-5xl mb-4">🕒</div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            No Instant Sessions
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            Sessions volunteers open up for this date will show up here
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* My Requested Sessions (the learner-request-for-any-volunteer flow) */}
+            <div>
+                <div className="flex items-center my-6">
+                    <div className="flex-1 border-t border-gray-200" />
+                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
+                        My Requested Sessions
+                    </span>
+                    <div className="flex-1 border-t border-gray-200" />
                 </div>
-            )}
+
+                <div className="flex justify-end mb-4">
+                    <select
+                        className="h-9 px-3 border border-gray-200 rounded-lg text-sm bg-white"
+                        value={requestStatus || ""}
+                        onChange={(e) => {
+                            setRequestStatus(e.target.value || null);
+                            setRequestsPage("1");
+                        }}
+                    >
+                        {REQUEST_STATUS_FILTERS.map((s) => (
+                            <option key={s} value={s}>
+                                {s ? REQUEST_STATUS_LABELS[s] : "All statuses"}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {isMyRequestsLoading || isMyRequestsFetching ? (
+                    <div className="flex justify-center py-6">
+                        <LottieLoader isLoading={true} />
+                    </div>
+                ) : myRequests.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {myRequests.map((req) => (
+                                <RequestedSessionCard
+                                    key={req.request_id}
+                                    request={req}
+                                    isActionLoading={isActionLoading}
+                                    onCancel={handleCancelRequest}
+                                    onView={handleViewRequestedSession}
+                                />
+                            ))}
+                        </div>
+                        {(Number(requestsPage) > 1 || myRequestsHasMore) && (
+                            <div className="flex justify-center gap-4 mt-4">
+                                <button
+                                    className="text-sm font-medium disabled:opacity-40"
+                                    disabled={Number(requestsPage) <= 1}
+                                    onClick={() => setRequestsPage(String(Number(requestsPage) - 1))}
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    className="text-sm font-medium disabled:opacity-40"
+                                    disabled={!myRequestsHasMore}
+                                    onClick={() => setRequestsPage(String(Number(requestsPage) + 1))}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                        <div className="text-5xl mb-4">📋</div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            No Requested Sessions
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-6">
+                            Requests you send will show up here
+                        </p>
+                        <button
+                            onClick={() => setIsRequestModalOpen(true)}
+                            className="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+                        >
+                            Request a Session
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {selectedSession && (
                 <InstantSessionDetailModal
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     session={selectedSession}
-                    onClaim={handleClaim}
+                    onClaim={() => {
+                        handleCloseModal();
+                    }}
                     onClaimLoadingChange={setIsActionLoading}
                     showNote={
                         claimedSessions.length > 0 &&
@@ -508,29 +615,62 @@ export default function InstantSessionsPage() {
                 />
             )}
 
-            {/* Loader when claiming or unclaiming (card switching) - only covers content area */}
-            {isActionLoading && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-background-input">
-                    <LottieLoader isLoading={true} />
-                </div>
-            )}
+            <CenterModal
+                isOpen={Boolean(sessionDetail) && !isDetailLoading}
+                onClose={() => setSessionDetail(null)}
+                title={sessionDetail?.title ?? "Session Details"}
+                width={520}
+                footerComponent={
+                    <div className="w-full flex gap-3">
+                        <Button
+                            title="Close"
+                            btnVariant="tertiary"
+                            customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
+                            onClick={() => setSessionDetail(null)}
+                        />
+                        {sessionDetail?.meetLink && (
+                            <a
+                                href={sessionDetail.meetLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1"
+                            >
+                                <Button title="Join" btnVariant="secondary" customClassName="w-full" />
+                            </a>
+                        )}
+                        {sessionDetail?.cancelAction && sessionDetail.cancelAction !== "none" && (
+                            <Button
+                                title="Cancel"
+                                btnVariant="tertiary"
+                                customClassName="!bg-white !text-red-600 !border !border-red-200 flex-1"
+                                onClick={handleCancelDetail}
+                            />
+                        )}
+                    </div>
+                }
+            >
+                {sessionDetail && (
+                    <div className="flex flex-col gap-3 text-sm text-[#121212]">
+                        {sessionDetail.description && <p>{sessionDetail.description}</p>}
+                        <p>
+                            <span className="font-medium">When: </span>
+                            {sessionDetail.dateLabel} {sessionDetail.timeLabel}
+                        </p>
+                        {sessionDetail.hostName && (
+                            <p>
+                                <span className="font-medium">Volunteer: </span>
+                                {sessionDetail.hostName}
+                            </p>
+                        )}
+                    </div>
+                )}
+            </CenterModal>
 
-            {/* Confirmation Modal for Claimed Sessions */}
-            {/* {isClaimedModalOpen && claimedSessionDetails && !isLoadingClaimedDetails && (
-                <ConfirmationSuccessfulModal
-                    isOpen={isClaimedModalOpen}
-                    onClose={handleCloseClaimedModal}
-                    session={claimedSessionDetails}
-                    onCancelMeeting={handleCancelMeeting}
-                />
-            )} */}
-
-            {/* Request Session Modal */}
-            <RequestInstantSessionModal 
+            <RequestInstantSessionModal
                 isOpen={isRequestModalOpen}
                 onClose={() => setIsRequestModalOpen(false)}
                 onSuccess={() => {
-                    queryClient.invalidateQueries({ queryKey: ["learner-pending-requests"] });
+                    queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
                 }}
             />
         </div>

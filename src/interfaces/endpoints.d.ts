@@ -50,7 +50,7 @@ export type EndpointProps = {
         getInstantSessions: string;
         validateInstantSession: (session_date: string, session_start_time: string, session_end_time: string) => string;
         getVolunteerInstantSession: (volunteer_slot_id: string, date: string, volunteer_id: string) => string;
-        getLearnerInstantSession: (date: string, isAccepted?: boolean) => string;
+        getLearnerInstantSession: (date: string, isAccepted?: boolean, query?: string) => string;
         getAcceptedInstantSessionsByDate: (date: string) => string;
         getLearnerInstantSessionDetail: (volunteer_slot_id: string) => string;
         unclaimInstantSession: (volunteer_slot_id: string) => string;
@@ -68,10 +68,12 @@ export type EndpointProps = {
         getUnreadCount: (id: string) => string;
         updateReadsNotifications: string;
         createLearnerInstantSessionRequest: string;
-        getLearnerRequests: string;
+        getLearnerRequests: (page?: number, size?: number, query?: string, requestStatus?: string) => string;
         cancelLearnerRequest: (id: string) => string;
-        getVolunteerLearnerRequests: string;
+        getVolunteerLearnerRequests: (page?: number, size?: number, query?: string) => string;
         acceptLearnerRequest: (id: string) => string;
+        getMyInstantSessions: (page?: number, size?: number, query?: string, requestStatus?: string) => string;
+        getSessionDetail: (sessionId: string) => string;
     };
     volunteer_chat: {
         sendMessage: (id: string) => string;
