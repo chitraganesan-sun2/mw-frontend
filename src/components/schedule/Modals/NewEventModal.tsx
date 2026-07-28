@@ -548,6 +548,11 @@ export default function NewEventModal({
             {fullScreenMobileStyles}
             <CenterModal
                 title="New Instant Session"
+                topContent={
+                    <p className="text-sm text-gray-500 font-normal !mt-0">
+                        Set up a live session for learners to join instantly
+                    </p>
+                }
                 headerComponent={isMobile ? mobileHeader : undefined}
                 hideCloseIcon={isMobile}
                 isOpen={isOpen}
@@ -559,7 +564,7 @@ export default function NewEventModal({
                 headerClassName="!px-6 !py-5"
                 bodyClassName="md:!px-6 !p-[20px]"
             >
-                <div className="flex flex-col gap-2 max-md:gap-4">
+                <div className="flex flex-col gap-5 max-md:gap-5">
                     {/* Select Date */}
                     <div className="flex flex-col gap-2">
                         <Input
@@ -570,34 +575,44 @@ export default function NewEventModal({
                             onChange={handleDateChange}
                             disabled={false}
                             format="DD MMMM YYYY"
-                            labelClassName="!text-base !text-[#121212]"
-                            inputClassName="w-full !h-12 !bg-white md:!border-gray-200 hover:!bg-white focus:!bg-white [&_.ant-picker]:!bg-white [&_.ant-picker]:!border-gray-200 [&_.ant-picker-input>input]:!bg-white [&_.ant-picker-input>input]:!text-[#121212] [&_.ant-picker-input>input]:!text-base [&_.ant-picker-suffix]:!text-[#4F4F4F]"
+                            labelClassName="!text-base !font-medium !text-[#121212]"
+                            inputClassName="w-full !h-12 !bg-white md:!border-gray-200 hover:!bg-white focus:!bg-white [&_.ant-picker]:!bg-white [&_.ant-picker]:!rounded-xl [&_.ant-picker]:!border-gray-200 [&_.ant-picker:hover]:!border-gray-400 [&_.ant-picker-focused]:!border-black [&_.ant-picker-input>input]:!bg-white [&_.ant-picker-input>input]:!text-[#121212] [&_.ant-picker-input>input]:!text-base [&_.ant-picker-suffix]:!text-[#4F4F4F]"
                             availableDates={[getTodayDate(), getTomorrowDate()]}
                         />
                     </div>
 
-                    {/* Duration and Start Time Row */}
-                    <div className="grid md:grid-cols-2 gap-[16px] md:gap-5">
-                        {/* Duration */}
-                        <div className="flex flex-col gap-2">
-                            <Input
-                                name="duration"
-                                label="Duration"
-                                inputType="select"
-                                value={formData.duration}
-                                onChange={handleDurationChange}
-                                options={durationOptions}
-                                placeholder="Select Duration"
-                                labelClassName="!text-base !text-[#121212]"
-                                inputClassName="w-full !h-12 [&_.ant-select-selector]:!text-base [&_.ant-select-selector]:!text-[#121212] [&_.ant-select-selection-placeholder]:!text-[#808080] [&_.ant-select-selection-placeholder]:!text-base [&_.ant-select-selection-placeholder]:!font-normal [&.ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder]:!text-[#808080] [&.ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder]:!text-base [&.ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder]:!font-normal"
-                            />
+                    {/* Duration – card-style pill selector */}
+                    <div className="flex flex-col gap-2">
+                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
+                            Duration
+                        </label>
+                        <div className="grid grid-cols-4 gap-2">
+                            {durationOptions.map((opt) => {
+                                const isSelected = formData.duration === opt.value;
+                                return (
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        onClick={() => handleDurationChange(opt.value)}
+                                        className={`py-3 px-2 rounded-xl border text-center text-sm font-medium transition-all duration-150 cursor-pointer ${
+                                            isSelected
+                                                ? "border-black bg-black text-white"
+                                                : "border-gray-200 text-[#121212] bg-white hover:border-gray-400"
+                                        }`}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                );
+                            })}
                         </div>
+                    </div>
 
-                        {/* Start Time */}
-                        <div className="flex flex-col gap-2">
-                            <label className="md:text-base text-[14px] font-regular text-[#121212]">
-                                Start Time{activeAbbreviation ? ` (${activeAbbreviation})` : ""}
-                            </label>
+                    {/* Start Time */}
+                    <div className="flex flex-col gap-2">
+                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
+                            Start Time{activeAbbreviation ? ` (${activeAbbreviation})` : ""}
+                        </label>
+                        <div className="w-full">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <MobileTimePicker
                                     format="h:mm A"
@@ -663,30 +678,30 @@ export default function NewEventModal({
                                             sx: {
                                                 width: "100%",
                                                 "& .MuiOutlinedInput-root": {
-                                                    borderRadius: "6px",
-                                                    fontSize: "14px",
+                                                    borderRadius: "12px",
+                                                    fontSize: "16px",
                                                     height: "48px",
-                                                    backgroundColor: "#f4f7fb",
+                                                    backgroundColor: "#ffffff",
                                                     "& fieldset": {
-                                                        border: "1px solid #e0e0e0",
+                                                        border: "1px solid #e5e7eb",
                                                     },
                                                     "&:hover": {
-                                                        backgroundColor: "#f4f7fb",
+                                                        backgroundColor: "#ffffff",
                                                         "& fieldset": {
-                                                            border: "1px solid #e0e0e0",
+                                                            border: "1px solid #9ca3af",
                                                         },
                                                     },
                                                     "&.Mui-focused": {
-                                                        backgroundColor: "#f4f7fb",
+                                                        backgroundColor: "#ffffff",
                                                         "& fieldset": {
-                                                            border: "1px solid #e0e0e0",
+                                                            border: "1px solid #000000",
                                                         },
                                                     },
                                                 },
                                                 "& .MuiInputBase-input": {
-                                                    padding: "4px 11px",
-                                                    fontSize: "14px",
-                                                    color: "#1a1a1a",
+                                                    padding: "4px 14px",
+                                                    fontSize: "16px",
+                                                    color: "#121212",
                                                     height: "48px",
                                                     display: "flex",
                                                     alignItems: "center",
@@ -714,8 +729,8 @@ export default function NewEventModal({
                             value={formData.title}
                             onChange={handleTitleChange}
                             placeholder="Enter title here"
-                            labelClassName="!text-base !text-[#121212]"
-                            inputClassName="w-full !h-12 !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
+                            labelClassName="!text-base !font-medium !text-[#121212]"
+                            inputClassName="w-full !h-12 !rounded-xl !border-gray-200 hover:!border-gray-400 focus:!border-black !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
                         />
                     </div>
 
@@ -728,15 +743,15 @@ export default function NewEventModal({
                             value={formData.description}
                             onChange={handleDescriptionChange}
                             placeholder="Enter description here"
-                            labelClassName="!text-base !text-[#121212]"
-                            inputClassName="w-full !h-[100px] !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
+                            labelClassName="!text-base !font-medium !text-[#121212]"
+                            inputClassName="w-full !h-[100px] !rounded-xl !border-gray-200 hover:!border-gray-400 focus:!border-black !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
                             rows={4}
                         />
                     </div>
 
                     {/* Tags – search and select from skills, pass skill IDs as tag_ids on post */}
                     <div className="flex flex-col md:gap-2">
-                        <label className="md:text-base text-[14px] font-regular text-[#121212]">
+                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
                             Tags
                         </label>
                         <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
@@ -773,36 +788,36 @@ export default function NewEventModal({
                                             String(s.skill_id) === String(opt.value)
                                     )
                             )}
-                            inputClassName="w-full !h-12 [&_.ant-select-selector]:!text-base"
+                            inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
                         />
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="hidden md:flex gap-3 justify-end pt-5 pb-2 border-t border-stroke">
+                    <div className="hidden md:flex gap-3 pt-5 pb-2 border-t border-stroke">
                         <Button
                             title="Cancel"
                             onClick={handleCancel}
-                            customClassName="!bg-white !text-black !font-medium rounded-full !px-6 !py-2.5"
+                            customClassName="flex-1 !bg-white !text-black !font-medium !rounded-2xl !border !border-gray-200 hover:!bg-gray-50 !py-3"
                         />
                         <Button
                             title={isSubmitting ? "Creating..." : "Create Event"}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            customClassName="!bg-black !text-white !font-medium rounded-full !px-6 !py-2.5"
+                            customClassName="flex-1 !bg-black !text-white !font-medium !rounded-2xl !py-3"
                         />
                     </div>
                 </div>
-                <div className="flex md:hidden gap-3 justify-end pt-5  border-t border-stroke">
+                <div className="flex md:hidden gap-3 pt-5 border-t border-stroke">
                     <Button
                         title="Cancel"
                         onClick={handleCancel}
-                        customClassName="!bg-white !text-black !font-medium rounded-full !px-6 !py-2.5"
+                        customClassName="flex-1 !bg-white !text-black !font-medium !rounded-2xl !border !border-gray-200 !py-3"
                     />
                     <Button
                         title={isSubmitting ? "Creating..." : "Create Event"}
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        customClassName="!bg-black !text-white !font-medium rounded-full !px-6 !py-2.5"
+                        customClassName="flex-1 !bg-black !text-white !font-medium !rounded-2xl !py-3"
                     />
                 </div>
             </CenterModal>
