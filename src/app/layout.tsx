@@ -97,6 +97,10 @@ export default function RootLayout({
                 <PostHogProvider>
                     <RootLayoutClient>{children}</RootLayoutClient>
                 </PostHogProvider>
+                <Script
+                    src="https://www.droppnotes.com/pinpoint.js?project=0a625646-27ca-4c67-917e-4ac55106e95f"
+                    strategy="afterInteractive"
+                />
             </body>
         </html>
     );
