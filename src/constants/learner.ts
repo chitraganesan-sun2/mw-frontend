@@ -433,13 +433,6 @@ const SkillsToLearnFields: FormField[] = [
         gridCols: 1,
     },
     {
-        id: "academic_goals_description",
-        label: "Academic Goals Description",
-        inputType: "textarea",
-        placeholder: "Describe here",
-        gridCols: 2,
-    },
-    {
         id: "arts_life_skills_to_learn",
         label: "Arts & Life Skills",
         sublabel: "(non-academic areas for tutoring or support)",
@@ -453,13 +446,6 @@ const SkillsToLearnFields: FormField[] = [
         gridCols: 1,
     },
     {
-        id: "arts_life_goals_description",
-        label: "Arts, Life Skills & Goals Description",
-        inputType: "textarea",
-        placeholder: "Describe here",
-        gridCols: 2,
-    },
-    {
         id: "preferred_volunteer_qualities",
         label: "Preferred Volunteer Qualities",
         sublabel: "(any specific traits the parent/guardian values in a tutor or mentor)",
@@ -467,6 +453,20 @@ const SkillsToLearnFields: FormField[] = [
         placeholder: "Enter here",
         gridCols: 1,
         required: true,
+    },
+    {
+        id: "academic_goals_description",
+        label: "Academic Goals Description",
+        inputType: "textarea",
+        placeholder: "Describe here",
+        gridCols: 2,
+    },
+    {
+        id: "arts_life_goals_description",
+        label: "Arts, Life Skills & Goals Description",
+        inputType: "textarea",
+        placeholder: "Describe here",
+        gridCols: 2,
     },
     {
         id: "other_comments_or_notes",
@@ -486,7 +486,7 @@ const SkillsToLearnFields: FormField[] = [
             { label: "Intermediate", value: "intermediate" },
             { label: "Expert", value: "expert" },
         ],
-        gridCols: 1,
+        gridCols: 2,
         className: "w-full h-fit mt-2 md:mt-4 gap-0 !mb-0",
         inputClassName: "w-full h-full",
         required: true,
