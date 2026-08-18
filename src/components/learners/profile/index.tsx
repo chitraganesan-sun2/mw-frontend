@@ -5,13 +5,12 @@ import Divider from "@/components/common/Divider";
 import TagComponent from "@/components/common/Tag";
 import ProfileCompletionBar, { calculateLearnerCompletion } from "@/components/profile/ProfileCompletionBar";
 import { useState, useRef, useEffect, useMemo } from "react";
-import { ParentGuardianInformation, ProfileDetails, LearnerInformation, AdditionalInformation } from "./tabs";
+import { ParentGuardianInformation, ProfileDetails, LearnerInformation } from "./tabs";
 
 const tabs = [
     { id: "profile-details", title: "Profile Details" },
     { id: "parent-guardian-information", title: "Guardian Info" },
     { id: "learner-information", title: "Personal Info" },
-    { id: "additional-information", title: "Additional Info" },
 ];
 
 const LearnerProfileBio = ({ data }: any) => {
@@ -48,8 +47,6 @@ const LearnerProfileBio = ({ data }: any) => {
                 return <ParentGuardianInformation data={data?.parent_info} />;
             case "learner-information":
                 return <LearnerInformation data={data} />;
-            case "additional-information":
-                return <AdditionalInformation data={data?.additional_info} />;
         }
     };
 

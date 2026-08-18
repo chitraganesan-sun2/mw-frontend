@@ -508,11 +508,9 @@ export const learnerFormSchema = z
             description: z
                 .string({ required_error: "Description of Needs is required" })
                 .min(1, { message: "Description of Needs is required" }),
-            areas_of_support_needed: z
-                .array(z.string(), {
-                    required_error: "Areas of Support Needed are required",
-                })
-                .nonempty("Areas of Support Needed are required"),
+            areas_of_support_needed: z.array(z.string()).optional(),
+            behavioral_concerns: z.string().optional(),
+            behavior_support_strategies: z.array(z.string()).optional(),
         }),
 
         // Education - Required
@@ -520,53 +518,38 @@ export const learnerFormSchema = z
             current_school: z
                 .string({ required_error: "Current School is required" })
                 .min(1, { message: "Current School is required" }),
-            iep_plan_key: z
-                .string({ required_error: "IEP Plan Key is required" })
-                .min(1, { message: "IEP Plan Key of Needs is required" }),
+            iep_plan_key: z.string().optional(),
+            program_iep_504_plan: z.string().optional(),
+            grade_or_education_level: z.string().optional(),
+            cultural_religious_considerations: z.string().optional(),
+            extracurricular_activities: z.string().optional(),
+            favorite_free_time_activities: z.string().optional(),
             academic_strengths: z
                 .array(z.string(), {
                     required_error: "Academic Strengths are required",
                 })
                 .nonempty("Academic Strengths are required"),
-            academic_challenges: z
-                .array(z.string(), {
-                    required_error: "Academic Challenges are required",
-                })
-                .nonempty("Academic Challenges are required"),
+            academic_challenges: z.array(z.string()).optional(),
         }),
 
-        // Social skills - Required
-        social_skills: z.object({
-            social_interaction_styles: z
-                .array(z.string(), {
-                    required_error: "Social Interaction Styles are required",
-                })
-                .nonempty("Social Interaction Styles are required"),
-            behavioral_concerns: z
-                .array(z.string(), {
-                    required_error: "Behavioral Concerns are required",
-                })
-                .nonempty("Behavioral Concerns are required"),
-            techniques_to_calm: z
-                .array(z.string(), {
-                    required_error: "Techniques to Calm are required",
-                })
-                .nonempty("Techniques to Calm are required"),
-        }),
+        // Social skills - no longer collected by this form (moved into
+        // learner_special_needs/education), kept optional for backward compatibility
+        social_skills: z
+            .object({
+                social_interaction_styles: z.array(z.string()).optional(),
+                behavioral_concerns: z.array(z.string()).optional(),
+                techniques_to_calm: z.array(z.string()).optional(),
+            })
+            .optional(),
 
-        // Current interests - Required
-        current_interests: z.object({
-            extra_curricular_activities: z
-                .string({
-                    required_error: "Extra-curricular Activities are required",
-                })
-                .min(1, { message: "Extra-curricular Activities  are required" }),
-            favorite_activities: z
-                .string({
-                    required_error: "Favorite Activities are required",
-                })
-                .min(1, { message: "Favorite Activities  are required" }),
-        }),
+        // Current interests - no longer collected by this form (moved into education),
+        // kept optional for backward compatibility
+        current_interests: z
+            .object({
+                extra_curricular_activities: z.string().optional(),
+                favorite_activities: z.string().optional(),
+            })
+            .optional(),
 
         // Learner goals - Required
         learner_goals: z.object({
@@ -578,32 +561,43 @@ export const learnerFormSchema = z
                     z.object({
                         skill_name: z.string({ required_error: "Skill name is required" }),
                         skill_id: z.string({ required_error: "Skill ID is required" }),
-                    }),
-                    { required_error: "Please add at least one skill" }
+                    })
                 )
-                .nonempty("Please add at least one skill"),
+                .optional(),
+            academic_skills_to_learn: z
+                .array(
+                    z.object({
+                        skill_name: z.string({ required_error: "Skill name is required" }),
+                        skill_id: z.string({ required_error: "Skill ID is required" }),
+                    })
+                )
+                .optional(),
+            arts_life_skills_to_learn: z
+                .array(
+                    z.object({
+                        skill_name: z.string({ required_error: "Skill name is required" }),
+                        skill_id: z.string({ required_error: "Skill ID is required" }),
+                    })
+                )
+                .optional(),
+            academic_goals_description: z.string().optional(),
+            arts_life_goals_description: z.string().optional(),
+            other_comments_or_notes: z.string().optional(),
             preferred_volunteer_qualities: z
                 .string({ required_error: "Preferred Volunteer Qualities are required" })
                 .min(1, { message: "Preferred Volunteer Qualities are required" }),
             skill_level: z.string({ required_error: "Skill Level is required" }),
         }),
 
-        // Additional info - Required
-        additional_info: z.object({
-            cultural_consideration: z
-                .string({ required_error: "Cultural Consideration is required" })
-                .min(1, { message: "Cultural Consideration is required" }),
-            other_concerns_or_requests: z
-                .string({
-                    required_error: "Other Concerns or Requests are required",
-                })
-                .min(1, { message: "Other Concerns or Requests are required" }),
-            what_motivates_to_learn: z
-                .string({
-                    required_error: "What Motivates the Learner is required",
-                })
-                .min(1, { message: "What Motivates the Learner is required" }),
-        }),
+        // Additional info - no longer collected by this form (moved into
+        // education/learner_goals), kept optional for backward compatibility
+        additional_info: z
+            .object({
+                cultural_consideration: z.string().optional(),
+                other_concerns_or_requests: z.string().optional(),
+                what_motivates_to_learn: z.string().optional(),
+            })
+            .optional(),
 
         // Consent and permissions - Required
         consent_and_permissions: z.object({
@@ -738,41 +732,28 @@ export const defaultLearnerData: Learner = {
         assistive_device_used: "Wheelchairs",
         communication_style: "Verbal",
         description: "Description",
-        areas_of_support_needed: ["Social skills", "Motor skills"],
-        learning_styles: ["Visual", "Verbal"],
+        behavioral_concerns: "Difficulty in social interaction",
+        behavior_support_strategies: ["provide_a_quiet_space"],
     },
 
     education: {
         current_school: "current_school",
-        iep_plan_key: "iep_plan_key",
+        grade_or_education_level: "Grade 6",
+        program_iep_504_plan: "iep_plan_key",
+        cultural_religious_considerations: "cultural_consideration",
         academic_strengths: ["math"],
-        academic_challenges: ["difficulty_with_reading"],
-    },
-
-    social_skills: {
-        communication_preferences: ["visual"],
-        social_interaction_styles: ["engaging"],
-        behavioral_concerns: ["difficulty_in_social_interaction"],
-        techniques_to_calm: ["provide_a_quiet_space"],
-    },
-
-    current_interests: {
-        interests: ["Basic chords"],
-        extra_curricular_activities: "Sports",
-        favorite_activities: "Drawing and coloring",
+        extracurricular_activities: "Sports",
+        favorite_free_time_activities: "Drawing and coloring",
     },
 
     learner_goals: {
         expected_goals: ["Encourage Independence"],
-        skills_to_learn: [{ skill_name: "science", skill_id: "science" }],
+        academic_skills_to_learn: [{ skill_name: "science", skill_id: "science" }],
+        academic_goals_description: "academic_goals_description",
+        arts_life_goals_description: "arts_life_goals_description",
+        other_comments_or_notes: "other_comments_or_notes",
         preferred_volunteer_qualities: "patience",
         skill_level: "beginner",
-    },
-
-    additional_info: {
-        cultural_consideration: "cultural_consideration",
-        other_concerns_or_requests: "other_concerns_or_requests",
-        what_motivates_to_learn: "what_motivates_to_learn",
     },
     consent_and_permissions: {
         photo_or_video_consent: true,

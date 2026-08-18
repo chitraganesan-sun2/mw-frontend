@@ -1,7 +1,19 @@
 import { EndpointProps } from "@/interfaces/endpoints";
 
 type UserType = "volunteer" | "learner";
-type CommonPath = "skills" | "languages" | "subjects" | "media" | "categories";
+type CommonPath =
+    | "skills"
+    | "languages"
+    | "subjects"
+    | "media"
+    | "categories"
+    | "development_disabilities"
+    | "assistive_devices"
+    | "communication_styles"
+    | "areas_of_support"
+    | "preferred_learner_age_group"
+    | "support_preference"
+    | (string & {});
 
 export const endpoints: EndpointProps = {
     onboarding: {
@@ -123,7 +135,12 @@ export const endpoints: EndpointProps = {
         getPostComments: (post_id: string) => `comment/${post_id}`,
         commentLikes: (comment_id: string) => `comment/${comment_id}/like`,
     },
-    common: (path: CommonPath) => `common/${path}/`,
+    // supports query-bearing paths like "skills?category=academic" - the trailing
+    // slash goes after the base segment and before the query string, not at the end.
+    common: (path: CommonPath) => {
+        const [base, query] = String(path).split("?");
+        return `common/${base}/${query ? `?${query}` : ""}`;
+    },
     resources: {
         create: "resource",
         get: "resource",

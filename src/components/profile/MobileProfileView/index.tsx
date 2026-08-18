@@ -5,7 +5,6 @@ import TagComponent from "@/components/common/Tag";
 import OverViewCard from "@/components/leaner/LeanerOverViewCard";
 import { ParentGuardianInformation, ProfileDetails } from "@/components/learners/profile/tabs";
 import { LearnerInformation } from "@/components/learners/profile/tabs";
-import { AdditionalInformation } from "@/components/learners/profile/tabs";
 import DetailCard from "@/components/profile/Bio/DetailCard";
 import DetailChipCard from "@/components/profile/Bio/DetailChipCard";
 import RatingCard from "@/components/profile/Overview/RatingCard";
@@ -216,7 +215,6 @@ const learnerTabs = [
     { id: "profile-details", title: "Profile Details" },
     { id: "parent-guardian-information", title: "Guardian Information" },
     { id: "learner-information", title: "Personal Info" },
-    { id: "additional-information", title: "Additional Information" },
 ]
 
 const volunteerTabs = [
@@ -246,8 +244,6 @@ const FullProfileDetails = ({ data }: { data: any }) => {
                     return <ParentGuardianInformation data={data?.parent_info} />
                 case "learner-information":
                     return <LearnerInformation data={data} />
-                case "additional-information":
-                    return <AdditionalInformation data={data?.additional_info} />
             }
         } else {
             switch (activeTab) {

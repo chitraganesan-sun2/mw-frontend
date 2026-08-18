@@ -3,10 +3,14 @@ interface Learner {
     parent_info?: Parentinfo;
     learner_special_needs: Learnerspecialneeds;
     education: Education;
-    social_skills: Socialskills;
-    current_interests: Currentinterests;
+    // Sections below are no longer collected by the onboarding/profile-edit UI (their
+    // fields moved into education/learner_special_needs/learner_goals) but stay optional
+    // here since existing records may still carry this data - see
+    // docs/learner-volunteer-onboarding-migration-plan.md.
+    social_skills?: Socialskills;
+    current_interests?: Currentinterests;
+    additional_info?: Additionalinfo;
     learner_goals: Learnergoals;
-    additional_info: Additionalinfo;
     consent_and_permissions: Consentandpermissions;
     profile_picture?: ProfilePicture | null;
 }
@@ -17,36 +21,46 @@ interface Consentandpermissions {
 }
 
 interface Additionalinfo {
-    cultural_consideration: string;
-    other_concerns_or_requests: string;
-    what_motivates_to_learn: string;
+    cultural_consideration?: string;
+    other_concerns_or_requests?: string;
+    what_motivates_to_learn?: string;
 }
 
 interface Learnergoals {
     expected_goals: string[];
-    skills_to_learn: { skill_name: string; skill_id: string }[];
+    skills_to_learn?: { skill_name: string; skill_id: string }[];
+    academic_skills_to_learn?: { skill_name: string; skill_id: string }[];
+    arts_life_skills_to_learn?: { skill_name: string; skill_id: string }[];
+    academic_goals_description?: string;
+    arts_life_goals_description?: string;
+    other_comments_or_notes?: string;
     preferred_volunteer_qualities: string;
     skill_level: string;
 }
 
 interface Currentinterests {
-    interests: string[];
-    extra_curricular_activities: string[] | string;
-    favorite_activities: string[] | string;
+    interests?: string[];
+    extra_curricular_activities?: string[] | string;
+    favorite_activities?: string[] | string;
 }
 
 interface Socialskills {
-    communication_preferences: string[];
-    social_interaction_styles: string[];
-    behavioral_concerns: string[];
-    techniques_to_calm: string[];
+    communication_preferences?: string[];
+    social_interaction_styles?: string[];
+    behavioral_concerns?: string[];
+    techniques_to_calm?: string[];
 }
 
 interface Education {
     current_school: string;
-    iep_plan_key: string;
+    iep_plan_key?: string;
+    program_iep_504_plan?: string;
+    grade_or_education_level?: string;
+    cultural_religious_considerations?: string;
+    extracurricular_activities?: string;
+    favorite_free_time_activities?: string;
     academic_strengths: string[];
-    academic_challenges: string[];
+    academic_challenges?: string[];
 }
 
 interface Learnerspecialneeds {
@@ -55,8 +69,10 @@ interface Learnerspecialneeds {
     assistive_device_used: string;
     communication_style: string;
     description: string;
-    areas_of_support_needed: string[];
-    learning_styles: string[];
+    areas_of_support_needed?: string[];
+    learning_styles?: string[];
+    behavioral_concerns?: string;
+    behavior_support_strategies?: string[];
 }
 
 interface Learnerpersonalinfo {

@@ -159,4 +159,18 @@ export type EndpointProps = {
     };
 };
 
-type CommonPath = "skills" | "languages" | "subjects" | "media" | "categories";
+// (string & {}) keeps literal autocomplete for known paths while still accepting any
+// string - needed for query-bearing values like "skills?category=academic".
+type CommonPath =
+    | "skills"
+    | "languages"
+    | "subjects"
+    | "media"
+    | "categories"
+    | "development_disabilities"
+    | "assistive_devices"
+    | "communication_styles"
+    | "areas_of_support"
+    | "preferred_learner_age_group"
+    | "support_preference"
+    | (string & {});

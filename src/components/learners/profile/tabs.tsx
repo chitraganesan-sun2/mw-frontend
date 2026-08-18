@@ -106,18 +106,20 @@ export const ParentGuardianInformation = ({ data }: { data: Parentinfo }) => {
 
 
 export const LearnerInformation = ({ data }: { data: Learner }) => {
-    const skills_to_learn = data?.learner_goals?.skills_to_learn?.map(skill => skill?.skill_name);
+    const academic_skills_to_learn = data?.learner_goals?.academic_skills_to_learn?.map(skill => skill?.skill_name);
+    const arts_life_skills_to_learn = data?.learner_goals?.arts_life_skills_to_learn?.map(skill => skill?.skill_name);
     const sections = [
         { title: "Disability-Specific Information", sectionData: data.learner_special_needs },
-        { title: "Education and Background", sectionData: data.education },
-        { title: "Behavior and Social Skills", sectionData: data.social_skills },
-        { title: "Current Interests and Hobbies", sectionData: data.current_interests },
+        { title: "Education and Hobbies", sectionData: data.education },
         {
-            title: "Expectations and Goals",
+            title: "Skills to Learn from Volunteers",
             sectionData: {
                 ...data?.learner_goals,
-                // Rename key so it displays with the correct label
-                "Skills and Expertise to Learn from Volunteers": skills_to_learn,
+                // Rename keys so they display with the correct labels
+                "Academic Skills": academic_skills_to_learn,
+                "Arts & Life Skills": arts_life_skills_to_learn,
+                academic_skills_to_learn: undefined,
+                arts_life_skills_to_learn: undefined,
                 skills_to_learn: undefined,
             }
         },
@@ -161,9 +163,9 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
 
 export const AdditionalInformation = ({ data }: { data: Additionalinfo }) => {
     const details = [
-        { label: "Cultural Consideration", value: data?.cultural_consideration },
-        { label: "Other Concerns or Requests", value: data?.other_concerns_or_requests },
-        { label: "What Motivates to Learn", value: data?.what_motivates_to_learn },
+        { label: "Cultural Consideration", value: data?.cultural_consideration ?? "" },
+        { label: "Other Concerns or Requests", value: data?.other_concerns_or_requests ?? "" },
+        { label: "What Motivates to Learn", value: data?.what_motivates_to_learn ?? "" },
     ]
 
     return (
