@@ -72,6 +72,7 @@ const VolunteerInfoFields: FormField[] = [
         ],
         gridCols: 1,
         required: true,
+        wrapperClassName: "justify-end",
     },
     {
         parent: "volunteer_contact_details",

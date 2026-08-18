@@ -115,7 +115,7 @@ export const FormField = ({
         <div
             className={`${
                 field.gridCols === 2 ? "col-span-2 w-full" : "col-span-2 md:col-span-1 w-full"
-            }`}
+            }${field.wrapperClassName ? ` flex flex-col ${field.wrapperClassName}` : ""}`}
         >
             <Controller
                 name={getFieldProperty(field, "name")}

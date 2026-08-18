@@ -95,21 +95,21 @@ const RadioInput: React.FC<RadioInputProps> = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}
-            className={`custom-radio-group ${inputClassName}`}
+            className={`custom-radio-group w-full ${inputClassName}`}
         >
             {customRadioStyles}
             <div
                 className={
                     layout === "vertical"
                         ? "flex flex-col gap-3 w-full"
-                        : "flex flex-wrap items-center md:gap-2 gap-4 w-full h-full"
+                        : "flex flex-wrap items-center gap-2 w-full h-full"
                 }
             >
                 {options.map((option) => (
                     <div
                         key={option.value}
-                        className={`flex items-start min-w-0 hover:bg-background-input border md:border-none bg-background-input px-2 py-1 rounded-lg ${
-                            layout === "vertical" ? "w-full" : "items-center"
+                        className={`flex items-center min-w-0 hover:bg-white bg-background-input px-2 py-1 rounded-lg border border-stroke ${
+                            layout === "vertical" ? "w-full" : ""
                         } ${radioButtonClassName}`}
                     >
                         <Radio value={option.value} className="w-full">

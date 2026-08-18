@@ -43,6 +43,7 @@ type FormField = {
     responseAsLabel?: string;
     responseAsValue?: string[] | string;
     birthDatePicker?: { minAge: number, maxAge: number };
+    wrapperClassName?: string;
 } & Partial<BaseFormField>;
 
 type BaseFormField = Omit<InputProps, "value" | "onChange" | "inputType"> & {
