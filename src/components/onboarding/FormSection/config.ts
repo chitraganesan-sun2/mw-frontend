@@ -49,12 +49,8 @@ export const volunteerFormSchema = z
         volunteer_languages: z
             .array(z.any(), { required_error: "Please specify the languages you know" })
             .nonempty("Please add at least one language"),
-        volunteer_experience: z
-            .string({ required_error: "Experience details are required" })
-            .min(1, { message: "Experience details cannot be empty" }),
-        volunteer_work_experience: z
-            .string({ required_error: "Work experience details are required" })
-            .min(1, { message: "Work experience details cannot be empty" }),
+        volunteer_experience: z.string().optional(),
+        volunteer_work_experience: z.string().optional(),
         volunteer_skills: z
             .array(
                 z.object({
@@ -64,9 +60,28 @@ export const volunteerFormSchema = z
                 { required_error: "Please add at least one skill" }
             )
             .nonempty("Please add at least one skill"),
+        volunteer_subjects: z
+            .array(
+                z.object({
+                    subject_name: z.string({ required_error: "Subject name is required" }),
+                    subject_id: z.string({ required_error: "Subject ID is required" }),
+                })
+            )
+            .optional(),
         volunteer_description: z
             .string({ required_error: "Description is required" })
             .min(1, { message: "Description cannot be empty" }),
+
+        // New fields added by the onboarding restructure (2026-08) - see
+        // docs/learner-volunteer-onboarding-migration-plan.md for the full old->new field mapping.
+        volunteer_parent_contact_number: contactNumberValidation.optional().or(z.null()),
+        volunteer_favorite_activities: z.string().optional(),
+        preferred_learner_age_group: z.string().optional(),
+        volunteer_academic_skills_notes: z.string().optional(),
+        volunteer_arts_life_skills_notes: z.string().optional(),
+        support_preference: z.string().optional(),
+        support_preference_details: z.string().optional(),
+        volunteer_teaching_traits: z.string().optional(),
 
         // Contact Details validations
         volunteer_contact_details: z.object({
@@ -313,6 +328,17 @@ export const volunteerFormSchema = z
                 code: "custom",
                 message: "Acceptance of terms and conditions is required",
                 path: ["terms_and_conditions_accepted"],
+            });
+        }
+        if (
+            data?.support_preference &&
+            data.support_preference !== "I am comfortable working with all learners" &&
+            !data?.support_preference_details?.trim()
+        ) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Please share more about your preferences or limitations",
+                path: ["support_preference_details"],
             });
         }
         return true;

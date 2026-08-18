@@ -4,9 +4,10 @@ type Volunteer = {
     volunteer_birth_date: string;
     volunteer_description: string;
     volunteer_parent_email: string;
+    volunteer_parent_contact_number?: Contactnumber;
     volunteer_higher_education: string;
     volunteer_gender: string;
-    volunteer_experience: string;
+    volunteer_experience?: string;
     consented_from_parent: boolean;
     volunteer_parent_name?: string;
     volunteer_contact_details: Volunteercontactdetails;
@@ -16,11 +17,20 @@ type Volunteer = {
     profile_video?: Profilevideo | null;
     profile_document?: Profiledocument | null;
     volunteer_languages: Volunteerlanguage[];
-    volunteer_subjects: Volunteersubject[];
+    volunteer_subjects?: Volunteersubject[];
     volunteer_skills: Volunteerskill[];
     volunteer_education: string;
     education_details?: string;
     volunteer_work_experience?: string;
+    volunteer_favorite_activities?: string;
+    // New fields added by the onboarding restructure (2026-08) - see
+    // docs/learner-volunteer-onboarding-migration-plan.md for the full old->new field mapping.
+    preferred_learner_age_group?: string;
+    volunteer_academic_skills_notes?: string;
+    volunteer_arts_life_skills_notes?: string;
+    support_preference?: string;
+    support_preference_details?: string;
+    volunteer_teaching_traits?: string;
 };
 
 type Consentandpermissions = {
