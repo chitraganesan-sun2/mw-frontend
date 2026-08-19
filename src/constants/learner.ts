@@ -230,7 +230,8 @@ const DisabilityInfoFields: FormField[] = [
         ],
         gridCols: 1,
         sublabel: " ",
-        className: "w-full h-full mt-2 md:mt-4",
+        className: "w-full h-full",
+        wrapperClassName: "justify-end",
         required: true,
     },
     {
@@ -324,6 +325,7 @@ const EducationAndHobbiesFields: FormField[] = [
         inputType: "text",
         placeholder: "Enter here",
         gridCols: 1,
+        wrapperClassName: "justify-end",
         required: true,
     },
     {
@@ -458,7 +460,8 @@ const SkillsToLearnFields: FormField[] = [
             { label: "Expert", value: "expert" },
         ],
         gridCols: 1,
-        className: "w-full h-fit mt-2 md:mt-4 gap-0 !mb-0",
+        wrapperClassName: "justify-end",
+        className: "w-full h-fit gap-0 !mb-0",
         inputClassName: "w-full h-full",
         required: true,
     },
