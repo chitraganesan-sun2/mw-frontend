@@ -29,7 +29,6 @@ type Volunteer = {
     volunteer_academic_skills_notes?: string;
     volunteer_arts_life_skills_notes?: string;
     support_preference?: string;
-    support_preference_details?: string;
     volunteer_teaching_traits?: string;
 };
 

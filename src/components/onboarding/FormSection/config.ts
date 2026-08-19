@@ -51,15 +51,16 @@ export const volunteerFormSchema = z
             .nonempty("Please add at least one language"),
         volunteer_experience: z.string().optional(),
         volunteer_work_experience: z.string().optional(),
+        // Individually optional - enforced as "at least one of subjects/skills" via
+        // superRefine below, per spec.
         volunteer_skills: z
             .array(
                 z.object({
                     skill_name: z.string({ required_error: "Skill name is required" }),
                     skill_id: z.string({ required_error: "Skill ID is required" }),
-                }),
-                { required_error: "Please add at least one skill" }
+                })
             )
-            .nonempty("Please add at least one skill"),
+            .optional(),
         volunteer_subjects: z
             .array(
                 z.object({
@@ -75,12 +76,17 @@ export const volunteerFormSchema = z
         // New fields added by the onboarding restructure (2026-08) - see
         // docs/learner-volunteer-onboarding-migration-plan.md for the full old->new field mapping.
         volunteer_parent_contact_number: contactNumberValidation.optional().or(z.null()),
-        volunteer_favorite_activities: z.string().optional(),
-        preferred_learner_age_group: z.string().optional(),
+        volunteer_favorite_activities: z
+            .string({ required_error: "Favorite Free Time Activities is required" })
+            .min(1, { message: "Favorite Free Time Activities is required" }),
+        preferred_learner_age_group: z
+            .string({ required_error: "Preferred Learner Age Group is required" })
+            .min(1, { message: "Preferred Learner Age Group is required" }),
         volunteer_academic_skills_notes: z.string().optional(),
         volunteer_arts_life_skills_notes: z.string().optional(),
-        support_preference: z.string().optional(),
-        support_preference_details: z.string().optional(),
+        support_preference: z
+            .string({ required_error: "Please select a support preference" })
+            .min(1, { message: "Please select a support preference" }),
         volunteer_teaching_traits: z.string().optional(),
 
         // Contact Details validations
@@ -330,15 +336,16 @@ export const volunteerFormSchema = z
                 path: ["terms_and_conditions_accepted"],
             });
         }
-        if (
-            data?.support_preference &&
-            data.support_preference !== "I am comfortable working with all learners" &&
-            !data?.support_preference_details?.trim()
-        ) {
+        if (!data?.volunteer_subjects?.length && !data?.volunteer_skills?.length) {
             ctx.addIssue({
                 code: "custom",
-                message: "Please share more about your preferences or limitations",
-                path: ["support_preference_details"],
+                message: "Please add at least one academic subject or arts & life skill",
+                path: ["volunteer_subjects"],
+            });
+            ctx.addIssue({
+                code: "custom",
+                message: "Please add at least one academic subject or arts & life skill",
+                path: ["volunteer_skills"],
             });
         }
         return true;

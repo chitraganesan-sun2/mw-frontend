@@ -29,10 +29,13 @@ export const MessageModalConstants: FormField[] = [
 
 //* Volunteer Onboarding Form Fields
 
-// "Volunteer Info" tab - renamed from the old "Profile Details" tab, absorbing the old
-// "Contact Details" tab's fields directly (via per-field parent: "volunteer_contact_details"
-// overrides, same pattern used for learner_contact_details in constants/learner.ts).
-const VolunteerInfoFields: FormField[] = [
+// "Volunteer Info" tab - renamed from the old "Profile Details" tab, now split into three
+// card subsections (Volunteer Details / Parent Details / Education & Work Experience) per
+// the latest spec, absorbing the old "Contact Details" tab's fields into "Volunteer Details"
+// (via per-field parent: "volunteer_contact_details" overrides, same pattern used for
+// learner_contact_details in constants/learner.ts). CardWrapper gives each subsection its
+// own independent 2-column grid and auto-numbers the title ("1. Volunteer Details", etc.).
+const VolunteerDetailsFields: FormField[] = [
     {
         id: "volunteer_first_name",
         label: "First Name",
@@ -124,38 +127,13 @@ const VolunteerInfoFields: FormField[] = [
         placeholder: "Search or select time zone",
         options: timezones,
         showSearch: true,
-        gridCols: 1,
-        inputClassName: "!w-full",
-        required: true,
-    },
-    {
-        id: "volunteer_higher_education",
-        label: "Highest Education",
-        inputType: "select",
-        placeholder: "Select education level",
-        options: [
-            { label: "Bachelor's Degree", value: "bachelors" },
-            { label: "High School", value: "high_school" },
-            { label: "Middle School", value: "middle_school" },
-            { label: "Elementary School", value: "elementary_school" },
-            { label: "Master's Degree", value: "masters" },
-            { label: "PhD", value: "phd" },
-            { label: "Others", value: "others" },
-            { label: "N/A", value: "N/A" },
-        ],
-        gridCols: 1,
-        inputClassName: "!w-full",
-        required: true,
-    },
-    {
-        id: "consented_from_parent",
-        label: "Parent Details are mandatory for minor volunteers",
-        sublabel: "(Below 18-21 depending on the US State)",
-        inputType: "checkbox",
-        placeholder: "I've consent from my parent or guardian to be a volunteer.",
         gridCols: 2,
-        inputClassName: "max-md:text-sm w-fit",
+        inputClassName: "!w-full",
+        required: true,
     },
+];
+
+const ParentDetailsFields: FormField[] = [
     {
         id: "volunteer_parent_name",
         label: "Parent Full Name",
@@ -177,7 +155,45 @@ const VolunteerInfoFields: FormField[] = [
         inputType: "contact-input",
         placeholder: "Enter Contact Number",
         sublabelAlignment: "right",
+        gridCols: 2,
+    },
+    {
+        id: "consented_from_parent",
+        label: "I'm a minor and I've consent from my parent or guardian to be a volunteer.",
+        sublabel: "(Parent details are mandatory for minors - below 18-21 depending on the US State)",
+        inputType: "checkbox",
+        gridCols: 2,
+        inputClassName: "max-md:text-sm w-fit",
+    },
+];
+
+const EducationWorkExperienceFields: FormField[] = [
+    {
+        id: "volunteer_higher_education",
+        label: "Highest Education",
+        inputType: "select",
+        placeholder: "Select education level",
+        options: [
+            { label: "Bachelor's Degree", value: "bachelors" },
+            { label: "High School", value: "high_school" },
+            { label: "Middle School", value: "middle_school" },
+            { label: "Elementary School", value: "elementary_school" },
+            { label: "Master's Degree", value: "masters" },
+            { label: "PhD", value: "phd" },
+            { label: "Others", value: "others" },
+            { label: "N/A", value: "N/A" },
+        ],
         gridCols: 1,
+        inputClassName: "!w-full",
+        required: true,
+    },
+    {
+        id: "volunteer_education",
+        label: "Education Summary and Specialization",
+        inputType: "text",
+        placeholder: "Describe your education here",
+        gridCols: 1,
+        required: true,
     },
     {
         id: "volunteer_work_experience",
@@ -185,14 +201,6 @@ const VolunteerInfoFields: FormField[] = [
         inputType: "text",
         placeholder: "Describe your work experience here",
         gridCols: 1,
-    },
-    {
-        id: "volunteer_education",
-        label: "Education Summary and Specialization",
-        inputType: "text",
-        placeholder: "Describe your education here",
-        gridCols: 2,
-        required: true,
     },
     {
         id: "volunteer_experience",
@@ -204,9 +212,10 @@ const VolunteerInfoFields: FormField[] = [
     {
         id: "volunteer_favorite_activities",
         label: "Favorite Free Time Activities",
-        inputType: "text",
+        inputType: "textarea",
         placeholder: "Enter here",
-        gridCols: 1,
+        gridCols: 2,
+        required: true,
     },
 ];
 
@@ -236,6 +245,7 @@ const SkillsToTeachFields: FormField[] = [
         responseAsValue: "preferred_learner_age_group_name",
         placeholder: "Select preferred learner age group",
         gridCols: 1,
+        required: true,
     },
     {
         id: "volunteer_subjects",
@@ -285,18 +295,12 @@ const SkillsToTeachFields: FormField[] = [
         responseAsValue: "support_preference_name",
         placeholder: "Select an option",
         gridCols: 2,
-    },
-    {
-        id: "support_preference_details",
-        label: "More about your preferences or limitations",
-        sublabel: "(only needed if you selected \"some preferences\" or \"not sure\" above)",
-        inputType: "textarea",
-        placeholder: "Describe here",
-        gridCols: 2,
+        required: true,
     },
     {
         id: "volunteer_teaching_traits",
-        label: "What traits do you have that help you teach and support others?",
+        label: "What are your Teaching Traits, Preferences & Limitations",
+        sublabel: "(optional, not tied to your answer above)",
         inputType: "textarea",
         placeholder: "Describe here",
         gridCols: 2,
@@ -509,14 +513,37 @@ const VolunteerExperienceDetailsFields: FormField[] = [
 
 export const VolunteerFormSections: FormSectionConfig[] = [
     {
-        parent: null,
         title: "Volunteer Info",
-        fields: VolunteerInfoFields,
+        fields: [
+            {
+                parent: null,
+                title: "Volunteer Details",
+                fields: VolunteerDetailsFields,
+            },
+            {
+                parent: null,
+                title: "Parent Details",
+                fields: ParentDetailsFields,
+            },
+            {
+                parent: null,
+                title: "Education & Work Experience",
+                fields: EducationWorkExperienceFields,
+            },
+        ],
+        type: "card",
     },
     {
         parent: null,
         title: "Profile Details",
-        fields: SkillsToTeachFields,
+        fields: [
+            {
+                parent: null,
+                title: "Skills to teach Learners",
+                fields: SkillsToTeachFields,
+            },
+        ],
+        type: "card",
     },
     {
         parent: "legal_and_safety_info",
