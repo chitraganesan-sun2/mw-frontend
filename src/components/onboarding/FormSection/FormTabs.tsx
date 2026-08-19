@@ -174,10 +174,34 @@ const FormTabs = ({
     };
 
     const validateCurrentSection = async () => {
-        const { fields, parent } = formData[activeTab];
-        const currentFields = fields.map((field: any) =>
-            parent ? `${parent}.${field.parent || field.id}` : field.parent || field.id
-        );
+        const { fields, parent, type } = formData[activeTab];
+        // Card-type sections nest their real leaf fields one level deeper (each entry in
+        // `fields` is a card wrapper with its own `fields` array) - mapping over the wrapper
+        // objects directly produced `undefined` (cards have no `id`/`parent` of their own to
+        // fall back to), which crashed @hookform/resolvers' internal path matching inside
+        // trigger() whenever any validation error existed elsewhere in the form. Flatten to
+        // the actual leaf paths instead, mirroring how FormField/getFieldProperty names them.
+        const currentFields =
+            type === "card"
+                ? fields.flatMap((card: any) => {
+                      const cardParent = parent ? `${parent}.${card.parent}` : card.parent;
+                      // A card can mix top-level fields with fields that belong under their
+                      // own nested object (see the matching comment in the render loop below) -
+                      // the leaf's own `.parent` must layer on top of the card's, not be
+                      // discarded in favor of it.
+                      return (card.fields || []).map((leaf: any) =>
+                          leaf.parent
+                              ? cardParent
+                                  ? `${cardParent}.${leaf.parent}.${leaf.id}`
+                                  : `${leaf.parent}.${leaf.id}`
+                              : cardParent
+                              ? `${cardParent}.${leaf.id}`
+                              : leaf.id
+                      );
+                  })
+                : fields.map((field: any) =>
+                      parent ? `${parent}.${field.parent || field.id}` : field.parent || field.id
+                  );
 
         // Custom validation for phone numbers
         const phoneNumberErrors: { [key: string]: string } = {};
@@ -495,7 +519,7 @@ const FormTabs = ({
                                 ?.filter((field: any) => !hideFields(field))
                                 .map((field: any, index: number) => {
                                     if (section?.type === "card") {
-                                        const parent = section?.parent
+                                        const cardParent = section?.parent
                                             ? `${section?.parent}.${field.parent}`
                                             : field.parent;
 
@@ -512,20 +536,39 @@ const FormTabs = ({
                                                         (childField: any) =>
                                                             !hideCardChildField(childField)
                                                     )
-                                                    .map((childField: any) => (
-                                                        <FormField
-                                                            key={childField.id}
-                                                            field={{
-                                                                ...childField,
-                                                                disabled: isFieldDisabled,
-                                                            }}
-                                                            control={control}
-                                                            errors={errors}
-                                                            parent={parent}
-                                                            setValue={setValue}
-                                                            clearErrors={clearErrors}
-                                                        />
-                                                    ))}
+                                                    .map((childField: any) => {
+                                                        // A card can mix top-level fields with
+                                                        // fields that belong under their own
+                                                        // nested object (e.g. "Volunteer
+                                                        // Details" mixes volunteer_first_name
+                                                        // with email/contact_number/etc., which
+                                                        // live under volunteer_contact_details).
+                                                        // The child's own `parent` must be
+                                                        // layered on top of the card's parent,
+                                                        // not discarded in favor of it - losing
+                                                        // it silently registers the field as
+                                                        // top-level, so its value never reaches
+                                                        // the nested object the schema expects.
+                                                        const childParent = childField.parent
+                                                            ? cardParent
+                                                                ? `${cardParent}.${childField.parent}`
+                                                                : childField.parent
+                                                            : cardParent;
+                                                        return (
+                                                            <FormField
+                                                                key={childField.id}
+                                                                field={{
+                                                                    ...childField,
+                                                                    disabled: isFieldDisabled,
+                                                                }}
+                                                                control={control}
+                                                                errors={errors}
+                                                                parent={childParent}
+                                                                setValue={setValue}
+                                                                clearErrors={clearErrors}
+                                                            />
+                                                        );
+                                                    })}
                                             </CardWrapper>
                                         );
                                     }

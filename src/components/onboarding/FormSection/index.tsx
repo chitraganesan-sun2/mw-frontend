@@ -117,7 +117,7 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
         
         // Then trigger validation for all fields including consent checkboxes
         const isFormValid = await trigger();
-        
+
         if (!isFormValid) {
             showToast({ type: "error", message: "Please fill in all required fields before submitting." });
             return false;
