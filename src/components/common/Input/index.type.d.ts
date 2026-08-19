@@ -183,6 +183,9 @@ type BaseAsyncSelectProps = BaseInputProps & {
     onChange: (value: any) => void;
     value: any;
     placeholder?: string;
+    // Adds a synthetic "None" option (never fetched from the backend LOV) to a multi-select -
+    // selecting it clears/replaces any other selection and vice versa. See AsyncSelect.tsx.
+    noneOption?: { label: string; value: any };
 };
 
 type CreatableSelectProps = BaseAsyncSelectProps & {

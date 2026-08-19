@@ -18,6 +18,7 @@ const AsyncSelect = ({
     responseAsLabel,
     responseAsValue,
     onError,
+    noneOption,
     ...props
 }: AsyncSelectProps) => {
     const pathname = usePathname();
@@ -52,8 +53,21 @@ const AsyncSelect = ({
                 return;
             }
 
+            // "None" is mutually exclusive with every real selection. filteredOptions already
+            // empties the dropdown once "None" is active, so the only mixed set that can ever
+            // reach here is "some real options were selected, then None was just clicked" -
+            // collapse to just None in that case. (The reverse - picking a real option while
+            // None is active - can't happen through the UI since there's nothing to pick.)
+            let resolvedValue = value;
+            if (noneOption && value.length > 1) {
+                const noneIncluded = value.some((o: any) => o.label === noneOption.label);
+                if (noneIncluded) {
+                    resolvedValue = value.filter((o: any) => o.label === noneOption.label);
+                }
+            }
+
             // For multi-select, handle array of values
-            const selectedValues = value.map((selectedOption: any) => {
+            const selectedValues = resolvedValue.map((selectedOption: any) => {
                 if (Array.isArray(responseAsValue)) {
                     // If responseAsValue is array, return object with multiple keys
                     const obj: any = {};
@@ -104,7 +118,17 @@ const AsyncSelect = ({
                         return d[responseAsValue] === val;
                     });
 
-                    if (!matchingItem) return null;
+                    if (!matchingItem) {
+                        // Not in the fetched LOV data - could be the synthetic "None" entry,
+                        // which never comes from the backend.
+                        if (noneOption) {
+                            const isNone = Array.isArray(responseAsValue)
+                                ? responseAsValue.every((key) => val?.[key] === noneOption.value?.[key])
+                                : val === noneOption.value;
+                            if (isNone) return { value: noneOption.value, label: noneOption.label };
+                        }
+                        return null;
+                    }
 
                     return {
                         value: Array.isArray(responseAsValue)
@@ -138,24 +162,32 @@ const AsyncSelect = ({
             value: Array.isArray(responseAsValue) ? matchingItem : matchingItem[responseAsValue],
             label: matchingItem[responseAsLabel],
         };
-    }, [data, props.value, responseAsValue, responseAsLabel, variant]);
+    }, [data, props.value, responseAsValue, responseAsLabel, variant, noneOption]);
 
     // console.log("Get Value: ", getValue);
 
-    const options = useMemo(
-        () => convertToOptions(data, responseAsValue, responseAsLabel, isLoading),
-        [data, responseAsValue, responseAsLabel, isLoading]
-    );
+    const options = useMemo(() => {
+        const fetched = convertToOptions(data, responseAsValue, responseAsLabel, isLoading);
+        if (!noneOption) return fetched;
+        return [{ label: noneOption.label, value: noneOption.value }, ...fetched];
+    }, [data, responseAsValue, responseAsLabel, isLoading, noneOption]);
 
     const filteredOptions = useMemo(() => {
         if (variant === "multi" && Array.isArray(getValue) && getValue?.length > 0) {
+            // Once "None" is the active selection, no other option can be added without
+            // removing it first - keeps the two mutually exclusive without a stray click
+            // silently overwriting the choice.
+            const noneIsSelected =
+                noneOption && getValue.some((v: any) => v?.label === noneOption.label);
+            if (noneIsSelected) return [];
+
             return options.filter(
                 (option: any) =>
                     !getValue.some((selectValue) => selectValue?.label === option?.label)
             );
         }
         return options;
-    }, [variant, getValue, options]);
+    }, [variant, getValue, options, noneOption]);
 
     // Add createOption handler
     const handleCreate = (inputValue: string) => {

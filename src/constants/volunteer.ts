@@ -10,6 +10,15 @@ export const SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS = [
     "I am not sure and would like guidance",
 ];
 
+// Synthetic "None" options for Academic Subjects / Arts & Life Skills - never fetched from
+// the backend LOV (would pollute the shared subjects_collection/skills_collection, which
+// skills_to_learn also draws from), handled entirely client-side by AsyncSelect via
+// `noneOption`. Selecting one is a real, explicit "I don't teach this category" answer, but
+// (per product decision) does NOT by itself satisfy the "at least one academic subject or
+// arts & life skill" requirement - see the superRefine in FormSection/config.ts.
+export const NONE_SUBJECT_OPTION = { label: "None", value: { subject_id: "__none__", subject_name: "None" } };
+export const NONE_SKILL_OPTION = { label: "None", value: { skill_id: "__none__", skill_name: "None" } };
+
 export const TestimonialFormConstants: FormField[] = [
     {
         name: "comments",
@@ -265,6 +274,7 @@ const SkillsToTeachFields: FormField[] = [
         endpoint: "subjects",
         responseAsLabel: "subject_name",
         responseAsValue: ["subject_id", "subject_name"],
+        noneOption: NONE_SUBJECT_OPTION,
     },
     {
         id: "volunteer_academic_skills_notes",
@@ -284,6 +294,7 @@ const SkillsToTeachFields: FormField[] = [
         responseAsLabel: "skill_name",
         responseAsValue: ["skill_id", "skill_name"],
         variant: "multi",
+        noneOption: NONE_SKILL_OPTION,
     },
     {
         id: "volunteer_arts_life_skills_notes",

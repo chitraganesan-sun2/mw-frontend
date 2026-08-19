@@ -1,7 +1,12 @@
 import { z, ZodError, ZodIssue } from "zod";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { ADULT_VOLUNTEER_AGE, SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunteer";
+import {
+    ADULT_VOLUNTEER_AGE,
+    NONE_SKILL_OPTION,
+    NONE_SUBJECT_OPTION,
+    SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS,
+} from "@/constants/volunteer";
 
 dayjs.extend(customParseFormat);
 
@@ -337,7 +342,15 @@ export const volunteerFormSchema = z
                 path: ["terms_and_conditions_accepted"],
             });
         }
-        if (!data?.volunteer_subjects?.length && !data?.volunteer_skills?.length) {
+        // "None" is a real, explicit answer (see NONE_SUBJECT_OPTION/NONE_SKILL_OPTION), but it
+        // doesn't itself satisfy "at least one" - a volunteer still needs a real pick somewhere.
+        const hasRealSubject = data?.volunteer_subjects?.some(
+            (s: any) => s?.subject_id !== NONE_SUBJECT_OPTION.value.subject_id
+        );
+        const hasRealSkill = data?.volunteer_skills?.some(
+            (s: any) => s?.skill_id !== NONE_SKILL_OPTION.value.skill_id
+        );
+        if (!hasRealSubject && !hasRealSkill) {
             ctx.addIssue({
                 code: "custom",
                 message: "Please add at least one academic subject or arts & life skill",
