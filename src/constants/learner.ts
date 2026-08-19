@@ -459,7 +459,6 @@ const SkillsToLearnFields: FormField[] = [
             { label: "Expert", value: "expert" },
         ],
         gridCols: 1,
-        wrapperClassName: "justify-end",
         className: "w-full h-fit gap-0 !mb-0",
         inputClassName: "w-full",
         required: true,
