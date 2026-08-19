@@ -90,22 +90,19 @@ const LearnerModalBody = ({
                 ))}
             </Radio.Group>
 
-            {enrolledBy === "self" ? (
-                <div>
-                    <DateOfBirthInput value={dob} onChange={setDob} />
-                    <div className="rounded-md p-3 text-xs bg-background-input text-gray-light">
-                        <span className="text-black font-medium mr-1">Note:</span>
-                        Learners under 13 should be onboarded by a parent.
-                    </div>
+            <div className="flex flex-col gap-3">
+                {enrolledBy === "self" && <DateOfBirthInput value={dob} onChange={setDob} />}
+                <div className="rounded-md p-3 text-xs bg-background-input text-gray-light">
+                    <span className="text-black font-medium mr-1">Note:</span>
+                    Learners under 13 should be onboarded by a parent.
                 </div>
-            ) : (
                 <div className="rounded-md p-3 text-xs bg-background-input text-gray-light">
                     <span className="text-black font-medium mr-1">Note:</span>
                     If the learner is over 13 but has limited legal or decision-making capacity, a
                     parent or guardian should complete the form and schedule their sessions on their
                     behalf.
                 </div>
-            )}
+            </div>
 
             <GoogleSignUpButton
                 loading={isLoading}
