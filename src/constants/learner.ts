@@ -208,7 +208,6 @@ const DisabilityInfoFields: FormField[] = [
     {
         id: "type_of_developmental_disability",
         label: "Type of Developmental Disability",
-        sublabel: "(e.g., autism, down syndrome, ADHD, etc.)",
         inputType: "async-select",
         creatable: true,
         endpoint: "development_disabilities",
@@ -236,7 +235,6 @@ const DisabilityInfoFields: FormField[] = [
     {
         id: "assistive_device_used",
         label: "Assistive Devices Used",
-        sublabel: "(E.g. , Hearing aids, Wheelchair)",
         inputType: "async-select",
         endpoint: "assistive_devices",
         variant: "single",
@@ -250,7 +248,6 @@ const DisabilityInfoFields: FormField[] = [
     {
         id: "communication_style",
         label: "Communication Style",
-        sublabel: "(e.g., verbal, sign language, AAC device)",
         inputType: "async-select",
         endpoint: "communication_styles",
         variant: "single",
@@ -264,7 +261,6 @@ const DisabilityInfoFields: FormField[] = [
     {
         id: "behavioral_concerns",
         label: "Behavioral Concerns",
-        sublabel: "(e.g., triggers, behaviors, suggested responses)",
         inputType: "text",
         placeholder: "Enter here",
         gridCols: 1,
@@ -272,7 +268,6 @@ const DisabilityInfoFields: FormField[] = [
     {
         id: "behavior_support_strategies",
         label: "Behavior Support Strategies",
-        sublabel: "(e.g., positive reinforcement, breaks)",
         inputType: "select-creatable",
         variant: "multi",
         placeholder: "Don't see your option? Type it in to add.",
@@ -390,7 +385,6 @@ const SkillsToLearnFields: FormField[] = [
     {
         id: "expected_goals",
         label: "Parent/Guardian's Goals for the learner ",
-        sublabel: "(e.g., improve social skills, academic progress, explore new hobbies)",
         inputType: "select-creatable",
         variant: "multi",
         placeholder: "Don't see your option? Type it in to add.",
