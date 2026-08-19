@@ -3,6 +3,13 @@ import timezones from "@/data/selectiveTimeZones.json";
 
 export const ADULT_VOLUNTEER_AGE = 21;
 
+// The two support_preference options that require a follow-up free-text explanation -
+// must match the LOV option text exactly (migrations/seed_preferred_learner_age_group_and_support_preference.py).
+export const SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS = [
+    "I have some preferences or limitations",
+    "I am not sure and would like guidance",
+];
+
 export const TestimonialFormConstants: FormField[] = [
     {
         name: "comments",
@@ -296,6 +303,14 @@ const SkillsToTeachFields: FormField[] = [
         placeholder: "Select an option",
         gridCols: 2,
         required: true,
+    },
+    {
+        id: "support_preference_details",
+        label: "Please tell us more",
+        sublabel: "Required when you select a preference or limitation above",
+        inputType: "textarea",
+        placeholder: "Describe your preferences or limitations",
+        gridCols: 2,
     },
     {
         id: "volunteer_teaching_traits",

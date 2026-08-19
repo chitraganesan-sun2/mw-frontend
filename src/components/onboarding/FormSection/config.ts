@@ -1,7 +1,7 @@
 import { z, ZodError, ZodIssue } from "zod";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { ADULT_VOLUNTEER_AGE } from "@/constants/volunteer";
+import { ADULT_VOLUNTEER_AGE, SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunteer";
 
 dayjs.extend(customParseFormat);
 
@@ -87,6 +87,7 @@ export const volunteerFormSchema = z
         support_preference: z
             .string({ required_error: "Please select a support preference" })
             .min(1, { message: "Please select a support preference" }),
+        support_preference_details: z.string().optional(),
         volunteer_teaching_traits: z.string().optional(),
 
         // Contact Details validations
@@ -346,6 +347,16 @@ export const volunteerFormSchema = z
                 code: "custom",
                 message: "Please add at least one academic subject or arts & life skill",
                 path: ["volunteer_skills"],
+            });
+        }
+        if (
+            SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS.includes(data?.support_preference) &&
+            !data?.support_preference_details?.trim()
+        ) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Please tell us more about your preferences or limitations",
+                path: ["support_preference_details"],
             });
         }
         return true;

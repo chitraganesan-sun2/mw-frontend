@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { validateLearnerParentFields, validateVolunteerParentDetails } from "./config";
 import { UseFormSetError, UseFormClearErrors, useWatch } from "react-hook-form";
 import { calculateAge, isAgeUnder18 } from "@/utils/timeFunctions";
-import { ADULT_VOLUNTEER_AGE } from "@/constants/volunteer";
+import { ADULT_VOLUNTEER_AGE, SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunteer";
 import { PrivacyPolicyElement, TermsAndConditionElement } from "./Consents";
 import { getCookie } from "@/utils/auth";
 import { GET_API, PUT_API } from "@/api/request";
@@ -54,6 +54,7 @@ const FormTabs = ({
     const isVolunteer = role === "volunteer";
     const volunteer_birth_date = useWatch({ name: "volunteer_birth_date", control: control });
     const enrolled_by = useWatch({ name: "enrolled_by", control: control });
+    const support_preference = useWatch({ name: "support_preference", control: control });
     const [isStepUpdatePending, setIsStepUpdatePending] = useState(false);
     // Form Tabs
     const [activeTab, setActiveTab] = useState(0);
@@ -394,6 +395,15 @@ const FormTabs = ({
     const hideFields = (field: any) =>
         role === "learner" ? null : fields.includes(field.id) && volunteerAge();
 
+    // Leaf-field-level hiding within a card subsection (e.g. "Please tell us more" only
+    // shows once a support_preference option that needs an explanation is selected).
+    const hideCardChildField = (childField: any) => {
+        if (childField.id === "support_preference_details") {
+            return !SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS.includes(support_preference);
+        }
+        return false;
+    };
+
     const diableField = (field: any) => {
         if (role !== "learner") {
             return false;
@@ -497,20 +507,25 @@ const FormTabs = ({
                                                 index={index}
                                                 title={field.title}
                                             >
-                                                {field.fields.map((childField: any) => (
-                                                    <FormField
-                                                        key={childField.id}
-                                                        field={{
-                                                            ...childField,
-                                                            disabled: isFieldDisabled,
-                                                        }}
-                                                        control={control}
-                                                        errors={errors}
-                                                        parent={parent}
-                                                        setValue={setValue}
-                                                        clearErrors={clearErrors}
-                                                    />
-                                                ))}
+                                                {field.fields
+                                                    .filter(
+                                                        (childField: any) =>
+                                                            !hideCardChildField(childField)
+                                                    )
+                                                    .map((childField: any) => (
+                                                        <FormField
+                                                            key={childField.id}
+                                                            field={{
+                                                                ...childField,
+                                                                disabled: isFieldDisabled,
+                                                            }}
+                                                            control={control}
+                                                            errors={errors}
+                                                            parent={parent}
+                                                            setValue={setValue}
+                                                            clearErrors={clearErrors}
+                                                        />
+                                                    ))}
                                             </CardWrapper>
                                         );
                                     }
