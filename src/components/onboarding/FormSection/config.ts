@@ -520,15 +520,15 @@ export const learnerFormSchema = z
                 .min(1, { message: "Current School is required" }),
             iep_plan_key: z.string().optional(),
             program_iep_504_plan: z.string().optional(),
-            grade_or_education_level: z.string().optional(),
+            grade_or_education_level: z
+                .string({ required_error: "Grade or Education Level is required" })
+                .min(1, { message: "Grade or Education Level is required" }),
             cultural_religious_considerations: z.string().optional(),
             extracurricular_activities: z.string().optional(),
-            favorite_free_time_activities: z.string().optional(),
-            academic_strengths: z
-                .array(z.string(), {
-                    required_error: "Academic Strengths are required",
-                })
-                .nonempty("Academic Strengths are required"),
+            favorite_free_time_activities: z
+                .string({ required_error: "Favorite Free-Time Activities is required" })
+                .min(1, { message: "Favorite Free-Time Activities is required" }),
+            academic_strengths: z.array(z.string()).optional(),
             academic_challenges: z.array(z.string()).optional(),
         }),
 
@@ -577,11 +577,14 @@ export const learnerFormSchema = z
                     z.object({
                         skill_name: z.string({ required_error: "Skill name is required" }),
                         skill_id: z.string({ required_error: "Skill ID is required" }),
-                    })
+                    }),
+                    { required_error: "Please add at least one arts & life skill" }
                 )
-                .optional(),
+                .nonempty("Please add at least one arts & life skill"),
             academic_goals_description: z.string().optional(),
-            arts_life_goals_description: z.string().optional(),
+            arts_life_goals_description: z
+                .string({ required_error: "Arts, Life Skills & Goals Description is required" })
+                .min(1, { message: "Arts, Life Skills & Goals Description is required" }),
             other_comments_or_notes: z.string().optional(),
             preferred_volunteer_qualities: z
                 .string({ required_error: "Preferred Volunteer Qualities are required" })

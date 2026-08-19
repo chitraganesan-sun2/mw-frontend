@@ -311,7 +311,7 @@ const DisabilityInfoFields: FormField[] = [
 const EducationAndHobbiesFields: FormField[] = [
     {
         id: "current_school",
-        label: "Current School/Program",
+        label: "Current School, College/Program",
         sublabel: "(name of school, grade level)",
         inputType: "text",
         placeholder: "Enter school name",
@@ -324,6 +324,7 @@ const EducationAndHobbiesFields: FormField[] = [
         inputType: "text",
         placeholder: "Enter here",
         gridCols: 1,
+        required: true,
     },
     {
         id: "program_iep_504_plan",
@@ -363,11 +364,10 @@ const EducationAndHobbiesFields: FormField[] = [
             { label: "Others", value: "others" },
             { label: "N/A", value: "N/A" },
         ],
-        required: true,
     },
     {
         id: "extracurricular_activities",
-        label: "Extracurricular Activities",
+        label: "Extracurriculars/ Non-Academic Skills",
         sublabel: "(current or past participation)",
         inputType: "text",
         placeholder: "Enter here",
@@ -380,6 +380,7 @@ const EducationAndHobbiesFields: FormField[] = [
         inputType: "textarea",
         placeholder: "Enter here",
         gridCols: 2,
+        required: true,
     },
 ];
 
@@ -444,14 +445,21 @@ const SkillsToLearnFields: FormField[] = [
         responseAsValue: ["skill_id", "skill_name"],
         placeholder: "Don't see your option? Type it in to add.",
         gridCols: 1,
+        required: true,
     },
     {
-        id: "preferred_volunteer_qualities",
-        label: "Preferred Volunteer Qualities",
-        sublabel: "(any specific traits the parent/guardian values in a tutor or mentor)",
-        inputType: "text",
-        placeholder: "Enter here",
+        id: "skill_level",
+        label: "Skill Level",
+        sublabel: " ",
+        inputType: "radio",
+        options: [
+            { label: "Beginner", value: "beginner" },
+            { label: "Intermediate", value: "intermediate" },
+            { label: "Expert", value: "expert" },
+        ],
         gridCols: 1,
+        className: "w-full h-fit mt-2 md:mt-4 gap-0 !mb-0",
+        inputClassName: "w-full h-full",
         required: true,
     },
     {
@@ -467,6 +475,16 @@ const SkillsToLearnFields: FormField[] = [
         inputType: "textarea",
         placeholder: "Describe here",
         gridCols: 2,
+        required: true,
+    },
+    {
+        id: "preferred_volunteer_qualities",
+        label: "Preferred Volunteer Qualities",
+        sublabel: "(any specific traits the parent/guardian values in a tutor or mentor)",
+        inputType: "textarea",
+        placeholder: "Describe here",
+        gridCols: 2,
+        required: true,
     },
     {
         id: "other_comments_or_notes",
@@ -475,21 +493,6 @@ const SkillsToLearnFields: FormField[] = [
         inputType: "textarea",
         placeholder: "Enter here",
         gridCols: 2,
-    },
-    {
-        id: "skill_level",
-        label: "Skill Level",
-        sublabel: " ",
-        inputType: "radio",
-        options: [
-            { label: "Beginner", value: "beginner" },
-            { label: "Intermediate", value: "intermediate" },
-            { label: "Expert", value: "expert" },
-        ],
-        gridCols: 2,
-        className: "w-full h-fit mt-2 md:mt-4 gap-0 !mb-0",
-        inputClassName: "w-full h-full",
-        required: true,
     },
 ];
 
