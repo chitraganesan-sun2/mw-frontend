@@ -75,32 +75,33 @@ interface VolunteerData {
     };
     learner_goals: {
         expected_goals: string[];
-        subjects_to_focus_on: string[];
         preferred_volunteer_qualities: string[];
         skill_level: string;
+        academic_skills_to_learn?: Array<{ skill_name: string }>;
+        arts_life_skills_to_learn?: Array<{ skill_name: string }>;
+        academic_goals_description?: string;
+        arts_life_goals_description?: string;
+        other_comments_or_notes?: string;
     };
     learner_special_needs: {
+        type_of_developmental_disability?: string;
         level_of_support_needed: string;
         assistive_device_used: string;
         communication_style: string;
+        description?: string;
         areas_of_support_needed: string[];
         learning_styles: string[];
+        behavioral_concerns?: string;
+        behavior_support_strategies?: string[];
     };
-    current_interests: {
-        interests: string[];
-        extra_curricular_activities: string[];
-        favorite_activities: string[];
-    };
-    social_skills: {
-        communication_preferences: string[];
-        social_interaction_styles: string[];
-        behavioral_concerns: string[];
-        techniques_to_calm: string[];
-    };
-    additional_info: {
-        cultural_consideration: string;
-        other_concerns_or_requests: string;
-        what_motivates_to_learn: string;
+    education: {
+        current_school?: string;
+        grade_or_education_level?: string;
+        program_iep_504_plan?: string;
+        academic_strengths?: string[];
+        cultural_religious_considerations?: string;
+        extracurricular_activities?: string;
+        favorite_free_time_activities?: string;
     };
     profile_picture: {
         image_url: string;
@@ -309,16 +310,16 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
                     : [],
         },
         {
-            title: "Subjects to Focus On",
-            tags:
-                Array.isArray(learnerData?.learner_goals?.subjects_to_focus_on) &&
-                learnerData?.learner_goals?.subjects_to_focus_on.length > 0
-                    ? learnerData.learner_goals.subjects_to_focus_on.map((subject: string) =>
-                          formatString(subject)
-                      )
-                    : typeof learnerData?.learner_goals?.subjects_to_focus_on === "string"
-                    ? [formatString(learnerData.learner_goals.subjects_to_focus_on)]
-                    : [],
+            title: "Academic Skills to Learn",
+            tags: (learnerData?.learner_goals?.academic_skills_to_learn || []).map((skill) =>
+                formatString(skill?.skill_name)
+            ),
+        },
+        {
+            title: "Arts & Life Skills to Learn",
+            tags: (learnerData?.learner_goals?.arts_life_skills_to_learn || []).map((skill) =>
+                formatString(skill?.skill_name)
+            ),
         },
         {
             title: "Preferred Volunteer Qualities",
@@ -340,7 +341,26 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
         },
     ].filter((item) => item.tags.length > 0);
 
+    const learnerGoalsNotes = [
+        {
+            title: "Academic Goals",
+            description: learnerData?.learner_goals?.academic_goals_description || "",
+        },
+        {
+            title: "Arts & Life Goals",
+            description: learnerData?.learner_goals?.arts_life_goals_description || "",
+        },
+        {
+            title: "Other Comments or Notes",
+            description: learnerData?.learner_goals?.other_comments_or_notes || "",
+        },
+    ].filter((item) => item.description !== "");
+
     const specialNeeds = [
+        {
+            title: "Type of Developmental Disability",
+            description: learnerData?.learner_special_needs?.type_of_developmental_disability || "",
+        },
         {
             title: "Level of Support Needed",
             description: learnerData?.learner_special_needs?.level_of_support_needed
@@ -354,6 +374,18 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
         {
             title: "Communication Style",
             description: learnerData?.learner_special_needs?.communication_style || "",
+        },
+        {
+            title: "Description",
+            description: learnerData?.learner_special_needs?.description || "",
+        },
+        {
+            title: "Behavioral Concerns",
+            description: learnerData?.learner_special_needs?.behavioral_concerns || "",
+        },
+        {
+            title: "Behavior Support Strategies",
+            tags: learnerData?.learner_special_needs?.behavior_support_strategies || [],
         },
         {
             title: "Areas of Support Needed",
@@ -380,113 +412,38 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
                     ? [formatString(learnerData.learner_special_needs.learning_styles)]
                     : [],
         },
-    ].filter((item) => (item.tags?.length ?? 0) > 0);
+    ].filter((item) => (item.tags?.length ?? 0) > 0 || item.description);
 
-    const currentInterests = [
+    const education = [
         {
-            title: "Interests",
-            tags:
-                Array.isArray(learnerData?.current_interests?.interests) &&
-                learnerData?.current_interests?.interests.length > 0
-                    ? learnerData.current_interests.interests.map((interest: string) =>
-                          formatString(interest)
-                      )
-                    : typeof learnerData?.current_interests?.interests === "string"
-                    ? [formatString(learnerData.current_interests.interests)]
-                    : [],
+            title: "Current School",
+            description: learnerData?.education?.current_school || "",
         },
         {
-            title: "Extra Curricular Activities",
-            tags:
-                Array.isArray(learnerData?.current_interests?.extra_curricular_activities) &&
-                learnerData?.current_interests?.extra_curricular_activities.length > 0
-                    ? learnerData.current_interests.extra_curricular_activities.map(
-                          (activity: string) => formatString(activity)
-                      )
-                    : typeof learnerData?.current_interests?.extra_curricular_activities ===
-                      "string"
-                    ? [formatString(learnerData.current_interests.extra_curricular_activities)]
-                    : [],
+            title: "Grade / Education Level",
+            description: learnerData?.education?.grade_or_education_level || "",
         },
         {
-            title: "Favorite Activities",
-            tags:
-                Array.isArray(learnerData?.current_interests?.favorite_activities) &&
-                learnerData?.current_interests?.favorite_activities.length > 0
-                    ? learnerData.current_interests.favorite_activities.map((activity: string) =>
-                          formatString(activity)
-                      )
-                    : typeof learnerData?.current_interests?.favorite_activities === "string"
-                    ? [formatString(learnerData.current_interests.favorite_activities)]
-                    : [],
-        },
-    ].filter((item) => item.tags.length > 0);
-
-    const socialSkills = [
-        {
-            title: "Communication Preferences",
-            tags:
-                Array.isArray(learnerData?.social_skills?.communication_preferences) &&
-                learnerData?.social_skills?.communication_preferences.length > 0
-                    ? learnerData.social_skills.communication_preferences.map((pref: string) =>
-                          formatString(pref)
-                      )
-                    : typeof learnerData?.social_skills?.communication_preferences === "string"
-                    ? [formatString(learnerData.social_skills.communication_preferences)]
-                    : [],
+            title: "IEP / 504 Plan",
+            description: learnerData?.education?.program_iep_504_plan || "",
         },
         {
-            title: "Social Interaction Styles",
-            tags:
-                Array.isArray(learnerData?.social_skills?.social_interaction_styles) &&
-                learnerData?.social_skills?.social_interaction_styles.length > 0
-                    ? learnerData.social_skills.social_interaction_styles.map((style: string) =>
-                          formatString(style)
-                      )
-                    : typeof learnerData?.social_skills?.social_interaction_styles === "string"
-                    ? [formatString(learnerData.social_skills.social_interaction_styles)]
-                    : [],
+            title: "Academic Strengths",
+            tags: learnerData?.education?.academic_strengths || [],
         },
         {
-            title: "Behavioral Concerns",
-            tags:
-                Array.isArray(learnerData?.social_skills?.behavioral_concerns) &&
-                learnerData?.social_skills?.behavioral_concerns.length > 0
-                    ? learnerData.social_skills.behavioral_concerns.map((concern: string) =>
-                          formatString(concern)
-                      )
-                    : typeof learnerData?.social_skills?.behavioral_concerns === "string"
-                    ? [formatString(learnerData.social_skills.behavioral_concerns)]
-                    : [],
+            title: "Cultural / Religious Considerations",
+            description: learnerData?.education?.cultural_religious_considerations || "",
         },
         {
-            title: "Techniques to Calm",
-            tags:
-                Array.isArray(learnerData?.social_skills?.techniques_to_calm) &&
-                learnerData?.social_skills?.techniques_to_calm.length > 0
-                    ? learnerData.social_skills.techniques_to_calm.map((technique: string) =>
-                          formatString(technique)
-                      )
-                    : typeof learnerData?.social_skills?.techniques_to_calm === "string"
-                    ? [formatString(learnerData.social_skills.techniques_to_calm)]
-                    : [],
-        },
-    ].filter((item) => item.tags.length > 0);
-
-    const additionalInfo = [
-        {
-            title: "Cultural Considerations",
-            description: learnerData?.additional_info?.cultural_consideration || "",
+            title: "Extracurricular Activities",
+            description: learnerData?.education?.extracurricular_activities || "",
         },
         {
-            title: "Other Concerns or Requests",
-            description: learnerData?.additional_info?.other_concerns_or_requests || "",
+            title: "Favorite Free Time Activities",
+            description: learnerData?.education?.favorite_free_time_activities || "",
         },
-        {
-            title: "What Motivates to Learn",
-            description: learnerData?.additional_info?.what_motivates_to_learn || "",
-        },
-    ].filter((item) => item.description !== "");
+    ].filter((item) => (item.tags?.length ?? 0) > 0 || item.description);
 
     return (
         <div className="flex flex-col gap-5">
@@ -511,6 +468,13 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
                             key={index}
                             title={item?.title}
                             description={item?.tags.join(", ")}
+                        />
+                    ))}
+                    {learnerGoalsNotes.map((item, index) => (
+                        <ContentRender
+                            key={`note-${index}`}
+                            title={item?.title}
+                            description={item?.description}
                         />
                     ))}
                 </div>
@@ -538,41 +502,23 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
             </div>
 
             <div className="px-5">
-                <h3 className="font-medium mb-3 text-xl">Current Interests</h3>
+                <h3 className="font-medium mb-3 text-xl">Education and Hobbies</h3>
                 <div className="grid grid-cols-2 gap-3">
-                    {currentInterests.map((item, index) => (
-                        <ContentRender
-                            key={index}
-                            title={item?.title}
-                            description={item?.tags.join(", ")}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            <div className="px-5">
-                <h3 className="font-medium mb-3 text-xl">Social Skills</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    {socialSkills.map((item, index) => (
-                        <ContentRender
-                            key={index}
-                            title={item?.title}
-                            description={item?.tags.join(", ")}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            <div className="px-5">
-                <h3 className="font-medium mb-3 text-xl">Additional Information</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    {additionalInfo.map((item, index) => (
-                        <ContentRender
-                            key={index}
-                            title={item?.title}
-                            description={item?.description}
-                        />
-                    ))}
+                    {education.map((item, index) =>
+                        item.tags ? (
+                            <ContentRender
+                                key={index}
+                                title={item?.title}
+                                description={item?.tags.join(", ")}
+                            />
+                        ) : (
+                            <ContentRender
+                                key={index}
+                                title={item?.title}
+                                description={item?.description}
+                            />
+                        )
+                    )}
                 </div>
             </div>
         </div>

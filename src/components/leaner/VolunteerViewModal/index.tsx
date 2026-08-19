@@ -18,6 +18,7 @@ import RatingHeader from "@/components/profile/Overview/RatingHeader";
 import InnerWidth from "@/utils/innerWidth";
 import { getLocalStorage } from "@/utils/localStorage";
 import { formatString } from "@/utils/stringFormats";
+import { SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunteer";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -75,6 +76,13 @@ interface VolunteerData {
     total_volunteered_hours: number;
     students_connected: number;
     volunteer_gender?: string;
+    preferred_learner_age_group?: string;
+    volunteer_academic_skills_notes?: string;
+    volunteer_arts_life_skills_notes?: string;
+    support_preference?: string;
+    support_preference_details?: string;
+    volunteer_teaching_traits?: string;
+    volunteer_favorite_activities?: string;
 }
 
 const ProfileInfo = ({
@@ -209,10 +217,18 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
         },
     ];
 
+    const showSupportPreferenceDetails = SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS.includes(
+        volunteerData?.support_preference || ""
+    );
+
     const bio = [
         {
             title: "Gender",
             description: formatString(volunteerData?.volunteer_gender || ""),
+        },
+        {
+            title: "Preferred Learner Age Group",
+            description: volunteerData?.preferred_learner_age_group,
         },
         {
             title: "Volunteer Experience",
@@ -225,6 +241,29 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
         {
             title: "Education",
             description: volunteerData?.volunteer_education,
+        },
+        {
+            title: "More about their academic skills",
+            description: volunteerData?.volunteer_academic_skills_notes,
+        },
+        {
+            title: "More about their arts/life skills",
+            description: volunteerData?.volunteer_arts_life_skills_notes,
+        },
+        {
+            title: "Favorite Free Time Activities",
+            description: volunteerData?.volunteer_favorite_activities,
+        },
+        {
+            title: "Support Preference",
+            description: volunteerData?.support_preference,
+        },
+        ...(showSupportPreferenceDetails
+            ? [{ title: "Support Preference Details", description: volunteerData?.support_preference_details }]
+            : []),
+        {
+            title: "Teaching Traits, Preferences & Limitations",
+            description: volunteerData?.volunteer_teaching_traits,
         },
     ];
 
@@ -276,12 +315,12 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
                     />
                 </div>
             </div>
-            {bio.map((item, index) => (
+            {bio.filter((item) => item?.description).map((item, index) => (
                 <DetailCard
                     key={index}
                     className="!gap-2"
                     title={item?.title}
-                    description={item?.description}
+                    description={item?.description || ""}
                 />
             ))}
             {details.map((detail, index) => (

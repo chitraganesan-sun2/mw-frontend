@@ -2,6 +2,7 @@ import ContactDetails from "@/components/profile/Bio/ContactDetails";
 import { MdEmail } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import { formatString } from "@/utils/stringFormats";
+import { SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunteer";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useEffect, useRef } from "react";
@@ -76,15 +77,32 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         { label: "Date of Birth", value: dayjs(data?.volunteer_birth_date, "DD-MM-YYYY").format("DD-MMM-YYYY") },
         { label: "Gender", value: formatString(data?.volunteer_gender) },
         { label: "Languages Spoken", value: data?.volunteer_languages?.map((language) => language.language_name) },
-        { label: "Skills", value: data?.volunteer_skills?.map((skill) => skill.skill_name) },
+        { label: "Preferred Learner Age Group", value: data?.preferred_learner_age_group },
+        { label: "Academic Subjects", value: data?.volunteer_subjects?.map((subject) => subject.subject_name) },
+        { label: "More about your academic skills", value: data?.volunteer_academic_skills_notes },
+        { label: "Arts & Life Skills", value: data?.volunteer_skills?.map((skill) => skill.skill_name) },
+        { label: "More about your arts/life skills", value: data?.volunteer_arts_life_skills_notes },
+        {
+            label: "Support Preference",
+            value: data?.support_preference,
+        },
+        {
+            label: "Support Preference Details",
+            value: SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS.includes(data?.support_preference || "")
+                ? data?.support_preference_details
+                : "",
+        },
+        { label: "Teaching Traits, Preferences & Limitations", value: data?.volunteer_teaching_traits },
         { label: "Higher Education", value: data?.volunteer_higher_education },
         { label: "Education Summary", value: data?.volunteer_education },
         { label: "Volunteered Experience", value: data?.volunteer_experience },
         { label: "Work Experience", value: data?.volunteer_work_experience },
+        { label: "Favorite Free Time Activities", value: data?.volunteer_favorite_activities },
         { label: "Description", value: data?.volunteer_description },
         { label: "Consented from Guardian", value: data?.consented_from_parent ? "Yes" : "No" },
-        { label: "Guardian Email", value: data?.volunteer_parent_email },
         { label: "Guardian Name", value: data?.volunteer_parent_name },
+        { label: "Guardian Email", value: data?.volunteer_parent_email },
+        { label: "Guardian Phone", value: data?.volunteer_parent_contact_number?.number },
     ].filter(detail => detail.value && Object.keys(detail.value).length);
     
     const renderAboutMeVideo = () => {
@@ -133,6 +151,7 @@ export const VolunteerContactDetails = ({ data }: { data: Volunteercontactdetail
     ]
 
     const contactDetails = [
+        { title: "Email", value: data?.email, icon: <MdEmail size={13} /> },
         { title: "Phone Number", value: data?.contact_number?.number, icon: <FaPhoneAlt size={13} /> },
     ]
 

@@ -101,6 +101,7 @@ interface Parentinfo {
     parent_address: string;
     relationship_to_learner: string;
     parent_email: string;
+    emergency_contact_number?: Parentcontactnumber;
 }
 
 interface Parentcontactnumber {

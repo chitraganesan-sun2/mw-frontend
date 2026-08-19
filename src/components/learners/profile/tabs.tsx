@@ -81,10 +81,12 @@ export const ParentGuardianInformation = ({ data }: { data: Parentinfo }) => {
 
     const number = data?.parent_contact_number?.number;
     const email = data?.parent_email;
+    const emergencyNumber = data?.emergency_contact_number?.number;
 
     const contactDetails = [
         { title: "Phone Number", value: number, icon: <FaPhoneAlt size={13} /> },
         { title: "Email", value: email, icon: <MdEmail size={15} /> },
+        { title: "Emergency Contact Number", value: emergencyNumber, icon: <FaPhoneAlt size={13} /> },
     ].filter(item => item.value);
 
     if(details.length === 0 && contactDetails.length === 0) return <div className="text-center text-base font-medium h-full flex-center">No information found</div>;
