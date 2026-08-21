@@ -61,7 +61,7 @@ const Avatar = () => {
     });
 
     return (
-        <Link href={"profile"} className="flex flex-col items-center gap-2 p-2">
+        <Link href={`/${role}/profile`} className="flex flex-col items-center gap-2 p-2">
             <div className="relative w-[80px] h-[80px]">
                 <Image src={userImage} alt="avatar" fill className="object-cover rounded-full" />
             </div>
