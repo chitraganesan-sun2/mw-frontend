@@ -2,6 +2,9 @@
 	"appId": "org.melodywings.app",
 	"appName": "MelodyWings",
 	"webDir": "out",
+	"android": {
+		"webContentsDebuggingEnabled": true
+	},
 	"server": {
 		"androidScheme": "https",
 		"allowNavigation": [

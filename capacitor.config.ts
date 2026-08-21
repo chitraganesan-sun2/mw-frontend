@@ -4,6 +4,11 @@ const config: CapacitorConfig = {
   appId: 'org.melodywings.app',
   appName: 'MelodyWings',
   webDir: 'out',
+  // TEMPORARY: makes release builds remote-debuggable via chrome://inspect
+  // to trace the profile logout bug. Remove before a real Play Store release.
+  android: {
+    webContentsDebuggingEnabled: true,
+  },
   server: {
     androidScheme: 'https',
     // Enable native HTTP handling - bypasses CORS for all requests
