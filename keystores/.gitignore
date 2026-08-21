@@ -2,6 +2,7 @@
 *.keystore
 *.jks
 *.p12
+release-keystore-credentials.txt
 
 # Keep this .gitignore and the README
 !.gitignore
