@@ -13,7 +13,7 @@ import { createPortal } from "react-dom";
 import { IoMdCheckmark } from "react-icons/io";
 import { MdClose } from "react-icons/md";
 import "./styles.css";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
 
@@ -42,7 +42,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const router = useRouter();
     const queryClient = useQueryClient();
     const { currentMonth } = useAppStore();
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     const markNotificationAsRead = async (sessionIds: (string | undefined)[]) => {
         const validSessionIds = sessionIds.filter((id): id is string => Boolean(id));

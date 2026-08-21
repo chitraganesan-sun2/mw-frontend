@@ -11,7 +11,7 @@ import RatingCard from "@/components/profile/Overview/RatingCard";
 import RatingHeader from "@/components/profile/Overview/RatingHeader";
 import { VolunteerContactDetails, ProfileDetails as VolunteerProfileDetails } from "@/components/volunteers/profile/tabs";
 import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 
@@ -92,7 +92,7 @@ const TabButtons = ({
 );
 
 const OverviewContent = ({ userData }: { userData: any }) => {
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const isLearner = role === "learner";
 
     const details = isLearner ?
@@ -224,7 +224,7 @@ const volunteerTabs = [
 
 const FullProfileDetails = ({ data }: { data: any }) => {
     const tabContentRef = useRef<HTMLDivElement>(null);
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     const tabs = role === "learner" ? learnerTabs : volunteerTabs;
     const [activeTab, setActiveTab] = useState(tabs[0].id);

@@ -7,7 +7,7 @@ import CenterModal from "@/components/common/Modals/CenterModal";
 import { CommunityFormConstants } from "@/constants/community";
 import { cn } from "@/utils/merge-class";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import FeedHeader from "../FeedHeader";
@@ -30,7 +30,7 @@ type FormData = z.infer<typeof PostFormSchema>;
 
 const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const queryClient = useQueryClient();
 
     const [postId] = useQueryState("id");

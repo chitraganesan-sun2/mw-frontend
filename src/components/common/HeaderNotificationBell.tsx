@@ -5,13 +5,13 @@ import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
 import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useState, useEffect, useRef } from "react";
 
 const HeaderNotificationBell = () => {
-    const role = Cookies.get("role");
-    const volunteerId = Cookies.get("volunteer_id");
-    const learnerId = Cookies.get("learner_id");
+    const role = getCookie("role");
+    const volunteerId = getCookie("volunteer_id");
+    const learnerId = getCookie("learner_id");
     const [isOpen, setIsOpen] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const prevCount = useRef<number>(0);

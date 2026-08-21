@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { getLocalStorage } from "@/utils/localStorage";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 interface SectionCardProps {
     href: string;
     text: string;
@@ -16,7 +16,7 @@ interface SectionCardProps {
 const SectionCard = ({ href, text, icon, textColor, onClick }: SectionCardProps) => {
     const pathname = usePathname();
     const isActive = pathname.includes(href);
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     // Normalize: strip any leading slash from href so we never produce
     // a double slash like "/learner//community" (which 404s in static export).

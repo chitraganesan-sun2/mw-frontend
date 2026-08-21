@@ -3,11 +3,11 @@ import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import TagComponent from "@/components/common/Tag";
 import Image from "next/image";
 import EditProfileIcon from "@/assets/icons/EditProfileIcon";
-import Cookies from "js-cookie"
+import { getCookie } from "@/utils/auth";
 import Link from "next/link";
 
 const BioHeader = ({ data }: any) => {
-    const role = Cookies.get("role") || "";
+    const role = getCookie("role") || "";
 
     return (
         <div className="flex flex-col gap-4 w-full px-5">

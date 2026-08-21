@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -26,9 +26,9 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
     console.log("availableSlots", availableSlots);
 
 
-    const role = Cookies.get("role");
-    const volunteerId = Cookies.get("volunteer_id");
-    const learnerId = Cookies.get("learner_id");
+    const role = getCookie("role");
+    const volunteerId = getCookie("volunteer_id");
+    const learnerId = getCookie("learner_id");
     const isVolunteer = role === "volunteer";
 
 

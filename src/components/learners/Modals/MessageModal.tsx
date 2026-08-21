@@ -5,7 +5,7 @@ import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { toUserTimeZone } from "@/utils/timeFunctions";
 import Loader from "@/components/common/Loader";
 import { useAppStore } from "@/store/useAppStore"
@@ -37,9 +37,9 @@ const MessageModal = ({ receiverId, isOpen, onClose }: MessageModalProps) => {
     const [message, setMessage] = useState<string>("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const userRole = Cookies.get("role");
+    const userRole = getCookie("role");
     const userTimezone = userRole === "learner" ? learnerDetails?.learner_personal_info?.learner_contact_details?.timezone : volunteerDetails?.volunteer_contact_details?.timezone
-    const senderId = userRole === "learner" ? Cookies.get("learner_id") : Cookies.get("volunteer_id");
+    const senderId = userRole === "learner" ? getCookie("learner_id") : getCookie("volunteer_id");
 
     // Role Based endpoints
     const endpoint = userRole === "learner" ? {

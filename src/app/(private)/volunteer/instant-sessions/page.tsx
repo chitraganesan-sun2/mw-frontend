@@ -7,7 +7,7 @@ import { useComponentStore } from "@/store/useComponenetStore";
 import { IoIosArrowBack } from "react-icons/io";
 import { POST_API, GET_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import CenterModal from "@/components/common/Modals/CenterModal";
@@ -171,7 +171,7 @@ export default function VolunteerInstantSessionsPage() {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [sessionDetail, setSessionDetail] = useState<any>(null);
     const [isDetailLoading, setIsDetailLoading] = useState(false);
-    const role = Cookies.get("role") || "volunteer";
+    const role = getCookie("role") || "volunteer";
 
     const [query] = useQueryState("query");
     const [debouncedQuery] = useDebounce(query, 400);

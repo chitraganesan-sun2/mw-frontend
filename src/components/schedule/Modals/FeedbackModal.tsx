@@ -12,7 +12,7 @@ import { LearnerFeedbackFormConstants } from "@/constants/schedule";
 import { useAppStore } from "@/store/useAppStore";
 import InnerWidth from "@/utils/innerWidth";
 import { cn } from "@/utils/merge-class";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useEffect, useState } from "react";
 import { FeedbackModalProps } from "./index.type.d";
 
@@ -30,7 +30,7 @@ const FeedbackModal = ({
     const [formData, setFormData] = useState<any>({});
     const { eventDetails } = useAppStore();
     const feedbackTitle = mode === "edit" ? "Edit Feedback" : "Please Fill the Feedback";
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     const feedBackEventDetails = {
         Name: role === "volunteer" ? eventDetails?.learner_name : eventDetails?.volunteer_name,

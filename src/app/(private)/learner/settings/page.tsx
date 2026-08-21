@@ -4,7 +4,7 @@ import { GET_API, PUT_API } from "@/api/request";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { Select, Switch } from "antd";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DropDown from "@/assets/icons/DropDown";
@@ -51,7 +51,7 @@ const Settings = () => {
         useState<SessionMatchValue>("all_sessions");
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
-    const learnerId = Cookies.get("learner_id");
+    const learnerId = getCookie("learner_id");
     const [isLoading, setIsLoading] = useState(false);
 
     const handlePermission = (value: any) => {

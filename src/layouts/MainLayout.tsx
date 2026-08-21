@@ -6,7 +6,7 @@ import { renderHeader } from "./helper";
 import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/utils/merge-class";
 import InnerWidth from "@/utils/innerWidth";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { ThankyouCardBase } from "@/components/landingpage/ThankyouCard";
 import { LearnerThankyouCardConstants } from "@/constants/learner";
 import { VolunteerRejectedMessage, VolunteerThankyouCardConstants } from "@/constants/volunteer";
@@ -15,8 +15,8 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const width = InnerWidth();
-    const onboardedStatus = Cookies.get("onboarded_status");
-    const role = Cookies.get("role");
+    const onboardedStatus = getCookie("onboarded_status");
+    const role = getCookie("role");
     const isProfile = pathname.includes("profile");
     const isMessagesChatPage =
         (pathname?.includes("/volunteer/messages") || pathname?.includes("/learner/messages")) &&

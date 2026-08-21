@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { endpoints } from "@/api/constants";
 import { GET_API, POST_API } from "@/api/request";
 import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useQueryState } from "nuqs";
 import Button from "@/components/common/Button";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +13,7 @@ import { getDefaultRouteForRole } from "@/utils/routeGuard";
 
 const LoginPage = () => {
     const router = useRouter();
-    const [role, setRole] = useState<UserType>((Cookies.get("role") as UserType) || "volunteer");
+    const [role, setRole] = useState<UserType>((getCookie("role") as UserType) || "volunteer");
     const [code] = useQueryState("code");
     const [Loading, setLoading] = useState(false);
 
@@ -69,7 +70,7 @@ const LoginPage = () => {
     });
 
     useEffect(() => {
-        const savedRole = Cookies.get("role") as UserType;
+        const savedRole = getCookie("role") as UserType;
         if (savedRole) {
             setRole(savedRole);
         }

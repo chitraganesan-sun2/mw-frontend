@@ -3,14 +3,14 @@ import DetailCard from "./DetailCard";
 import BioHeader from "@/components/profile/Bio/BioHeader";
 import Divider from "@/components/common/Divider";
 import DetailChipCard from "@/components/profile/Bio/DetailChipCard";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import ContactDetails from "./ContactDetails";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import TagComponent from "@/components/common/Tag";
 
 const index = ({ data }: any) => {
-    const role = Cookies.get("role") || "";
+    const role = getCookie("role") || "";
     const isLearner = role === "learner";
 
     const details = [

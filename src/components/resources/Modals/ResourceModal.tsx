@@ -4,7 +4,7 @@ import CenterModal from "@/components/common/Modals/CenterModal";
 import { ResourceFormConstants, ResourceFormDefaultValues, ResourceFormSchema } from "@/constants/resources";
 import { cn } from "@/utils/merge-class";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppStore } from "@/store/useAppStore";
@@ -141,7 +141,7 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
     const { userName } = useAppStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const [resourceId] = useQueryState("id") || "";
     const [currentMode] = useQueryState("mode");
     const isEditMode = currentMode === "edit";

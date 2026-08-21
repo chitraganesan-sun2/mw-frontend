@@ -1,6 +1,6 @@
 "use client";
 
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 
 export const VolunteerTheme = {
     primary: "#FE5B11",
@@ -17,7 +17,7 @@ export const LearnerTheme = {
 export const getTheme = () => {
     if (typeof window === "undefined") return LearnerTheme;
 
-    const userType = Cookies.get("role");
+    const userType = getCookie("role");
 
     switch (userType) {
         case "volunteer":

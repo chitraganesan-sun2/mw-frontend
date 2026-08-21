@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { getCalendarEvents } from "@/utils/calender";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSendData } from "@/hooks/useReactQuery";
@@ -31,7 +31,7 @@ export default function LearnerSchedulePage() {
     const queryClient = useQueryClient();
 
     const [modal] = useQueryState("modal");
-    const learnerId = Cookies.get("learner_id");
+    const learnerId = getCookie("learner_id");
 
     const getEvents = () => getCalendarEvents(learnerId as string, "learner", currentMonth);
 

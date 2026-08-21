@@ -5,7 +5,7 @@ import MonthYearSlider from "./MonthYearSlider";
 import { CalendarDayOne, CalendarIcon, NotificationIcon, SideMenuIcon } from "@/assets/icons";
 import { IoIosSearch } from "react-icons/io";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
 import MonthYearPicker from "./MonthYearPicker";
 import SideModal from "@/components/common/Modals/MobileSideModal";
@@ -18,7 +18,7 @@ import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 type Props = {};
 
 const Header = (props: Props) => {
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const router = useRouter();
     const [isSideNavBarOpen, setIsSideNavBarOpen] = useState<boolean>(false);
 

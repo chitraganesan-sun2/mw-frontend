@@ -9,7 +9,7 @@ import { Spin } from "antd";
 import ErrorMsg from "@/components/common/Messages/ErrorMsg";
 import { timesAgo } from "@/utils/timeFunctions";
 import { useQueryState } from "nuqs";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 
 const POST_NOTIFICATION_TYPES = ["like", "comment", "liked_on_your_comment", "replied_to_your_comment"];
 
@@ -47,7 +47,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
     const router = useRouter();
     const [_, setPostId] = useQueryState("id");
     const [mode, setMode] = useQueryState("mode");
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const isPostNotification = POST_NOTIFICATION_TYPES.includes(notification.notification_type);
 
     const getNotificationMessage = (type: string, createdBy?: string) => {

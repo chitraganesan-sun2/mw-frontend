@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import dayjs from "dayjs";
 const formatDateTime = (dateTimeString: string) => {
     const date = new Date(dateTimeString);
@@ -37,7 +37,7 @@ const MessageCard = ({
     const router = useRouter();
     const params = useSearchParams();
     const chatId = params.get("chatId");
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     const handleClick = () => {
         if (isIndividualChatLoading) return;

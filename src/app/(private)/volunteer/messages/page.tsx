@@ -12,7 +12,7 @@ import Button from "@/components/common/Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import VolunteerChatList from "@/components/messages/VolunteerChatList";
 import NoMessage from "@/components/messages/NoMessage";
 import LottieLoader from "@/components/common/Loader/Lottie";
@@ -81,7 +81,7 @@ const Messages = () => {
     const isMobile = useIsMobile();
     const [searchQuery, setSearchQuery] = useQueryState("query");
     const [message, setMessage] = useState("");
-    const volunteerId = Cookies.get("volunteer_id");
+    const volunteerId = getCookie("volunteer_id");
     const [chats, setChats] = useState<VolunteerChatItem[]>([]);
     const urlChatId = useSearchParams().get("chatId");
     const urlLearnerId = useSearchParams().get("learnerId");

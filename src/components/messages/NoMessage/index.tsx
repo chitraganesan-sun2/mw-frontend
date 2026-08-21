@@ -3,11 +3,11 @@ import Image from "next/image";
 import Nomessage from "@/assets/images/Nomessage.png";
 import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useState } from "react";
 const NoMessage = () => {
     const router = useRouter();
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const [isNavigating, setIsNavigating] = useState(false);
 
     const handleGoToSettings = () => {

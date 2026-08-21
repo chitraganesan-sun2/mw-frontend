@@ -5,13 +5,14 @@ import { endpoints } from "@/api/constants";
 import { useSendData } from "./useReactQuery";
 import { PUT_API } from "@/api/request";
 import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/common/Toast";
 import { useAppStore } from "@/store/useAppStore";
 import { useState } from "react";
 
 export const useOnboardingForm = (schema: any) => {
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const form = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
     });

@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CommentInput from "../CommentInput";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { callbackToast } from "@/components/common/Toast";
 import MobileCommentPanel from "../MobileCommentPanel";
 import SortDropdown from "../SortDropdown";
@@ -58,7 +58,7 @@ interface PostData {
 
 const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCardProps) => {
     const queryClient = useQueryClient();
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const [activeTab] = useQueryState("tab");
     const [searchQuery, setSearchQuery] = useQueryState("query");
 

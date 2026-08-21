@@ -7,7 +7,7 @@ import { CommunityFormConstants } from "@/constants/community";
 import { useSendData } from "@/hooks/useReactQuery";
 import { cn } from "@/utils/merge-class";
 import { useState } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import FeedHeader from "../FeedHeader";
@@ -20,7 +20,7 @@ type PostModalProps = {
 const PostModal = ({ isOpen, onClose }: PostModalProps) => {
     const [notes, setNotes] = useState("");
     const [uploadPictures, setUploadPictures] = useState<any[]>([]);
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const queryClient = useQueryClient();
 
     const handleChange = (key: string, value: any) => {

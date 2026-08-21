@@ -12,7 +12,7 @@ import Button from "@/components/common/Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import NoMessage from "@/components/messages/NoMessage";
 import VolunteerViewModal from "@/components/leaner/VolunteerViewModal";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
@@ -68,7 +68,7 @@ const Messages = () => {
     const isMobile = useIsMobile();
     const [searchQuery, setSearchQuery] = useQueryState("query");
     const [message, setMessage] = useState("");
-    const learnerId = Cookies.get("learner_id");
+    const learnerId = getCookie("learner_id");
     interface LearnerChatItem {
         chat_id: string;
         volunteer_id: string;

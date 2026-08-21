@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { MdClose } from "react-icons/md";
 
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
@@ -35,7 +35,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     const router = useRouter();
     const queryClient = useQueryClient();
     const { currentMonth } = useAppStore();
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     const [isAnimating, setIsAnimating] = useState(false);
     const [isVisible, setIsVisible] = useState(false);

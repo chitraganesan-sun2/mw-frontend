@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getTheme } from "@/utils/theme";
 import { ConfigProvider, ThemeConfig } from "antd";
 import { Poppins } from "next/font/google";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { Toaster } from "react-hot-toast";
 
 const poppins = Poppins({
@@ -87,7 +87,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     // Watch for cookie changes
     useEffect(() => {
         const checkCookies = () => {
-            const role = Cookies.get("role") as UserType | undefined;
+            const role = getCookie("role") as UserType | undefined;
             if (role !== currentRole) {
                 setCurrentRole(role || null);
                 updateTheme();

@@ -3,7 +3,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
@@ -73,7 +73,7 @@ export const getCalendarEvents = async (
     const monthParam = currentMonth
         ? dayjs(currentMonth).format("YYYY-MM")
         : dayjs().format("YYYY-MM");
-    const role = Cookies.get("role") as UserType | undefined;
+    const role = getCookie("role") as UserType | undefined;
 
     const endpoint =
         role === "volunteer"

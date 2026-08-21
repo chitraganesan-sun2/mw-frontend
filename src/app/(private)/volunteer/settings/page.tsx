@@ -6,7 +6,7 @@ import { useComponentStore } from "@/store/useComponenetStore";
 import { Select, Switch } from "antd";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 
@@ -38,7 +38,7 @@ const Settings = () => {
         useState<SessionMatchValue>("all_sessions");
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
-    const volunteerId = Cookies.get("volunteer_id");
+    const volunteerId = getCookie("volunteer_id");
     const [isLoading, setIsLoading] = useState(false);
 
     const handlePermission = (value: any) => {

@@ -5,7 +5,7 @@ import { NotificationCardSkeleton } from "@/components/schedule/NotificationCard
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import dayjs from "dayjs";
 import InnerWidth from "@/utils/innerWidth";
 import { ApprovalModalProps } from "./index.type.d";
@@ -35,7 +35,7 @@ interface NotificationData {
 
 const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose }) => {
     const [notificationsData, setNotificationsData] = useState<NotificationData[]>([]);
-    const volunteerId = Cookies.get("volunteer_id");
+    const volunteerId = getCookie("volunteer_id");
     const queryClient = useQueryClient();
 
     const getNotifications = async () => {

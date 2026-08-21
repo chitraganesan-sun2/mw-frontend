@@ -8,10 +8,10 @@ import ReviewFilter from "./ReviewFilter";
 import Divider from "@/components/common/Divider";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 
 const Overview = ({ data, reviewEndpoint }: any) => {
-    const role = Cookies.get("role") || "";
+    const role = getCookie("role") || "";
     const isLearner = role === "learner";
 
     const overViewCard = [

@@ -12,7 +12,7 @@ import { TimeIcon, HostedByIcon } from "@/assets/icons";
 import { POST_API, GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "@/components/common/Toast";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { cn } from "@/utils/merge-class";
@@ -54,7 +54,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
     showNote = false,
 }) => {
     const queryClient = useQueryClient();
-    const learnerId = Cookies.get("learner_id");
+    const learnerId = getCookie("learner_id");
     const statusConfig = {
         available: {
             bg: "!bg-[#DCFCE7]",

@@ -14,7 +14,7 @@ import {
     SettingIcon,
     InstantSessionIcon,
 } from "@/assets/icons";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import Link from "next/link";
 import InnerWidth from "@/utils/innerWidth";
 import Image from "next/image";
@@ -23,7 +23,7 @@ import { clearCookies } from "@/utils/auth";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const router = useRouter();
-    const role = Cookies.get("role");
+    const role = getCookie("role");
     const isMobileOrTabScreen = InnerWidth() < 1024;
 
     // Instant Sessions - for both learners and volunteers

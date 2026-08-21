@@ -4,7 +4,7 @@ import Button from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { toUserTimeZone } from "@/utils/timeFunctions";
 import Loader from "@/components/common/Loader";
 import { useAppStore } from "@/store/useAppStore"
@@ -39,7 +39,7 @@ const MobileMessageModal = ({ receiverId, isOpen, onClose }: MobileMessageModalP
     const [message, setMessage] = useState<string>("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const userRole = Cookies.get("role");
+    const userRole = getCookie("role");
     const userTimezone = userRole === "learner" ? learnerDetails?.learner_personal_info?.learner_contact_details?.timezone : volunteerDetails?.volunteer_contact_details?.timezone
 
     // Role Based endpoints

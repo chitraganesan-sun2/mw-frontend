@@ -16,7 +16,7 @@ import CommentInput from "../CommentInput";
 import React, { useState } from "react";
 import { POST_API } from "@/api/request";
 import { callbackToast } from "@/components/common/Toast";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { IoIosClose } from "react-icons/io";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import CommentSkeleton from "../CommentCard/skeleton";
@@ -108,7 +108,7 @@ const FeedViewModal = ({
     const queryClient = useQueryClient();
     const [activeTab] = useQueryState("tab");
 
-    const role = Cookies.get("role");
+    const role = getCookie("role");
 
     const [mode, setMode] = useQueryState("mode");
     const [id, setId] = useQueryState("id");

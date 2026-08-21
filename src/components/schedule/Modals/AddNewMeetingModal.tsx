@@ -45,7 +45,7 @@ import { useSendData } from "@/hooks/useReactQuery";
 import { z } from "zod";
 import InnerWidth from "@/utils/innerWidth";
 import { showToast } from "@/components/common/Toast";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 
 // Define Zod schema for form validation
 const meetingFormSchema = z.object({
@@ -97,7 +97,7 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
     const [selectedVolunteerId, setSelectedVolunteerId] = useState<string>("");
     const [isLoadingAvailableDays, setIsLoadingAvailableDays] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<string>(dayjs().format("YYYY-MM"));
-    const learnerId = Cookies.get("learner_id");
+    const learnerId = getCookie("learner_id");
 
     const getVolunteers = async () => {
         setFetchingVolunteers(true);

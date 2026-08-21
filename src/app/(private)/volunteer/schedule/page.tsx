@@ -14,7 +14,7 @@ import { endpoints } from "@/api/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
 import { useAppStore } from "@/store/useAppStore";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { getCalendarEvents } from "@/utils/calender";
 import { useSendData } from "@/hooks/useReactQuery";
 import LottieLoader from "@/components/common/Loader/Lottie";
@@ -35,7 +35,7 @@ export default function SchedulePage() {
     const { eventDetails, currentMonth, setVolunteerUtcOffset, setVolunteerTimeZone } =
         useAppStore();
     const [modal] = useQueryState("modal");
-    const volunteerId = Cookies.get("volunteer_id");
+    const volunteerId = getCookie("volunteer_id");
     const [isOpenOnetImeSchedule, setIsOpenOnetImeSchedule] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string>("");
 
