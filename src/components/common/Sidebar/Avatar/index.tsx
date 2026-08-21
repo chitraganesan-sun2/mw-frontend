@@ -4,14 +4,14 @@ import { GET_API } from "@/api/request";
 import TagComponent from "@/components/common/Tag";
 import { useAppStore } from "@/store/useAppStore";
 import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import Image from "next/image";
 import Link from "next/link";
 
 const Avatar = () => {
-    const role = Cookies.get("role");
-    const volunteerId = Cookies.get("volunteer_id");
-    const learnerId = Cookies.get("learner_id");
+    const role = getCookie("role");
+    const volunteerId = getCookie("volunteer_id");
+    const learnerId = getCookie("learner_id");
     const isVolunteer = role === "volunteer";
 
     const {

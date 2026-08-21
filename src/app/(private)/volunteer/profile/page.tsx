@@ -6,7 +6,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import Overview from "@/components/profile/Overview";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { getIndividualVolunteer } from "@/api/volunteers";
 import { useAppStore } from "@/store/useAppStore";
 import { endpoints } from "@/api/constants";
@@ -26,7 +26,7 @@ export default function ProfilePage() {
     const [mode, setMode] = useQueryState("mode");
     const [editProfileData, setEditProfileData] = useState({});
 
-    const volunteerId = Cookies.get("volunteer_id") || "";
+    const volunteerId = getCookie("volunteer_id") || "";
     const [volunteerData, setVolunteerData] = useState({ bio: {}, overview: {} });
 
     const { data, isLoading, refetch } = useQuery({

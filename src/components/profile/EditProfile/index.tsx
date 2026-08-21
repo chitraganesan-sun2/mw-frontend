@@ -2,7 +2,7 @@ import { z } from "zod";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 import { useEffect, useState, useRef } from "react";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showToast } from "@/components/common/Toast";
@@ -35,9 +35,9 @@ const EditProfileModal = ({
   const isMobile = useMediaQuery("(max-width: 767px)");
   const formRef = useRef<any>(null);
 
-  const role = Cookies.get("role");
+  const role = getCookie("role");
   const isVolunteer = role === "volunteer";
-  const userId = isVolunteer ? Cookies.get("volunteer_id") : Cookies.get("learner_id");
+  const userId = isVolunteer ? getCookie("volunteer_id") : getCookie("learner_id");
 
   const UserProfileFormConstants = isVolunteer ? VolunteerProfileFormConstants : LearnerProfileFormSections;
   const UserProfileFormSchema = isVolunteer ? volunteerFormSchema : learnerFormSchema;

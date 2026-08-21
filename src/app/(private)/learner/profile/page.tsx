@@ -6,7 +6,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import Overview from "@/components/profile/Overview";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { getCookie } from "@/utils/auth";
 import { getIndividualLearner } from "@/api/learners";
 import { useAppStore } from "@/store/useAppStore";
 import { endpoints } from "@/api/constants";
@@ -25,7 +25,7 @@ export default function ProfilePage() {
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const [mode, setMode] = useQueryState("mode");
 
-    const learnerId = Cookies.get("learner_id") || "";
+    const learnerId = getCookie("learner_id") || "";
     const [learnerData, setLearnerData] = useState({ bio: {}, overview: {} });
 
     const { data, isLoading, refetch } = useQuery({
