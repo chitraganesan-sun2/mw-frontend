@@ -5,10 +5,9 @@
 	"server": {
 		"androidScheme": "https",
 		"allowNavigation": [
-			"api.melodywings.org",
-			"192.168.1.36"
+			"melodywings-backend-781782361175.us-central1.run.app"
 		],
-		"cleartext": true
+		"cleartext": false
 	},
 	"plugins": {
 		"CapacitorHttp": {
