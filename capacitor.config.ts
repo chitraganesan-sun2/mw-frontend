@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
     // Enable native HTTP handling - bypasses CORS for all requests
     // This is correct for mobile apps since CORS is a browser security feature
-    allowNavigation: ['api.melodywings.org'],
+    allowNavigation: ['melodywings-backend-781782361175.us-central1.run.app'],
     cleartext: false,
     // For local dev, uncomment to use live reload:
     // url: 'http://10.0.2.2:3000',

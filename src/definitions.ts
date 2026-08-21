@@ -3,7 +3,8 @@
 import { isNativePlatform } from '@/utils/platform';
 
 // Production API URL for mobile app
-const MOBILE_API_URL = 'https://api.melodywings.org/api/v1';
+// api.melodywings.org does not resolve (no DNS record) - use the Cloud Run URL directly
+const MOBILE_API_URL = 'https://melodywings-backend-781782361175.us-central1.run.app/api/v1';
 
 // For web, this is baked at build time from .env
 const WEB_API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'}/api/v1`;
