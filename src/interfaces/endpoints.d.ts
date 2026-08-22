@@ -25,6 +25,8 @@ export type EndpointProps = {
         getConnectedVolunteers: (id: string) => string;
         getTotalLearnersCount: string;
         emailPreference: (id: string) => string;
+        matchTrigger: string;
+        matchHistory: string;
     };
     volunteer: {
         update: (id: string) => string;
@@ -32,6 +34,8 @@ export type EndpointProps = {
         getIndividualVolunteer: (id: string) => string;
         getConnectedLearners: (id: string) => string;
         getTotalVolunteersHours: string;
+        matchTrigger: string;
+        matchHistory: string;
     };
     volunteer_slot: {
         update: string;
