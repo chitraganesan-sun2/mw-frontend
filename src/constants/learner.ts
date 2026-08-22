@@ -1,6 +1,8 @@
 import nationalities from "@/data/nationalities.json";
 import timezones from "@/data/selectiveTimeZones.json";
 
+export const LEARNER_MIN_AGE = 5;
+
 export const LearnerOnboardingConstants = {
     title: "Enroll a learner",
     description:
@@ -109,7 +111,7 @@ const LearnerPersonalFields: FormField[] = [
         format: "DD-MM-YYYY",
         gridCols: 1,
         required: true,
-        birthDatePicker: { minAge: 0, maxAge: 100 },
+        birthDatePicker: { minAge: LEARNER_MIN_AGE, maxAge: 100 },
     },
     {
         id: "learner_gender",
@@ -307,7 +309,7 @@ const EducationAndHobbiesFields: FormField[] = [
     {
         id: "current_school",
         label: "Current School, College/Program",
-        sublabel: "(name of school, grade level)",
+        sublabel: "Name of the Academy",
         inputType: "text",
         placeholder: "Enter school name",
         gridCols: 1,
@@ -383,39 +385,6 @@ const EducationAndHobbiesFields: FormField[] = [
 // Skills to Learn from Volunteers Fields
 const SkillsToLearnFields: FormField[] = [
     {
-        id: "expected_goals",
-        label: "Parent/Guardian's Goals for the learner ",
-        inputType: "select-creatable",
-        variant: "multi",
-        placeholder: "Don't see your option? Type it in to add.",
-        gridCols: 1,
-        options: [
-            { label: "Boost Confidence", value: "boost_confidence" },
-            { label: "Build Friendships", value: "build_friendships" },
-            { label: "Encourage Activities", value: "encourage_activities" },
-            { label: "Encourage Independence", value: "encourage_independence" },
-            { label: "Find Family Support", value: "find_family_support" },
-            { label: "Handle Sensory Issues", value: "handle_sensory_issues" },
-            { label: "Improve Communication", value: "improve_communication" },
-            { label: "Learn Learner's Needs", value: "learn_learners_needs" },
-            { label: "Manage Emotions", value: "manage_emotions" },
-            { label: "Prepare for Changes", value: "prepare_for_changes" },
-            { label: "Promote Good Health", value: "promote_good_health" },
-            { label: "Provide a Safe Home", value: "provide_a_safe_home" },
-            { label: "Show Love and Acceptance", value: "show_love_and_acceptance" },
-            { label: "Support Hobbies", value: "support_hobbies" },
-            { label: "Support Learning", value: "support_learning" },
-            { label: "Teach Life Skills", value: "teach_life_skills" },
-            { label: "Teach Problem-Solving", value: "teach_problem_solving" },
-            { label: "Teach Responsibility", value: "teach_responsibility" },
-            { label: "Teach Self-Advocacy", value: "teach_self_advocacy" },
-            { label: "Work with Therapists", value: "work_with_therapists" },
-            { label: "Others", value: "others" },
-            { label: "N/A", value: "N/A" },
-        ],
-        required: true,
-    },
-    {
         id: "academic_skills_to_learn",
         label: "Academic Skills",
         sublabel: "(academic areas for tutoring or support)",
@@ -427,6 +396,13 @@ const SkillsToLearnFields: FormField[] = [
         responseAsValue: ["skill_id", "skill_name"],
         placeholder: "Don't see your option? Type it in to add.",
         gridCols: 1,
+    },
+    {
+        id: "academic_goals_description",
+        label: "Academic Goals Description",
+        inputType: "textarea",
+        placeholder: "Describe here",
+        gridCols: 2,
     },
     {
         id: "arts_life_skills_to_learn",
@@ -443,28 +419,6 @@ const SkillsToLearnFields: FormField[] = [
         required: true,
     },
     {
-        id: "skill_level",
-        label: "Skill Level",
-        sublabel: " ",
-        inputType: "radio",
-        options: [
-            { label: "Beginner", value: "beginner" },
-            { label: "Intermediate", value: "intermediate" },
-            { label: "Expert", value: "expert" },
-        ],
-        gridCols: 1,
-        className: "w-full h-fit gap-0 !mb-0",
-        inputClassName: "w-full",
-        required: true,
-    },
-    {
-        id: "academic_goals_description",
-        label: "Academic Goals Description",
-        inputType: "textarea",
-        placeholder: "Describe here",
-        gridCols: 2,
-    },
-    {
         id: "arts_life_goals_description",
         label: "Arts, Life Skills & Goals Description",
         inputType: "textarea",
@@ -474,8 +428,8 @@ const SkillsToLearnFields: FormField[] = [
     },
     {
         id: "preferred_volunteer_qualities",
-        label: "Preferred Volunteer Qualities",
-        sublabel: "(any specific traits the parent/guardian values in a tutor or mentor)",
+        label: "Goals & Preferred Volunteer Qualities",
+        sublabel: "(what you hope the learner gains, and any traits you value in a tutor or mentor)",
         inputType: "textarea",
         placeholder: "Describe here",
         gridCols: 2,
@@ -533,7 +487,7 @@ export const LearnerFormSections: FormSectionConfig[] = [
                 inputType: "upload",
                 required: false,
                 gridCols: 1,
-                variant: "file",
+                variant: "profile-image",
                 fileType: "image/*",
             },
         ],

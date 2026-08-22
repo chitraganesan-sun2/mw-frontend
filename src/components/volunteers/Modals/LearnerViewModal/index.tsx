@@ -74,9 +74,9 @@ interface VolunteerData {
         parent_last_name: string;
     };
     learner_goals: {
-        expected_goals: string[];
+        expected_goals?: string[];
         preferred_volunteer_qualities: string[];
-        skill_level: string;
+        skill_level?: string;
         academic_skills_to_learn?: Array<{ skill_name: string }>;
         arts_life_skills_to_learn?: Array<{ skill_name: string }>;
         academic_goals_description?: string;
@@ -322,7 +322,7 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
             ),
         },
         {
-            title: "Preferred Volunteer Qualities",
+            title: "Goals & Preferred Volunteer Qualities",
             tags:
                 Array.isArray(learnerData?.learner_goals?.preferred_volunteer_qualities) &&
                 learnerData?.learner_goals?.preferred_volunteer_qualities.length > 0
@@ -332,12 +332,6 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
                     : typeof learnerData?.learner_goals?.preferred_volunteer_qualities === "string"
                     ? [formatString(learnerData.learner_goals.preferred_volunteer_qualities)]
                     : [],
-        },
-        {
-            title: "Skill Level",
-            tags: learnerData?.learner_goals?.skill_level
-                ? [formatString(learnerData.learner_goals.skill_level)]
-                : [],
         },
     ].filter((item) => item.tags.length > 0);
 

@@ -27,7 +27,10 @@ interface Additionalinfo {
 }
 
 interface Learnergoals {
-    expected_goals: string[];
+    // No longer collected by the onboarding/profile-edit UI (Parent/Guardian's Goals was
+    // combined into preferred_volunteer_qualities, Skill Level was removed) but stays
+    // optional here since existing records may still carry this data.
+    expected_goals?: string[];
     skills_to_learn?: { skill_name: string; skill_id: string }[];
     academic_skills_to_learn?: { skill_name: string; skill_id: string }[];
     arts_life_skills_to_learn?: { skill_name: string; skill_id: string }[];
@@ -35,7 +38,7 @@ interface Learnergoals {
     arts_life_goals_description?: string;
     other_comments_or_notes?: string;
     preferred_volunteer_qualities: string;
-    skill_level: string;
+    skill_level?: string;
 }
 
 interface Currentinterests {

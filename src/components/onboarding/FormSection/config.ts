@@ -7,6 +7,7 @@ import {
     NONE_SUBJECT_OPTION,
     SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS,
 } from "@/constants/volunteer";
+import { LEARNER_MIN_AGE } from "@/constants/learner";
 
 dayjs.extend(customParseFormat);
 
@@ -521,9 +522,14 @@ export const learnerFormSchema = z
             learner_last_name: z
                 .string({ required_error: "Learner's Last Name is required" })
                 .min(1, { message: "Learner's Last Name cannot be empty" }),
-            learner_date_of_birth: z.string({
-                required_error: "Learner's Date of Birth is required",
-            }),
+            learner_date_of_birth: z
+                .string({
+                    required_error: "Learner's Date of Birth is required",
+                })
+                .refine(
+                    (dob) => dayjs().diff(dayjs(dob, "DD-MM-YYYY"), "years") >= LEARNER_MIN_AGE,
+                    { message: `Learner must be at least ${LEARNER_MIN_AGE} years old` }
+                ),
             learner_gender: z.string({ required_error: "Learner's Gender is required" }),
             learner_preferred_pronoun: z.string({
                 required_error: "Learner's Preferred Pronoun is required",
@@ -610,9 +616,6 @@ export const learnerFormSchema = z
 
         // Learner goals - Required
         learner_goals: z.object({
-            expected_goals: z
-                .array(z.string(), { required_error: "Expected Goals are required" })
-                .nonempty("Expected Goals are required"),
             skills_to_learn: z
                 .array(
                     z.object({
@@ -644,9 +647,8 @@ export const learnerFormSchema = z
                 .min(1, { message: "Arts, Life Skills & Goals Description is required" }),
             other_comments_or_notes: z.string().optional(),
             preferred_volunteer_qualities: z
-                .string({ required_error: "Preferred Volunteer Qualities are required" })
-                .min(1, { message: "Preferred Volunteer Qualities are required" }),
-            skill_level: z.string({ required_error: "Skill Level is required" }),
+                .string({ required_error: "Goals & Preferred Volunteer Qualities are required" })
+                .min(1, { message: "Goals & Preferred Volunteer Qualities are required" }),
         }),
 
         // Additional info - no longer collected by this form (moved into
@@ -807,13 +809,11 @@ export const defaultLearnerData: Learner = {
     },
 
     learner_goals: {
-        expected_goals: ["Encourage Independence"],
         academic_skills_to_learn: [{ skill_name: "science", skill_id: "science" }],
         academic_goals_description: "academic_goals_description",
         arts_life_goals_description: "arts_life_goals_description",
         other_comments_or_notes: "other_comments_or_notes",
         preferred_volunteer_qualities: "patience",
-        skill_level: "beginner",
     },
     consent_and_permissions: {
         photo_or_video_consent: true,
