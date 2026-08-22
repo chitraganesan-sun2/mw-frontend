@@ -119,9 +119,9 @@ const ProfileInfo = ({
 }) => {
 
     return (
-    <div className="grid md:grid-cols-[1.7fr,2fr,2fr] gap-4 px-5 max-md:py-5">
+    <div className="grid md:grid-cols-[2fr,1fr,1fr] gap-3 px-5 max-md:py-5">
         <div className="flex items-center gap-3">
-            <div className="relative w-[80px] h-[80px] rounded-full shrink-0">
+            <div className="relative w-[64px] h-[64px] rounded-full shrink-0">
                 <Image
                     src={learnerData?.profile_picture?.image_url}
                     alt="avatar"
@@ -129,7 +129,7 @@ const ProfileInfo = ({
                     className="object-cover rounded-full w-full h-full"
                 />
             </div>
-            <div className="flex flex-col gap-1 md:gap-2">
+            <div className="flex flex-col gap-1 md:gap-1.5">
                 <p className="max-md:text-xl font-medium">
                     {`${learnerData?.learner_personal_info?.learner_first_name || ""} ${
                         learnerData?.learner_personal_info?.learner_last_name || ""
@@ -158,13 +158,13 @@ const ProfileInfo = ({
             title="Hours Attended"
             value={learnerData?.total_attended_hours || 0}
             icon={<ClockIcon />}
-            className="max-md:hidden"
+            className="max-md:hidden !px-3 !py-2 !gap-2"
         />
         <OverViewCard
             title="Volunteers Connected"
             value={learnerData?.total_volunteers_connected || 0}
             icon={<LearnerConnectIcon />}
-            className="max-md:hidden"
+            className="max-md:hidden !px-3 !py-2 !gap-2"
         />
     </div>
 )};
@@ -236,9 +236,9 @@ const TabButtons = ({
 
 const ContentRender = ({ title, description }: { title: string; description: string }) => {
     return (
-        <div className="flex flex-col gap-1.5">
-            <p className="font-normal text-gray-light text-sm">{title}</p>
-            <p className="font-medium">{description}</p>
+        <div className="flex flex-col gap-1 bg-background-input rounded-lg p-3">
+            <p className="font-normal text-gray-light text-xs">{title}</p>
+            <p className="font-medium text-sm break-words">{description}</p>
         </div>
     );
 };
@@ -379,7 +379,9 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
         },
         {
             title: "Behavior Support Strategies",
-            tags: learnerData?.learner_special_needs?.behavior_support_strategies || [],
+            tags: (learnerData?.learner_special_needs?.behavior_support_strategies || []).map(
+                (strategy: string) => formatString(strategy)
+            ),
         },
         {
             title: "Areas of Support Needed",
@@ -423,7 +425,9 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
         },
         {
             title: "Academic Strengths",
-            tags: learnerData?.education?.academic_strengths || [],
+            tags: (learnerData?.education?.academic_strengths || []).map((strength: string) =>
+                formatString(strength)
+            ),
         },
         {
             title: "Cultural / Religious Considerations",
@@ -455,27 +459,7 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
             </div>
 
             <div className="px-5">
-                <h3 className="font-medium mb-3 text-xl">Learner Goals</h3>
-                <div className="grid grid-cols-2 gap-3">
-                    {learnerGoals.map((item, index) => (
-                        <ContentRender
-                            key={index}
-                            title={item?.title}
-                            description={item?.tags.join(", ")}
-                        />
-                    ))}
-                    {learnerGoalsNotes.map((item, index) => (
-                        <ContentRender
-                            key={`note-${index}`}
-                            title={item?.title}
-                            description={item?.description}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            <div className="px-5">
-                <h3 className="font-medium mb-3 text-xl ">Learner Special Needs</h3>
+                <h3 className="font-medium mb-3 text-xl">Disability-Specific Information</h3>
                 <div className="grid grid-cols-2 gap-3">
                     {specialNeeds.map((item, index) =>
                         item.tags ? (
@@ -513,6 +497,26 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
                             />
                         )
                     )}
+                </div>
+            </div>
+
+            <div className="px-5">
+                <h3 className="font-medium mb-3 text-xl">Skills to Learn from Volunteers</h3>
+                <div className="grid grid-cols-2 gap-3">
+                    {learnerGoals.map((item, index) => (
+                        <ContentRender
+                            key={index}
+                            title={item?.title}
+                            description={item?.tags.join(", ")}
+                        />
+                    ))}
+                    {learnerGoalsNotes.map((item, index) => (
+                        <ContentRender
+                            key={`note-${index}`}
+                            title={item?.title}
+                            description={item?.description}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
