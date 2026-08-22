@@ -628,7 +628,7 @@ export const VolunteerFormSections: FormSectionConfig[] = [
                 inputType: "upload",
                 required: true,
                 gridCols: 1,
-                variant: "file",
+                variant: "profile-image",
                 fileType: "image/*",
             },
             {
