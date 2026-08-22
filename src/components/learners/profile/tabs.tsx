@@ -27,7 +27,7 @@ const InfoItem = ({ label, value }: { label: string, value: string | string[] })
     
     const isFullWidth = (Array.isArray(value) && value.length > 3) || String(value).length > 40;
     return (
-        <div className={`flex flex-col gap-1 ${isFullWidth ? "col-span-2" : ""}`}>
+        <div className={`flex flex-col gap-1 bg-background-input rounded-lg p-3 ${isFullWidth ? "col-span-2" : ""}`}>
             <p className="text-sm font-normal text-gray-light">{formatString(label)}</p>
             {renderValue(value)}
         </div>
@@ -123,6 +123,10 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
                 academic_skills_to_learn: undefined,
                 arts_life_skills_to_learn: undefined,
                 skills_to_learn: undefined,
+                // No longer collected (dropped from the onboarding form) - don't surface
+                // stale values from records saved before that change.
+                expected_goals: undefined,
+                skill_level: undefined,
             }
         },
     ].filter(section => section.sectionData && Object.keys(section.sectionData).length);

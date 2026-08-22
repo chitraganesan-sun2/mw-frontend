@@ -31,7 +31,7 @@ const InfoItem = ({ label, value }: { label: string, value: string | string[] })
     
     const isFullWidth = (Array.isArray(value) && value.length > 3) || String(value).length > 40;
     return (
-        <div className={`flex flex-col gap-1 ${isFullWidth ? "col-span-2" : ""}`}>
+        <div className={`flex flex-col gap-1 bg-background-input rounded-lg p-3 ${isFullWidth ? "col-span-2" : ""}`}>
             <p className="text-sm font-normal text-gray-light">{label}</p>
             {renderValue(value, label)}
         </div>
