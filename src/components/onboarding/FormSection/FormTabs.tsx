@@ -17,15 +17,12 @@ import { endpoints } from "@/api/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 
-const currentVersion = process.env.NEXT_PUBLIC_CURRENT_VERSION;
-
 type FormTabsProps = {
     formData: FormSectionConfig[];
     control: any;
     errors: any;
     trigger: (fields: any) => Promise<boolean>;
     validateForm: () => Promise<boolean>;
-    handleFillForm: () => void;
     onSubmit: () => void;
     setError: UseFormSetError<any>;
     clearErrors: UseFormClearErrors<any>;
@@ -44,7 +41,6 @@ const FormTabs = ({
     clearErrors,
     setValue,
     validateForm,
-    handleFillForm,
     onSubmit,
     isLoading,
     reset,
@@ -459,17 +455,6 @@ const FormTabs = ({
     return (
         <form onSubmit={onSubmit} className="w-full pb-16">
             <div ref={tabButtonsRef} className="max-w-7xl mx-auto lg:px-8">
-                {/* Auto Form Fill - Only for Dev */}
-                {currentVersion === "dev" && (
-                    <div className="flex items-end justify-end mb-5">
-                        <Button
-                            onClick={handleFillForm}
-                            title="Fill Form"
-                            size="large"
-                            customClassName="w-fit hover:!bg-green-700 !text-sm !bg-green-700 !text-white !rounded-lg !shadow-2xl !font-bold"
-                        />
-                    </div>
-                )}
 
                 {/* Tabs Header */}
                 <div className="lg:hidden w-full text-center mt-5 lg:mt-0">
