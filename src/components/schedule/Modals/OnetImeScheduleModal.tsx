@@ -508,7 +508,7 @@ const OnetImeScheduleModal = ({
                                 />
                                 <button
                                     onClick={addSlot}
-                                    className="mt- text-blue-500 flex items-center"
+                                    className="mt- text-primary flex items-center"
                                 >
                                     {idx === slots.length - 1 && <AddSlotIcon />}
                                 </button>

@@ -238,7 +238,7 @@ export default function LearnersPage() {
                             <p>No Learners Found</p>
                             {query && (
                                 <button
-                                    className="text-blue-500 underline"
+                                    className="text-primary underline"
                                     onClick={() => setSearchQuery(null)}
                                 >
                                     Clear Search
@@ -246,7 +246,7 @@ export default function LearnersPage() {
                             )}
                             {appliedFiltersCount > 0 && (
                                 <button
-                                    className="text-blue-500 underline"
+                                    className="text-primary underline"
                                     onClick={() => router.push("/volunteer/learners")}
                                 >
                                     Clear Filters
