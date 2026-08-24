@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import dayjs from "dayjs";
 import TagComponent from "@/components/common/Tag";
 import { TimeIcon } from "@/assets/icons";
 import DummyProfileImg from "@/assets/images/dummy-profile.webp";
@@ -18,6 +19,7 @@ interface SessionCardProps {
         endTime: string;
         timezone: string;
         duration: string;
+        date?: string;
         instructor: {
             name: string;
             profilePicture?: string;
@@ -25,6 +27,17 @@ interface SessionCardProps {
     };
     onClick: () => void;
 }
+
+// The instant-sessions list combines today + tomorrow into one feed - a plain time no longer
+// tells you which day a card is for, so label it the same way the old single-date picker did.
+const dayLabel = (date?: string) => {
+    if (!date) return "";
+    const today = dayjs().format("YYYY-MM-DD");
+    const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
+    if (date === today) return "Today";
+    if (date === tomorrow) return "Tomorrow";
+    return dayjs(date).format("DD MMM");
+};
 
 const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
     const statusConfig = {
@@ -85,6 +98,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                         </div>
                     
                     <span className="text-[16px] font-medium text-black whitespace-nowrap">
+                        {dayLabel(session.date) && `${dayLabel(session.date)}, `}
                         {session.startTime} - {session.endTime} {session.timezone} ({session.duration})
                     </span>
                 </div>
