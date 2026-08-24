@@ -17,11 +17,10 @@ import { usePathname } from "next/navigation";
 import { InstantSessionIcon } from "@/assets/icons";
 import { GET_API, DELETE_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { showToast } from "@/components/common/Toast";
 import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
-import DaySlider from "@/components/learners/DaySlider/index";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 
@@ -228,45 +227,49 @@ export default function InstantSessionsPage() {
     const pathname = usePathname();
 
     const todayStr = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
-    const [selectedDate, setSelectedDate] = useState(todayStr);
+    const tomorrowStr = useMemo(() => dayjs().add(1, "day").format("YYYY-MM-DD"), []);
+    // Browsing is always "today + tomorrow" combined, no per-date navigation - users
+    // shouldn't have to click forward just to see whether tomorrow has anything.
+    const browseDates = useMemo(() => [todayStr, tomorrowStr], [todayStr, tomorrowStr]);
 
     const [query] = useQueryState("query");
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
     const [requestStatus, setRequestStatus] = useQueryState("request_status", { defaultValue: "" });
 
-    // Available Instant Sessions (volunteer-opened slots, browsed by date)
-    const {
-        data: apiData,
-        isLoading,
-        isError,
-    } = useQuery({
-        queryKey: ["learner-instant-sessions", selectedDate, debouncedQuery],
-        queryFn: async () => {
-            const res = await GET_API(
-                endpoints.session.getLearnerInstantSession(selectedDate, undefined, debouncedQuery || undefined)
-            );
-            return res?.data;
-        },
-        staleTime: 30000,
-        refetchOnWindowFocus: false,
+    // Available Instant Sessions (volunteer-opened slots) for today and tomorrow, fetched in
+    // parallel and merged - the endpoint only takes a single date, so this can't be one call.
+    const availableQueries = useQueries({
+        queries: browseDates.map((date) => ({
+            queryKey: ["learner-instant-sessions", date, debouncedQuery],
+            queryFn: async () => {
+                const res = await GET_API(
+                    endpoints.session.getLearnerInstantSession(date, undefined, debouncedQuery || undefined)
+                );
+                return res?.data;
+            },
+            staleTime: 30000,
+            refetchOnWindowFocus: false,
+        })),
     });
+    const isLoading = availableQueries.some((q) => q.isLoading);
+    const isError = availableQueries.some((q) => q.isError);
 
-    const {
-        data: claimedApiData,
-        isLoading: isClaimedLoading,
-        isError: isClaimedError,
-    } = useQuery({
-        queryKey: ["learner-accepted-instant-sessions", selectedDate],
-        queryFn: async () => {
-            const res = await GET_API(
-                endpoints.session.getAcceptedInstantSessionsByDate(selectedDate)
-            );
-            return res?.data;
-        },
-        staleTime: 30000,
-        refetchOnWindowFocus: false,
+    const claimedQueries = useQueries({
+        queries: browseDates.map((date) => ({
+            queryKey: ["learner-accepted-instant-sessions", date],
+            queryFn: async () => {
+                const res = await GET_API(
+                    endpoints.session.getAcceptedInstantSessionsByDate(date)
+                );
+                return res?.data;
+            },
+            staleTime: 30000,
+            refetchOnWindowFocus: false,
+        })),
     });
+    const isClaimedLoading = claimedQueries.some((q) => q.isLoading);
+    const isClaimedError = claimedQueries.some((q) => q.isError);
 
     // My Requested Sessions (the learner-initiated request flow - any volunteer can accept)
     const {
@@ -294,27 +297,40 @@ export default function InstantSessionsPage() {
     const myRequestsHasMore = Number(requestsPage) * REQUESTS_PAGE_SIZE < myRequestsTotal;
 
     const availableSessions: Session[] = useMemo(() => {
-        if (!apiData) return [];
-        const raw = Array.isArray(apiData) ? apiData : apiData.items ?? apiData.sessions ?? [];
-        return raw
-            .map((item: any) => mapItemToSession(item, selectedDate))
-            .filter((s: Session) => s.status === "available");
-    }, [apiData, selectedDate]);
-
-    const claimedSessions: Session[] = useMemo(() => {
-        if (!claimedApiData) return [];
-        const raw = Array.isArray(claimedApiData)
-            ? claimedApiData
-            : claimedApiData.items ?? claimedApiData.sessions ?? [];
-        return raw
-            .map((item: any) => mapItemToSession(item, selectedDate))
-            .filter((s: Session) => s.date === selectedDate)
+        return availableQueries
+            .flatMap((q, i) => {
+                const apiData = q.data;
+                if (!apiData) return [];
+                const raw = Array.isArray(apiData) ? apiData : apiData.items ?? apiData.sessions ?? [];
+                return raw.map((item: any) => mapItemToSession(item, browseDates[i]));
+            })
+            .filter((s: Session) => s.status === "available")
             .sort((a: Session, b: Session) =>
                 a.startDateTime && b.startDateTime
                     ? dayjs(a.startDateTime).valueOf() - dayjs(b.startDateTime).valueOf()
                     : 0
             );
-    }, [claimedApiData, selectedDate]);
+    }, [availableQueries, browseDates]);
+
+    const claimedSessions: Session[] = useMemo(() => {
+        return claimedQueries
+            .flatMap((q, i) => {
+                const claimedApiData = q.data;
+                if (!claimedApiData) return [];
+                const raw = Array.isArray(claimedApiData)
+                    ? claimedApiData
+                    : claimedApiData.items ?? claimedApiData.sessions ?? [];
+                const date = browseDates[i];
+                return raw
+                    .map((item: any) => mapItemToSession(item, date))
+                    .filter((s: Session) => s.date === date);
+            })
+            .sort((a: Session, b: Session) =>
+                a.startDateTime && b.startDateTime
+                    ? dayjs(a.startDateTime).valueOf() - dayjs(b.startDateTime).valueOf()
+                    : 0
+            );
+    }, [claimedQueries, browseDates]);
 
     const handleSessionClick = (session: Session) => {
         setSelectedSession(session);
@@ -428,12 +444,9 @@ export default function InstantSessionsPage() {
                 buttonClassName: "!text-black !border-none !font-medium !pr-5 !text-[20px]",
                 showButton: true,
             },
-            centerComponent: (
-                <DaySlider selectedDate={selectedDate} onDateChange={setSelectedDate} />
-            ),
             showButton: false,
         });
-    }, [setHeaderOptions, pathname, selectedDate]);
+    }, [setHeaderOptions, pathname]);
 
     // Only block the whole page on the very first load; background refetches
     // should update data quietly without hiding already-rendered sessions.
