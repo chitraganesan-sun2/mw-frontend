@@ -202,66 +202,84 @@ const TabButtons = ({
 );
 
 const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) => {
-    const details = [
-        {
-            title: "Subjects I Teach",
-            tags: volunteerData?.volunteer_subjects?.map((subject) => subject?.subject_name),
-        },
-        {
-            title: "Languages I Speak",
-            tags: volunteerData?.volunteer_languages?.map((lang) => lang?.language_name),
-        },
-        {
-            title: "Skills You Can Share with Learners",
-            tags: volunteerData?.volunteer_skills?.map((skill) => skill?.skill_name),
-        },
-    ];
-
     const showSupportPreferenceDetails = SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS.includes(
         volunteerData?.support_preference || ""
     );
 
-    const bio = [
+    // Ordered so each subjects/skills tag list sits directly next to its matching notes field,
+    // instead of the two being rendered from separate arrays with unrelated fields between them.
+    const overviewDetails = [
         {
-            title: "Gender",
-            description: formatString(volunteerData?.volunteer_gender || ""),
+            type: "tags" as const,
+            title: "Subjects I Teach",
+            tags: volunteerData?.volunteer_subjects?.map((subject) => subject?.subject_name),
         },
         {
-            title: "Preferred Learner Age Group",
-            description: volunteerData?.preferred_learner_age_group,
-        },
-        {
-            title: "Volunteer Experience",
-            description: volunteerData?.volunteer_experience,
-        },
-        {
-            title: "Work Experience",
-            description: volunteerData?.volunteer_work_experience,
-        },
-        {
-            title: "Education",
-            description: volunteerData?.volunteer_education,
-        },
-        {
+            type: "description" as const,
             title: "More about their academic skills",
             description: volunteerData?.volunteer_academic_skills_notes,
         },
         {
+            type: "tags" as const,
+            title: "Skills You Can Share with Learners",
+            tags: volunteerData?.volunteer_skills?.map((skill) => skill?.skill_name),
+        },
+        {
+            type: "description" as const,
             title: "More about their arts/life skills",
             description: volunteerData?.volunteer_arts_life_skills_notes,
         },
         {
+            type: "tags" as const,
+            title: "Languages I Speak",
+            tags: volunteerData?.volunteer_languages?.map((lang) => lang?.language_name),
+        },
+        {
+            type: "description" as const,
+            title: "Gender",
+            description: formatString(volunteerData?.volunteer_gender || ""),
+        },
+        {
+            type: "description" as const,
+            title: "Preferred Learner Age Group",
+            description: volunteerData?.preferred_learner_age_group,
+        },
+        {
+            type: "description" as const,
+            title: "Volunteer Experience",
+            description: volunteerData?.volunteer_experience,
+        },
+        {
+            type: "description" as const,
+            title: "Work Experience",
+            description: volunteerData?.volunteer_work_experience,
+        },
+        {
+            type: "description" as const,
+            title: "Education",
+            description: volunteerData?.volunteer_education,
+        },
+        {
+            type: "description" as const,
             title: "Favorite Free Time Activities",
             description: volunteerData?.volunteer_favorite_activities,
         },
         {
+            type: "description" as const,
             title: "Support Preference",
             description: volunteerData?.support_preference,
         },
         ...(showSupportPreferenceDetails
-            ? [{ title: "Support Preference Details", description: volunteerData?.support_preference_details }]
+            ? [
+                  {
+                      type: "description" as const,
+                      title: "Support Preference Details",
+                      description: volunteerData?.support_preference_details,
+                  },
+              ]
             : []),
         {
+            type: "description" as const,
             title: "Teaching Traits, Preferences & Limitations",
             description: volunteerData?.volunteer_teaching_traits,
         },
@@ -315,22 +333,27 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
                     />
                 </div>
             </div>
-            {bio.filter((item) => item?.description).map((item, index) => (
-                <DetailCard
-                    key={index}
-                    className="!gap-2"
-                    title={item?.title}
-                    description={item?.description || ""}
-                />
-            ))}
-            {details.map((detail, index) => (
-                <DetailChipCard
-                    key={index}
-                    className="!gap-2"
-                    tags={detail?.tags}
-                    title={detail?.title}
-                />
-            ))}
+            {overviewDetails.map((item, index) =>
+                item.type === "tags" ? (
+                    item.tags && item.tags.length > 0 && (
+                        <DetailChipCard
+                            key={index}
+                            className="!gap-2"
+                            tags={item.tags}
+                            title={item.title}
+                        />
+                    )
+                ) : (
+                    item.description && (
+                        <DetailCard
+                            key={index}
+                            className="!gap-2"
+                            title={item.title}
+                            description={item.description}
+                        />
+                    )
+                )
+            )}
         </div>
     );
 };
