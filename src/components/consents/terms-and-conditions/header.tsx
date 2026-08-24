@@ -16,7 +16,7 @@ const TermsAndConditionsHeader = () => {
     return (
         <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-3 text-center">
-                <h5 className="text-xl font-bold">Melody Wings</h5>
+                <h5 className="text-xl font-bold">MelodyWings</h5>
                 <h6 className="text-2xl font-bold uppercase">Terms of Service</h6>
                 <p className="text-base text-gray-700">Last Updated: March 2025</p>
             </div>
