@@ -109,16 +109,25 @@ const FormTabsSection = forwardRef(
       "parent_info.relationship_to_learner",
     ];
 
-    const handleNavigation = async (index: number) => {
-      if (role === "learner") learnerParentValidateKeys.forEach((key) => clearErrors(key));
-
-      if (index > activeTab) {
-        const isValidSection = await validateCurrentSection();
-        if (!isValidSection) return;
-      }
+    const goToTab = (index: number) => {
       setActiveTab(index);
       setHighestTab(Math.max(highestTab, index));
       setLocalStorage(`editProfile_activeTab_${role}`, index.toString());
+    };
+
+    // This is an editor for an already-saved, already-verified profile, not a first-time
+    // onboarding wizard - clicking a tab pill directly should let the user jump anywhere to
+    // review/fix a field, without being blocked by validation on a section they're leaving.
+    // Only the "Next" button (sequential forward flow) still validates the current section.
+    const handleTabClick = (index: number) => {
+      if (role === "learner") learnerParentValidateKeys.forEach((key) => clearErrors(key));
+      goToTab(index);
+    };
+
+    const handleNext = async () => {
+      const isValidSection = await validateCurrentSection();
+      if (!isValidSection) return;
+      goToTab(activeTab + 1);
     };
 
     useEffect(() => {
@@ -172,9 +181,8 @@ const FormTabsSection = forwardRef(
 
     const diableField = (field: any) =>
       (role === "learner" &&
-        ((["self", "parent"].includes(enrolled_by) &&
+        (((["self", "parent"].includes(enrolled_by) &&
             [
-              "email",
               "learner_date_of_birth",
               "learner_first_name",
               "learner_last_name",
@@ -187,10 +195,14 @@ const FormTabsSection = forwardRef(
               "timezone",
               "parent_first_name",
               "parent_last_name",
-              "parent_email",
               "parent_contact_number",
               "relationship_to_learner",
-            ].includes(field.id)))) ||
+            ].includes(field.id))) ||
+          // The email tied to whichever party actually holds the login account is the one
+          // that must stay locked - the other party's email is just contact info and can
+          // still be edited.
+          (enrolled_by === "self" && field.id === "email") ||
+          (enrolled_by === "parent" && field.id === "parent_email"))) ||
       (role === "volunteer" &&
         [
           "volunteer_first_name",
@@ -225,7 +237,7 @@ const FormTabsSection = forwardRef(
         <div ref={tabButtonsRef} className="mx-auto pb-2">
           <div className="flex md:flex-wrap max-md:overflow-x-auto no-scrollbar py-3 gap-2 sticky top-0 bg-background-input md:bg-white z-10 border-b border-gray-500 md:border-stroke">
             {formData.map((section: any, index) => (
-              <button key={section.title || index} type="button" onClick={() => handleNavigation(index)}>
+              <button key={section.title || index} type="button" onClick={() => handleTabClick(index)}>
                 <TagComponent
                   text={section.title}
                   className={`!text-sm md:!text-base py-1 px-3 border ${
@@ -322,7 +334,7 @@ const FormTabsSection = forwardRef(
                   ) : (
                     <Button
                       htmlType="button"
-                      onClick={() => handleNavigation(activeTab + 1)}
+                      onClick={handleNext}
                       title="Next"
                       size="large"
                       customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto hover:!bg-background-secondary !text-sm !bg-background-secondary !text-black !rounded-lg !shadow-2xl !font-medium"
