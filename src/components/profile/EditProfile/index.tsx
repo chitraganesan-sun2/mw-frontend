@@ -148,6 +148,7 @@ const EditProfileModal = ({
       primaryActionProps={buttonProps.primary}
       rootClassName="md:h-[90vh] md:rounded-2xl md:overflow-hidden"
       bodyClassName="max-md:!bg-background-input !py-0"
+      showScrollbar
     >
       <FormTabsSection
         ref={formRef}

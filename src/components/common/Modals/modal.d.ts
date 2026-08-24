@@ -34,6 +34,9 @@ interface CenterModalProps {
     loading?: boolean;
     zIndex?: number;
     isDirty?: boolean; // For unsaved changes confirmation
+    /** Show a visible scrollbar on the scrollable body instead of the default hidden one -
+     * useful when the body holds long, multi-section content the user needs to navigate. */
+    showScrollbar?: boolean;
 }
 
 interface ViewModalProps {

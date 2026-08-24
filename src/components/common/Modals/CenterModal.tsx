@@ -33,6 +33,7 @@ const CenterModal: React.FC<CenterModalProps> = ({
     hideCloseIcon = false,
     headerClassName = "",
     footerClassName = "",
+    showScrollbar = false,
 }) => {
     const innerWidth = useInnerWidth();
     const isMobile = innerWidth > 0 && innerWidth < 768;
@@ -164,7 +165,7 @@ const CenterModal: React.FC<CenterModalProps> = ({
                 )}
                 {/* Modal Content */}
                 <div
-                    className={`flex-1 min-h-0 p-3 md:px-4 lg:px-6  md:py-3 bg-white overflow-y-auto no-scrollbar ${bodyClassName}`}
+                    className={`flex-1 min-h-0 p-3 md:px-4 lg:px-6  md:py-3 bg-white overflow-y-auto ${showScrollbar ? "" : "no-scrollbar"} ${bodyClassName}`}
                 >
                     {children}
                 </div>
