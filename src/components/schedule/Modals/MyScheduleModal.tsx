@@ -914,7 +914,7 @@ const MyScheduleModal: React.FC<MyScheduleModalProps> = ({ isOpen, onClose }) =>
                                                     e.stopPropagation();
                                                     addTimeSlot(day);
                                                 }}
-                                                className="text-blue-500 mt-1.5 hover:text-blue-700 w-fit"
+                                                className="text-primary mt-1.5 hover:opacity-80 w-fit"
                                             >
                                                 <AddSlotIcon />
                                             </span>

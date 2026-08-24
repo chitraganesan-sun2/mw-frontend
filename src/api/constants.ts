@@ -195,4 +195,7 @@ export const endpoints: EndpointProps = {
     publicSessions: {
         getInstantSessions: (limit?: number) => `session/public/instant_sessions${limit ? `?limit=${limit}` : ""}`,
     },
+    contact: {
+        create: "contact",
+    },
 };

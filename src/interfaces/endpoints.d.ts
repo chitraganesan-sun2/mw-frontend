@@ -157,6 +157,9 @@ export type EndpointProps = {
     publicSessions: {
         getInstantSessions: (limit?: number) => string;
     };
+    contact: {
+        create: string;
+    };
 };
 
 // (string & {}) keeps literal autocomplete for known paths while still accepting any

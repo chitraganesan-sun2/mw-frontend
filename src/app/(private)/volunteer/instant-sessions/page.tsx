@@ -35,7 +35,7 @@ const REQUEST_STATUS_STYLES: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
     accepted: "bg-blue-100 text-blue-800",
     active: "bg-green-100 text-green-700",
-    completed: "bg-gray-100 text-gray-700",
+    completed: "bg-gray-100 text-blue-700",
     cancelled: "bg-red-100 text-red-700",
     expired: "bg-gray-100 text-gray-500",
 };
@@ -134,7 +134,7 @@ function MySessionCard({
             </div>
             <div className="flex flex-wrap justify-end gap-2">
                 <button
-                    className="text-blue-600 text-xs font-medium hover:text-blue-700 disabled:opacity-50"
+                    className="text-primary text-xs font-medium hover:opacity-80 disabled:opacity-50"
                     disabled={isActionLoading}
                     onClick={() => onView(session.session_id)}
                 >
