@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "@/components/common/Toast";
-import { defaultLearnerData, defaultVolunteerData, validateVolunteerParentDetails, validateLearnerParentFields } from "./config";
+import { validateVolunteerParentDetails, validateLearnerParentFields } from "./config";
 import FormTabs from "./FormTabs";
 import { getCookie } from "@/utils/auth";
 import ModalLoader from "@/components/common/Loader/Modal";
@@ -126,36 +126,6 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
         return true;
     };
 
-    const handleFillForm = () => {
-        // Dev-only test-data shortcut. learner_personal_info/volunteer_birth_date carry the
-        // real DOB (and, for learners, email) already populated from the signup step above -
-        // preserve them instead of clobbering with the hardcoded dummy values below.
-        const preservedDob = isVolunteer
-            ? getValues("volunteer_birth_date")
-            : getValues("learner_personal_info.learner_date_of_birth");
-        const preservedEmail = isLearner
-            ? getValues("learner_personal_info.learner_contact_details.email")
-            : undefined;
-
-        Object.entries(isVolunteer ? defaultVolunteerData : defaultLearnerData).forEach(
-            ([key, value]) => {
-                form.setValue(key, value);
-            }
-        );
-
-        if (preservedDob) {
-            form.setValue(
-                isVolunteer
-                    ? "volunteer_birth_date"
-                    : "learner_personal_info.learner_date_of_birth",
-                preservedDob
-            );
-        }
-        if (preservedEmail) {
-            form.setValue("learner_personal_info.learner_contact_details.email", preservedEmail);
-        }
-    };
-
     return (
         <div>
             {isUserLoading && (
@@ -172,7 +142,6 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
                 errors={errors}
                 trigger={trigger}
                 validateForm={validateForm}
-                handleFillForm={handleFillForm}
                 onSubmit={onSubmit}
                 getValues={getValues}
                 isLoading={isLoading}
