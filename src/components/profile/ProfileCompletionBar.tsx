@@ -107,7 +107,13 @@ export function calculateLearnerCompletion(data: any): { percentage: number; mis
         { value: personalInfo?.learner_contact_details?.timezone, label: "Timezone" },
         { value: data?.profile_picture, label: "Profile Photo" },
         { value: data?.parent_info?.parent_first_name, label: "Guardian Info" },
-        { value: data?.learner_goals?.skills_to_learn, label: "Learning Goals" },
+        {
+            value: [
+                ...(data?.learner_goals?.academic_skills_to_learn || []),
+                ...(data?.learner_goals?.arts_life_skills_to_learn || []),
+            ],
+            label: "Learning Goals",
+        },
         { value: data?.learner_special_needs, label: "Special Needs Info" },
     ];
 
