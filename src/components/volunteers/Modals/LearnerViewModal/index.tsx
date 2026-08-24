@@ -234,9 +234,19 @@ const TabButtons = ({
     );
 };
 
-const ContentRender = ({ title, description }: { title: string; description: string }) => {
+const ContentRender = ({
+    title,
+    description,
+    fullWidth,
+}: {
+    title: string;
+    description: string;
+    fullWidth?: boolean;
+}) => {
     return (
-        <div className="flex flex-col gap-1 bg-background-input rounded-lg p-3">
+        <div
+            className={`flex flex-col gap-1 bg-background-input rounded-lg p-3 ${fullWidth ? "col-span-2" : ""}`}
+        >
             <p className="font-normal text-gray-light text-xs">{title}</p>
             <p className="font-medium text-sm break-words">{description}</p>
         </div>
@@ -296,53 +306,54 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
         },
     ].filter((item) => item.description !== "");
 
-    const learnerGoals = [
+    // Expected Goals is legacy (dropped from the current onboarding form) and has no current-form
+    // pair, so it's kept first/standalone - everything after it is ordered so each skills-to-learn
+    // entry sits directly next to its matching goals description in the 2-column grid below.
+    const learnerGoalsContent = [
         {
             title: "Expected Goals",
-            tags:
-                Array.isArray(learnerData?.learner_goals?.expected_goals) &&
-                learnerData?.learner_goals?.expected_goals.length > 0
-                    ? learnerData.learner_goals.expected_goals.map((goal: string) =>
-                          formatString(goal)
-                      )
-                    : typeof learnerData?.learner_goals?.expected_goals === "string"
-                    ? [formatString(learnerData.learner_goals.expected_goals)]
-                    : [],
+            description: (Array.isArray(learnerData?.learner_goals?.expected_goals) &&
+            learnerData?.learner_goals?.expected_goals.length > 0
+                ? learnerData.learner_goals.expected_goals.map((goal: string) => formatString(goal))
+                : typeof learnerData?.learner_goals?.expected_goals === "string"
+                ? [formatString(learnerData.learner_goals.expected_goals)]
+                : []
+            ).join(", "),
+            // Legacy field with no current-form pair - full width so it can't push the
+            // skills/goals pairs below it out of alignment on old records that still have it.
+            fullWidth: true,
         },
         {
             title: "Academic Skills to Learn",
-            tags: (learnerData?.learner_goals?.academic_skills_to_learn || []).map((skill) =>
-                formatString(skill?.skill_name)
-            ),
+            description: (learnerData?.learner_goals?.academic_skills_to_learn || [])
+                .map((skill) => formatString(skill?.skill_name))
+                .join(", "),
         },
-        {
-            title: "Arts & Life Skills to Learn",
-            tags: (learnerData?.learner_goals?.arts_life_skills_to_learn || []).map((skill) =>
-                formatString(skill?.skill_name)
-            ),
-        },
-        {
-            title: "Goals & Preferred Volunteer Qualities",
-            tags:
-                Array.isArray(learnerData?.learner_goals?.preferred_volunteer_qualities) &&
-                learnerData?.learner_goals?.preferred_volunteer_qualities.length > 0
-                    ? learnerData.learner_goals.preferred_volunteer_qualities.map(
-                          (quality: string) => formatString(quality)
-                      )
-                    : typeof learnerData?.learner_goals?.preferred_volunteer_qualities === "string"
-                    ? [formatString(learnerData.learner_goals.preferred_volunteer_qualities)]
-                    : [],
-        },
-    ].filter((item) => item.tags.length > 0);
-
-    const learnerGoalsNotes = [
         {
             title: "Academic Goals",
             description: learnerData?.learner_goals?.academic_goals_description || "",
         },
         {
+            title: "Arts & Life Skills to Learn",
+            description: (learnerData?.learner_goals?.arts_life_skills_to_learn || [])
+                .map((skill) => formatString(skill?.skill_name))
+                .join(", "),
+        },
+        {
             title: "Arts & Life Goals",
             description: learnerData?.learner_goals?.arts_life_goals_description || "",
+        },
+        {
+            title: "Goals & Preferred Volunteer Qualities",
+            description: (Array.isArray(learnerData?.learner_goals?.preferred_volunteer_qualities) &&
+            learnerData?.learner_goals?.preferred_volunteer_qualities.length > 0
+                ? learnerData.learner_goals.preferred_volunteer_qualities.map((quality: string) =>
+                      formatString(quality)
+                  )
+                : typeof learnerData?.learner_goals?.preferred_volunteer_qualities === "string"
+                ? [formatString(learnerData.learner_goals.preferred_volunteer_qualities)]
+                : []
+            ).join(", "),
         },
         {
             title: "Other Comments or Notes",
@@ -503,18 +514,12 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
             <div className="px-5">
                 <h3 className="font-medium mb-3 text-xl">Skills to Learn from Volunteers</h3>
                 <div className="grid grid-cols-2 gap-3">
-                    {learnerGoals.map((item, index) => (
+                    {learnerGoalsContent.map((item, index) => (
                         <ContentRender
                             key={index}
                             title={item?.title}
-                            description={item?.tags.join(", ")}
-                        />
-                    ))}
-                    {learnerGoalsNotes.map((item, index) => (
-                        <ContentRender
-                            key={`note-${index}`}
-                            title={item?.title}
                             description={item?.description}
+                            fullWidth={item?.fullWidth}
                         />
                     ))}
                 </div>
