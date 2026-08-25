@@ -4,7 +4,6 @@ import Image from "next/image";
 import CardChips from "./CardChips";
 import Divider from "@/components/common/Divider";
 import { FaStar } from "react-icons/fa";
-import { SeeMoreIcon } from "@/assets/icons";
 import { formatString } from "@/utils/stringFormats";
 import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";
@@ -33,6 +32,10 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
             console.log(res, "chat response");
             router.push(`/learner/messages?chatId=${res.data.chat_id}&volunteerId=${volunteerId}`);
         });
+    };
+
+    const handleScheduleMeeting = () => {
+        router.push(`/learner/volunteer?volunteerId=${volunteerId}&modal=add_new_meeting`);
     };
 
     return (
@@ -114,14 +117,23 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                 </div>
             )}
             <Divider />
-            <div className="flex items-center justify-between">
-                <Button
-                    disabled={!chatPermission}
-                    onClick={handleChatClick}
-                    title="Start Chat"
-                    btnVariant="secondary"
-                    className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-black hover:!text-white !text-black !border-stroke"
-                />
+            <div className="flex items-center gap-2">
+                <div className="flex-1">
+                    <Button
+                        onClick={handleScheduleMeeting}
+                        title="Schedule a meeting"
+                        className="!rounded-xl !text-sm !w-full !text-black !bg-primary !border-primary !border"
+                    />
+                </div>
+                <div className="flex-1">
+                    <Button
+                        disabled={!chatPermission}
+                        onClick={handleChatClick}
+                        title="Start Chat"
+                        btnVariant="secondary"
+                        className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-black hover:!text-white !text-black !border-stroke"
+                    />
+                </div>
             </div>
         </div>
     );

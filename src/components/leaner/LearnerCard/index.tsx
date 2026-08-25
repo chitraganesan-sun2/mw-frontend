@@ -4,7 +4,6 @@ import Image from "next/image";
 import CardChips from "./CardChips";
 import Divider from "@/components/common/Divider";
 import { FaStar } from "react-icons/fa";
-import { SeeMoreIcon } from "@/assets/icons";
 import { formatString } from "@/utils/stringFormats";
 import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";

@@ -58,6 +58,7 @@ export interface CalendarEvent {
         feedBackCollectedFromVolunteer?: boolean;
         volunteer_slot_id?: string;
         isAvailableSlot?: boolean;
+        isInstantSessionOpen?: boolean;
     };
 }
 
@@ -134,6 +135,26 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                         },
                         feedBackCollectedFromLearner: sd.feedback_collected_from_learner,
                         feedBackCollectedFromVolunteer: sd.feedback_collected_from_volunteer,
+                    },
+                });
+            } else if (slot.is_new_session && dayDate) {
+                // A volunteer-created instant slot nobody has claimed yet (once claimed,
+                // it becomes a real sessions_collection record and takes the
+                // session_details branch above instead) - was previously indistinguishable
+                // from a plain open-availability slot below.
+                events.push({
+                    title: slot.title || "Instant Session (Open)",
+                    date: dayDate,
+                    start: dayjs(`${dayDate} ${slot.start_time}`).format(),
+                    end: dayjs(`${dayDate} ${slot.end_time}`).format(),
+                    backgroundColor: "var(--warning-light-color, #FFF3E0)",
+                    classNames: ["event-item", "rounded-md", "py-1", "my-0.5"],
+                    textColor: "var(--warning-color, #E65100)",
+                    borderColor: "var(--warning-color, #E65100)",
+                    status: "instant_session_open",
+                    extendedProps: {
+                        volunteer_slot_id: slot.volunteer_slot_id,
+                        isInstantSessionOpen: true,
                     },
                 });
             } else if (dayDate) {
