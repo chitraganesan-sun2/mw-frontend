@@ -59,7 +59,7 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
                 <h3 className="font-semibold text-lg">{req.learner_name}</h3>
                 <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">Pending Request</span>
             </div>
-            <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === "academic" ? "Academic" : "Non-Academic"}</p>
+            <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === "academic" ? "Academic" : "Arts & Life Skills"}</p>
             <p className="text-sm text-gray-600 mb-2">Level: {req.grade_level || req.expertise_level || "N/A"}</p>
             {Array.isArray(req.skills) && req.skills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-3">
@@ -71,6 +71,9 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
                         />
                     ))}
                 </div>
+            )}
+            {req.session_details && (
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{req.session_details}</p>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">

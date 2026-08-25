@@ -14,7 +14,6 @@ import TagComponent from "@/components/common/Tag";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { getHeaderIcon } from "@/layouts/helper";
 import { usePathname } from "next/navigation";
-import { InstantSessionIcon } from "@/assets/icons";
 import { GET_API, DELETE_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
@@ -140,7 +139,6 @@ const REQUEST_STATUS_STYLES: Record<string, string> = {
     expired: "bg-gray-100 text-gray-500",
 };
 
-const REQUEST_STATUS_FILTERS = ["", "pending", "accepted", "active", "completed", "cancelled", "expired"];
 const REQUESTS_PAGE_SIZE = 5;
 
 function RequestedSessionCard({
@@ -163,7 +161,7 @@ function RequestedSessionCard({
         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <div className="flex justify-between items-start mb-2">
                 <h3 className="font-semibold text-lg">
-                    {request.session_type === "academic" ? "Academic Session" : "Non-Academic Session"}
+                    {request.session_type === "academic" ? "Academic Session" : "Arts & Life Skills Session"}
                 </h3>
                 <span className={`${statusClass} text-xs px-2 py-1 rounded-full font-medium`}>
                     {statusLabel}
@@ -182,6 +180,9 @@ function RequestedSessionCard({
                         />
                     ))}
                 </div>
+            )}
+            {request.session_details && (
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{request.session_details}</p>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
@@ -235,7 +236,6 @@ export default function InstantSessionsPage() {
     const [query] = useQueryState("query");
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
-    const [requestStatus, setRequestStatus] = useQueryState("request_status", { defaultValue: "" });
 
     // Available Instant Sessions (volunteer-opened slots) for today and tomorrow, fetched in
     // parallel and merged - the endpoint only takes a single date, so this can't be one call.
@@ -277,14 +277,14 @@ export default function InstantSessionsPage() {
         isLoading: isMyRequestsLoading,
         isFetching: isMyRequestsFetching,
     } = useQuery({
-        queryKey: ["learner-my-requests", requestsPage, requestStatus, debouncedQuery],
+        queryKey: ["learner-my-requests", requestsPage, debouncedQuery],
         queryFn: async () => {
             const res = await GET_API(
                 endpoints.session.getLearnerRequests(
                     Number(requestsPage) || 1,
                     REQUESTS_PAGE_SIZE,
                     debouncedQuery || undefined,
-                    requestStatus || undefined
+                    undefined
                 )
             );
             return res?.data;
@@ -437,13 +437,6 @@ export default function InstantSessionsPage() {
             title: "Instant Sessions",
             titleIcon: getHeaderIcon(pathname),
             searchPlaceholder: "Search sessions",
-            leftButton: {
-                buttonTitle: "Events",
-                buttonIcon: <InstantSessionIcon />,
-                buttonOnClick: () => { },
-                buttonClassName: "!text-black !border-none !font-medium !pr-5 !text-[20px]",
-                showButton: true,
-            },
             showButton: false,
         });
     }, [setHeaderOptions, pathname]);
@@ -468,93 +461,27 @@ export default function InstantSessionsPage() {
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Instant Sessions</h1>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Browse live sessions or request one for a time that works for you
-                    </p>
-                </div>
-                <button
-                    onClick={() => setIsRequestModalOpen(true)}
-                    className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
-                >
-                    + Request a Session
-                </button>
+            <div className="flex flex-col items-center text-center gap-2 mb-8">
+                <h1 className="text-2xl font-bold text-gray-900">Instant Sessions</h1>
+                <p className="text-sm text-gray-500 max-w-2xl">
+                    Instant Sessions are sessions available <strong>today or tomorrow.</strong> You
+                    can browse available Instant Sessions or request a specific session based on
+                    your preferred time and subject.
+                </p>
             </div>
 
-            {/* Available Instant Sessions (volunteer-opened slots, browse by date + join) */}
+            {/* My Requested Sessions (the learner-request-for-any-volunteer flow) - shown first */}
             <div className="mb-10">
-                <div className="flex items-center my-6">
-                    <div className="flex-1 border-t border-gray-200" />
-                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                        Available Instant Sessions
-                    </span>
-                    <div className="flex-1 border-t border-gray-200" />
-                </div>
-
-                {availableSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {availableSessions.map((session) => (
-                            <SessionCard
-                                key={session.id}
-                                session={session}
-                                onClick={() => handleSessionClick(session)}
-                            />
-                        ))}
-                    </div>
-                )}
-
-                {claimedSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {claimedSessions.map((session) => (
-                            <SessionCard
-                                key={session.id}
-                                session={session}
-                                onClick={() => handleClaimedSessionClick(session)}
-                            />
-                        ))}
-                    </div>
-                )}
-
-                {availableSessions.length === 0 && claimedSessions.length === 0 && (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                        <div className="text-5xl mb-4">🕒</div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            No Instant Sessions
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                            Sessions volunteers open up for this date will show up here
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            {/* My Requested Sessions (the learner-request-for-any-volunteer flow) */}
-            <div>
-                <div className="flex items-center my-6">
-                    <div className="flex-1 border-t border-gray-200" />
-                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                        My Requested Sessions
-                    </span>
-                    <div className="flex-1 border-t border-gray-200" />
-                </div>
-
-                <div className="flex justify-end mb-4">
-                    <select
-                        className="h-9 px-3 border border-gray-200 rounded-lg text-sm bg-white"
-                        value={requestStatus || ""}
-                        onChange={(e) => {
-                            setRequestStatus(e.target.value || null);
-                            setRequestsPage("1");
-                        }}
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
+                        My Requested Instant Sessions
+                    </h2>
+                    <button
+                        onClick={() => setIsRequestModalOpen(true)}
+                        className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
                     >
-                        {REQUEST_STATUS_FILTERS.map((s) => (
-                            <option key={s} value={s}>
-                                {s ? REQUEST_STATUS_LABELS[s] : "All statuses"}
-                            </option>
-                        ))}
-                    </select>
+                        + Request a Session
+                    </button>
                 </div>
 
                 {isMyRequestsLoading || isMyRequestsFetching ? (
@@ -608,6 +535,49 @@ export default function InstantSessionsPage() {
                         >
                             Request a Session
                         </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Available Instant Sessions (volunteer-opened slots, browse + join) */}
+            <div>
+                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
+                    Instant Sessions posted by Volunteers
+                </h2>
+
+                {availableSessions.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {availableSessions.map((session) => (
+                            <SessionCard
+                                key={session.id}
+                                session={session}
+                                onClick={() => handleSessionClick(session)}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {claimedSessions.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {claimedSessions.map((session) => (
+                            <SessionCard
+                                key={session.id}
+                                session={session}
+                                onClick={() => handleClaimedSessionClick(session)}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {availableSessions.length === 0 && claimedSessions.length === 0 && (
+                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                        <div className="text-5xl mb-4">🕒</div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            No Instant Sessions
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            Sessions volunteers open up for this date will show up here
+                        </p>
                     </div>
                 )}
             </div>

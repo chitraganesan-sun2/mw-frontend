@@ -5,9 +5,9 @@ import CenterModal from "@/components/common/Modals/CenterModal";
 import { showToast } from "@/components/common/Toast";
 import dayjs from "dayjs";
 import LottieLoader from "@/components/common/Loader/Lottie";
-import { GET_API, POST_API } from "@/api/request";
+import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { useQuery } from "@tanstack/react-query";
+import { Input } from "@/components/common/Input";
 
 interface RequestInstantSessionModalProps {
     isOpen: boolean;
@@ -31,36 +31,24 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
 
     // Form state
     const [sessionType, setSessionType] = useState<"academic" | "non_academic" | "">("");
-    const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
+    const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
     const [level, setLevel] = useState("");
     const [date, setDate] = useState<string>("");
     const [time, setTime] = useState<string>("");
     const [duration, setDuration] = useState<number>(30);
+    const [sessionDetails, setSessionDetails] = useState<string>("");
 
-    const { data: skillsData, isLoading: isSkillsLoading } = useQuery({
-        queryKey: ["learner-request-skills", sessionType],
-        queryFn: async () => {
-            if (!sessionType) return [];
-            const res = await GET_API(`${endpoints.common("skills")}?category=${sessionType}`);
-            return (res?.data as Skill[]) || [];
-        },
-        enabled: isOpen && !!sessionType,
-    });
-    const skills: Skill[] = Array.isArray(skillsData) ? skillsData : [];
-
-    const toggleSkill = (skillId: string) => {
-        setSelectedSkillIds((prev) =>
-            prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
-        );
-    };
+    const todayStr = dayjs().format("YYYY-MM-DD");
+    const tomorrowStr = dayjs().add(1, "day").format("YYYY-MM-DD");
 
     const resetForm = () => {
         setSessionType("");
-        setSelectedSkillIds([]);
+        setSelectedSkills([]);
         setLevel("");
         setDate("");
         setTime("");
         setDuration(30);
+        setSessionDetails("");
     };
 
     const handleClose = () => {
@@ -73,7 +61,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             showToast({ message: "Please select what you want to learn", type: "error" });
             return;
         }
-        if (selectedSkillIds.length === 0) {
+        if (selectedSkills.length === 0) {
             showToast({ message: "Please select at least one skill", type: "error" });
             return;
         }
@@ -85,6 +73,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             showToast({ message: "Please select both date and time", type: "error" });
             return;
         }
+        if (date !== todayStr && date !== tomorrowStr) {
+            showToast({ message: "Instant Sessions can only be requested for today or tomorrow", type: "error" });
+            return;
+        }
 
         setIsLoading(true);
         try {
@@ -93,9 +85,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 availability_start_time: time,
                 duration: duration,
                 session_type: sessionType,
-                skill_ids: selectedSkillIds,
+                skill_ids: selectedSkills.map((s) => s.skill_id),
                 grade_level: sessionType === "academic" ? level : null,
                 expertise_level: sessionType === "non_academic" ? level : null,
+                session_details: sessionDetails.trim() || null,
             };
 
             const res = await POST_API(endpoints.session.createLearnerInstantSessionRequest, payload);
@@ -147,7 +140,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                         value={sessionType}
                         onChange={(e) => {
                             setSessionType(e.target.value as "academic" | "non_academic" | "");
-                            setSelectedSkillIds([]);
+                            setSelectedSkills([]);
                             setLevel("");
                         }}
                     >
@@ -155,42 +148,28 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                             Select a category
                         </option>
                         <option value="academic">Academic</option>
-                        <option value="non_academic">Non-Academic (Skills/Arts)</option>
+                        <option value="non_academic">Arts &amp; Life Skills</option>
                     </select>
                 </div>
 
-                {/* Skills – multi-select, filtered by category */}
+                {/* Skills – LOV, filtered by category, matches the onboarding form's async-select
+                    (same endpoint/response shape) so users can add a skill that isn't listed yet. */}
                 {sessionType && (
-                    <div className="flex flex-col gap-2">
-                        <label className="text-base font-medium text-[#121212]">
-                            Which skills do you want to learn?
-                        </label>
-                        {isSkillsLoading ? (
-                            <p className="text-sm text-gray-400">Loading skills...</p>
-                        ) : skills.length === 0 ? (
-                            <p className="text-sm text-gray-400">No skills found for this category.</p>
-                        ) : (
-                            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1">
-                                {skills.map((skill) => {
-                                    const isSelected = selectedSkillIds.includes(skill.skill_id);
-                                    return (
-                                        <button
-                                            key={skill.skill_id}
-                                            type="button"
-                                            onClick={() => toggleSkill(skill.skill_id)}
-                                            className={`py-2 px-3 rounded-xl border text-sm font-medium capitalize transition-all duration-150 cursor-pointer ${
-                                                isSelected
-                                                    ? "border-black bg-black text-white"
-                                                    : "border-gray-200 text-[#121212] bg-white hover:border-gray-400"
-                                            }`}
-                                        >
-                                            {skill.skill_name}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
+                    <Input
+                        name="skills"
+                        label="Which skills do you want to learn?"
+                        inputType="async-select"
+                        variant="multi"
+                        creatable
+                        allowCreate
+                        endpoint={`skills?category=${sessionType}`}
+                        responseAsLabel="skill_name"
+                        responseAsValue={["skill_id", "skill_name"]}
+                        placeholder="Don't see your option? Type it in to add."
+                        value={selectedSkills}
+                        onChange={(value: any) => setSelectedSkills(Array.isArray(value) ? value : [])}
+                        onCreate={(value: any) => setSelectedSkills((prev) => [...prev, value])}
+                    />
                 )}
 
                 {/* Level */}
@@ -245,7 +224,8 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            min={dayjs().format("YYYY-MM-DD")}
+                            min={todayStr}
+                            max={tomorrowStr}
                             className="w-full h-12 px-4 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212]"
                         />
                     </div>
@@ -279,6 +259,20 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                             </button>
                         ))}
                     </div>
+                </div>
+
+                {/* Session Details and Expectations from Volunteers */}
+                <div className="flex flex-col gap-2">
+                    <label className="text-base font-medium text-[#121212]">
+                        Session Details and Expectations from Volunteers
+                    </label>
+                    <textarea
+                        value={sessionDetails}
+                        onChange={(e) => setSessionDetails(e.target.value)}
+                        placeholder="Let the volunteer know what you're hoping to cover or any specific expectations"
+                        rows={3}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] resize-none"
+                    />
                 </div>
 
                 {/* Actions */}
