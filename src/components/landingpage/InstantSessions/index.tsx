@@ -6,7 +6,6 @@ import ContainerHeader from "../components/ContainerHeader";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import TagComponent from "@/components/common/Tag";
 import { TimeIcon } from "@/assets/icons";
 import Link from "next/link";
 
@@ -22,6 +21,8 @@ interface PublicSession {
     tag_ids?: any[];
 }
 
+// High-level preview row for the public landing page - just when it is and what it's
+// about (timestamp + subject), not the full detail the in-app session card shows.
 const SessionPill = ({ session }: { session: PublicSession }) => {
     const formatTime = (t: string) => {
         if (!t) return "";
@@ -33,44 +34,35 @@ const SessionPill = ({ session }: { session: PublicSession }) => {
 
     const formatDate = (d: string) => {
         if (!d) return "";
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const tomorrowStr = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+        if (d === todayStr) return "Today";
+        if (d === tomorrowStr) return "Tomorrow";
         const date = new Date(d + "T00:00:00");
         return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     };
 
     return (
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between gap-2">
-                <h3 className="text-base font-semibold text-gray-900 line-clamp-1">{session.title}</h3>
-                <TagComponent
-                    text="Available"
-                    tagClassName="!bg-[#DCFCE7] !text-[#16A34A] !border-none !px-2 !py-0.5 !text-xs flex-shrink-0"
-                />
-            </div>
-            {session.description && (
-                <p className="text-sm text-gray-500 line-clamp-2">{session.description}</p>
-            )}
-            <div className="flex items-center gap-1.5 text-sm text-gray-700">
+        <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 text-sm text-gray-700 flex-shrink-0">
                 <TimeIcon />
-                <span>{formatDate(session.date)} · {formatTime(session.start_time)} – {formatTime(session.end_time)}</span>
+                <span className="font-medium whitespace-nowrap">
+                    {formatDate(session.date)}, {formatTime(session.start_time)}
+                </span>
             </div>
-            <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-500">By <span className="font-medium text-gray-800">{session.volunteer_first_name}</span></p>
-                {session.duration && (
-                    <span className="text-xs text-gray-400">{session.duration} min</span>
-                )}
-            </div>
+            <h3 className="text-base font-semibold text-gray-900 line-clamp-1 flex-1 text-right">
+                {session.title}
+            </h3>
         </div>
     );
 };
 
 const InstantSessionsSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+    <div className="flex flex-col gap-3 w-full">
         {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-3" />
-                <div className="h-3 bg-gray-100 rounded w-full mb-2" />
-                <div className="h-3 bg-gray-100 rounded w-2/3 mb-4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+            <div key={i} className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 animate-pulse flex items-center justify-between gap-3">
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div className="h-4 bg-gray-100 rounded w-1/3" />
             </div>
         ))}
     </div>
@@ -126,7 +118,7 @@ const InstantSessions = () => {
                 {isLoading ? (
                     <InstantSessionsSkeleton />
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    <div className="flex flex-col gap-3 w-full">
                         {sessions.map((session) => (
                             <SessionPill key={session.volunteer_slot_id} session={session} />
                         ))}
