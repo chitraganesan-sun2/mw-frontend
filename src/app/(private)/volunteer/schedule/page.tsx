@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 import MyScheduleModal from "@/components/schedule/Modals/MyScheduleModal";
+import ScheduleAvailabilitySection from "@/components/schedule/ScheduleAvailabilitySection";
+import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
@@ -112,6 +114,8 @@ export default function SchedulePage() {
 
     return (
         <div className="w-full h-full animate-fadeIn">
+            <ScheduleAvailabilitySection role="volunteer" />
+            <AcceptedSessionsList role="volunteer" />
             {isFetching ? (
                 <LottieLoader isLoading={true} fullscreen={false} />
             ) : isMobileOrTabScreen ? (
