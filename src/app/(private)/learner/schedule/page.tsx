@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
+import LearnerScheduleModal from "@/components/schedule/Modals/LearnerScheduleModal";
 import ScheduleAvailabilitySection from "@/components/schedule/ScheduleAvailabilitySection";
 import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
 
@@ -25,6 +26,7 @@ import MobileCalender from "@/components/schedule/MobileCalender";
 export default function LearnerSchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
     const [isOpenFeedback, setIsOpenFeedback] = useState(false);
+    const [isOpenAvailability, setIsOpenAvailability] = useState(false);
 
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
@@ -90,6 +92,7 @@ export default function LearnerSchedulePage() {
     useEffect(() => {
         setIsOpenSchedule(modal === "add_new_meeting");
         setIsOpenFeedback(modal === "feedback");
+        setIsOpenAvailability(modal === "my_availability");
     }, [modal]);
 
     return (
@@ -105,6 +108,7 @@ export default function LearnerSchedulePage() {
                     <Calendar events={data || []} />
                 )}
                 <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleNavigate} />
+                <LearnerScheduleModal isOpen={isOpenAvailability} onClose={handleNavigate} />
                 <FeedbackModal
                     mode="create"
                     isOpen={isOpenFeedback}
