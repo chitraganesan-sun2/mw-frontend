@@ -38,6 +38,10 @@ export default function LearnerSchedulePage() {
     const { data, isFetching } = useQuery({
         queryKey: ["learner-events", currentMonth],
         queryFn: getEvents,
+        // A volunteer accepting/declining happens in their own separate browser session -
+        // query invalidation in the volunteer's client can't reach this learner's cache, so
+        // this needs to self-refresh. Matches the header bell's existing 30s poll cadence.
+        refetchInterval: 30000,
     });
 
     const getLearnerDetails = async () => {
