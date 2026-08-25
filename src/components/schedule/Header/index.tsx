@@ -34,6 +34,10 @@ const Header = (props: Props) => {
         router.push("/learner/schedule?modal=add_new_meeting");
     };
 
+    const handleMyAvailability = () => {
+        router.push("/learner/schedule?modal=my_availability");
+    };
+
     const handleAddEvent = () => {
         router.push("/volunteer/schedule?modal=new_event");
     };
@@ -124,6 +128,11 @@ const Header = (props: Props) => {
                                 onClick={handleViewDemo}
                                 title="View Demo"
                                 customClassName="max-lg:hidden !bg-white max-lg:!text-sm !font-medium !text-black rounded-full p-1 lg:!p-3"
+                            />
+                            <Button
+                                onClick={handleMyAvailability}
+                                title="Schedule my Availability"
+                                customClassName="!bg-white !border !border-gray-200 !text-[14px] lg:!text-[16px] !font-medium !text-black rounded-full !py-2 lg:!py-3 lg:!px-3 max-lg:flex-1"
                             />
                             <Button
                                 onClick={handleAddMeeting}
