@@ -42,6 +42,8 @@ export const endpoints: EndpointProps = {
         getConnectedVolunteers: (id: string) => `learner/${id}/connected_volunteers`,
         getTotalLearnersCount: "learner/total_learners_count",
         emailPreference: (id: string) => `learner/${id}/email_preference`,
+        matchTrigger: "learner/match/trigger",
+        matchHistory: "learner/match",
     },
     volunteer: {
         update: (id: string) => `volunteers/${id}`,
@@ -49,6 +51,8 @@ export const endpoints: EndpointProps = {
         getIndividualVolunteer: (id: string) => `volunteers/${id}`,
         getConnectedLearners: (id: string) => `volunteers/${id}/connected_learners`,
         getTotalVolunteersHours: "volunteers/total_volunteered_hours",
+        matchTrigger: "volunteers/match/trigger",
+        matchHistory: "volunteers/match",
     },
     volunteer_slot: {
         update: "volunteer_slots",
