@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
+import ScheduleAvailabilitySection from "@/components/schedule/ScheduleAvailabilitySection";
+import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useAppStore } from "@/store/useAppStore";
@@ -93,6 +95,8 @@ export default function LearnerSchedulePage() {
     return (
         <>
             <div className="w-full h-full animate-fadeIn">
+                <ScheduleAvailabilitySection role="learner" />
+                <AcceptedSessionsList role="learner" />
                 {isFetching ? (
                     <LottieLoader isLoading={true} fullscreen={false} />
                 ) : isMobileOrTabScreen ? (

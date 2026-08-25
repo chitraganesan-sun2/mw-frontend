@@ -47,6 +47,10 @@ export type EndpointProps = {
         getAvailableDaysForDate: (date: string) => string;
         createSlotForParticularDate: string;
     };
+    learner_slot: {
+        update: string;
+        get: string;
+    };
     session: {
         bookSession: string;
         createInstantSession: string;
@@ -59,6 +63,7 @@ export type EndpointProps = {
         getLearnerInstantSessionDetail: (volunteer_slot_id: string) => string;
         unclaimInstantSession: (volunteer_slot_id: string) => string;
         getLearnerSessions: (id: string) => string;
+        getVolunteerSessions: (id: string) => string;
         cancelSession: (id: string) => string;
         getApprovalNotifications: (id: string) => string;
         updateNotificationStatus: (id: string) => string;

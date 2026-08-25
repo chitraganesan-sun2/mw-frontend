@@ -66,6 +66,10 @@ export const endpoints: EndpointProps = {
         getAvailableDaysForDate: (date: string) => `volunteer_slots/get_slots_by_date/${date}`,
         createSlotForParticularDate: `volunteer_slots/add_available_slots`,
     },
+    learner_slot: {
+        update: "learner_slots",
+        get: "learner_slots",
+    },
     session: {
         bookSession: "session",
         createInstantSession: "session/instant_session",
@@ -88,6 +92,7 @@ export const endpoints: EndpointProps = {
         unclaimInstantSession: (volunteer_slot_id: string) =>
             `session/instant_session/unclaim/${volunteer_slot_id}`,
         getLearnerSessions: (id: string) => `session/learner/${id}`,
+        getVolunteerSessions: (id: string) => `session/volunteer/${id}`,
         cancelSession: (id: string) => `session/${id}`,
         getApprovalNotifications: (id: string) => `session/pending_invites/${id}`,
         getCalendarEvents: (id: string, userType: UserType, month?: string, status?: string) =>
