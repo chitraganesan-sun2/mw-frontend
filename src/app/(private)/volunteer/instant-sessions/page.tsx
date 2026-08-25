@@ -335,53 +335,8 @@ export default function VolunteerInstantSessionsPage() {
                 }}
             />
 
-            {/* Available Learner Requests */}
-            <div className="mb-10">
-                <div className="flex items-center my-6">
-                    <div className="flex-1 border-t border-gray-200" />
-                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                        Available Learner Requests
-                    </span>
-                    <div className="flex-1 border-t border-gray-200" />
-                </div>
-                {learnerRequests.length > 0 ? (
-                    <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {learnerRequests.map((req) => (
-                                <LearnerRequestCard
-                                    key={req.request_id}
-                                    req={req}
-                                    isActionLoading={isActionLoading}
-                                    onAccept={handleAcceptRequest}
-                                />
-                            ))}
-                        </div>
-                        {(Number(requestsPage) > 1 || learnerRequestsHasMore) && (
-                            <div className="flex justify-center gap-4 mt-4">
-                                <button
-                                    className="text-sm font-medium disabled:opacity-40"
-                                    disabled={Number(requestsPage) <= 1}
-                                    onClick={() => setRequestsPage(String(Number(requestsPage) - 1))}
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="text-sm font-medium disabled:opacity-40"
-                                    disabled={!learnerRequestsHasMore}
-                                    onClick={() => setRequestsPage(String(Number(requestsPage) + 1))}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    <p className="text-gray-500 text-sm text-center py-6">No open learner requests right now.</p>
-                )}
-            </div>
-
             {/* My Sessions */}
-            <div>
+            <div className="mb-10">
                 <div className="flex items-center my-6">
                     <div className="flex-1 border-t border-gray-200" />
                     <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">My Sessions</span>
@@ -452,6 +407,51 @@ export default function VolunteerInstantSessionsPage() {
                             </div>
                         )}
                     </>
+                )}
+            </div>
+
+            {/* Available Learner Requests */}
+            <div>
+                <div className="flex items-center my-6">
+                    <div className="flex-1 border-t border-gray-200" />
+                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
+                        Available Learner Requests
+                    </span>
+                    <div className="flex-1 border-t border-gray-200" />
+                </div>
+                {learnerRequests.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {learnerRequests.map((req) => (
+                                <LearnerRequestCard
+                                    key={req.request_id}
+                                    req={req}
+                                    isActionLoading={isActionLoading}
+                                    onAccept={handleAcceptRequest}
+                                />
+                            ))}
+                        </div>
+                        {(Number(requestsPage) > 1 || learnerRequestsHasMore) && (
+                            <div className="flex justify-center gap-4 mt-4">
+                                <button
+                                    className="text-sm font-medium disabled:opacity-40"
+                                    disabled={Number(requestsPage) <= 1}
+                                    onClick={() => setRequestsPage(String(Number(requestsPage) - 1))}
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    className="text-sm font-medium disabled:opacity-40"
+                                    disabled={!learnerRequestsHasMore}
+                                    onClick={() => setRequestsPage(String(Number(requestsPage) + 1))}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <p className="text-gray-500 text-sm text-center py-6">No open learner requests right now.</p>
                 )}
             </div>
 
