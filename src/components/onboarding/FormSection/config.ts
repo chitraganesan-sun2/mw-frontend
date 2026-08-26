@@ -75,9 +75,7 @@ export const volunteerFormSchema = z
                 })
             )
             .optional(),
-        volunteer_description: z
-            .string({ required_error: "Description is required" })
-            .min(1, { message: "Description cannot be empty" }),
+        volunteer_description: z.string().optional(),
 
         // New fields added by the onboarding restructure (2026-08) - see
         // docs/learner-volunteer-onboarding-migration-plan.md for the full old->new field mapping.

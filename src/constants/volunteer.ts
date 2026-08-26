@@ -176,7 +176,7 @@ const ParentDetailsFields: FormField[] = [
     {
         id: "consented_from_parent",
         label: "I'm a minor and I've consent from my parent or guardian to be a volunteer.",
-        sublabel: "(Parent details are mandatory for minors - below 18-21 depending on the US State)",
+        sublabel: "(Parent/guardian details are required for minors, typically 18–21, depending on the U.S. state.)",
         inputType: "checkbox",
         gridCols: 2,
         inputClassName: "max-md:text-sm w-fit",
@@ -205,7 +205,7 @@ const EducationWorkExperienceFields: FormField[] = [
     },
     {
         id: "volunteer_education",
-        label: "Education Summary and Specialization",
+        label: "Grade / Education Level and Area of Specialization",
         inputType: "text",
         placeholder: "Describe your education here",
         gridCols: 1,
@@ -612,16 +612,6 @@ export const VolunteerFormSections: FormSectionConfig[] = [
         //TODO: Need Clarification
         title: "Volunteer snapshot",
         fields: [
-            {
-                id: "volunteer_description",
-                label: "Why do you want to tutor with us, and what do you hope to gain from this experience? What subjects would you like to teach, and why?",
-                sublabel:
-                    "Please share an overview of your profile, your areas of expertise and the reasons behind your choice, such as your passion for the subject or past teaching experience.",
-                inputType: "textarea",
-                placeholder: "Describe here",
-                required: true,
-                gridCols: 2,
-            },
             {
                 id: "profile_picture",
                 label: "Profile Picture",
