@@ -4,7 +4,7 @@ import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import Pagination from "@/components/common/Pagination";
-import LearnerCard from "@/components/leaner/LearnerCard";
+import LearnerCard from "@/components/learners/LearnerCard";
 import LearnerFilterModal from "@/components/learners/Modals/LearnerFilter";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";

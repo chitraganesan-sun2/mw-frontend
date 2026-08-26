@@ -3,7 +3,7 @@ import { learnerData } from "@/constants/landingPage";
 import ContainerHeader from "../components/ContainerHeader";
 import ContainerWrapper from "../components/ContainerWrapper";
 import StepsChart from "../components/StepsChart";
-import LandingPageButton from "../components/Button";
+import Button from "@/components/common/Button";
 import { useQueryState } from "nuqs";
 
 const ForLearner = () => {
@@ -31,9 +31,11 @@ const ForLearner = () => {
                     ))}
                 </div>
                 <div className="max-w-[300px]">
-                    <LandingPageButton
+                    <Button
                         title="Enroll as Learner"
-                        type="learner"
+                        btnVariant="learner"
+                        size="small"
+                        customClassName="w-full md:w-auto"
                         onClick={handleSignUp}
                     />
                 </div>

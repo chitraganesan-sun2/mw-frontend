@@ -14,7 +14,7 @@ import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
 import NoMessage from "@/components/messages/NoMessage";
-import VolunteerViewModal from "@/components/leaner/VolunteerViewModal";
+import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import { useAppStore } from "@/store/useAppStore";
 import dayjs from "dayjs";

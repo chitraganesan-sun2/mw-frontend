@@ -2,7 +2,6 @@ import ModalCloseIcon from "@/assets/icons/ModalCloseIcon"
 import Button from "@/components/common/Button"
 import { Modal } from "antd"
 import { FcGoogle } from "react-icons/fc"
-import LandingPageButton from "../components/Button"
 import { useQueryState } from "nuqs"
 import { useGoogleLogin } from "@react-oauth/google";
 import { useState } from "react"
@@ -104,21 +103,21 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                         <div className="pt-4">
                             <span className='text-xl font-medium'>New User?</span>
                             <div className="flex flex-col md:flex-row gap-3 mt-3">
-                                <LandingPageButton
+                                <Button
                                     // loading={buttonLoading === "learner"}
                                     onClick={() => handleTriggerSignUp("learner")}
                                     title="Enroll as Learner"
-                                    type="learner"
-                                    buttonClassName="!w-full"
-                                    rootClassName="!w-full !text-start"
+                                    btnVariant="learner"
+                                    size="small"
+                                    customClassName="!w-full !text-start"
                                 />
-                                <LandingPageButton
+                                <Button
                                     // loading={buttonLoading === "volunteer"}
                                     onClick={() => handleTriggerSignUp("volunteer")}
                                     title="Become a Volunteer"
-                                    type="volunteer"
-                                    buttonClassName="!w-full"
-                                    rootClassName="!w-full !text-start"
+                                    btnVariant="volunteer"
+                                    size="small"
+                                    customClassName="!w-full !text-start"
                                 />
                             </div>
                         </div>

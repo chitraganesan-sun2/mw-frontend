@@ -3,8 +3,8 @@
 import { getHeaderIcon } from "@/layouts/helper";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import VolunteerCard from "@/components/leaner/VolunteerCard";
-import VolunteerViewModal from "@/components/leaner/VolunteerViewModal";
+import VolunteerCard from "@/components/learners/VolunteerCard";
+import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";

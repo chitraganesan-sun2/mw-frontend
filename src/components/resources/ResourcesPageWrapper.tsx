@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/common/Button";
 import { getMyResources, getResources } from "@/api/resources";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -257,9 +258,9 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
                             <p>No Resources Found</p>
                             {
                                 searchQuery ? (
-                                    <button className="text-blue-500 underline" onClick={() => setSearchQuery(null)}>Clear Search</button>
+                                    <Button btnVariant="link" title="Clear Search" onClick={() => setSearchQuery(null)} />
                                 ) : (
-                                    <button className="text-blue-500 underline" onClick={handleAddResourceClick}>Add Resource</button>
+                                    <Button btnVariant="link" title="Add Resource" onClick={handleAddResourceClick} />
                                 )
                             }
                         </div>

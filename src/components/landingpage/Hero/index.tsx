@@ -4,7 +4,7 @@ import HeroBannerImg from "@/assets/images/HeroBannerImg.png";
 import HeroBannerMobileImg from "@/assets/images/HeroBannerMobileImg.png";
 import Image from "next/image";
 import { useState } from "react";
-import LandingPageButton from "../components/Button";
+import Button from "@/components/common/Button";
 import HeroBannerLogo from "@/assets/images/landingpage/hero-banner.png";
 import { useQueryState } from "nuqs";
 import Header from "../components/Header";
@@ -30,15 +30,19 @@ const Hero = () => {
                         disabilities
                     </h1>
                     <div className="flex flex-col md:flex-row gap-3">
-                        <LandingPageButton
+                        <Button
                             onClick={() => setParamMode("learner")}
                             title="Enroll as Learner"
-                            type="learner"
+                            btnVariant="learner"
+                            size="small"
+                            customClassName="w-full md:w-auto"
                         />
-                        <LandingPageButton
+                        <Button
                             onClick={() => setParamMode("volunteer")}
                             title="Become a Volunteer"
-                            type="volunteer"
+                            btnVariant="volunteer"
+                            size="small"
+                            customClassName="w-full md:w-auto"
                         />
                     </div>
                     <p className="text-base font-bold text-gray-600">COPPA & HIPAA Compliant</p>

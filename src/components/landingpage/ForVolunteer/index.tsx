@@ -3,7 +3,7 @@ import { volunteerData } from "@/constants/landingPage";
 import ContainerHeader from "../components/ContainerHeader";
 import ContainerWrapper from "../components/ContainerWrapper";
 import StepsChart from "../components/StepsChart";
-import LandingPageButton from "../components/Button";
+import Button from "@/components/common/Button";
 import { useQueryState } from "nuqs";
 
 const ForVolunteer = () => {
@@ -32,9 +32,11 @@ const ForVolunteer = () => {
                     ))}
                 </div>
                 <div className="max-w-[300px]">
-                    <LandingPageButton
+                    <Button
                         title="Become a Volunteer"
-                        type="volunteer"
+                        btnVariant="volunteer"
+                        size="small"
+                        customClassName="w-full md:w-auto"
                         onClick={handleSignUp}
                     />
                 </div>

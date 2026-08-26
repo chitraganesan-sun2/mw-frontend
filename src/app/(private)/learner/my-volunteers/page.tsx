@@ -15,7 +15,7 @@ import { getCookie } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import MobileMessageModal from "@/components/learners/Modals/MobileMessageModal";
 import Image from "next/image";
-import CardChips from "@/components/leaner/VolunteerCard/CardChips";
+import CardChips from "@/components/learners/VolunteerCard/CardChips";
 import Button from "@/components/common/Button";
 import InnerWidth from "@/utils/innerWidth";
 import DummyProfile from "@/assets/images/DummyProfile.png";

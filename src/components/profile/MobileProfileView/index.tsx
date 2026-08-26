@@ -2,7 +2,7 @@
 
 import { GET_API } from "@/api/request";
 import TagComponent from "@/components/common/Tag";
-import OverViewCard from "@/components/leaner/LeanerOverViewCard";
+import OverViewCard from "@/components/learners/LearnerOverViewCard";
 import { ParentGuardianInformation, ProfileDetails } from "@/components/learners/profile/tabs";
 import { LearnerInformation } from "@/components/learners/profile/tabs";
 import DetailCard from "@/components/profile/Bio/DetailCard";

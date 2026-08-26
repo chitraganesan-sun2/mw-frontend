@@ -4,7 +4,7 @@ import { endpoints } from "@/api/constants";
 import { GET_API, POST_API } from "@/api/request";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { callbackToast, showToast } from "@/components/common/Toast";
-import LearnerCard from "@/components/leaner/LearnerCard";
+import LearnerCard from "@/components/learners/LearnerCard";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";

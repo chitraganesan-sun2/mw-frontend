@@ -10,7 +10,7 @@ import Divider from "@/components/common/Divider";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import ViewModal from "@/components/common/Modals/ViewModal";
 import TagComponent from "@/components/common/Tag";
-import OverViewCard from "@/components/leaner/LeanerOverViewCard";
+import OverViewCard from "@/components/learners/LearnerOverViewCard";
 import DetailCard from "@/components/profile/Bio/DetailCard";
 import DetailChipCard from "@/components/profile/Bio/DetailChipCard";
 import RatingCard from "@/components/profile/Overview/RatingCard";

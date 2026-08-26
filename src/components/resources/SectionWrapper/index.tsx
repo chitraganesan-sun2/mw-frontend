@@ -95,9 +95,7 @@ const SectionWrapper = ({
                                     <p>No Resources Found</p>
                                     {
                                         searchQuery && (
-                                            <button className="text-blue-500 underline" onClick={() => setSearchQuery(null)}>
-                                                Clear Search
-                                            </button>
+                                            <Button btnVariant="link" title="Clear Search" onClick={() => setSearchQuery(null)} />
                                         )
                                     }
                                 </span>

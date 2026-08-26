@@ -12,7 +12,7 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
-import CardChips from "@/components/leaner/VolunteerCard/CardChips";
+import CardChips from "@/components/learners/VolunteerCard/CardChips";
 import Image from "next/image";
 import DummyProfile from "@/assets/images/DummyProfile.png";
 import Button from "@/components/common/Button";

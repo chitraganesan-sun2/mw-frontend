@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Button from "@/components/common/Button";
 import VideoPlayer from "@/components/common/VideoPlayer";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import TagComponent from "@/components/common/Tag";
@@ -505,7 +506,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                         <div className="flex-center w-full h-full min-h-[50vh] flex-col gap-1">
                             <p>No Posts Found</p>
                             {searchQuery && (
-                                <button className="text-blue-500 underline" onClick={() => setSearchQuery(null)}>Clear Search</button>
+                                <Button btnVariant="link" title="Clear Search" onClick={() => setSearchQuery(null)} />
                             ) }
                         </div>
                     )}
