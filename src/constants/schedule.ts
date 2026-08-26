@@ -82,3 +82,39 @@ export const LearnerScheduleModalDescriptionConstants = [
         required: true,
     },
 ];
+
+export const VolunteerScheduleModalConstants = [
+    {
+        name: "title_of_the_meeting",
+        label: "Title of the Meeting",
+        inputType: "text",
+        placeholder: "Enter meeting title",
+        required: true,
+    },
+    {
+        name: "select_learner",
+        label: "Select Learner",
+        inputType: "select",
+        placeholder: "Select a learner",
+        required: true,
+        isLoading: true,
+        options: [],
+    },
+    {
+        name: "select_date",
+        label: "Select Date",
+        inputType: "datepicker",
+        placeholder: "Select a date",
+        required: true,
+    },
+];
+
+export const VolunteerScheduleModalDescriptionConstants = [
+    {
+        name: "description",
+        label: "Description",
+        inputType: "textarea",
+        placeholder: "Enter meeting description here",
+        required: true,
+    },
+];

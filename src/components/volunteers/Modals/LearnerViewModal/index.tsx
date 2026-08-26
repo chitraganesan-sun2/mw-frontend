@@ -5,6 +5,7 @@ import ClockIcon from "@/assets/icons/ClockIcon";
 import ModalCloseIcon from "@/assets/icons/FeedModalCloseIcon";
 import LearnerConnectIcon from "@/assets/icons/LearnerConnectIcon";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
+import Button from "@/components/common/Button";
 import Divider from "@/components/common/Divider";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import ViewModal from "@/components/common/Modals/ViewModal";
@@ -19,7 +20,7 @@ import { getLocalStorage } from "@/utils/localStorage";
 import { formatString } from "@/utils/stringFormats";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
@@ -27,9 +28,11 @@ import { IoIosArrowBack } from "react-icons/io";
 const ProfileHeader = ({
     text,
     onClose,
+    onScheduleMeeting,
 }: {
     text: string | null;
     onClose: () => void;
+    onScheduleMeeting: () => void;
 }) => (
     <div className="flex items-center justify-between px-5">
         <div className="flex items-center gap-2">
@@ -42,6 +45,11 @@ const ProfileHeader = ({
             <p className="font-medium text-xl">Profile</p>
         </div>
         <div className="flex items-center gap-2">
+            <Button
+                onClick={onScheduleMeeting}
+                title="Schedule a meeting"
+                className="text-sm !text-black !bg-primary !border-primary !border"
+            />
             <span onClick={onClose} className="cursor-pointer max-md:hidden">
                 <ModalCloseIcon />
             </span>
@@ -558,6 +566,7 @@ const ReviewsContent = ({ learnerFeedback }: { learnerFeedback: any }) => {
 };
 
 const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }) => {
+    const router = useRouter();
     const searchParams = useSearchParams();
 
     const innerWidth = InnerWidth();
@@ -599,6 +608,10 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
         setActiveTab(tab);
     };
 
+    const handleScheduleMeeting = () => {
+        router.push(`/volunteer/learners?learnerId=${learnerId}&modal=add_new_meeting`);
+    };
+
     if (isError) {
         return (
             <ViewModal modalOpen={isOpen} onClose={onClose} width={855}>
@@ -628,6 +641,7 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
                     <ProfileHeader
                         text={text}
                         onClose={onClose}
+                        onScheduleMeeting={handleScheduleMeeting}
                     />
                     <Divider className="max-md:hidden" />
                     <ProfileInfo text={text} learnerData={learnerData} />

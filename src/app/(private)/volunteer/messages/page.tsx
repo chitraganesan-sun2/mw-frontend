@@ -16,6 +16,7 @@ import { getCookie } from "@/utils/auth";
 import VolunteerChatList from "@/components/messages/VolunteerChatList";
 import NoMessage from "@/components/messages/NoMessage";
 import LottieLoader from "@/components/common/Loader/Lottie";
+import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
 import { useAppStore } from "@/store/useAppStore";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -103,6 +104,8 @@ const Messages = () => {
     const [location, setLocation] = useState("");
     const [isRefetching, setIsRefetching] = useState(false);
     const [pendingMessages, setPendingMessages] = useState<Map<string, ChatMessage>>(new Map());
+    const [isOpenSchedule, setIsOpenSchedule] = useState(false);
+    const handleScheduleMeeting = () => setIsOpenSchedule(!isOpenSchedule);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -441,6 +444,7 @@ const Messages = () => {
 
     return (
         <>
+            <AddNewMeetingModalVolunteer isOpen={isOpenSchedule} onClose={handleScheduleMeeting} />
             {noChats ? (
                 <NoMessage />
             ) : (
@@ -473,6 +477,14 @@ const Messages = () => {
                                 showBackButton={isMobile}
                                 onBack={() => router.push("/volunteer/messages")}
                             />
+                            <div className="w-full  md:w-fit pb-4 md:pb-0 px-3">
+                                <Button
+                                    onClick={handleScheduleMeeting}
+                                    title="Schedule Meeting"
+                                    btnVariant="secondary"
+                                    className="!rounded-xl !w-full md:w-fit  !text-sm !bg-black hover:!bg-black !text-white transition-all duration-300"
+                                />
+                            </div>
                         </div>
                         <div className="flex flex-col md:gap-4 p-4 bg-[#f4f7fb] md:bg-white h-[calc(100vh-16em)] overflow-y-auto">
                             {isIndividualLoading ? (

@@ -6,7 +6,7 @@ import LottieLoader from "@/components/common/Loader/Lottie";
 import Pagination from "@/components/common/Pagination";
 import LearnerCard from "@/components/learners/LearnerCard";
 import LearnerFilterModal from "@/components/learners/Modals/LearnerFilter";
-import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
+import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";
@@ -220,7 +220,7 @@ export default function LearnersPage() {
 
     return (
         <div className="h-full animate-fadeIn">
-            <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleModal} />
+            <AddNewMeetingModalVolunteer isOpen={isOpenSchedule} onClose={handleModal} />
             <LearnerViewModal isOpen={isOpen} onClose={handleModal} />
             <LearnerFilterModal
                 isFilterApplying={false}

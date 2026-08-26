@@ -23,6 +23,10 @@ interface NotificationCardProps {
         learner_picture: {
             image_url: string;
         };
+        volunteer_full_name?: string;
+        volunteer_picture?: {
+            image_url: string;
+        };
         session_date: string;
         session_start_time: string;
         session_end_time: string;
@@ -32,11 +36,28 @@ interface NotificationCardProps {
         volunteer_start_time: string;
         volunteer_end_time: string;
         volunteer_start_date: string;
+        learner_start_time: string;
+        learner_end_time: string;
+        learner_start_date: string;
         is_read?: boolean;
     };
+    /** Whose approval queue this card is shown in - determines which party's name/picture
+     * and local time to display. Defaults to "volunteer" (the original, learner-initiated
+     * request case). */
+    viewerRole?: "learner" | "volunteer";
 }
 
-const NotificationCard: React.FC<NotificationCardProps> = ({ data }) => {
+const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = "volunteer" }) => {
+    const isLearnerViewer = viewerRole === "learner";
+    const otherPartyName = isLearnerViewer
+        ? data?.volunteer_full_name
+        : `${data?.learner_first_name} ${data?.learner_last_name}`;
+    const otherPartyPicture = isLearnerViewer
+        ? data?.volunteer_picture?.image_url
+        : data?.learner_picture?.image_url;
+    const displayDate = isLearnerViewer ? data?.learner_start_date : data?.volunteer_start_date;
+    const displayStartTime = isLearnerViewer ? data?.learner_start_time : data?.volunteer_start_time;
+    const displayEndTime = isLearnerViewer ? data?.learner_end_time : data?.volunteer_end_time;
     const queryClient = useQueryClient();
     const [loadingAccept, setLoadingAccept] = useState(false);
     const [loadingDecline, setLoadingDecline] = useState(false);
@@ -80,7 +101,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data }) => {
             } else {
                 showToast({ type: "error", message: "Invitation Declined" });
             }
-            queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
+            queryClient.invalidateQueries({
+                queryKey: [isLearnerViewer ? "learner-events" : "volunteer-events"],
+            });
         });
     };
 
@@ -89,7 +112,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data }) => {
         fn: (status: string) => handleNotificationStatus(status, data?.session_id),
         invalidateKey: ["events"],
         success: () => {
-            queryClient.invalidateQueries({ queryKey: ["approval-notifications"] });
+            queryClient.invalidateQueries({
+                queryKey: [isLearnerViewer ? "learner-approval-notifications" : "approval-notifications"],
+            });
             queryClient.invalidateQueries({ queryKey: ["events"] });
             setLoadingAccept(false);
             setLoadingDecline(false);
@@ -105,12 +130,10 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data }) => {
         <div className="flex flex-col gap-4 border rounded-xl p-4 border-[#E0E0E0] h-fit min-w-[250px] md:w-[360px]">
             <div className="flex items-center gap-2">
                 <div>
-                    <Image src={data?.learner_picture?.image_url || DummyProfileImg} alt="notification" width={40} height={40} className="h-[40px] w-[40px] object-cover rounded-full" />
+                    <Image src={otherPartyPicture || DummyProfileImg} alt="notification" width={40} height={40} className="h-[40px] w-[40px] object-cover rounded-full" />
                 </div>
                 <p className="font-normal">
-                    <span className="font-semibold">
-                        {`${data?.learner_first_name} ${data?.learner_last_name}`}
-                    </span>{" "}
+                    <span className="font-semibold">{otherPartyName}</span>{" "}
                     requested for a meeting
                 </p>
             </div>
@@ -121,12 +144,12 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data }) => {
                 </div>
                 <div className="flex flex-col gap-1">
                     <p className="text-[0.75rem] font-medium text-gray-light">Date</p>
-                    <p className="text-sm font-medium">{dayjs(data?.volunteer_start_date).format("D-MMM-YYYY")}</p>
+                    <p className="text-sm font-medium">{dayjs(displayDate).format("D-MMM-YYYY")}</p>
                 </div>
                 <div className="flex flex-col gap-1">
                     <p className="text-[0.75rem] font-medium text-gray-light">Time</p>
                     <p className="text-sm font-medium">
-                        {formatTime(data?.volunteer_start_time, data?.volunteer_end_time)}
+                        {formatTime(displayStartTime, displayEndTime)}
                     </p>
                 </div>
             </div>

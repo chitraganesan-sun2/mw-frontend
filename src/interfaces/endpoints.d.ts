@@ -34,6 +34,7 @@ export type EndpointProps = {
         getIndividualVolunteer: (id: string) => string;
         getConnectedLearners: (id: string) => string;
         getTotalVolunteersHours: string;
+        emailPreference: (id: string) => string;
         matchTrigger: string;
         matchHistory: string;
     };
@@ -53,6 +54,8 @@ export type EndpointProps = {
     };
     session: {
         bookSession: string;
+        bookVolunteerInitiatedSession: string;
+        getPendingInvitesForLearner: (learnerId: string) => string;
         createInstantSession: string;
         claimInstantSession: string;
         getInstantSessions: string;

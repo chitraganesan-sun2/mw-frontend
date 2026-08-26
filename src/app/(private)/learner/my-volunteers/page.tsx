@@ -41,7 +41,13 @@ const VolunteerCard = ({
     volunteer: any;
     handleMessage: () => void;
 }) => {
-    const { profile_picture = "", name = "", classesTaken = "", country = "" } = volunteer;
+    const {
+        profile_picture = "",
+        name = "",
+        classesTaken = "",
+        country = "",
+        chatPermission = false,
+    } = volunteer;
     return (
         <div className="bg-white rounded-xl w-full p-4 space-y-4">
             <div className="flex items-center gap-2">
@@ -70,10 +76,13 @@ const VolunteerCard = ({
                         onClick={handleTestimonial}
                     /> */}
                     <Button
-                        title="Message Learner"
-                        customClassName="!px-2 !py-1 !h-auto !rounded-2xl !text-sm"
+                        title="Message Volunteer"
+                        customClassName={`!px-2 !py-1 !h-auto !rounded-2xl !text-sm ${
+                            !chatPermission ? "!text-gray-400" : ""
+                        }`}
                         btnVariant="tertiary"
                         onClick={handleMessage}
+                        disabled={!chatPermission}
                     />
                 </div>
             </div>

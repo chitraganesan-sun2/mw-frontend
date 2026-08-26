@@ -51,6 +51,7 @@ export const endpoints: EndpointProps = {
         getIndividualVolunteer: (id: string) => `volunteers/${id}`,
         getConnectedLearners: (id: string) => `volunteers/${id}/connected_learners`,
         getTotalVolunteersHours: "volunteers/total_volunteered_hours",
+        emailPreference: (id: string) => `volunteers/${id}/email_preference`,
         matchTrigger: "volunteers/match/trigger",
         matchHistory: "volunteers/match",
     },
@@ -72,6 +73,8 @@ export const endpoints: EndpointProps = {
     },
     session: {
         bookSession: "session",
+        bookVolunteerInitiatedSession: "session/volunteer_initiated",
+        getPendingInvitesForLearner: (learnerId: string) => `session/pending_invites/learner/${learnerId}`,
         createInstantSession: "session/instant_session",
         claimInstantSession: "session/instant_session/claim",
         /** GET all active instant sessions (for dedicated instant sessions page) */

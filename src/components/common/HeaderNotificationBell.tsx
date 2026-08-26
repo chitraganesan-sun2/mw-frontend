@@ -4,7 +4,6 @@ import NotificationIcon from "@/assets/icons/NotificationIcon";
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
-import LearnerNotificationsModal from "@/components/schedule/Modals/LearnerNotificationsModal";
 import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import { useState, useEffect, useRef } from "react";
@@ -87,11 +86,11 @@ const HeaderNotificationBell = () => {
                 </div>
             )}
 
-            {isLearner ? (
-                <LearnerNotificationsModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
-            ) : (
-                <ApprovalModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
-            )}
+            <ApprovalModal
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+                role={isLearner ? "learner" : "volunteer"}
+            />
         </>
     );
 };

@@ -32,6 +32,19 @@ const SESSION_MATCH_OPTIONS = [
 
 type SessionMatchValue = (typeof SESSION_MATCH_OPTIONS)[number]["value"];
 
+/** API expects: all_sessions | only_matches_for_skills | no_email_notifications */
+const UI_TO_API_PREFERENCE: Record<SessionMatchValue, string> = {
+    all_sessions: "all_sessions",
+    skills_to_learn: "only_matches_for_skills",
+    none: "no_email_notifications",
+};
+
+const API_TO_UI_PREFERENCE: Record<string, SessionMatchValue> = {
+    all_sessions: "all_sessions",
+    only_matches_for_skills: "skills_to_learn",
+    no_email_notifications: "none",
+};
+
 const Settings = () => {
     const [isEnabled, setIsEnabled] = useState(false);
     const [sessionMatchPreference, setSessionMatchPreference] =
@@ -50,6 +63,16 @@ const Settings = () => {
         });
     };
 
+    const handleEmailPreferenceChange = (value: SessionMatchValue) => {
+        setSessionMatchPreference(value);
+        const apiValue = UI_TO_API_PREFERENCE[value];
+        PUT_API(endpoints.volunteer.emailPreference(volunteerId as string), {
+            instant_session_email_preference: apiValue,
+        }).catch((err) => {
+            console.error(err, "EMAIL PREFERENCE");
+        });
+    };
+
     useEffect(() => {
         setHeaderOptions({
             title: "Settings",
@@ -61,9 +84,12 @@ const Settings = () => {
     useEffect(() => {
         setIsLoading(true);
         GET_API(endpoints.volunteer.getIndividualVolunteer(volunteerId as string))
-            .then((res) => {
+            .then((res: any) => {
                 setIsEnabled(res.data.chat_permission);
-                // console.log(res.data.chat_permission, "RES DATA VOLUNTEER");
+                const apiPref = res.data?.instant_session_email_preference;
+                if (apiPref && API_TO_UI_PREFERENCE[apiPref] !== undefined) {
+                    setSessionMatchPreference(API_TO_UI_PREFERENCE[apiPref]);
+                }
             })
             .finally(() => {
                 setIsLoading(false);
@@ -93,7 +119,7 @@ const Settings = () => {
                     />
                 </div>
 
-                {/* <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
+                <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
                         <p className="md:text-base text-[14px] font-medium">
                             Session Match Email Notification Preferences
@@ -104,7 +130,7 @@ const Settings = () => {
                     </div>
                     <Select
                         value={sessionMatchPreference}
-                        onChange={(value) => setSessionMatchPreference(value)}
+                        onChange={(value) => handleEmailPreferenceChange(value)}
                         virtual={false}
                         suffixIcon={
                             <span className="flex items-center justify-center w-full h-full min-h-[0.5em]">
@@ -115,23 +141,17 @@ const Settings = () => {
                             value: opt.value,
                             label: opt.label,
                         }))}
-                        
                         optionRender={(option) => {
                             const item = SESSION_MATCH_OPTIONS.find(
                                 (o) => o.value === option.value
                             );
-                            const isSelected = option.value === sessionMatchPreference;
                             return (
                                 <div className="session-match-option py-3 px-3">
-                                    <div
-                                        className={`text-sm font-medium ${isSelected ? "text-[#121212]" : "text-[#121212]"}`}
-                                    >
+                                    <div className="text-sm font-medium text-[#121212]">
                                         {item?.label ?? option.label}
                                     </div>
                                     {item?.description && (
-                                        <div
-                                            className={`text-[11px] font-normal mt-1 leading-snug ${isSelected ? "text-[#121212]" : "text-[#121212]"}`}
-                                        >
+                                        <div className="text-[11px] font-normal mt-1 leading-snug text-[#121212]">
                                             {item.description}
                                         </div>
                                     )}
@@ -140,9 +160,9 @@ const Settings = () => {
                         }}
                         popupClassName="session-match-dropdown"
                         dropdownAlign={{ points: ["tc", "bc"] }}
-                        className="session-match-select w-full md:w-[400px] [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-300 [&_.ant-select-selector]:!h-auto [&_.ant-select-selector]:!min-h-10 "
+                        className="session-match-select w-full md:w-[400px] [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-300 [&_.ant-select-selector]:!h-auto [&_.ant-select-selector]:!min-h-10"
                     />
-                </div> */}
+                </div>
 
                 <DeleteAccountSection userId={volunteerId as string} role="volunteer" />
             </div>

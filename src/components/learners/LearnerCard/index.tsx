@@ -35,6 +35,10 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
         });
     };
 
+    const handleScheduleMeeting = () => {
+        router.push(`/volunteer/learners?learnerId=${learnerId}&modal=add_new_meeting`);
+    };
+
     return (
         <div className="bg-white rounded-xl w-full shadow-sm h-auto p-4 flex flex-col gap-4">
             {/* Profile Header */}
@@ -111,14 +115,23 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
                 </div>
             )}
             <Divider />
-            <div className="flex items-center justify-between">
-                <Button
-                    disabled={!chatPermission}
-                    onClick={handleChatClick}
-                    title="Start Chat"
-                    btnVariant="secondary"
-                    className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-black hover:!text-white !text-black !border-stroke"
-                />
+            <div className="flex items-center gap-2">
+                <div className="flex-1">
+                    <Button
+                        onClick={handleScheduleMeeting}
+                        title="Schedule a meeting"
+                        className="!rounded-xl !text-sm !w-full !text-black !bg-primary !border-primary !border"
+                    />
+                </div>
+                <div className="flex-1">
+                    <Button
+                        disabled={!chatPermission}
+                        onClick={handleChatClick}
+                        title="Start Chat"
+                        btnVariant="secondary"
+                        className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-black hover:!text-white !text-black !border-stroke"
+                    />
+                </div>
             </div>
         </div>
     );

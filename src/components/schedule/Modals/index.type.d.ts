@@ -43,6 +43,8 @@ export type MyScheduleModalProps = {
 export type ApprovalModalProps = {
     isOpen: boolean;
     onClose: () => void;
+    /** Whose pending session requests to show/act on. Defaults to "volunteer". */
+    role?: "learner" | "volunteer";
 };
 
 export type CustomRecurrenceModalProps = {

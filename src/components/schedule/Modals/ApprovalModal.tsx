@@ -16,6 +16,10 @@ type SessionsData = {
     learner_picture: {
         image_url: string;
     };
+    volunteer_full_name?: string;
+    volunteer_picture?: {
+        image_url: string;
+    };
     session_date: string;
     session_start_time: string;
     session_end_time: string;
@@ -25,6 +29,9 @@ type SessionsData = {
     volunteer_start_time: string;
     volunteer_end_time: string;
     volunteer_start_date: string;
+    learner_start_time: string;
+    learner_end_time: string;
+    learner_start_date: string;
     is_read?: boolean;
 };
 
@@ -33,21 +40,24 @@ interface NotificationData {
     sessions: SessionsData[];
 }
 
-const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose }) => {
+const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "volunteer" }) => {
     const [notificationsData, setNotificationsData] = useState<NotificationData[]>([]);
+    const isLearner = role === "learner";
     const volunteerId = getCookie("volunteer_id");
+    const learnerId = getCookie("learner_id");
     const queryClient = useQueryClient();
 
     const getNotifications = async () => {
         const response: any = await GET_API(
-            endpoints.session.getApprovalNotifications(volunteerId as string)
+            isLearner
+                ? endpoints.session.getPendingInvitesForLearner(learnerId as string)
+                : endpoints.session.getApprovalNotifications(volunteerId as string)
         );
-        console.log("Response from getApprovalNotifications: ", response?.data);
         return response?.data;
     };
 
     const { data, isFetching, isError } = useQuery({
-        queryKey: ["approval-notifications", isOpen],
+        queryKey: [isLearner ? "learner-approval-notifications" : "approval-notifications", isOpen],
         queryFn: () => getNotifications(),
         enabled: isOpen,
     });
@@ -122,7 +132,11 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose }) => {
                             </div>
                             <div className="flex flex-col gap-3">
                                 {notification?.sessions?.map((session) => (
-                                    <NotificationCard key={session?.session_id} data={session} />
+                                    <NotificationCard
+                                        key={session?.session_id}
+                                        data={session}
+                                        viewerRole={role}
+                                    />
                                 ))}
                             </div>
                         </div>
