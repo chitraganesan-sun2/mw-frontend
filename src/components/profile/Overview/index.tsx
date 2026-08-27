@@ -28,7 +28,7 @@ const Overview = ({ data, reviewEndpoint }: any) => {
     ];
 
     const { data: reviews, isLoading } = useQuery({
-        queryKey: ["my-reviews"],
+        queryKey: ["my-reviews", reviewEndpoint],
         queryFn: async() => {
             const { data } = await GET_API(reviewEndpoint)
             return data

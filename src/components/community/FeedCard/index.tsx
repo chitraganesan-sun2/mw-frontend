@@ -117,7 +117,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
 
     // Handle Like & DisLike
     const handleLikeAction = (postId: string, currentLikeStatus: boolean) => {
-        queryClient.setQueryData(["get-posts", activeTab, searchQuery], (oldData: any) => {
+        queryClient.setQueryData(["get-posts", activeTab, debouncedSearchQuery], (oldData: any) => {
             return {
                 ...oldData,
                 pages: oldData?.pages.map((page: any) => ({
@@ -146,7 +146,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
 
     // Handle Save
     const handleSave = (postId: string, currentSaveStatus: boolean) => {
-        queryClient.setQueryData(["get-posts", activeTab, searchQuery], (oldData: any) => {
+        queryClient.setQueryData(["get-posts", activeTab, debouncedSearchQuery], (oldData: any) => {
             return {
                 ...oldData,
                 pages: oldData.pages.map((page: any) => ({
@@ -187,7 +187,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
             successMsg: "Comment Posted Successfully",
             errorMsg: "Failed to Post Comment",
         }).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab, searchQuery] });
+            queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab, debouncedSearchQuery] });
             setComment("");
             setIsCommentLoading(false);
         });

@@ -183,22 +183,11 @@ const FeedViewModal = ({
             POST_API(endpoints.post.save(postId));
         }
 
-        queryClient.setQueryData(["get-posts", activeTab], (oldData: any) => {
-            return {
-                ...oldData,
-                pages: oldData?.pages?.map((page: any) => ({
-                    ...page,
-                    items: page?.items?.map((post: PostData) =>
-                        post?.post_id === postId
-                            ? {
-                                ...post,
-                                is_saved: !currentSaveStatus,
-                            }
-                            : post
-                    ),
-                })),
-            };
-        });
+        // A precise setQueryData needs the exact live search-query segment the feed list is
+        // cached under (["get-posts", activeTab, debouncedSearchQuery]), which this modal
+        // doesn't have - invalidate by prefix instead, same pattern already used for delete
+        // above, so the list refetches with the correct saved state regardless of search.
+        queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab] });
 
         queryClient.setQueryData(["get-single-post", id], (oldData: any) => ({
             ...oldData,

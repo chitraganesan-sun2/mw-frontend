@@ -17,6 +17,7 @@ import VolunteerChatList from "@/components/messages/VolunteerChatList";
 import NoMessage from "@/components/messages/NoMessage";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
+import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { useAppStore } from "@/store/useAppStore";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -106,6 +107,8 @@ const Messages = () => {
     const [pendingMessages, setPendingMessages] = useState<Map<string, ChatMessage>>(new Map());
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
     const handleScheduleMeeting = () => setIsOpenSchedule(!isOpenSchedule);
+    const [isOpenProfile, setIsOpenProfile] = useState(false);
+    const handleCloseProfile = () => setIsOpenProfile(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -445,6 +448,7 @@ const Messages = () => {
     return (
         <>
             <AddNewMeetingModalVolunteer isOpen={isOpenSchedule} onClose={handleScheduleMeeting} />
+            <LearnerViewModal isOpen={isOpenProfile} onClose={handleCloseProfile} />
             {noChats ? (
                 <NoMessage />
             ) : (
@@ -473,7 +477,7 @@ const Messages = () => {
                                 name={recieverName}
                                 location={location}
                                 image={recieverImage}
-                                onSeeMoreClick={() => {}}
+                                onSeeMoreClick={() => setIsOpenProfile(true)}
                                 showBackButton={isMobile}
                                 onBack={() => router.push("/volunteer/messages")}
                             />

@@ -24,7 +24,6 @@ export default function ProfilePage() {
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const [mode, setMode] = useQueryState("mode");
-    const [editProfileData, setEditProfileData] = useState({});
 
     const volunteerId = getCookie("volunteer_id") || "";
     const [volunteerData, setVolunteerData] = useState({ bio: {}, overview: {} });
@@ -64,21 +63,6 @@ export default function ProfilePage() {
         const volunteer_first_name = data?.volunteer_first_name;
         const volunteer_last_name = data?.volunteer_last_name;
         const description = data?.volunteer_description;
-
-        setEditProfileData({
-            userId: volunteerId,
-            volunteer_first_name: volunteer_first_name,
-            volunteer_last_name: volunteer_last_name,
-            volunteer_description: description,
-            profile_picture: data?.profile_picture,
-            volunteer_subjects: data?.volunteer_subjects,
-            volunteer_languages: data?.volunteer_languages,
-            volunteer_skills: data?.volunteer_skills,
-            volunteer_experience: data?.volunteer_experience,
-            volunteer_education: data?.volunteer_education,
-            country: data?.volunteer_contact_details?.country,
-            volunteer_gender: data?.volunteer_gender,
-        })
 
         const bioData = {
             userId: volunteerId,
@@ -132,7 +116,7 @@ export default function ProfilePage() {
                     <MobileProfileView
                         data={data}
                         userData={volunteerData?.bio}
-                        reviewEndpoint={endpoints.learnerFeedback.get(volunteerId)}
+                        reviewEndpoint={endpoints.volunterFeedback.get(volunteerId)}
                     />
                     :
                     <div className="h-full w-full grid grid-cols-[1fr,2fr] gap-10 p-5">

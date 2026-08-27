@@ -121,6 +121,16 @@ export default function LearnerFilterModal({
 
     const handleClear = () => {
         setFilterData({});
+        setLanguages(null);
+        setDevelopmentalDisability(null);
+        setAreasOfSupport(null);
+        setAcademicStrengths(null);
+        setAcademicChallenges(null);
+        setBehavioralConcerns(null);
+        setTechniquesThatWork(null);
+        setSkillsExpertiseToLearn(null);
+        setParentGoals(null);
+        onClose();
     };
 
     const isMobileScreen = InnerWidth() < 768;

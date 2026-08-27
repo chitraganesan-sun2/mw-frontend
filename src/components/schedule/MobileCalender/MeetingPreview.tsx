@@ -65,7 +65,9 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         fn: (status: string) => handleNotificationStatus(status, sessionId),
         invalidateKey: ["events "],
         success: () => {
-            queryClient.invalidateQueries({ queryKey: ["approval-notifications"] });
+            queryClient.invalidateQueries({
+                queryKey: [role === "learner" ? "learner-approval-notifications" : "approval-notifications"],
+            });
             if (role === "volunteer") {
                 queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
             } else {
@@ -112,8 +114,12 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         volunteer_full_name,
         feedBackCollectedFromLearner,
         feedBackCollectedFromVolunteer,
+        initiatedBy,
     } = extendedProps;
     const status = event?.status || extendedProps?.status;
+    // Only the recipient of a pending request can accept/decline it - not whoever initiated
+    // it (legacy sessions have no initiatedBy stored, and were always learner-initiated).
+    const canRespondToPending = (initiatedBy || "learner") !== role;
 
     const handleFeedBack = () => {
         onClose()
@@ -239,7 +245,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                 </div>
                 <Divider />
                 <div className="p-4">
-                    {status === "pending" && role === "volunteer" ? (
+                    {status === "pending" && canRespondToPending ? (
                         <div className="flex items-center gap-2 w-full">
                             <Button
                                 disabled={loadingAccept || loadingDecline}

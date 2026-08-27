@@ -2,7 +2,7 @@
 
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
-import { MessageModal, TestmonialModal } from "@/components/learners/Modals";
+import { TestmonialModal } from "@/components/learners/Modals";
 import LearnersTable from "@/components/learners/Table";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";
@@ -16,7 +16,6 @@ import CardChips from "@/components/learners/VolunteerCard/CardChips";
 import Image from "next/image";
 import DummyProfile from "@/assets/images/DummyProfile.png";
 import Button from "@/components/common/Button";
-import MobileMessageModal from "@/components/learners/Modals/MobileMessageModal";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useDebounce } from "use-debounce";
 import { useRouter } from "next/navigation";
@@ -173,16 +172,8 @@ export default function LearnersPage() {
         });
     }, [setHeaderOptions]);
 
-    const LearnerMessageModal = isMobileScreen ? MobileMessageModal : MessageModal;
-
     return (
         <div className="w-full h-full py-6 px-4 md:p-6 animate-fadeIn">
-            <LearnerMessageModal
-                key={learnerId}
-                receiverId={learnerId}
-                isOpen={mode === "message"}
-                onClose={handleClose}
-            />
             <TestmonialModal
                 isOpen={mode === "testimonial"}
                 mode={"create"}

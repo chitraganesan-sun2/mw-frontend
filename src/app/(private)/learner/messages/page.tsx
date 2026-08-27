@@ -100,7 +100,6 @@ const Messages = () => {
     const queryClient = useQueryClient();
     const [noChats, setNoChats] = useState<boolean | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [volunteerIdQuery, setVolunteerIdQuery] = useQueryState("volunteerId");
     const [location, setLocation] = useState("");
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
     const [isRefetching, setIsRefetching] = useState(false);
@@ -108,7 +107,6 @@ const Messages = () => {
 
     const handleModal = () => {
         setIsOpen(false);
-        setVolunteerIdQuery(null);
     };
 
     const getAllChatsForLearners = async () => {
@@ -480,7 +478,7 @@ const Messages = () => {
                                 name={recieverName}
                                 location={location}
                                 image={recieverImage}
-                                onSeeMoreClick={() => {}}
+                                onSeeMoreClick={() => setIsOpen(true)}
                                 showBackButton={isMobile}
                                 onBack={() => router.push("/learner/messages")}
                                 // action={

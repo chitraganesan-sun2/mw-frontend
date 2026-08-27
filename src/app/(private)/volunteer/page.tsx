@@ -131,9 +131,9 @@ export default function VolunteerDashboardPage() {
                         location={matchedLearner.country}
                         learnerHrs={matchedLearner.total_attended_hours?.toString()}
                         studentConnected={matchedLearner.total_volunteers_connected?.toString()}
-                        subjects={[]}
+                        subjects={matchedLearner.learner_subjects?.map((s: any) => s.subject_name)}
                         languages={matchedLearner.learner_personal_info?.learner_primary_language}
-                        totalReviews=""
+                        totalReviews={matchedLearner.total_reviews}
                         overallRating={matchedLearner.overall_rating}
                         chatPermission={matchedLearner.chat_permission}
                         developementDisability={

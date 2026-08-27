@@ -30,6 +30,7 @@ interface EventResponse {
     learner_start_time: string;
     learner_end_time: string;
     learner_start_date: string;
+    initiated_by?: "learner" | "volunteer";
 }
 
 export interface CalendarEvent {
@@ -59,6 +60,7 @@ export interface CalendarEvent {
         volunteer_slot_id?: string;
         isAvailableSlot?: boolean;
         isInstantSessionOpen?: boolean;
+        initiatedBy?: "learner" | "volunteer";
     };
 }
 
@@ -135,6 +137,7 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                         },
                         feedBackCollectedFromLearner: sd.feedback_collected_from_learner,
                         feedBackCollectedFromVolunteer: sd.feedback_collected_from_volunteer,
+                        initiatedBy: sd.initiated_by,
                     },
                 });
             } else if (slot.is_new_session && dayDate) {
@@ -206,6 +209,7 @@ function mapLearnerSessionsToEvents(data: any): CalendarEvent[] {
             },
             feedBackCollectedFromLearner: item.feedback_collected_from_learner,
             feedBackCollectedFromVolunteer: item.feedback_collected_from_volunteer,
+            initiatedBy: item.initiated_by,
         },
     }));
 }

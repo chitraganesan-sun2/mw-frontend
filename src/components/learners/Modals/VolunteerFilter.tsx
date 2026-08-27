@@ -92,6 +92,15 @@ export default function VolunteerFilterModal({
 
     const handleClear = () => {
         setFilterData({});
+        setStartDate(null);
+        setEndDate(null);
+        setStartTime(null);
+        setEndTime(null);
+        setLanguages(null);
+        setSubjects(null);
+        setCountry(null);
+        setSkills(null);
+        onClose();
     };
 
     const isMobileScreen = InnerWidth() < 768;

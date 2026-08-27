@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import MyScheduleModal from "@/components/schedule/Modals/MyScheduleModal";
-import ScheduleAvailabilitySection from "@/components/schedule/ScheduleAvailabilitySection";
 import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
@@ -10,7 +9,6 @@ const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: 
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,7 +26,6 @@ import { GET_API } from "@/api/request";
 
 export default function SchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
-    const [isOpenApproval, setIsOpenApproval] = useState(false);
     const [isOpenFeedback, setIsOpenFeedback] = useState(false);
     const [isOpenNewEvent, setIsOpenNewEvent] = useState(false);
     const queryClient = useQueryClient();
@@ -111,14 +108,12 @@ export default function SchedulePage() {
 
     useEffect(() => {
         setIsOpenSchedule(modal === "my_schedule");
-        setIsOpenApproval(modal === "approval_notification");
         setIsOpenFeedback(modal === "feedback");
         setIsOpenNewEvent(modal === "new_event");
     }, [modal]);
 
     return (
         <div className="w-full h-full animate-fadeIn">
-            <ScheduleAvailabilitySection role="volunteer" />
             <AcceptedSessionsList role="volunteer" />
             {isFetching ? (
                 <LottieLoader isLoading={true} fullscreen={false} />
@@ -128,7 +123,6 @@ export default function SchedulePage() {
                 <Calendar events={data || []} onDateSelect={handleDateSelect} />
             )}
             <MyScheduleModal isOpen={isOpenSchedule} onClose={handleNavigate} />
-            <ApprovalModal isOpen={isOpenApproval} onClose={handleNavigate} />
             <NewEventModal
                 isOpen={isOpenNewEvent}
                 onClose={handleNavigate}

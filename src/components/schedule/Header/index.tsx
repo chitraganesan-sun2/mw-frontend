@@ -82,11 +82,14 @@ const Header = (props: Props) => {
                     {/* Mobile: View Demo + Bell (volunteer) in top row */}
                     <div className="flex items-center gap-2 max-lg:flex lg:hidden">
                         {role === "learner" && (
-                            <Button
-                                onClick={handleViewDemo}
-                                title="View Demo"
-                                customClassName="!bg-transparent !text-sm !font-medium !text-[#33D0FD] md:!text-orange-500 md:hover:!text-orange-600 !border-none !shadow-none underline"
-                            />
+                            <>
+                                <Button
+                                    onClick={handleViewDemo}
+                                    title="View Demo"
+                                    customClassName="!bg-transparent !text-sm !font-medium !text-[#33D0FD] md:!text-orange-500 md:hover:!text-orange-600 !border-none !shadow-none underline"
+                                />
+                                <HeaderNotificationBell />
+                            </>
                         )}
                         {role === "volunteer" && (
                             <>
@@ -124,6 +127,7 @@ const Header = (props: Props) => {
                     )}
                     {role === "learner" ? (
                         <div className="flex items-center gap-2">
+                            {!isMobileOrTabScreen && <HeaderNotificationBell />}
                             <Button
                                 onClick={handleViewDemo}
                                 title="View Demo"
