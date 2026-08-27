@@ -11,7 +11,7 @@ import { useComponentStore } from "@/store/useComponenetStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface MatchRecord {
     match_id: string;
@@ -52,10 +52,20 @@ export default function VolunteerDashboardPage() {
         enabled: !!latestMatch?.learner_id && latestMatch?.status === "notified",
     });
 
+    // The header action button config has no disabled state and is registered once, so
+    // guard against concurrent triggers here - a match run is an expensive server scan.
+    const isTriggeringRef = useRef(false);
+
     const triggerMutation = useMutation({
         mutationFn: async () => {
             const response: any = await POST_API(endpoints.volunteer.matchTrigger);
             return response.data as MatchRecord;
+        },
+        onMutate: () => {
+            isTriggeringRef.current = true;
+        },
+        onSettled: () => {
+            isTriggeringRef.current = false;
         },
         onSuccess: (result) => {
             queryClient.invalidateQueries({ queryKey: ["volunteerMatchHistory"] });
@@ -69,6 +79,7 @@ export default function VolunteerDashboardPage() {
     });
 
     const handleFindMatch = () => {
+        if (isTriggeringRef.current) return;
         callbackToast({
             apiCall: triggerMutation.mutateAsync(),
             loadingMsg: "Finding your best learner match...",
