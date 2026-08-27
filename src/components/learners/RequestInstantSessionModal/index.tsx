@@ -5,14 +5,45 @@ import CenterModal from "@/components/common/Modals/CenterModal";
 import { showToast } from "@/components/common/Toast";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { Input } from "@/components/common/Input";
+import { useAppStore } from "@/store/useAppStore";
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Onboarding stores the timezone as "ABBR - Full Name (UTC±HH:MM)"; map the abbr to an
+// IANA zone so dayjs can do DST-correct math. Mirrors schedule/Modals/NewEventModal.
+const ABBR_TO_IANA: Record<string, string> = {
+    AKST: "America/Anchorage",
+    AKDT: "America/Anchorage",
+    AST: "America/Halifax",
+    ADT: "America/Halifax",
+    CST: "America/Chicago",
+    CDT: "America/Chicago",
+    CT: "America/Chicago",
+    EST: "America/New_York",
+    EDT: "America/New_York",
+    ET: "America/New_York",
+    HST: "Pacific/Honolulu",
+    HDT: "Pacific/Honolulu",
+    MST: "America/Denver",
+    MDT: "America/Denver",
+    MT: "America/Denver",
+    NST: "America/St_Johns",
+    NDT: "America/St_Johns",
+    PST: "America/Los_Angeles",
+    PDT: "America/Los_Angeles",
+    PT: "America/Los_Angeles",
+    IST: "Asia/Kolkata",
+};
 
 interface RequestInstantSessionModalProps {
     isOpen: boolean;
@@ -34,30 +65,44 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
 }) => {
     const [isLoading, setIsLoading] = useState(false);
 
+    // Everything date/time is reasoned about in the learner's *profile* timezone, not
+    // the browser's, so "today", the past-time guard and the picker all agree with what
+    // the backend later assumes when it converts availability_start_time to UTC.
+    const { learnerDetails } = useAppStore();
+    const learnerTz =
+        ABBR_TO_IANA[
+            ((learnerDetails?.learner_personal_info?.learner_contact_details?.timezone as string) ?? "")
+                .split(" - ")[0]
+                ?.trim() ?? ""
+        ] || "";
+    const nowInTz = learnerTz ? dayjs().tz(learnerTz) : dayjs();
+    const tzAbbr = learnerTz ? nowInTz.format("z") : "";
+    const todayStr = nowInTz.format("YYYY-MM-DD");
+    const tomorrowStr = nowInTz.add(1, "day").format("YYYY-MM-DD");
+
     // Form state
     const [sessionType, setSessionType] = useState<"academic" | "non_academic" | "">("");
     const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
     const [level, setLevel] = useState("");
-    // Default the date to today so the learner doesn't have to open the picker for the
-    // most common case; they can still switch to tomorrow.
-    const [date, setDate] = useState<string>(() => dayjs().format("YYYY-MM-DD"));
+    // Default the date to today (in the learner's timezone) so they don't have to open
+    // the picker for the common case; tomorrow is still selectable.
+    const [date, setDate] = useState<string>(todayStr);
     const [time, setTime] = useState<string>("");
     const [duration, setDuration] = useState<number>(30);
     const [sessionDetails, setSessionDetails] = useState<string>("");
 
-    const todayStr = dayjs().format("YYYY-MM-DD");
-    const tomorrowStr = dayjs().add(1, "day").format("YYYY-MM-DD");
-
-    // The time picker holds a full datetime anchored to the selected date, so MUI's
-    // built-in `disablePast` greys out only the genuinely past slots for "today" and
-    // leaves the whole clock open for "tomorrow".
-    const timeValue = time ? dayjs(`${date}T${time}`) : null;
+    // The picker carries a full datetime anchored to the selected date in the learner's
+    // timezone, so MUI's `disablePast` greys out only the genuinely past slots for
+    // "today" and leaves the whole clock open for "tomorrow".
+    const makeInTz = (isoish: string) =>
+        learnerTz ? dayjs.tz(isoish, learnerTz) : dayjs(isoish);
+    const timeValue = time ? makeInTz(`${date}T${time}`) : null;
 
     const resetForm = () => {
         setSessionType("");
         setSelectedSkills([]);
         setLevel("");
-        setDate(dayjs().format("YYYY-MM-DD"));
+        setDate(learnerTz ? dayjs().tz(learnerTz).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"));
         setTime("");
         setDuration(30);
         setSessionDetails("");
@@ -89,7 +134,9 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             showToast({ message: "Instant Sessions can only be requested for today or tomorrow", type: "error" });
             return;
         }
-        if (date === todayStr && dayjs(`${date} ${time}`, "YYYY-MM-DD HH:mm").isBefore(dayjs())) {
+        // isBefore compares absolute instants, so a fresh dayjs() is correct regardless
+        // of zone - and re-reading the clock here avoids a stale render-time value.
+        if (date === todayStr && makeInTz(`${date}T${time}`).isBefore(dayjs())) {
             showToast({ message: "Start time can't be in the past", type: "error" });
             return;
         }
@@ -246,14 +293,18 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                         />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-base font-medium text-[#121212]">Start Time</label>
+                        <label className="text-base font-medium text-[#121212]">
+                            Start Time{tzAbbr ? ` (${tzAbbr})` : ""}
+                        </label>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <MobileTimePicker
                                 format="h:mm A"
                                 minutesStep={5}
+                                timezone={learnerTz || undefined}
                                 value={timeValue}
-                                referenceDate={date === todayStr ? dayjs() : dayjs(`${date}T09:00`)}
+                                referenceDate={date === todayStr ? nowInTz : makeInTz(`${date}T09:00`)}
                                 disablePast={date === todayStr}
+                                minTime={date === todayStr ? nowInTz : undefined}
                                 onChange={(value) => setTime(value ? value.format("HH:mm") : "")}
                                 slotProps={{
                                     textField: {
