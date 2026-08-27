@@ -20,6 +20,8 @@ interface SessionCardProps {
         timezone: string;
         duration: string;
         date?: string;
+        meetLink?: string;
+        claimedByMe?: boolean;
         instructor: {
             name: string;
             profilePicture?: string;
@@ -107,8 +109,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                 <div className="flex items-center gap-2">
                     <div className="relative w-8 h-8 rounded-full overflow-hidden">
                         <Image
-                            src={session.instructor.profilePicture && session.instructor.profilePicture !== "/dummy-profile.webp" 
-                                ? session.instructor.profilePicture 
+                            src={session.instructor.profilePicture && session.instructor.profilePicture !== "/dummy-profile.webp"
+                                ? session.instructor.profilePicture
                                 : PersonImg}
                             alt={session.instructor.name}
                             fill
@@ -118,6 +120,20 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                     <span className="text-base font-medium text-[#121212]">{session.instructor.name}</span>
                 </div>
             </div>
+
+            {/* Join - shown directly on the learner's own claimed cards, below the time,
+                so they don't have to open the detail modal to join. */}
+            {session.status === "claimed" && session.claimedByMe && session.meetLink && (
+                <a
+                    href={session.meetLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                >
+                    Join
+                </a>
+            )}
         </div>
     );
 };

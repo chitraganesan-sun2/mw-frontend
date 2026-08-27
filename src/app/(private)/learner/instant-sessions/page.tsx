@@ -35,6 +35,10 @@ export interface Session {
     duration: string;
     date: string;
     startDateTime?: string;
+    /** Meet link - present on claimed sessions so the card can offer Join directly. */
+    meetLink?: string;
+    /** True when this learner is the one who claimed the session (backend `is_learner`). */
+    claimedByMe?: boolean;
     /** For claim API: volunteer_id, start_time and end_time in 24h (HH:mm) */
     volunteer_id?: string;
     start_time_24?: string;
@@ -92,6 +96,8 @@ function mapItemToSession(item: any, date: string): Session {
         duration,
         date,
         startDateTime,
+        meetLink: item.meet_link ?? item.session_event_details?.meet_link,
+        claimedByMe: item.is_learner === true,
         volunteer_id: item.volunteer_id,
         start_time_24: item.start_time ?? startTimeRaw,
         end_time_24: item.end_time ?? endTimeRaw,
