@@ -127,7 +127,7 @@ const OverviewContent = ({ userData }: { userData: any }) => {
             description: userData?.experience,
         },
         {
-            title: "Education",
+            title: "Grade / Education Level and Area of Specialization",
             description: userData?.education,
         },
     ];

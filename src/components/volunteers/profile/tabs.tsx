@@ -94,7 +94,7 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         },
         { label: "Teaching Traits, Preferences & Limitations", value: data?.volunteer_teaching_traits },
         { label: "Higher Education", value: data?.volunteer_higher_education },
-        { label: "Education Summary", value: data?.volunteer_education },
+        { label: "Grade / Education Level and Area of Specialization", value: data?.volunteer_education },
         { label: "Volunteered Experience", value: data?.volunteer_experience },
         { label: "Work Experience", value: data?.volunteer_work_experience },
         { label: "Favorite Free Time Activities", value: data?.volunteer_favorite_activities },

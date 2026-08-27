@@ -256,7 +256,7 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
         },
         {
             type: "description" as const,
-            title: "Education",
+            title: "Grade / Education Level and Area of Specialization",
             description: volunteerData?.volunteer_education,
         },
         {
