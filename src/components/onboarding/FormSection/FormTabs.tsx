@@ -306,6 +306,14 @@ const FormTabs = ({
     ];
 
     const handleNavigation = async (index: number, type: "next" | "tab") => {
+        // Tabs ahead of the furthest step actually reached haven't had their required fields
+        // validated yet - clicking straight to them (e.g. the final Submit tab) would silently
+        // skip that validation. Only tabs already visited (<= highestTab) are free to jump
+        // between for review; reaching a new tab still has to go through "Next".
+        if (type === "tab" && index > highestTab) {
+            return;
+        }
+
         if (role === "learner") learnerParentValidateKeys.forEach((key) => clearErrors(key));
 
         // Only validate when clicking Next button, not when switching tabs
@@ -468,7 +476,10 @@ const FormTabs = ({
                             key={section.title || index}
                             type="button"
                             onClick={() => handleNavigation(index, "tab")}
-                            className="lg:px-4 py-2 w-full text-sm font-medium"
+                            disabled={index > highestTab}
+                            className={`lg:px-4 py-2 w-full text-sm font-medium ${
+                                index > highestTab ? "cursor-not-allowed opacity-50" : ""
+                            }`}
                         >
                             <p className="hidden lg:block text-base">
                                 {section.title || `Step ${index + 1}`}

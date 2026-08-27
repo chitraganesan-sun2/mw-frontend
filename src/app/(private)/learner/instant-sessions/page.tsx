@@ -591,11 +591,6 @@ export default function InstantSessionsPage() {
                         handleCloseModal();
                     }}
                     onClaimLoadingChange={setIsActionLoading}
-                    showNote={
-                        claimedSessions.length > 0 &&
-                        availableSessions.length > 0 &&
-                        selectedSession.id === availableSessions[0]?.id
-                    }
                 />
             )}
 

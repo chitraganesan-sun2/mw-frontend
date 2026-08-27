@@ -42,7 +42,6 @@ interface InstantSessionDetailModalProps {
     onClaim?: () => void;
     /** Called with true when claim API starts, false when it ends (for full-screen loader) */
     onClaimLoadingChange?: (loading: boolean) => void;
-    showNote?: boolean;
 }
 
 const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
@@ -51,7 +50,6 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
     session,
     onClaim,
     onClaimLoadingChange,
-    showNote = false,
 }) => {
     const queryClient = useQueryClient();
     const learnerId = getCookie("learner_id");
@@ -128,7 +126,6 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
     // is_valid: true  -> isValidated: true  -> Can claim, don't show validation note
     // is_valid: false -> isValidated: false -> Cannot claim, show validation note
     // Only show note when validation fails (isValidated = false)
-    // showNote prop is ignored - note only shows based on validation result
     const displayNote = !isValidated;
     const isClaimDisabled = !isValidated || isCheckingValidation;
 

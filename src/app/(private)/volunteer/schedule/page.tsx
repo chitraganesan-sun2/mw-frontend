@@ -82,6 +82,9 @@ export default function SchedulePage() {
 
     const handleNewEventSubmit = () => {
         queryClient.invalidateQueries({ queryKey: ["volunteer-events", currentMonth] });
+        // This modal is also opened from the Instant Sessions page - keep that page's list
+        // in sync too, instead of leaving it stale until its own poll.
+        queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
         handleNavigate();
     };
 

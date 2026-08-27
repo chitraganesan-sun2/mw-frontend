@@ -332,6 +332,9 @@ export default function VolunteerInstantSessionsPage() {
                 onSubmit={() => {
                     setShowCreateForm(false);
                     refetchMySessions();
+                    // This modal is also opened from the Schedule page - keep that page's
+                    // calendar in sync too, instead of leaving it stale until its own poll.
+                    queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
                 }}
             />
 
