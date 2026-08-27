@@ -304,8 +304,9 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                 timezone={learnerTz || undefined}
                                 value={timeValue}
                                 referenceDate={date === todayStr ? nowInTz : makeInTz(`${date}T09:00`)}
+                                // disablePast is evaluated live against "now"; the submit
+                                // guard re-checks with a fresh clock. (No stale minTime prop.)
                                 disablePast={date === todayStr}
-                                minTime={date === todayStr ? nowInTz : undefined}
                                 onChange={(value) => setTime(value ? value.format("HH:mm") : "")}
                                 slotProps={{
                                     textField: {

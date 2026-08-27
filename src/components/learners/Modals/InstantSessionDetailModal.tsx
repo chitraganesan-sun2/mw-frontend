@@ -112,8 +112,11 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                     }
                 } catch (error) {
                     console.error("Validation check failed:", error);
-                    // On error, assume not valid to be safe
-                    setIsValidated(false);
+                    // Don't fail-closed on a transient error - let the learner attempt the
+                    // claim; the claim endpoint re-validates and will reject if it's truly
+                    // not allowed. Fail-closed here blocked ALL claims on any hiccup and
+                    // showed a misleading "you've already claimed one session" note.
+                    setIsValidated(true);
                 } finally {
                     setIsCheckingValidation(false);
                 }

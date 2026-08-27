@@ -96,7 +96,7 @@ function mapItemToSession(item: any, date: string): Session {
         duration,
         date,
         startDateTime,
-        meetLink: item.meet_link ?? item.session_event_details?.meet_link,
+        meetLink: item.meet_link,
         claimedByMe: item.is_learner === true,
         volunteer_id: item.volunteer_id,
         start_time_24: item.start_time ?? startTimeRaw,
@@ -357,21 +357,6 @@ export default function InstantSessionsPage() {
         setSelectedSession(null);
     };
 
-    // Open the detail modal for a ?session=<id> deep link once the lists have loaded.
-    // Consume the param either way so it doesn't re-fire when the learner closes the modal.
-    useEffect(() => {
-        if (!sessionParam || isLoading || isClaimedLoading) return;
-        const match =
-            availableSessions.find((s) => s.id === sessionParam) ??
-            claimedSessions.find((s) => s.id === sessionParam);
-        if (match) {
-            setSelectedSession(match);
-            setIsModalOpen(true);
-        }
-        setSessionParam(null);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sessionParam, isLoading, isClaimedLoading, availableSessions, claimedSessions]);
-
     /** Claimed volunteer-opened slots live in instant_session_collection, keyed by
      * volunteer_slot_id, and are un-joined via the unclaim endpoint. */
     const handleClaimedSessionClick = async (session: Session) => {
@@ -398,6 +383,25 @@ export default function InstantSessionsPage() {
             setIsDetailLoading(false);
         }
     };
+
+    // Handle a ?session=<id> deep link from the notification email once the lists load:
+    // open the claim modal if it's still available, or the claimed-detail view if this
+    // learner already has it. Consume the param either way so it doesn't re-fire on close.
+    useEffect(() => {
+        if (!sessionParam || isLoading || isClaimedLoading) return;
+        const available = availableSessions.find((s) => s.id === sessionParam);
+        const claimed = claimedSessions.find((s) => s.id === sessionParam);
+        if (available) {
+            setSelectedSession(available);
+            setIsModalOpen(true);
+        } else if (claimed?.claimedByMe) {
+            // Already claimed by this learner - show the claimed-detail view. If someone
+            // else claimed it, fall through: it just shows as "Claimed" in the list.
+            handleClaimedSessionClick(claimed);
+        }
+        setSessionParam(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionParam, isLoading, isClaimedLoading, availableSessions, claimedSessions]);
 
     /** Sessions created from an accepted learner request live in sessions_collection,
      * keyed by session_id, and are cancelled via the generic PUT /session/{id} endpoint. */
