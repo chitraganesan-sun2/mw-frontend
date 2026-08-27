@@ -48,12 +48,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     const todayStr = dayjs().format("YYYY-MM-DD");
     const tomorrowStr = dayjs().add(1, "day").format("YYYY-MM-DD");
 
-    // When the request is for today, don't let the picker offer a start time that's
-    // already passed. Only applies to today - tomorrow is always fully open.
-    const shouldDisableTime = (value: dayjs.Dayjs, view: string) => {
-        if (date !== todayStr) return false;
-        return value.isBefore(dayjs(), view === "minutes" ? "minute" : "hour");
-    };
+    // The time picker holds a full datetime anchored to the selected date, so MUI's
+    // built-in `disablePast` greys out only the genuinely past slots for "today" and
+    // leaves the whole clock open for "tomorrow".
+    const timeValue = time ? dayjs(`${date}T${time}`) : null;
 
     const resetForm = () => {
         setSessionType("");
@@ -253,9 +251,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                             <MobileTimePicker
                                 format="h:mm A"
                                 minutesStep={5}
-                                value={time ? dayjs(time, "HH:mm") : null}
+                                value={timeValue}
+                                referenceDate={date === todayStr ? dayjs() : dayjs(`${date}T09:00`)}
+                                disablePast={date === todayStr}
                                 onChange={(value) => setTime(value ? value.format("HH:mm") : "")}
-                                shouldDisableTime={shouldDisableTime}
                                 slotProps={{
                                     textField: {
                                         placeholder: "Select time",
