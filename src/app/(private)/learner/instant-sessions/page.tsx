@@ -170,6 +170,12 @@ function RequestedSessionCard({
             <p className="text-sm text-gray-600 mb-2">
                 Level: {request.grade_level || request.expertise_level || "N/A"}
             </p>
+            {request.volunteer_name && (
+                <p className="text-sm text-gray-600 mb-2">
+                    Volunteer:{" "}
+                    <span className="font-medium text-[#121212]">{request.volunteer_name}</span>
+                </p>
+            )}
             {Array.isArray(request.skills) && request.skills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-3">
                     {request.skills.map((skill: string) => (

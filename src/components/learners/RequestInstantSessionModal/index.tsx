@@ -4,10 +4,15 @@ import React, { useState } from "react";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { showToast } from "@/components/common/Toast";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { Input } from "@/components/common/Input";
+
+dayjs.extend(customParseFormat);
 
 interface RequestInstantSessionModalProps {
     isOpen: boolean;
@@ -40,6 +45,13 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
 
     const todayStr = dayjs().format("YYYY-MM-DD");
     const tomorrowStr = dayjs().add(1, "day").format("YYYY-MM-DD");
+
+    // When the request is for today, don't let the picker offer a start time that's
+    // already passed. Only applies to today - tomorrow is always fully open.
+    const shouldDisableTime = (value: dayjs.Dayjs, view: string) => {
+        if (date !== todayStr) return false;
+        return value.isBefore(dayjs(), view === "minutes" ? "minute" : "hour");
+    };
 
     const resetForm = () => {
         setSessionType("");
@@ -75,6 +87,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         }
         if (date !== todayStr && date !== tomorrowStr) {
             showToast({ message: "Instant Sessions can only be requested for today or tomorrow", type: "error" });
+            return;
+        }
+        if (date === todayStr && dayjs(`${date} ${time}`, "YYYY-MM-DD HH:mm").isBefore(dayjs())) {
+            showToast({ message: "Start time can't be in the past", type: "error" });
             return;
         }
 
@@ -231,12 +247,31 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                     </div>
                     <div className="flex flex-col gap-2">
                         <label className="text-base font-medium text-[#121212]">Start Time</label>
-                        <input
-                            type="time"
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                            className="w-full h-12 px-4 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212]"
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <MobileTimePicker
+                                format="h:mm A"
+                                minutesStep={5}
+                                value={time ? dayjs(time, "HH:mm") : null}
+                                onChange={(value) => setTime(value ? value.format("HH:mm") : "")}
+                                shouldDisableTime={shouldDisableTime}
+                                slotProps={{
+                                    textField: {
+                                        placeholder: "Select time",
+                                        fullWidth: true,
+                                        InputProps: {
+                                            sx: {
+                                                height: 48,
+                                                borderRadius: "0.75rem",
+                                                fontSize: "1rem",
+                                                "& fieldset": { borderColor: "#e5e7eb" },
+                                                "&:hover fieldset": { borderColor: "#9ca3af" },
+                                                "&.Mui-focused fieldset": { borderColor: "#000" },
+                                            },
+                                        },
+                                    },
+                                }}
+                            />
+                        </LocalizationProvider>
                     </div>
                 </div>
 
