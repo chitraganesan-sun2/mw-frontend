@@ -15,19 +15,18 @@ const SESSION_MATCH_OPTIONS = [
         value: "all_sessions",
         label: "All Sessions",
         description:
-            "Volunteers receive email notifications for all instant session requests posted by Learners, letting Volunteers review topics and choose whether to accept.",
+            "Get an email every time a learner requests an instant session, so you can look over the topic and decide whether to accept.",
     },
     {
         value: "skills_to_learn",
         label: "Sessions matched for exact skills / match by Sentiment Analysis",
         description:
-            "Volunteers receive email notifications when a Learner posts an Instant Session request that matches either the exact skills offered or the broader skill match identified through sentiment analysis.",
+            "Get an email only when a learner's request matches the skills you offer — exact matches plus closely related ones we detect automatically.",
     },
     {
         value: "none",
         label: "No Email Notifications",
-        description:
-            "Volunteers do not receive any notifications when Learners post instant session requests.",
+        description: "Don't email me when learners request instant sessions.",
     },
 ] as const;
 
