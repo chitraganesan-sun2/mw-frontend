@@ -69,14 +69,15 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     // the browser's, so "today", the past-time guard and the picker all agree with what
     // the backend later assumes when it converts availability_start_time to UTC.
     const { learnerDetails } = useAppStore();
-    const learnerTz =
-        ABBR_TO_IANA[
-            ((learnerDetails?.learner_personal_info?.learner_contact_details?.timezone as string) ?? "")
-                .split(" - ")[0]
-                ?.trim() ?? ""
-        ] || "";
+    // Onboarding stores "ABBR - Full Name (UTC±HH:MM)". Keep the abbr as-is for the label
+    // (it's exactly what the learner picked - "IST", "PST", ...) and map it to an IANA
+    // zone for DST-correct date math.
+    const tzAbbr =
+        ((learnerDetails?.learner_personal_info?.learner_contact_details?.timezone as string) ?? "")
+            .split(" - ")[0]
+            ?.trim() ?? "";
+    const learnerTz = ABBR_TO_IANA[tzAbbr] || "";
     const nowInTz = learnerTz ? dayjs().tz(learnerTz) : dayjs();
-    const tzAbbr = learnerTz ? nowInTz.format("z") : "";
     const todayStr = nowInTz.format("YYYY-MM-DD");
     const tomorrowStr = nowInTz.add(1, "day").format("YYYY-MM-DD");
 
