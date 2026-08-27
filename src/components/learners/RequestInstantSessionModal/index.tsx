@@ -38,7 +38,9 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     const [sessionType, setSessionType] = useState<"academic" | "non_academic" | "">("");
     const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
     const [level, setLevel] = useState("");
-    const [date, setDate] = useState<string>("");
+    // Default the date to today so the learner doesn't have to open the picker for the
+    // most common case; they can still switch to tomorrow.
+    const [date, setDate] = useState<string>(() => dayjs().format("YYYY-MM-DD"));
     const [time, setTime] = useState<string>("");
     const [duration, setDuration] = useState<number>(30);
     const [sessionDetails, setSessionDetails] = useState<string>("");
@@ -57,7 +59,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         setSessionType("");
         setSelectedSkills([]);
         setLevel("");
-        setDate("");
+        setDate(dayjs().format("YYYY-MM-DD"));
         setTime("");
         setDuration(30);
         setSessionDetails("");
