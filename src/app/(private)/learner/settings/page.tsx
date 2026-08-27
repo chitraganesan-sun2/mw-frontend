@@ -15,18 +15,19 @@ const SESSION_MATCH_OPTIONS = [
         value: "all_sessions",
         label: "All Sessions",
         description:
-            "Users receive email notifications for all available session matches, letting them quickly review topics and choose whether to join.",
+            "Learners receive email notifications for all posted instant sessions by Volunteers, letting Learners review topics and choose whether to join.",
     },
     {
         value: "skills_to_learn",
-        label: "Only Matches for My Skills to Learn",
+        label: "Sessions matched for exact skills / match by Sentiment Analysis",
         description:
-            "The user receives email notifications only when a session matches the skills or topics they have selected to learn from the tutor.",
+            "Learners receive email notifications when a Volunteer posts an Instant Session that matches either the exact skills requested or the broader skill match identified through sentiment analysis.",
     },
     {
         value: "none",
         label: "No Email Notifications",
-        description: "The user will not receive any emails when new sessions are matched.",
+        description:
+            "Learners do not receive any notifications when Volunteers create instant sessions.",
     },
 ] as const;
 
@@ -121,10 +122,10 @@ const Settings = () => {
                 <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
                         <p className="md:text-base text-[14px] font-medium">
-                            Session Match Email Notification Preferences
+                            Instant Session Email Notification Preferences
                         </p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
-                            Manage how you receive email notifications for session matches.
+                            Manage email notifications for instant sessions posted by volunteers.
                         </p>
                     </div>
                     <Select

@@ -242,6 +242,9 @@ export default function InstantSessionsPage() {
     const [query] = useQueryState("query");
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
+    // Deep link from the "new instant session" notification email:
+    // /learner/instant-sessions?session=<volunteer_slot_id> -> open that session's detail.
+    const [sessionParam, setSessionParam] = useQueryState("session");
 
     // Available Instant Sessions (volunteer-opened slots) for today and tomorrow, fetched in
     // parallel and merged - the endpoint only takes a single date, so this can't be one call.
@@ -347,6 +350,21 @@ export default function InstantSessionsPage() {
         setIsModalOpen(false);
         setSelectedSession(null);
     };
+
+    // Open the detail modal for a ?session=<id> deep link once the lists have loaded.
+    // Consume the param either way so it doesn't re-fire when the learner closes the modal.
+    useEffect(() => {
+        if (!sessionParam || isLoading || isClaimedLoading) return;
+        const match =
+            availableSessions.find((s) => s.id === sessionParam) ??
+            claimedSessions.find((s) => s.id === sessionParam);
+        if (match) {
+            setSelectedSession(match);
+            setIsModalOpen(true);
+        }
+        setSessionParam(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionParam, isLoading, isClaimedLoading, availableSessions, claimedSessions]);
 
     /** Claimed volunteer-opened slots live in instant_session_collection, keyed by
      * volunteer_slot_id, and are un-joined via the unclaim endpoint. */
