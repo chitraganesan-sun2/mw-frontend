@@ -311,19 +311,11 @@ export default function VolunteerInstantSessionsPage() {
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Instant Sessions</h1>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Start a live session for learners to join instantly
-                    </p>
-                </div>
-                <button
-                    onClick={() => setShowCreateForm(true)}
-                    className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
-                >
-                    + Start Instant Session
-                </button>
+            <div className="flex flex-col items-center text-center gap-2 mb-8">
+                <h1 className="text-2xl font-bold text-gray-900">Instant Sessions</h1>
+                <p className="text-sm text-gray-500 max-w-2xl">
+                    Start a live session for learners to join instantly
+                </p>
             </div>
 
             <NewEventModal
@@ -340,10 +332,14 @@ export default function VolunteerInstantSessionsPage() {
 
             {/* My Sessions */}
             <div className="mb-10">
-                <div className="flex items-center my-6">
-                    <div className="flex-1 border-t border-gray-200" />
-                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">My Sessions</span>
-                    <div className="flex-1 border-t border-gray-200" />
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">My Sessions</h2>
+                    <button
+                        onClick={() => setShowCreateForm(true)}
+                        className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+                    >
+                        + Start Instant Session
+                    </button>
                 </div>
 
                 <div className="flex justify-end mb-4">
@@ -415,13 +411,9 @@ export default function VolunteerInstantSessionsPage() {
 
             {/* Available Learner Requests */}
             <div>
-                <div className="flex items-center my-6">
-                    <div className="flex-1 border-t border-gray-200" />
-                    <span className="px-4 md:text-[20px] text-[16px] font-medium text-[#121212]">
-                        Available Learner Requests
-                    </span>
-                    <div className="flex-1 border-t border-gray-200" />
-                </div>
+                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
+                    Available Learner Requests
+                </h2>
                 {learnerRequests.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
