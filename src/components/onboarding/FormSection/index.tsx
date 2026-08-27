@@ -100,10 +100,11 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
             if (!learnerValidation.success) {
                 // Set errors for the fields that failed validation
                 Object.entries(learnerValidation.errors).forEach(([key, value]) => {
-                    setTimeout(() => {
-                    showToast({ type: "error", message: "Guardian info is required for learners under 13" });
-                }, 1500);
                     setError(key, { message: value });
+                });
+                showToast({
+                    type: "error",
+                    message: "Guardian info is required when a parent enrolls the learner.",
                 });
                 hasCustomValidationErrors = true;
             }

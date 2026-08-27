@@ -56,6 +56,10 @@ const FormTabs = ({
     const [activeTab, setActiveTab] = useState(0);
     const [highestTab, setHighestTab] = useState(0);
     const tabButtonsRef = useRef<HTMLDivElement>(null);
+    // handleUpdateStepAndData invalidates the onboardingData query on every "Next", so
+    // this effect re-runs after each step - reset() must fire only on the first load, or
+    // it wipes whatever the user just typed on the new step before the refetch lands.
+    const hasHydratedRef = useRef(false);
     const queryClient = useQueryClient();
     const userId = getCookie(isVolunteer ? "volunteer_id" : "learner_id") || "";
 
@@ -110,7 +114,9 @@ const FormTabs = ({
     });
 
     useEffect(() => {
+        if (hasHydratedRef.current) return;
         if (onboardingData?.data?.onboarded_status === "partially_filled") {
+            hasHydratedRef.current = true;
             setActiveTab(onboardingData?.data?.step);
             setHighestTab(onboardingData?.data?.step);
             console.log(onboardingData?.data, "ONBOARDING DAT ss");
