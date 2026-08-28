@@ -166,6 +166,7 @@ export type EndpointProps = {
     };
     tutorialLinks: {
         getAll: string;
+        getByCategory: (category: string) => string;
     };
     publicSessions: {
         getInstantSessions: (limit?: number) => string;

@@ -12,8 +12,10 @@ import SideModal from "@/components/common/Modals/MobileSideModal";
 import Sidebar from "@/components/common/Sidebar";
 import { useState } from "react";
 import { VIEW_DEMO_LINK, VIEW_DEMO_LINK_FOR_VOLUNTEER } from "@/definitions";
-import { useIsFetching } from "@tanstack/react-query";
+import { useIsFetching, useQuery } from "@tanstack/react-query";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
+import { GET_API } from "@/api/request";
+import { endpoints } from "@/api/constants";
 
 type Props = {};
 
@@ -46,19 +48,34 @@ const Header = (props: Props) => {
         router.push("/volunteer/schedule?modal=my_schedule");
     };
 
-    const handleViewDemo = () => {
-        if (typeof window !== "undefined") {
-            window.open(VIEW_DEMO_LINK, "_blank");
-            console.log(VIEW_DEMO_LINK);
+    // "View Demo" now opens the admin-managed Tutorial Link (category learner_demo /
+    // volunteer_demo - the same entry the approval emails use). The NEXT_PUBLIC_VIEW_DEMO_LINK*
+    // env var stays as a fallback for when the admin hasn't configured one yet.
+    const demoCategory = role === "volunteer" ? "volunteer_demo" : "learner_demo";
+    const envDemoFallback = role === "volunteer" ? VIEW_DEMO_LINK_FOR_VOLUNTEER : VIEW_DEMO_LINK;
+
+    const { data: adminDemoLink } = useQuery({
+        queryKey: ["tutorial-demo-link", demoCategory],
+        queryFn: async () => {
+            const res: any = await GET_API(endpoints.tutorialLinks.getByCategory(demoCategory));
+            const list = (Array.isArray(res?.data) ? res.data : [])
+                .slice()
+                .sort((a: any, b: any) => (b?.created_at || "").localeCompare(a?.created_at || ""));
+            return (list[0]?.url as string) || null;
+        },
+        enabled: role === "learner" || role === "volunteer",
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const openDemo = () => {
+        const url = adminDemoLink || envDemoFallback;
+        if (url && typeof window !== "undefined") {
+            window.open(url, "_blank");
         }
     };
 
-    const handleViewDemoforvolunteer = () => {
-        if (typeof window !== "undefined") {
-            window.open(VIEW_DEMO_LINK_FOR_VOLUNTEER, "_blank");
-            console.log(VIEW_DEMO_LINK_FOR_VOLUNTEER);
-        }
-    };
+    const handleViewDemo = openDemo;
+    const handleViewDemoforvolunteer = openDemo;
 
     return (
         <div className={`w-full h-full p-2 px-3 lg:min-h-[10vh] ${isScheduleLoading ? "opacity-50 pointer-events-none grayscale" : ""}`}>
