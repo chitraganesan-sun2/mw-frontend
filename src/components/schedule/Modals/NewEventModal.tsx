@@ -128,8 +128,14 @@ export default function NewEventModal({
         tags: [],
     });
 
-    const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
-    const [skillSelectValue, setSkillSelectValue] = useState<string | null>(null);
+    // Tags are split into Academic vs Non-Academic skills - the skills catalog already
+    // carries a `category` ("academic" | "non_academic"), so each picker just fetches its
+    // own slice. At least one selection across the two is required. tag_ids on the payload
+    // stays the union of skill_ids, so all downstream tag resolution is unchanged.
+    const [selectedAcademic, setSelectedAcademic] = useState<Skill[]>([]);
+    const [selectedNonAcademic, setSelectedNonAcademic] = useState<Skill[]>([]);
+    const [academicSelectValue, setAcademicSelectValue] = useState<string | null>(null);
+    const [nonAcademicSelectValue, setNonAcademicSelectValue] = useState<string | null>(null);
     const [isCreatingSkill, setIsCreatingSkill] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     // Temporary time state for mobile time picker dialog
@@ -204,8 +210,10 @@ export default function NewEventModal({
                 description: "",
                 tags: [],
             });
-            setSkillSelectValue(null);
-            setSelectedSkills([]);
+            setAcademicSelectValue(null);
+            setNonAcademicSelectValue(null);
+            setSelectedAcademic([]);
+            setSelectedNonAcademic([]);
             setTempTime(null);
             setOriginalTempTime(null);
             setSelectedMeridiem(null);
@@ -222,16 +230,28 @@ export default function NewEventModal({
     }, [formData.start_time, volunteerTimezone]);
 
     const queryClient = useQueryClient();
-    const { data: skillsData } = useQuery({
-        queryKey: ["common-skills"],
+    const { data: academicSkillsData } = useQuery({
+        queryKey: ["common-skills", "academic"],
         queryFn: async () => {
-            const res = await GET_API(endpoints.common("skills"));
+            const res = await GET_API(endpoints.common("skills?category=academic"));
             return res?.data as Skill[];
         },
         enabled: isOpen,
     });
-    const skills: Skill[] = Array.isArray(skillsData) ? skillsData : [];
-    const skillOptions = skills.map((s) => ({ label: s.skill_name, value: s.skill_id }));
+    const { data: nonAcademicSkillsData } = useQuery({
+        queryKey: ["common-skills", "non_academic"],
+        queryFn: async () => {
+            const res = await GET_API(endpoints.common("skills?category=non_academic"));
+            return res?.data as Skill[];
+        },
+        enabled: isOpen,
+    });
+    const academicSkills: Skill[] = Array.isArray(academicSkillsData) ? academicSkillsData : [];
+    const nonAcademicSkills: Skill[] = Array.isArray(nonAcademicSkillsData) ? nonAcademicSkillsData : [];
+    const toOptions = (list: Skill[], picked: Skill[]) =>
+        list
+            .filter((s) => !picked.some((p) => String(p.skill_id) === String(s.skill_id)))
+            .map((s) => ({ label: s.skill_name, value: s.skill_id }));
 
     const handleDateChange = (date: Date | null) => {
         setFormData((prev) => ({ ...prev, select_date: date }));
@@ -329,22 +349,44 @@ export default function NewEventModal({
         setFormData((prev) => ({ ...prev, description: value }));
     };
 
-    const handleAddSkill = (skillId: string) => {
-        const skill = skills.find((s) => s.skill_id === skillId);
-        if (skill && !selectedSkills.some((s) => s.skill_id === skillId)) {
-            setSelectedSkills((prev) => [...prev, skill]);
-            setSkillSelectValue(null);
+    type SkillCategory = "academic" | "non_academic";
+
+    const catState = (category: SkillCategory) =>
+        category === "academic"
+            ? {
+                  list: academicSkills,
+                  selected: selectedAcademic,
+                  setSelected: setSelectedAcademic,
+                  setSelectValue: setAcademicSelectValue,
+              }
+            : {
+                  list: nonAcademicSkills,
+                  selected: selectedNonAcademic,
+                  setSelected: setSelectedNonAcademic,
+                  setSelectValue: setNonAcademicSelectValue,
+              };
+
+    const handleAddSkill = (category: SkillCategory, skillId: string) => {
+        const { list, selected, setSelected, setSelectValue } = catState(category);
+        const skill = list.find((s) => String(s.skill_id) === String(skillId));
+        if (skill && !selected.some((s) => String(s.skill_id) === String(skillId))) {
+            setSelected((prev) => [...prev, skill]);
+            setSelectValue(null);
         }
     };
 
     /** Create a new skill via POST /api/v1/common/skills/ and return it for use in payload. */
-    const createSkill = async (skillName: string): Promise<Skill | null> => {
+    const createSkill = async (
+        skillName: string,
+        category: SkillCategory
+    ): Promise<Skill | null> => {
         const name = skillName?.trim();
         if (!name) return null;
         try {
-            const res = await POST_API<{ skill_name: string }>(endpoints.common("skills"), {
-                skill_name: name,
-            });
+            const res = await POST_API<{ skill_name: string; category: string }>(
+                endpoints.common("skills"),
+                { skill_name: name, category }
+            );
             if (res?.status === 201 || res?.status === 200) {
                 const data = res?.data as { skill_id?: string; skill_name?: string } | string;
                 const skillId = typeof data === "string" ? data : (data?.skill_id ?? "");
@@ -361,24 +403,26 @@ export default function NewEventModal({
         return null;
     };
 
-    const handleCreateSkill = async (skillName: string) => {
+    const handleCreateSkill = async (category: SkillCategory, skillName: string) => {
+        const { selected, setSelected, setSelectValue } = catState(category);
         setIsCreatingSkill(true);
         try {
-            const newSkill = await createSkill(skillName);
-            if (newSkill && !selectedSkills.some((s) => s.skill_id === newSkill.skill_id)) {
-                setSelectedSkills((prev) => [...prev, newSkill]);
-                setSkillSelectValue(null);
-                queryClient.invalidateQueries({ queryKey: ["common-skills"] });
+            const newSkill = await createSkill(skillName, category);
+            if (newSkill && !selected.some((s) => String(s.skill_id) === String(newSkill.skill_id))) {
+                setSelected((prev) => [...prev, newSkill]);
+                setSelectValue(null);
+                queryClient.invalidateQueries({ queryKey: ["common-skills", category] });
             }
         } finally {
             setIsCreatingSkill(false);
         }
     };
 
-    const handleRemoveSkill = (skillId: string) => {
-        setSelectedSkills((prev) => prev.filter((s) => s.skill_id !== skillId));
+    const handleRemoveSkill = (category: SkillCategory, skillId: string) => {
+        const { setSelected, setSelectValue } = catState(category);
+        setSelected((prev) => prev.filter((s) => String(s.skill_id) !== String(skillId)));
         // Clear the input field to ensure the removed tag can be selected again
-        setSkillSelectValue(null);
+        setSelectValue(null);
     };
 
     // Helper function to check if time slots overlap
@@ -406,8 +450,11 @@ export default function NewEventModal({
             showToast({ message: "Please fill in Duration, start time and title", type: "error" });
             return;
         }
-        if (selectedSkills.length === 0) {
-            showToast({ message: "Please add tags", type: "error" });
+        if (selectedAcademic.length === 0 && selectedNonAcademic.length === 0) {
+            showToast({
+                message: "Add at least one Academic or Non-Academic Skill",
+                type: "error",
+            });
             return;
         }
 
@@ -472,6 +519,7 @@ export default function NewEventModal({
                 .map((b) => b.toString(16).padStart(2, "0"))
                 .join("");
         }
+        const allSelected = [...selectedAcademic, ...selectedNonAcademic];
         const payload: InstantSessionPayload = {
             volunteer_slot_id,
             date: dateStr,
@@ -479,14 +527,16 @@ export default function NewEventModal({
             start_time: formData.start_time,
             title: formData.title.trim(),
             description: formData.description?.trim() ?? "",
-            tag_ids: selectedSkills.map((s) => s.skill_id),
+            // Union of both pickers - each skill_id already carries its own academic /
+            // non_academic category in the skills catalog, so downstream stays unchanged.
+            tag_ids: allSelected.map((s) => s.skill_id),
         };
         setIsSubmitting(true);
         try {
             const res = await POST_API(endpoints.session.createInstantSession, payload);
             if (res?.status === 200 || res?.status === 201) {
                 showToast({ message: "Event created successfully", type: "success" });
-                onSubmit?.({ ...formData, tags: selectedSkills.map((s) => s.skill_name) });
+                onSubmit?.({ ...formData, tags: allSelected.map((s) => s.skill_name) });
                 setFormData({
                     select_date: getTodayDateObject(),
                     duration: "",
@@ -495,8 +545,10 @@ export default function NewEventModal({
                     description: "",
                     tags: [],
                 });
-                setSelectedSkills([]);
-                setSkillSelectValue(null);
+                setSelectedAcademic([]);
+                setSelectedNonAcademic([]);
+                setAcademicSelectValue(null);
+                setNonAcademicSelectValue(null);
                 setTempTime(null);
                 setOriginalTempTime(null);
                 onClose();
@@ -519,8 +571,10 @@ export default function NewEventModal({
             description: "",
             tags: [],
         });
-        setSelectedSkills([]);
-        setSkillSelectValue(null);
+        setSelectedAcademic([]);
+        setSelectedNonAcademic([]);
+        setAcademicSelectValue(null);
+        setNonAcademicSelectValue(null);
         setTempTime(null);
         setOriginalTempTime(null);
         setSelectedMeridiem(null);
@@ -749,45 +803,77 @@ export default function NewEventModal({
                         />
                     </div>
 
-                    {/* Tags – search and select from skills, pass skill IDs as tag_ids on post */}
+                    {/* Academic Skills – tags from the academic skills catalog */}
                     <div className="flex flex-col md:gap-2">
                         <label className="md:text-base text-[14px] font-medium text-[#121212]">
-                            Tags
+                            Academic Skills
                         </label>
                         <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
-                            {selectedSkills.map((skill) => (
+                            {selectedAcademic.map((skill) => (
                                 <TagComponent
                                     key={skill.skill_id}
                                     text={skill.skill_name}
                                     isClose={true}
-                                    onClose={() => handleRemoveSkill(skill.skill_id)}
+                                    onClose={() => handleRemoveSkill("academic", skill.skill_id)}
                                 />
                             ))}
                         </div>
                         <Input
-                            key={`skill-select-${selectedSkills.length}`}
-                            name="skill_select"
+                            key={`academic-select-${selectedAcademic.length}`}
+                            name="academic_skill_select"
                             inputType="select-creatable"
                             variant="single"
-                            placeholder="Search and select skills or create a new tag"
-                            value={skillSelectValue ? [skillSelectValue] : []}
+                            placeholder="Search and select academic skills or create a new tag"
+                            value={academicSelectValue ? [academicSelectValue] : []}
                             onChange={(value: string | number) => {
                                 if (value != null && value !== "") {
-                                    handleAddSkill(String(value));
+                                    handleAddSkill("academic", String(value));
                                 }
                             }}
-                            onCreate={handleCreateSkill}
+                            onCreate={(name: string) => handleCreateSkill("academic", name)}
                             allowCreate={true}
                             endpoint="skills"
                             isLoading={isCreatingSkill}
-                            options={skillOptions.filter(
-                                (opt) =>
-                                    !selectedSkills.some(
-                                        (s) =>
-                                            s.skill_id === opt.value ||
-                                            String(s.skill_id) === String(opt.value)
-                                    )
-                            )}
+                            options={toOptions(academicSkills, selectedAcademic)}
+                            inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
+                        />
+                    </div>
+
+                    {/* Non-Academic Skills – tags from the non-academic skills catalog */}
+                    <div className="flex flex-col md:gap-2">
+                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
+                            Non-Academic Skills
+                        </label>
+                        <p className="text-xs text-gray-500 mb-1 md:-mt-1">
+                            Add at least one Academic or Non-Academic Skill.
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
+                            {selectedNonAcademic.map((skill) => (
+                                <TagComponent
+                                    key={skill.skill_id}
+                                    text={skill.skill_name}
+                                    isClose={true}
+                                    onClose={() => handleRemoveSkill("non_academic", skill.skill_id)}
+                                />
+                            ))}
+                        </div>
+                        <Input
+                            key={`non-academic-select-${selectedNonAcademic.length}`}
+                            name="non_academic_skill_select"
+                            inputType="select-creatable"
+                            variant="single"
+                            placeholder="Search and select non-academic skills or create a new tag"
+                            value={nonAcademicSelectValue ? [nonAcademicSelectValue] : []}
+                            onChange={(value: string | number) => {
+                                if (value != null && value !== "") {
+                                    handleAddSkill("non_academic", String(value));
+                                }
+                            }}
+                            onCreate={(name: string) => handleCreateSkill("non_academic", name)}
+                            allowCreate={true}
+                            endpoint="skills"
+                            isLoading={isCreatingSkill}
+                            options={toOptions(nonAcademicSkills, selectedNonAcademic)}
                             inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
                         />
                     </div>
