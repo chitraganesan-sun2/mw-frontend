@@ -428,6 +428,10 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
         queryKey: ["volunteer", volunteerId],
         queryFn: getIndividualVolunteer,
         enabled: !!volunteerId,
+        // Profile Details must reflect edits the volunteer has since made - don't serve a
+        // stale cached copy when the learner reopens the modal.
+        staleTime: 0,
+        refetchOnMount: "always",
     });
 
     const { data: volunteerFeedback } = useQuery({

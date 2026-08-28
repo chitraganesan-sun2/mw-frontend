@@ -17,12 +17,11 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
     location,
     name,
     profileImage,
-    studentConnected,
     subjects,
-    volunteerHrs,
     totalReviews,
     overallRating,
     chatPermission,
+    hasTimeSlots,
     skillsToLearn,
 }) => {
     const router = useRouter();
@@ -96,35 +95,33 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex flex-wrap gap-2.5">
-                <CardChips label="Volunteer Hrs" value={volunteerHrs || "0"} />
-            </div>
-            <div className="flex max-lg:flex-col gap-2.5">
-                <CardChips label="Student connected" value={studentConnected} />
-                <CardChips label="Subject" value={subjects?.join(", ")} />
-            </div>
-            {Array.isArray(languages) && languages?.length > 0 && (
-                <div>
-                    <CardChips label="Language" value={languages.join(", ")} />
-                </div>
-            )}
-            {skillsToLearn && skillsToLearn.length > 0 && (
-                <div>
-                    <CardChips 
-                        label="Skills to Learn" 
-                        value={skillsToLearn.map(skill => skill.skill_name).join(", ")} 
+            <div className="flex flex-col gap-2.5">
+                {Array.isArray(languages) && languages.length > 0 && (
+                    <CardChips label="Languages" value={languages.join(", ")} />
+                )}
+                {Array.isArray(subjects) && subjects.length > 0 && (
+                    <CardChips label="Academic Skills" value={subjects.join(", ")} />
+                )}
+                {skillsToLearn && skillsToLearn.length > 0 && (
+                    <CardChips
+                        label="Non-Academic Skills"
+                        value={skillsToLearn.map((skill) => skill.skill_name).join(", ")}
                     />
-                </div>
-            )}
+                )}
+            </div>
             <Divider />
+            {/* "Schedule a meeting" only when the volunteer has recurring availability slots
+                (hasTimeSlots). An explicit false hides it; undefined callers keep both buttons. */}
             <div className="flex items-center gap-2">
-                <div className="flex-1">
-                    <Button
-                        onClick={handleScheduleMeeting}
-                        title="Schedule a meeting"
-                        className="!rounded-xl !text-sm !w-full !text-black !bg-primary !border-primary !border"
-                    />
-                </div>
+                {hasTimeSlots !== false && (
+                    <div className="flex-1">
+                        <Button
+                            onClick={handleScheduleMeeting}
+                            title="Schedule a meeting"
+                            className="!rounded-xl !text-sm !w-full !text-black !bg-primary !border-primary !border"
+                        />
+                    </div>
+                )}
                 <div className="flex-1">
                     <Button
                         disabled={!chatPermission}

@@ -11,6 +11,9 @@ interface VolunteerCardProps {
     totalReviews: string;
     overallRating: string;
     chatPermission?: boolean;
+    /** From the list API's has_time_slots. Only an explicit `false` hides the
+     * "Schedule a meeting" button; `undefined` (callers that don't pass it) keeps it. */
+    hasTimeSlots?: boolean;
     skillsToLearn?: Array<{
         skill_name: string;
         skill_id: string;

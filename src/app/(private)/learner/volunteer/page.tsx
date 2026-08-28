@@ -30,6 +30,8 @@ interface VolunteerCardData {
     languages: string[];
     totalReviews: string;
     overallRating: string;
+    chatPermission?: boolean;
+    hasTimeSlots?: boolean;
     skillsToLearn?: Array<{
         skill_name: string;
         skill_id: string;
@@ -121,6 +123,7 @@ export default function LearnersPage() {
                 totalReviews: volunteer?.total_reviews,
                 overallRating: volunteer?.overall_rating,
                 chatPermission: volunteer?.chat_permission,
+                hasTimeSlots: volunteer?.has_time_slots,
                 skillsToLearn: volunteer?.volunteer_skills,
             }));
             setVolunteerCardData(formattedData);
