@@ -280,6 +280,23 @@ export default function NewEventModal({
         enabled: !!formData.select_date,
     });
 
+    // The volunteer's own still-open instant sessions - so we can pre-warn on an overlap
+    // instead of only finding out from the server's generic error after submit.
+    const { data: myOpenSessionsData } = useQuery({
+        queryKey: ["my-open-instant-sessions-overlap"],
+        queryFn: async () => {
+            try {
+                const res = await GET_API(
+                    endpoints.session.getMyInstantSessions(1, 100, undefined, "open")
+                );
+                return (res?.data?.items ?? []) as any[];
+            } catch {
+                return [];
+            }
+        },
+        enabled: isOpen,
+    });
+
     const handleTimeChange = (time: dayjs.Dayjs | null) => {
         if (time) {
             setFormData((prev) => ({ ...prev, start_time: time.format("HH:mm") }));
@@ -508,6 +525,31 @@ export default function NewEventModal({
                     type: "error",
                 });
                 return;
+            }
+        }
+
+        // Pre-warn against the volunteer's own already-open instant sessions (the server
+        // rejects this too, but only with a generic message after submit).
+        {
+            const myOpen = Array.isArray(myOpenSessionsData) ? myOpenSessionsData : [];
+            if (myOpen.length > 0) {
+                const durationMinutes = Number(formData.duration) || 0;
+                const s = formData.start_time;
+                const e = calculateEndTime(s, durationMinutes);
+                const overlapsOpen = myOpen.some(
+                    (os) =>
+                        os?.volunteer_start_date === dateStr &&
+                        os?.volunteer_start_time &&
+                        os?.volunteer_end_time &&
+                        areSlotsOverlapping(s, e, os.volunteer_start_time, os.volunteer_end_time)
+                );
+                if (overlapsOpen) {
+                    showToast({
+                        message: "You've already opened an instant session that overlaps this time",
+                        type: "error",
+                    });
+                    return;
+                }
             }
         }
         let volunteer_slot_id = volunteerSlotIdProp;
