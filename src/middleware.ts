@@ -52,6 +52,12 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Local dev helper page — only reachable when explicitly enabled
+  // (NEXT_PUBLIC_ENABLE_DEV_LOGIN=true in .env.local). Never on in a real build.
+  if (pathname === "/dev-login" && process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "true") {
+    return NextResponse.next();
+  }
+
   const { cookies } = req;
   const isUserCookiesFound = isCookiesFound(cookies);
   const isUserTokenValid = isTokenValid(cookies);
