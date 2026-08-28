@@ -15,18 +15,19 @@ const SESSION_MATCH_OPTIONS = [
         value: "all_sessions",
         label: "All Sessions",
         description:
-            "Get an email every time a learner requests an instant session, so you can look over the topic and decide whether to accept.",
+            "Receive email notifications for all instant sessions posted by learners, so you can review the topics and choose whether to teach.",
     },
     {
         value: "skills_to_learn",
         label: "Sessions matched for exact skills / match by Sentiment Analysis",
         description:
-            "Get an email only when a learner's request matches the skills you offer — exact matches plus closely related ones we detect automatically.",
+            "Receive email notifications when a learner posts an instant session that matches either the exact skills posted or the broader skill match identified through sentiment analysis.",
     },
     {
         value: "none",
         label: "No Email Notifications",
-        description: "Don't email me when learners request instant sessions.",
+        description:
+            "Don't receive any email notifications when learners request instant sessions.",
     },
 ] as const;
 
@@ -103,10 +104,10 @@ const Settings = () => {
                 <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
                         <p className="md:text-base text-[14px] font-medium">
-                            Allow messages from volunteers to reach you.
+                            Allow messages from learners to reach you.
                         </p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
-                            By enabling this, you agree to receive communication from volunteers.
+                            By enabling this, you agree to receive communication from learners.
                         </p>
                     </div>
                     <Switch
