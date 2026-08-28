@@ -77,17 +77,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
 
     useEffect(() => {
         if (data) {
-            const transformedData = data?.items || [];
-            setNotificationsData(transformedData);
-
-            // Debug: Log all sessions and their is_read status
-            data?.items?.forEach((item: any, index: number) => {
-                console.log(`Item ${index} (${item.date}):`, item.sessions?.map((session: any) => ({
-                    session_id: session.session_id,
-                    is_read: session.is_read
-                })));
-            });
-
+            setNotificationsData(data?.items || []);
             handleUpdateReadsNotifications();
         }
     }, [data]);

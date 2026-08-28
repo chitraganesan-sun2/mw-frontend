@@ -15,6 +15,7 @@ const HeaderNotificationBell = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const prevCount = useRef<number>(0);
+    const hasInitialized = useRef(false);
 
     const isLearner = role === "learner";
     const currentUserId = isLearner ? learnerId : volunteerId;
@@ -33,14 +34,22 @@ const HeaderNotificationBell = () => {
 
     const unreadCount = Number(data?.unread_count || 0);
 
-    // Show popup when count increases
+    // Toast on any genuine increase - but not on the first load, and not repeatedly while
+    // the count merely stays elevated (the old `!== 0` guard also swallowed the first
+    // increase after the badge had been cleared to 0).
     useEffect(() => {
-        if (unreadCount > prevCount.current && prevCount.current !== 0) {
+        if (!hasInitialized.current) {
+            hasInitialized.current = true;
+            prevCount.current = unreadCount;
+            return;
+        }
+        const increased = unreadCount > prevCount.current;
+        prevCount.current = unreadCount;
+        if (increased) {
             setShowToast(true);
             const timer = setTimeout(() => setShowToast(false), 5000);
             return () => clearTimeout(timer);
         }
-        prevCount.current = unreadCount;
     }, [unreadCount]);
 
     // Show the bell for all authenticated users (volunteer + learner)
