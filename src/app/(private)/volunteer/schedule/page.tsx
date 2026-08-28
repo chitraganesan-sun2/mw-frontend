@@ -54,7 +54,6 @@ export default function SchedulePage() {
             endpoints.volunteer.getIndividualVolunteer(volunteerId as string)
         );
         if (res?.status === 200) {
-            console.log("res?.data?.utc_offset", res?.data?.volunteer_contact_details?.utc_offset);
             setVolunteerUtcOffset(res?.data?.volunteer_contact_details?.utc_offset);
             setVolunteerTimeZone(res?.data?.volunteer_contact_details?.timezone);
             return res?.data;
@@ -105,7 +104,6 @@ export default function SchedulePage() {
             queryClient.invalidateQueries({ queryKey: ["volunteer-events", currentMonth] });
         },
         error: (err) => {
-            console.log("Error: ", err);
         },
     });
 

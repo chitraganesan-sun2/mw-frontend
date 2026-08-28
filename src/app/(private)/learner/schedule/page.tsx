@@ -50,7 +50,6 @@ export default function LearnerSchedulePage() {
     const getLearnerDetails = async () => {
         const res = await GET_API(endpoints.learner.getIndividualLearner(learnerId as string));
         if (res?.status === 200) {
-            console.log("res?.data?.learner_contact_details?.utc_offset", res?.data?.learner_personal_info?.learner_contact_details?.utc_offset);
             setLearnerUtcOffset(res?.data?.learner_personal_info?.learner_contact_details?.utc_offset);
             setLearnerTimeZone(res?.data?.learner_personal_info?.learner_contact_details?.timezone);
             return res?.data;
@@ -84,7 +83,6 @@ export default function LearnerSchedulePage() {
             queryClient.invalidateQueries({ queryKey: ["learner-events", currentMonth] });
         },
         error: (err) => {
-            console.log("Error: ", err);
         },
     });
 

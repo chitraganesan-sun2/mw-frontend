@@ -315,7 +315,6 @@ export default function AddNewMeetingModalVolunteer({
             });
         },
         error: (err) => {
-            console.log("Error: ", err);
         },
     });
 

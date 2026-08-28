@@ -44,7 +44,6 @@ export const initPushNotifications = async (): Promise<string | null> => {
 
         PushNotifications.addListener('registration', (token) => {
           clearTimeout(timeout);
-          console.log('[Push] Registration token:', token.value);
           resolve(token.value);
         });
 
@@ -73,7 +72,6 @@ export const registerPushListeners = (
 
   // Notification received while app is in foreground
   PushNotifications.addListener('pushNotificationReceived', (notification) => {
-    console.log('[Push] Notification received:', notification);
     onNotificationReceived?.(notification);
 
     // Show as local notification since push won't show in foreground
@@ -91,7 +89,6 @@ export const registerPushListeners = (
 
   // Notification tapped (app opened from notification)
   PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
-    console.log('[Push] Notification tapped:', action);
     onNotificationTapped?.(action.notification);
   });
 };

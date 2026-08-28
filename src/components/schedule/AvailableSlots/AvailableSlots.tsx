@@ -23,7 +23,6 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
     volunteerTimezone,
 }) => {
     const [isSlotsAvailable, setIsSlotsAvailable] = useState(false);
-    console.log("availableSlots", availableSlots);
 
 
     const role = getCookie("role");

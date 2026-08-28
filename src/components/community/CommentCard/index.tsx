@@ -30,7 +30,6 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
             }
             queryClient.invalidateQueries({ queryKey: ["get-post-comments"] });
         } catch (err) {
-            console.log(err, "ERROR FOR LIKE");
             // Revert on error
             setIsLiked(!newLikeStatus);
             setLikesCount((prev) => (!newLikeStatus ? prev + 1 : prev - 1));
@@ -48,7 +47,6 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
     };
 
     const handleReply = (comment: any) => {
-        console.log(comment, "COMMENT DATA");
         const replyId = reply ? comment.parent_comment_id : comment.comment_id;
         onReply(comment.author.name, replyId);
     };

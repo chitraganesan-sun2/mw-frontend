@@ -30,7 +30,6 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
 
     const handleChatClick = async () => {
         GET_API(endpoints.chat.createChatForLearner(learnerId)).then((res: any) => {
-            console.log(res, "chat response");
             router.push(`/volunteer/messages?chatId=${res.data.chat_id}&learnerId=${learnerId}`);
         });
     };

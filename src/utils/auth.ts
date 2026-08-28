@@ -9,6 +9,16 @@ import { isNativePlatform } from '@/utils/platform';
 // truth for auth state on native and keep cookies in sync for the axios header.
 const AUTH_STORAGE_KEY = "mw_auth_backup";
 
+// sameSite:"lax" (not strict) so the cookie still rides the top-level
+// navigation back from the Google OAuth redirect; secure only in production so
+// http://localhost dev still works.
+const COOKIE_OPTS: Cookies.CookieAttributes = {
+    expires: 1,
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+};
+
 const persistToStorage = (data: Record<string, string>) => {
     if (typeof window !== "undefined") {
         try {
@@ -40,7 +50,7 @@ const readAuthValue = (key: string): string | undefined => {
         const val = stored?.[key];
         if (val) {
             // Re-sync cookie for axios (fire-and-forget, don't depend on it being readable immediately)
-            Cookies.set(key, val, { expires: 1, path: "/" });
+            Cookies.set(key, val, COOKIE_OPTS);
             return val;
         }
     }
@@ -98,7 +108,7 @@ export const getCookie = (key: string) => {
 export const setCookie = (cookieData: Object) => {
     const entries = Object.entries(cookieData);
     entries.forEach(([key, value]) => {
-        if (value) Cookies.set(key, value, { expires: 1, path: "/" })
+        if (value) Cookies.set(key, value, COOKIE_OPTS)
     });
 
     // Persist to localStorage for native WebView resilience (source of truth on native)
@@ -117,11 +127,14 @@ export const removeCookie = (key: string) => {
 
 export const clearCookies = () => {
     const cookies = ["token", "role", "onboarded_status", "learner_id", "volunteer_id", "cookieConsent", "lastActivity"];
-    cookies.map(cookie => removeCookie(cookie));
+    cookies.forEach(removeCookie);
 
     if (typeof window !== "undefined") {
-        localStorage.removeItem(AUTH_STORAGE_KEY);
-        localStorage.clear();
-        sessionStorage.clear();
+        // Clear only MelodyWings-owned storage keys, not the whole origin
+        // (which also nukes analytics/consent state and any third-party keys).
+        ["mw_auth_backup", "melody-wings-store"].forEach((k) => {
+            try { localStorage.removeItem(k); } catch { }
+        });
+        try { sessionStorage.removeItem("join-us-store"); } catch { }
     }
 }

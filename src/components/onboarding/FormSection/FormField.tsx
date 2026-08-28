@@ -78,11 +78,9 @@ export const FormField = ({
                 }
             }
 
-            console.log("selectedOption in handleChange", selectedOption);
             if (selectedOption?.label) {
                 // Extract the timezone offset
                 const offset = extractTimezoneOffset(selectedOption.label);
-                console.log("offset in handleChange", offset, "PARENT", parent);
 
                 // Store the offset in volunteer_contact_details
                 if (offset && parent === "volunteer_contact_details") {

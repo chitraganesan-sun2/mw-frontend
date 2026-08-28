@@ -145,14 +145,12 @@ export default function LearnersPage() {
 
     const handleMessageLearner = (learnerId: string) => {
         GET_API(endpoints.chat.createChatForLearner(learnerId)).then((res: any) => {
-            console.log(res, "chat response");
             router.push(`/volunteer/messages?chatId=${res.data.chat_id}&learnerId=${learnerId}`);
         });
         // setMode("message");
     };
 
     const handleUploadTestimonial = (learnerId: string) => {
-        console.log("Upload testimonial:", learnerId);
         setLearnerId(learnerId);
         setMode("testimonial");
     };

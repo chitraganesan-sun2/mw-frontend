@@ -138,7 +138,6 @@ const Messages = () => {
             // Do not redirect here; desktop auto-open is handled in useEffect (mobile stays on list)
             return res.data;
         } catch (err: any) {
-            console.log(err);
             setNoChats(true);
             return [];
         } finally {
@@ -230,7 +229,6 @@ const Messages = () => {
             if (isFirstLoadForThisChat) setIsIndividualLoading(false);
             return response.data;
         } catch (error) {
-            console.log(error);
             if (isFirstLoadForThisChat) setIsIndividualLoading(false);
         }
     };

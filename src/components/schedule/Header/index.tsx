@@ -12,6 +12,7 @@ import SideModal from "@/components/common/Modals/MobileSideModal";
 import Sidebar from "@/components/common/Sidebar";
 import { useState } from "react";
 import { VIEW_DEMO_LINK, VIEW_DEMO_LINK_FOR_VOLUNTEER } from "@/definitions";
+import { safeHref } from "@/utils/safeHref";
 import { useIsFetching, useQuery } from "@tanstack/react-query";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 import { GET_API } from "@/api/request";
@@ -68,9 +69,9 @@ const Header = (props: Props) => {
     });
 
     const openDemo = () => {
-        const url = adminDemoLink || envDemoFallback;
+        const url = safeHref(adminDemoLink || envDemoFallback);
         if (url && typeof window !== "undefined") {
-            window.open(url, "_blank");
+            window.open(url, "_blank", "noopener,noreferrer");
         }
     };
 
@@ -124,7 +125,6 @@ const Header = (props: Props) => {
                 <div className="max-lg:hidden flex items-center gap-4">
                     <MonthYearSlider
                         onChange={(date) => {
-                            console.log(date, "date from month year slider");
                         }}
                     />
                 </div>

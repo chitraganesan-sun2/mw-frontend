@@ -158,7 +158,6 @@ export default function LearnersPage() {
                 skillsToLearn: learner?.skills,
             }));
             setLearnerCardData(formattedData);
-            console.log(formattedData, "formattedData");
         }
     }, [data]);
 

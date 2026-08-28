@@ -153,13 +153,11 @@ export default function VolunteerPage() {
 
     const handleMessageVolunteer = (volunteedId: string) => {
         GET_API(endpoints.chat.createChatForVolunteer(volunteedId)).then((res: any) => {
-            console.log(res, "chat response");
             router.push(`/learner/messages?chatId=${res.data.chat_id}&volunteedId=${volunteedId}`);
         });
     };
 
     const handleUploadTestimonial = (volunteedId: string) => {
-        console.log("Upload testimonial:", volunteedId);
         setVolunteerId(volunteedId);
         setMode("testimonial");
     };

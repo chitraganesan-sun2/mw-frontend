@@ -60,7 +60,6 @@ const Settings = () => {
         PUT_API(endpoints.chat.volunteerPermission(volunteerId as string), {
             chat_permission: value,
         }).then((res) => {
-            console.log(res, "PERMISSION VOLUNTEER");
         });
     };
 

@@ -119,27 +119,9 @@ const FormTabs = ({
             hasHydratedRef.current = true;
             setActiveTab(onboardingData?.data?.step);
             setHighestTab(onboardingData?.data?.step);
-            console.log(onboardingData?.data, "ONBOARDING DAT ss");
 
             // Filter out null values before resetting the form
             const filteredData = filterNullValues(onboardingData?.data);
-            console.log(filteredData, "FILTERED DATA I");
-
-            // Debug email field
-            if (role === "learner") {
-                console.log(
-                    "Original email from onboarding:",
-                    onboardingData?.data?.learner_personal_info?.learner_contact_details?.email
-                );
-                console.log(
-                    "Filtered email:",
-                    filteredData?.learner_personal_info?.learner_contact_details?.email
-                );
-                console.log(
-                    "Current form email before reset:",
-                    getValues()?.learner_personal_info?.learner_contact_details?.email
-                );
-            }
 
             if (filteredData) {
                 reset(filteredData);
@@ -154,7 +136,6 @@ const FormTabs = ({
                             "learner_personal_info.learner_contact_details.email",
                             onboardingEmail
                         );
-                        console.log("Email set after reset:", onboardingEmail);
                     }
                 }
             }
@@ -383,11 +364,9 @@ const FormTabs = ({
                 endpoints.onboarding.update(role as "volunteer" | "learner"),
                 { ...data, step: index }
             );
-            console.log(res, "RES DATA");
             queryClient.invalidateQueries({ queryKey: ["onboardingData"] });
             Cookies.set("onboarded_status", "partially_filled");
         } catch (err) {
-            console.log(err, "ERR DATA");
         } finally {
             setIsStepUpdatePending(false);
         }

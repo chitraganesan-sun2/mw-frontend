@@ -29,10 +29,8 @@ export const initAppLifecycle = (router: { back: () => void }): (() => void) => 
   // App state change (foreground/background)
   const stateListener = App.addListener('appStateChange', ({ isActive }) => {
     if (isActive) {
-      console.log('[App] Resumed to foreground');
       // Could refresh data here
     } else {
-      console.log('[App] Moved to background');
     }
   });
   cleanupFns.push(() => stateListener.then((l) => l.remove()));

@@ -19,7 +19,6 @@ export const getMyResources = async (params?: any) => {
         const { data } = await GET_API(`${endpoint}?${new URLSearchParams({ ...params })}`);
         return data || {};
     }catch(error){
-        console.log(error);
         return {};
     }
 }

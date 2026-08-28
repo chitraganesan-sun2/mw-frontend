@@ -47,7 +47,6 @@ interface Props {
 
 const MAX_LINKS = 5;
 const CuratedInputComponent: React.FC<Props> = ({ value, onChange, error }) => {
-    console.log("error", error);
     const [links, setLinks] = useState<CuratedLink[]>(value.length ? value : []);
 
     useEffect(() => {

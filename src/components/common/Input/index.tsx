@@ -380,7 +380,6 @@ export const Input: React.FC<InputProps> = (props) => {
                     // Pass the raw date object to the parent component
                     const formattedDate = dayjs(date).format("DD-MM-YYYY");
                     onChange(formattedDate);
-                    console.log("formatted as:", formattedDate);
                 };
 
                 return (

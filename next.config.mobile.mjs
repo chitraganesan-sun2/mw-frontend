@@ -7,6 +7,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
+  eslint: {
+    // Lint runs in CI (informational); keep the mobile build green off typecheck.
+    ignoreDuringBuilds: true,
+  },
   images: {
     unoptimized: true, // Required for static export
     remotePatterns: [

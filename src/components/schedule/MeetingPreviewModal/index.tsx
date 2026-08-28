@@ -95,7 +95,6 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             onClose();
         },
         error: (err) => {
-            console.log("Error: ", err);
             setLoadingAccept(false);
             setLoadingDecline(false);
         },
@@ -168,7 +167,6 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 volunteer_slot_id: volunteer_slot_id,
             },
         ];
-        console.log(payload, "payload");
         await POST_API(endpoints.volunteer_slot.deleteParticularSlot, payload)
             .then(() => {
                 showToast({ type: "success", message: "Slot deleted" });
@@ -177,7 +175,6 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
             })
             .catch((err) => {
-                console.log(err, "error in deleting slot");
             });
     };
 

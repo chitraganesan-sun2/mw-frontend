@@ -4,10 +4,12 @@ const config: CapacitorConfig = {
   appId: 'org.melodywings.app',
   appName: 'MelodyWings',
   webDir: 'out',
-  // TEMPORARY: makes release builds remote-debuggable via chrome://inspect
-  // to trace the profile logout bug. Remove before a real Play Store release.
   android: {
-    webContentsDebuggingEnabled: true,
+    // Remote WebView debugging (chrome://inspect) exposes localStorage — which
+    // holds the auth token backup (mw_auth_backup) — plus the DOM and network
+    // to anyone with the APK. Off by default; opt in locally with
+    // `CAP_DEBUG=true npx cap run android`.
+    webContentsDebuggingEnabled: process.env.CAP_DEBUG === 'true',
   },
   server: {
     androidScheme: 'https',

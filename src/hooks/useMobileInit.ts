@@ -56,11 +56,9 @@ export default function useMobileInit() {
         registerPushListeners(
           // On notification received in foreground
           (notification) => {
-            console.log('[Mobile] Foreground notification:', notification.title);
           },
           // On notification tapped
           (notification) => {
-            console.log('[Mobile] Notification tapped:', notification.data);
             // Navigate based on notification data
             if (notification.data?.route) {
               router.push(notification.data.route);

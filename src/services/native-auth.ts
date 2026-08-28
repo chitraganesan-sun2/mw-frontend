@@ -38,7 +38,6 @@ export const nativeGoogleSignIn = async (): Promise<string | null> => {
     });
 
     const loginResult = result?.result as any;
-    console.log('[NativeAuth] Full login result:', JSON.stringify(result));
 
     // The token is nested: result.result.accessToken.token
     if (loginResult?.accessToken?.token) {
@@ -59,7 +58,7 @@ export const nativeGoogleSignIn = async (): Promise<string | null> => {
       return loginResult.idToken;
     }
 
-    console.error('[NativeAuth] No token in sign-in result:', JSON.stringify(loginResult));
+    console.error('[NativeAuth] No token in sign-in result (unexpected shape)');
     return null;
   } catch (error) {
     console.error('[NativeAuth] Google Sign-In failed:', error);

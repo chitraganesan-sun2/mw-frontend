@@ -155,7 +155,6 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             .then((response: any) => {
                 setModalLoader(true);
                 const { onboarded_status } = response;
-                console.log("response from signup", onboarded_status);
                 const role = getCookie("role") as "learner" | "volunteer" | undefined;
                 const defaultRoute = getDefaultRouteForRole(role);
                 const routes: Record<string, string> = {
@@ -166,9 +165,7 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     verification_completed: defaultRoute,
                 };
                 if (routes[onboarded_status]) {
-                    console.log("pushing to", routes[onboarded_status]);
                     router.push(routes[onboarded_status]);
-                    // router.refresh();
                 }
             })
             .catch((err) => {

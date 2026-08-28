@@ -18,7 +18,6 @@ const TestmonialModal = ({ isOpen, mode = "view", onClose }: TestmonialModalProp
     };
 
     const handleSubmit = () => {
-        console.log("Proceed");
     };
 
     return (

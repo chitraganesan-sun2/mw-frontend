@@ -20,6 +20,24 @@ export interface AuthState {
     onboardedStatus: OnboardedStatus;
 }
 
+const KNOWN_ONBOARDED_STATUSES: OnboardedStatus[] = [
+    "",
+    "details_pending",
+    "partially_filled",
+    "verification_pending",
+    "verification_rejected",
+    "verification_completed",
+];
+
+// NOTE: role / onboarded_status come from client-writable cookies, so this
+// guard is a UX router, not a security boundary — every privileged API must
+// re-check the caller's real onboarding state server-side. What we can do here
+// is refuse to honour a value that isn't even a real status (treat it as
+// "not onboarded" rather than letting it fall through and grant access).
+function normalizeStatus(status: OnboardedStatus): OnboardedStatus {
+    return KNOWN_ONBOARDED_STATUSES.includes(status) ? status : "details_pending";
+}
+
 export const LANDING_PAGE_ROUTES = [
     "/",
     "/about-us",
@@ -47,6 +65,9 @@ export function getDefaultRouteForRole(role: Role): string {
  * performing the actual redirect.
  */
 export function getRedirectForRoute(pathname: string, auth: AuthState): string | null {
+    const onboardedStatus = normalizeStatus(auth.onboardedStatus);
+    auth = { ...auth, onboardedStatus };
+
     if (!auth.isAuthenticated) {
         return LANDING_PAGE_ROUTES.includes(pathname) ? null : "/";
     }

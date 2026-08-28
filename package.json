@@ -17,7 +17,8 @@
     "cap:open": "npx cap open android",
     "mobile:build": "npm run build:mobile && npx cap sync android",
     "mobile:run": "npx cap run android",
-    "mobile:live": "npx cap run android --livereload --external"
+    "mobile:live": "npx cap run android --livereload --external",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.0",
@@ -100,6 +101,8 @@
     "@types/react-slick": "^0.23.13",
     "@types/react-timeago": "^4.1.7",
     "@types/scrollreveal": "^0.0.11",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.21",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.2"

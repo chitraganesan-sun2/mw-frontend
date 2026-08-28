@@ -107,7 +107,6 @@ const OnetImeScheduleModal = ({
         : rawAbbreviation;
 
     const getAvailableDaysForDate = async () => {
-        console.log(currentDate, "currentDate");
         if (currentDate !== "") {
             setIsAvailableDaysLoading(true);
             const response = await GET_API(
@@ -138,7 +137,6 @@ const OnetImeScheduleModal = ({
         }
     }, [isOpen]);
 
-    console.log(availableDays, "availableDays for date");
 
     const handleSubmit = () => {
         // Check if any slot is partially filled
@@ -194,7 +192,6 @@ const OnetImeScheduleModal = ({
             return;
         }
         finalSlots.forEach((slot, idx) => {
-            console.log(`Slot ${idx + 1}: Start - ${slot.start_time}, End - ${slot.end_time}`);
         });
         setIsSaving(true);
         const formattedData = finalSlots.map((slot) => ({
@@ -205,7 +202,6 @@ const OnetImeScheduleModal = ({
         }));
         POST_API(endpoints.volunteer_slot.createSlotForParticularDate, formattedData)
             .then((res) => {
-                console.log(res, "res");
                 onClose();
                 showToast({
                     message: "Slots created successfully",
@@ -221,7 +217,6 @@ const OnetImeScheduleModal = ({
                 });
             })
             .catch((err) => {
-                console.log(err, "err");
                 showToast({
                     message: "Error creating slots",
                     type: "error",

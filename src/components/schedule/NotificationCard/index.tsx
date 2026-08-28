@@ -122,7 +122,6 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
             setLoadingDecline(false);
         },
         error: (err) => {
-            console.log("Error: ", err);
             setLoadingAccept(false);
             setLoadingDecline(false);
         },

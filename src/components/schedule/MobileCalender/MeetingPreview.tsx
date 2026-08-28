@@ -78,7 +78,6 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
             onClose();
         },
         error: (err) => {
-            console.log("Error: ", err);
             setLoadingAccept(false);
             setLoadingDecline(false);
         },

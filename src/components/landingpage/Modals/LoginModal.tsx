@@ -46,7 +46,12 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             .catch(err => {
                 setIsLoginLoading(false);
                 setModalLoader(false);
-                if (err?.status === 404) return showToast({ type: "error", message: "User not found, please signup." });
+                // apiGoogleLogin uses a raw axios call, so the status is on err.response.
+                const status = err?.response?.status ?? err?.status;
+                if (status === 404) {
+                    return showToast({ type: "error", message: "User not found, please signup." });
+                }
+                showToast({ type: "error", message: "Sign in failed. Please try again." });
             })
     };
 

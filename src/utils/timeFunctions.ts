@@ -60,7 +60,6 @@ export const calculateAge = (dob: string) => {
 
 export const isAgeUnder18 = (dob: string) => {
     const age = Number(calculateAge(dob)) || 0;
-    console.log("Age: ", age);
     return age < 18;
 };
 

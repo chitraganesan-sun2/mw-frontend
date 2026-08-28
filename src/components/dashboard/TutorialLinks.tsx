@@ -4,6 +4,7 @@ import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import { useQuery } from "@tanstack/react-query";
 import { FiVideo, FiFileText, FiBookOpen, FiExternalLink } from "react-icons/fi";
+import { safeHref } from "@/utils/safeHref";
 
 interface TutorialLink {
     link_id: string;
@@ -44,7 +45,7 @@ const TutorialLinks = () => {
                 {links.map((link) => (
                     <a
                         key={link.link_id}
-                        href={link.url}
+                        href={safeHref(link.url) || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 p-3 rounded-xl bg-background hover:bg-gray-100 transition-colors group"

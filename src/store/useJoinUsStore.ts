@@ -53,6 +53,7 @@ export const useJoinUsStore = create<JoinUsState>()(
                 name: 'join-us-store',
                 storage: createJSONStorage(() => sessionStorage), // using sessionStorage so it resets if they close the tab, could be localStorage too
             }
-        )
+        ),
+        { enabled: process.env.NODE_ENV === 'development' }
     )
 );

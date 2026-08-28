@@ -130,7 +130,6 @@ const Messages = () => {
             // Don't redirect here; desktop redirect is handled in useEffect so isMobile is current
             return res.data;
         } catch (err: any) {
-            console.log(err);
             setNoChats(true);
             return [];
         } finally {
@@ -221,7 +220,6 @@ const Messages = () => {
             if (isFirstLoadForThisChat) setIsIndividualLoading(false);
             return response.data;
         } catch (error) {
-            console.log(error);
             if (isFirstLoadForThisChat) setIsIndividualLoading(false);
         }
     };

@@ -59,7 +59,6 @@ const Settings = () => {
         PUT_API(endpoints.chat.learnerPermission(learnerId as string), {
             chat_permission: value,
         }).then((res) => {
-            console.log(res, "PERMISSION LEARNER");
         });
     };
 

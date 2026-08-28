@@ -157,7 +157,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             const response = await GET_API(
                 endpoints.volunteer_slot.availableDays(selectedVolunteerId, currentMonth)
             );
-            console.log("Raw API Response:", response.data);
 
             // Make sure we're getting the array directly
             const availableDays = Array.isArray(response.data)
@@ -168,9 +167,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             const availableDates = response.data.available_dates || [];
             const unavailableDates = response.data.unavailable_dates || [];
 
-            console.log("Processed Available Days:", availableDays);
-            console.log("Available Dates:", availableDates);
-            console.log("Unavailable Dates:", unavailableDates);
 
             setVolunteerAvailableDays(availableDays);
             setVolunteerAvailableDates(availableDates);
@@ -350,7 +346,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             });
         },
         error: (err) => {
-            console.log("Error: ", err);
         },
     });
 
@@ -443,7 +438,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                 const response = await GET_API(
                     endpoints.volunteer_slot.availableDays(selectedVolunteerId, monthToFetch)
                 );
-                console.log("Raw API Response:", response.data);
 
                 const availableDays = Array.isArray(response.data)
                     ? response.data
@@ -486,9 +480,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                     const unavailableDatesForField =
                         field.name === "select_date" ? volunteerUnavailableDates : undefined;
 
-                    console.log(`Field ${field.name} availableDays:`, availableDaysForField);
-                    console.log(`Field ${field.name} availableDates:`, availableDatesForField);
-                    console.log(`Field ${field.name} unavailableDates:`, unavailableDatesForField);
 
                     if (field.name === "select_date" && selectedVolunteerId === "") return null;
 
@@ -548,43 +539,19 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                                                     : dayjs(value).format("YYYY-MM");
                                             }
 
-                                            console.log(
-                                                "Panel changed - new month:",
-                                                newMonth,
-                                                "mode:",
-                                                mode,
-                                                "value type:",
-                                                typeof value,
-                                                "isDayjs:",
-                                                dayjs.isDayjs(value)
-                                            );
-
                                             // Always update and fetch, even if month appears the same (to handle edge cases)
                                             setCurrentMonth(newMonth);
 
                                             // Directly fetch available days for the new month
                                             try {
                                                 setIsLoadingAvailableDays(true);
-                                                console.log(
-                                                    "Fetching available days for month:",
-                                                    newMonth,
-                                                    "volunteer:",
-                                                    selectedVolunteerId
-                                                );
                                                 const apiUrl =
                                                     endpoints.volunteer_slot.availableDays(
                                                         selectedVolunteerId,
                                                         newMonth
                                                     );
-                                                console.log("API URL:", apiUrl);
 
                                                 const response = await GET_API(apiUrl);
-                                                console.log(
-                                                    "API Response for month",
-                                                    newMonth,
-                                                    ":",
-                                                    response.data
-                                                );
 
                                                 const availableDays = Array.isArray(response.data)
                                                     ? response.data

@@ -46,7 +46,6 @@ export default function LearnerFilterModal({
     const [expected_goals, setParentGoals] = useQueryState("expected_goals");
 
     const [filterData, setFilterData] = useState<FilterData>({});
-    console.log(filterData, "filterData");
 
     // Update form data when query state changes
     useEffect(() => {
@@ -74,7 +73,6 @@ export default function LearnerFilterModal({
     ]);
 
     const handleChange = (name: keyof FilterData, value: any) => {
-        console.log(name, value, "name, value");
         setFilterData((prev) => ({
             ...prev,
             [name]: value,

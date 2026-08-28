@@ -18,6 +18,7 @@ import { showToast } from "@/components/common/Toast";
 import { useState } from "react";
 import { HeartLikeIcon, UnlikeHeartIcon } from "@/assets/icons";
 import LottieLoader from "@/components/common/Loader/Lottie";
+import { safeHref } from "@/utils/safeHref";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 type DetailModalProps = {
@@ -92,14 +93,21 @@ const DetailModal = ({
         ));
 
     const renderCuratedLinks = () =>
-        resource?.curated_links?.map((item: any, index: number) => (
-            <p key={index}>
-                {index + 1}. {item?.title} -{" "}
-                <Link href={item?.url} target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                    {item?.url}
-                </Link>
-            </p>
-        ));
+        resource?.curated_links?.map((item: any, index: number) => {
+            const href = safeHref(item?.url);
+            return (
+                <p key={index}>
+                    {index + 1}. {item?.title} -{" "}
+                    {href ? (
+                        <Link href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                            {item?.url}
+                        </Link>
+                    ) : (
+                        <span className="text-gray break-all">{item?.url}</span>
+                    )}
+                </p>
+            );
+        });
 
     if (!resourceId) return null;
 
