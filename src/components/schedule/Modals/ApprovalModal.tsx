@@ -63,25 +63,15 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
     });
 
     const handleUpdateReadsNotifications = async () => {
-        // Flatten all sessions from all items and filter for unread ones
-        const unreadSessions = data?.items?.flatMap((item: any) =>
-            item?.sessions?.filter((session: any) => session?.is_read === false) || []
-        ) || [];
-
-        let payload = {
-            session_ids: unreadSessions.map((session: any) => session?.session_id),
-        };
-
-        if (unreadSessions && unreadSessions.length > 0) {
-            try {
-                await POST_API(
-                    endpoints.session.updateReadsNotifications,
-                    payload
-                );
-                queryClient.invalidateQueries({ queryKey: ["unread-count"] });
-            } catch (error) {
-                console.error("Error updating unread sessions:", error);
-            }
+        // Opening the bell = "seen". Clear every unread session notification for this user,
+        // not just the pending invites listed here - otherwise session_accepted /
+        // session_rejected / session_cancelled notices never get marked read and the badge
+        // count stays > 0 with nothing left to act on.
+        try {
+            await POST_API(endpoints.session.markAllNotificationsRead, {});
+            queryClient.invalidateQueries({ queryKey: ["unread-count"] });
+        } catch (error) {
+            console.error("Error updating unread sessions:", error);
         }
     };
 

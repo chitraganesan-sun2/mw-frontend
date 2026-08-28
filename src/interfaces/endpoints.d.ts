@@ -79,6 +79,7 @@ export type EndpointProps = {
         markAsCompleted: (id: string) => string;
         getUnreadCount: (userType?: "volunteer" | "learner") => string;
         updateReadsNotifications: string;
+        markAllNotificationsRead: string;
         createLearnerInstantSessionRequest: string;
         getLearnerRequests: (page?: number, size?: number, query?: string, requestStatus?: string) => string;
         cancelLearnerRequest: (id: string) => string;
