@@ -94,6 +94,9 @@ export const endpoints: EndpointProps = {
             `session/learner/instant_session/${volunteer_slot_id}`,
         unclaimInstantSession: (volunteer_slot_id: string) =>
             `session/instant_session/unclaim/${volunteer_slot_id}`,
+        /** DELETE - volunteer withdraws one of their own still-unclaimed instant sessions */
+        withdrawInstantSession: (volunteer_slot_id: string) =>
+            `session/instant_session/${volunteer_slot_id}`,
         getLearnerSessions: (id: string) => `session/learner/${id}`,
         getVolunteerSessions: (id: string) => `session/volunteer/${id}`,
         cancelSession: (id: string) => `session/${id}`,

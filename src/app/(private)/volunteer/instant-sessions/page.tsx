@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { IoIosArrowBack } from "react-icons/io";
-import { POST_API, GET_API, PUT_API } from "@/api/request";
+import { POST_API, GET_API, PUT_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
 import { Spin } from "antd";
@@ -24,6 +24,7 @@ const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEven
 
 const REQUEST_STATUS_LABELS: Record<string, string> = {
     pending: "Pending",
+    open: "Open",
     accepted: "Accepted",
     active: "Active",
     completed: "Completed",
@@ -33,6 +34,7 @@ const REQUEST_STATUS_LABELS: Record<string, string> = {
 
 const REQUEST_STATUS_STYLES: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
+    open: "bg-amber-100 text-amber-800",
     accepted: "bg-blue-100 text-blue-800",
     active: "bg-green-100 text-green-700",
     completed: "bg-gray-100 text-blue-700",
@@ -40,7 +42,7 @@ const REQUEST_STATUS_STYLES: Record<string, string> = {
     expired: "bg-gray-100 text-gray-500",
 };
 
-const MY_SESSIONS_STATUS_FILTERS = ["", "accepted", "active", "completed", "cancelled", "expired"];
+const MY_SESSIONS_STATUS_FILTERS = ["", "open", "accepted", "active", "completed", "cancelled", "expired"];
 
 function getTimeAgo(dateString?: string): string {
     if (!dateString) return "";
@@ -101,16 +103,19 @@ function MySessionCard({
     onView,
     onComplete,
     onCancel,
+    onWithdraw,
 }: {
     session: any;
     isActionLoading: boolean;
     onView: (sessionId: string) => void;
     onComplete: (sessionId: string) => void;
     onCancel: (sessionId: string) => void;
+    onWithdraw: (volunteerSlotId: string) => void;
 }) {
     const statusClass = REQUEST_STATUS_STYLES[session.status] ?? "bg-gray-100 text-gray-700";
     const statusLabel = REQUEST_STATUS_LABELS[session.status] ?? session.status;
     const isLive = session.status === "accepted" || session.status === "active";
+    const isOpen = session.status === "open";
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-shadow p-5">
@@ -120,10 +125,12 @@ function MySessionCard({
             </div>
             <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
-                    {session.learner_name?.charAt(0)?.toUpperCase() || "L"}
+                    {isOpen ? "?" : session.learner_name?.charAt(0)?.toUpperCase() || "L"}
                 </div>
                 <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">{session.learner_name || "Learner"}</h4>
+                    <h4 className="font-semibold text-gray-900 text-sm">
+                        {session.learner_name || (isOpen ? "Waiting for a learner to claim" : "Learner")}
+                    </h4>
                     <p className="text-xs text-gray-500">{session.session_title}</p>
                 </div>
             </div>
@@ -136,29 +143,41 @@ function MySessionCard({
                 </span>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
-                <button
-                    className="text-primary text-xs font-medium hover:opacity-80 disabled:opacity-50"
-                    disabled={isActionLoading}
-                    onClick={() => onView(session.session_id)}
-                >
-                    {isLive ? "Join" : "View"}
-                </button>
-                {isLive && (
+                {isOpen ? (
+                    <button
+                        className="text-red-600 text-xs font-medium hover:text-red-700 disabled:opacity-50"
+                        disabled={isActionLoading}
+                        onClick={() => onWithdraw(session.session_id)}
+                    >
+                        Withdraw
+                    </button>
+                ) : (
                     <>
                         <button
-                            className="text-green-700 text-xs font-medium hover:text-green-800 disabled:opacity-50"
+                            className="text-primary text-xs font-medium hover:opacity-80 disabled:opacity-50"
                             disabled={isActionLoading}
-                            onClick={() => onComplete(session.session_id)}
+                            onClick={() => onView(session.session_id)}
                         >
-                            Complete
+                            {isLive ? "Join" : "View"}
                         </button>
-                        <button
-                            className="text-red-600 text-xs font-medium hover:text-red-700 disabled:opacity-50"
-                            disabled={isActionLoading}
-                            onClick={() => onCancel(session.session_id)}
-                        >
-                            Cancel
-                        </button>
+                        {isLive && (
+                            <>
+                                <button
+                                    className="text-green-700 text-xs font-medium hover:text-green-800 disabled:opacity-50"
+                                    disabled={isActionLoading}
+                                    onClick={() => onComplete(session.session_id)}
+                                >
+                                    Complete
+                                </button>
+                                <button
+                                    className="text-red-600 text-xs font-medium hover:text-red-700 disabled:opacity-50"
+                                    disabled={isActionLoading}
+                                    onClick={() => onCancel(session.session_id)}
+                                >
+                                    Cancel
+                                </button>
+                            </>
+                        )}
                     </>
                 )}
             </div>
@@ -278,6 +297,20 @@ export default function VolunteerInstantSessionsPage() {
         }
     };
 
+    const handleWithdrawOpenSession = async (volunteerSlotId: string) => {
+        if (!confirm("Withdraw this open instant session? Learners will no longer see it.")) return;
+        setIsActionLoading(true);
+        try {
+            await DELETE_API(endpoints.session.withdrawInstantSession(volunteerSlotId));
+            showToast({ message: "Instant session withdrawn", type: "success" });
+            queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
+        } catch (error: any) {
+            showToast({ message: error?.response?.data?.detail || "Failed to withdraw session", type: "error" });
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
+
     const handleCancelSession = async (sessionId: string) => {
         if (!confirm("Are you sure you want to cancel this session?")) return;
         setIsActionLoading(true);
@@ -384,6 +417,7 @@ export default function VolunteerInstantSessionsPage() {
                                     onView={handleViewSession}
                                     onComplete={handleCompleteSession}
                                     onCancel={handleCancelSession}
+                                    onWithdraw={handleWithdrawOpenSession}
                                 />
                             ))}
                         </div>

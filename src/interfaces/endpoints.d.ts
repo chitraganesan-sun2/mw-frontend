@@ -65,6 +65,7 @@ export type EndpointProps = {
         getAcceptedInstantSessionsByDate: (date: string) => string;
         getLearnerInstantSessionDetail: (volunteer_slot_id: string) => string;
         unclaimInstantSession: (volunteer_slot_id: string) => string;
+        withdrawInstantSession: (volunteer_slot_id: string) => string;
         getLearnerSessions: (id: string) => string;
         getVolunteerSessions: (id: string) => string;
         cancelSession: (id: string) => string;
