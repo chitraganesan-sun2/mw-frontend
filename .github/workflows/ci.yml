@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  typecheck-lint:
-    name: Typecheck + Lint
+  build:
+    name: Build + Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,8 +20,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Typecheck
-        run: npm run typecheck
+      # `next build` is the real gate: it generates next-env.d.ts (gitignored)
+      # and type-checks. A bare `tsc --noEmit` on a fresh checkout can't resolve
+      # the image-module ambient types that next-env.d.ts provides.
+      - name: Build
+        run: npx next build
       - name: Lint
         # Informational for now — the repo had no ESLint config before this, so a
         # first run surfaces a backlog of pre-existing warnings. Tighten to a hard
