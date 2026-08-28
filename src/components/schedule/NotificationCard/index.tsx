@@ -40,6 +40,8 @@ interface NotificationCardProps {
         learner_end_time: string;
         learner_start_date: string;
         is_read?: boolean;
+        academic_skills?: string[];
+        non_academic_skills?: string[];
     };
     /** Whose approval queue this card is shown in - determines which party's name/picture
      * and local time to display. Defaults to "volunteer" (the original, learner-initiated
@@ -153,7 +155,25 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                     </p>
                 </div>
             </div>
-            { data?.overlapped_slot && 
+            {((data?.academic_skills?.length ?? 0) > 0 ||
+                (data?.non_academic_skills?.length ?? 0) > 0) && (
+                <div className="flex flex-col gap-1">
+                    <p className="text-[0.75rem] font-medium text-gray-light">Focus areas</p>
+                    <div className="flex flex-wrap gap-1">
+                        {[...(data?.academic_skills || []), ...(data?.non_academic_skills || [])].map(
+                            (skill) => (
+                                <span
+                                    key={skill}
+                                    className="text-xs bg-[#F1F1F1] text-black rounded-full px-2 py-0.5"
+                                >
+                                    {skill}
+                                </span>
+                            )
+                        )}
+                    </div>
+                </div>
+            )}
+            { data?.overlapped_slot &&
                 <div className="bg-[#FEFCE8] p-3 rounded-xl">
                     <p className="text-xs text-[#CA8A04]">
                         <span className="mr-2 font-semibold text-[#A16207]">Conflict Alert:</span>

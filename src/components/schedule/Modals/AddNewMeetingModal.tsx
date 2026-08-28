@@ -61,6 +61,9 @@ const meetingFormSchema = z.object({
     google_meet_link: z.string(),
     description: z.string().min(1, "Description is required"),
     selected_slot: z.string().min(1, "Please select a time slot"),
+    // Optional - picked from the selected volunteer's own declared subjects/skills.
+    academic_skills: z.array(z.string()).optional().default([]),
+    non_academic_skills: z.array(z.string()).optional().default([]),
 });
 
 // Infer TypeScript type from schema
@@ -81,8 +84,18 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
         google_meet_link: "",
         description: "",
         selected_slot: "",
+        academic_skills: [],
+        non_academic_skills: [],
     });
     const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+    // Options for the two skill pickers, sourced from the selected volunteer's own
+    // declared subjects (academic) / skills (non-academic).
+    const [volunteerAcademicOptions, setVolunteerAcademicOptions] = useState<
+        Array<{ label: string; value: string }>
+    >([]);
+    const [volunteerNonAcademicOptions, setVolunteerNonAcademicOptions] = useState<
+        Array<{ label: string; value: string }>
+    >([]);
 
     const [fetchingVolunteers, setFetchingVolunteers] = useState<boolean>(false);
     const [volunteers, setVolunteers] = useState<Array<{ label: string; value: string }>>([]);
@@ -307,6 +320,8 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             session_title: formData.title_of_the_meeting,
             session_description: formData.description,
             learner_id: learnerId,
+            academic_skills: formData.academic_skills || [],
+            non_academic_skills: formData.non_academic_skills || [],
         };
         return await POST_API(endpoints.session.bookSession, payload);
     };
@@ -324,6 +339,8 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                 google_meet_link: "",
                 description: "",
                 selected_slot: "",
+                academic_skills: [],
+                non_academic_skills: [],
             });
             setAvailableSlots([]);
             onClose();
@@ -351,24 +368,39 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
         setFormData((prev) => ({
             ...prev,
             select_date: "",
+            academic_skills: [],
+            non_academic_skills: [],
         }));
         if (formData.select_volunteer) {
             setSelectedVolunteerId(formData.select_volunteer);
 
-            // Fetch volunteer timezone
-            const fetchVolunteerTz = async () => {
+            // Fetch volunteer timezone + the skills they've declared they can teach,
+            // which populate the Academic / Non-Academic Skills pickers.
+            const fetchVolunteerDetails = async () => {
                 try {
                     const { data } = await GET_API(
                         endpoints.volunteer.getIndividualVolunteer(formData.select_volunteer)
                     );
                     const tzCode = data?.volunteer_contact_details?.timezone;
                     setVolunteerTimezone(timezoneMapping[tzCode] || "UTC");
+                    setVolunteerAcademicOptions(
+                        (data?.volunteer_subjects || [])
+                            .filter((s: any) => s?.subject_name)
+                            .map((s: any) => ({ label: s.subject_name, value: s.subject_name }))
+                    );
+                    setVolunteerNonAcademicOptions(
+                        (data?.volunteer_skills || [])
+                            .filter((s: any) => s?.skill_name)
+                            .map((s: any) => ({ label: s.skill_name, value: s.skill_name }))
+                    );
                 } catch (error) {
-                    console.error("Error fetching volunteer timezone:", error);
+                    console.error("Error fetching volunteer details:", error);
                     setVolunteerTimezone("UTC");
+                    setVolunteerAcademicOptions([]);
+                    setVolunteerNonAcademicOptions([]);
                 }
             };
-            fetchVolunteerTz();
+            fetchVolunteerDetails();
 
             setFormData((prev) => ({
                 ...prev,
@@ -383,6 +415,8 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             setVolunteerUnavailableDates([]);
         } else {
             setVolunteerTimezone("");
+            setVolunteerAcademicOptions([]);
+            setVolunteerNonAcademicOptions([]);
         }
     }, [formData.select_volunteer]);
 
@@ -581,6 +615,30 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                         />
                     );
                 })}
+                {selectedVolunteerId !== "" && volunteerAcademicOptions.length > 0 && (
+                    <Input
+                        inputType="multiselect"
+                        name="academic_skills"
+                        label="Academic Skills"
+                        placeholder="Select academic skills for this session"
+                        options={volunteerAcademicOptions}
+                        value={formData.academic_skills || []}
+                        onChange={(value: any) => handleChange("academic_skills", value)}
+                        error={errors.academic_skills}
+                    />
+                )}
+                {selectedVolunteerId !== "" && volunteerNonAcademicOptions.length > 0 && (
+                    <Input
+                        inputType="multiselect"
+                        name="non_academic_skills"
+                        label="Non-Academic Skills"
+                        placeholder="Select non-academic skills for this session"
+                        options={volunteerNonAcademicOptions}
+                        value={formData.non_academic_skills || []}
+                        onChange={(value: any) => handleChange("non_academic_skills", value)}
+                        error={errors.non_academic_skills}
+                    />
+                )}
                 <AvailableSlots
                     availableSlots={availableSlots}
                     selectedSlot={formData.selected_slot || ""}
