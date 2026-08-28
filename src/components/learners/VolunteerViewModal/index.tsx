@@ -3,6 +3,7 @@ import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import ClockIcon from "@/assets/icons/ClockIcon";
 import ModalCloseIcon from "@/assets/icons/FeedModalCloseIcon";
+import MessageIcon from "@/assets/icons/MessageIcon";
 import LearnerConnectIcon from "@/assets/icons/LearnerConnectIcon";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import Button from "@/components/common/Button";
@@ -30,10 +31,14 @@ const ProfileHeader = ({
     text,
     onClose,
     onScheduleMeeting,
+    onStartChat,
+    chatDisabled,
 }: {
     text: string | null;
     onClose: () => void;
     onScheduleMeeting: () => void;
+    onStartChat: () => void;
+    chatDisabled?: boolean;
 }) => (
     <div className="flex items-center justify-between px-5">
         <div className="flex items-center gap-2">
@@ -51,6 +56,16 @@ const ProfileHeader = ({
                 title="Schedule a meeting"
                 className="text-sm !text-black !bg-primary !border-primary !border"
             />
+            <button
+                type="button"
+                onClick={onStartChat}
+                disabled={chatDisabled}
+                aria-label="Start chat"
+                title="Start chat"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stroke text-black transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-black"
+            >
+                <MessageIcon />
+            </button>
             <span onClick={onClose} className="cursor-pointer max-md:hidden">
                 <ModalCloseIcon />
             </span>
@@ -83,6 +98,7 @@ interface VolunteerData {
     support_preference_details?: string;
     volunteer_teaching_traits?: string;
     volunteer_favorite_activities?: string;
+    chat_permission?: boolean;
 }
 
 const ProfileInfo = ({
@@ -479,6 +495,15 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
     const handleScheduleMeeting = () => {
         router.push(`/learner/volunteer?volunteerId=${volunteerId}&modal=add_new_meeting`);
     };
+
+    const handleStartChat = () => {
+        if (!volunteerId) return;
+        GET_API(endpoints.chat.createChatForVolunteer(volunteerId)).then((res: any) => {
+            router.push(
+                `/learner/messages?chatId=${res?.data?.chat_id}&volunteerId=${volunteerId}`
+            );
+        });
+    };
     const rating = volunteerFeedback?.overall_rating;
     const totalReviews = volunteerFeedback?.feedbacks?.length;
 
@@ -501,6 +526,8 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
                         text={text}
                         onClose={handleClose}
                         onScheduleMeeting={handleScheduleMeeting}
+                        onStartChat={handleStartChat}
+                        chatDisabled={!volunteerData?.chat_permission}
                     />
                     <Divider className="max-md:hidden" />
                     <ProfileInfo text={text} volunteerData={volunteerData} />
