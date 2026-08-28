@@ -1,59 +1,59 @@
 # MelodyWings Play Store Release Checklist
 
-**Branch**: `release/playstore-v1.0.0`  
-**Version**: 1.0.0 (versionCode: 1)  
-**Date**: June 24, 2026
+**Build from**: `main` (has the full security-audit pass — Aug 2026)
+**Version**: 1.0.0 (versionCode: 1) — never uploaded to Play, so no bump needed for the first AAB
+**Updated**: 28 Aug 2026
+
+> Build the release from `main`, not from a `release/*` branch. `main` carries
+> every backend + frontend security fix; there is no separate release branch to
+> maintain.
 
 ---
 
-## ✅ Completed (Code Changes)
+## ✅ Done (code / project)
 
-- [x] API URL switched to production (`https://api.melodywings.org/api/v1`)
-- [x] Cleartext traffic disabled (capacitor.config.ts + AndroidManifest)
-- [x] Network security config added (only allows cleartext for local dev)
-- [x] Release signing config added to build.gradle
-- [x] ProGuard enabled with minifyEnabled + shrinkResources
-- [x] ProGuard rules written for Capacitor/Firebase/WebView
-- [x] Version bumped to 1.0.0 (package.json + build.gradle)
-- [x] Keystores directory with setup instructions created
-- [x] Account deletion feature added (Play Store requirement)
-- [x] Backend DELETE endpoint for account deletion added
-- [x] Custom app icons already in place (webp format, all densities)
-- [x] Build passes type checking successfully
+- [x] API URL → production (mobile uses the Cloud Run URL directly; `api.melodywings.org` has no DNS record — see `src/definitions.ts`)
+- [x] Cleartext traffic disabled (`AndroidManifest.xml` `usesCleartextTraffic="false"` + `res/xml/network_security_config.xml`; cleartext allowed only for `10.0.2.2` / `localhost` emulator)
+- [x] Release signing config in `android/app/build.gradle` — reads `KEYSTORE_PASSWORD` / `KEY_PASSWORD` from the environment
+- [x] ProGuard: `minifyEnabled` + `shrinkResources` + `proguard-rules.pro` (Capacitor / Firebase / WebView)
+- [x] `versionCode 1` / `versionName "1.0.0"` in `package.json` + `android/app/build.gradle`
+- [x] **Release keystore generated** — `keystores/melodywings-release.keystore` (+ `release-keystore-credentials.txt`). Both gitignored; not committed. **Verify you have an off-machine backup.**
+- [x] `android/app/google-services.json` in place
+- [x] Account deletion (Play requirement) — `Settings → Delete Account` → `DELETE /api/v1/auth/delete-account` → soft-delete + sign-in block. Works end to end (the endpoint was added/fixed in the profile-account audit, commit `6ec8677`).
+- [x] Custom app icons (webp, all densities)
+- [x] **Remote WebView debugging disabled for release** — `capacitor.config.ts` `webContentsDebuggingEnabled` is now `process.env.CAP_DEBUG === 'true'` (was hard `true`). Takes effect on the next `cap sync`. Local debugging: `CAP_DEBUG=true npx cap run android`.
+- [x] Security audit landed on `main` — CSP is web-only (static export can't emit headers; mobile relies on the Capacitor `allowNavigation` allowlist + `cleartext:false`), but the bundle fixes apply: `safeHref()` on user-supplied links, and the Google access token is no longer logged to logcat in `src/services/native-auth.ts`.
 
 ---
 
-## 🔴 Manual Steps Required (Before Building AAB)
+## 🔴 Before building the AAB
 
-### 1. Generate Release Keystore
-```bash
-cd melody-wings-frontend
-keytool -genkey -v -keystore keystores/melodywings-release.keystore -alias melodywings -keyalg RSA -keysize 2048 -validity 10000
-```
-⚠️ **BACK UP the keystore immediately. If lost, you cannot update the app.**
+### 1. Release SHA-1 → OAuth client  *(also closes the backend `GOOGLE_OAUTH_CLIENT_ID` gap)*
 
-### 2. Get Release SHA-1 & Configure Firebase
 ```bash
 keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodywings
 ```
-Then:
-1. Go to Firebase Console → Project Settings → Android app
-2. Add the **release SHA-1** fingerprint
-3. Go to Google Cloud Console → Credentials → Create Android OAuth client
-   - Package: `org.melodywings.app`
-   - SHA-1: (from above)
-4. Re-download `google-services.json` → place in `android/app/`
 
-### 3. Set Environment Variables (for signing)
-```bash
-set KEYSTORE_PASSWORD=your_password
-set KEY_PASSWORD=your_key_password
-```
+- [ ] Firebase Console → Project Settings → Android app → add the **release SHA-1**
+- [ ] Google Cloud Console → Credentials → **Android OAuth client** for package `org.melodywings.app` + that SHA-1
+- [ ] Re-download `google-services.json` → `android/app/`
+- [ ] Set that OAuth **Web client id** as `GOOGLE_OAUTH_CLIENT_ID` on the Cloud Run backend service (the token-audience check is a no-op until this is set — see backend memory `auth-jwt-audit-2026-08-28`):
+  ```bash
+  gcloud run services update melodywings-backend --region us-central1 \
+    --update-env-vars GOOGLE_OAUTH_CLIENT_ID=<web client id>[,<android client id>]
+  ```
+  Then confirm normal Google login still works on web + mobile.
 
-### 4. Build Production AAB
+### 2. Build the signed AAB (on a machine with internet — `next/font` fetches Google Fonts at build time)
+
 ```bash
-npm run build:mobile
-npx cap sync android
+cd melody-wings-frontend
+git checkout main && git pull
+
+set KEYSTORE_PASSWORD=...        # from keystores/release-keystore-credentials.txt
+set KEY_PASSWORD=...
+
+npm run mobile:build            # next build (mobile static config) + cap sync android
 cd android
 gradlew bundleRelease
 ```
@@ -61,87 +61,61 @@ Output: `android/app/build/outputs/bundle/release/app-release.aab`
 
 ---
 
-## 🟡 Google Play Console Setup
+## 🟡 Google Play Console
 
-### Store Listing
+### Store listing
 - [ ] App name: **MelodyWings**
-- [ ] Short description (80 chars): "Connect learners with volunteer music teachers for free online lessons"
-- [ ] Full description (4000 chars): Write detailed feature description
-- [ ] App icon: 512x512 PNG (high-res version of existing icon)
-- [ ] Feature graphic: 1024x500 PNG (promotional banner)
-- [ ] Screenshots: Min 2, recommended 5-8 (phone: 1080x1920)
+- [ ] Short description (≤80): "Connect learners with volunteer music teachers for free online lessons"
+- [ ] Full description (≤4000)
+- [ ] App icon: 512×512 PNG
+- [ ] Feature graphic: 1024×500 PNG
+- [ ] Screenshots: 2 min, 5–8 recommended (phone 1080×1920)
 - [ ] Category: **Education**
-- [ ] Contact email: (required)
+- [ ] Contact email
 - [ ] Privacy policy URL: `https://melodywings.org/privacy-policy`
 
-### Content Rating
-- [ ] Fill IARC questionnaire
-  - App type: Education
-  - No violence / No mature content
-  - Target audience: 13+ (avoids stricter COPPA rules)
+### Content rating
+- [ ] IARC questionnaire — Education, no violence / mature content, target 13+
 
-### Data Safety Form
-- [ ] Personal info collected: Name, email (Google Sign-In)
-- [ ] Photos collected: Profile pictures (Cloudinary)
-- [ ] Device identifiers: FCM push token
-- [ ] App activity: Analytics (PostHog)
-- [ ] Data encrypted in transit: Yes (HTTPS)
-- [ ] Data deletion available: Yes (Settings → Delete Account)
-- [ ] Third parties: Google (auth), Cloudinary (images), PostHog (analytics)
+### Data safety form
+- [ ] Personal info: name, email (Google Sign-In)
+- [ ] Photos: profile pictures (Cloudinary)
+- [ ] Device IDs: FCM push token
+- [ ] App activity: analytics — **Firebase Analytics on native** (PostHog is web-only; `PostHogProvider` no-ops on Capacitor)
+- [ ] Encrypted in transit: Yes
+- [ ] Data deletion available: **Yes** — Settings → Delete Account
+- [ ] Third parties: Google (auth), Cloudinary (images), Firebase (analytics/push)
 
 ---
 
-## 🟡 Testing Before Submission
+## 🟡 Device testing (release build)
 
-### Physical Device Testing
-- [ ] Budget phone (Android 7-8)
-- [ ] Mid-range phone (Android 11-12)
-- [ ] Flagship phone (Android 13-14)
+Phones: budget (Android 7–8), mid (11–12), flagship (13–14).
 
-### Test Scenarios
-- [ ] Fresh install → Google Sign-In → Onboarding flow
-- [ ] Session persists after kill/reopen
+- [ ] Fresh install → **Google Sign-In on the RELEASE build (production OAuth)** → onboarding
+- [ ] Session persists after kill / reopen
 - [ ] Airplane mode → offline banner → recovery
 - [ ] Profile photo upload (camera + gallery)
 - [ ] Push notification receive + tap
-- [ ] Back button navigation + app exit
-- [ ] Delete Account flow (Settings → Delete → Confirm)
-- [ ] Google Sign-In with RELEASE build (production OAuth)
+- [ ] Back-button navigation + app exit
+- [ ] **Delete Account** (Settings → Delete → Confirm → sign-in blocked afterward)
 
 ---
 
-## Timeline
+## Timeline (est.)
 
-| Task | Est. Duration |
-|------|---------------|
-| Generate keystore + Firebase OAuth | 1 day |
-| Build signed AAB + device testing | 2-3 days |
+| Task | Duration |
+|---|---|
+| Release SHA-1 + OAuth client + backend env | 0.5 day |
+| Signed AAB + device testing | 2–3 days |
 | Store listing (screenshots, copy) | 1 day |
-| Submit to Play Console | 1 day |
-| Google review period | 3-7 days |
-| **Total** | **~7-12 days** |
+| Submit | 1 day |
+| Google review | 3–7 days (up to 14 for a new account) |
+| **Total** | **~7–12 days** |
 
 ---
 
-## Branch Structure
+## Notes
 
-```
-melody-wings-frontend:
-  master (web production)
-  └── feature/capacitor-android-app (mobile base)
-      └── fix/mobile-auth-redirect (auth fixes)
-          └── release/playstore-v1.0.0 ← YOU ARE HERE
-
-melody-wings-backend:
-  master (API production)
-  └── feature/mobile-cors-support (CORS for mobile)
-      └── release/playstore-v1.0.0 ← account deletion endpoint
-```
-
----
-
-## Post-Submission Notes
-
-- First review can take 3-7 days (up to 14 for new accounts)
-- Common rejection reasons: broken OAuth, missing data safety, no account deletion
-- After approval, merge `release/playstore-v1.0.0` back into `feature/capacitor-android-app` and then into `master`
+- Common rejection reasons: broken OAuth on the release build, incomplete data-safety form, no working account deletion — all three are addressed above; verify OAuth on a real release build.
+- After approval, no branch merge-back is needed — the mobile project tracks `main`.
