@@ -2,7 +2,13 @@
 
 **Build from**: `main` (has the full security-audit pass — Aug 2026)
 **Version**: 1.0.0 (versionCode: 1) — never uploaded to Play, so no bump needed for the first AAB
-**Updated**: 28 Aug 2026
+**Updated**: 2 Sep 2026
+
+> **Full submission packet:** see [`playstore/`](playstore/) — copy-paste-ready store
+> listing, data-safety / content-rating / app-content answers, release notes, reviewer
+> testing instructions, the build-and-sign runbook, and the privacy-policy cross-check.
+> `cap sync` was re-run on 2 Sep 2026 and the mobile build is now dev-login-free (see
+> `playstore/09-pre-submission-checklist.md` §3).
 
 > Build the release from `main`, not from a `release/*` branch. `main` carries
 > every backend + frontend security fix; there is no separate release branch to

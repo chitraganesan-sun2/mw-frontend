@@ -47,6 +47,9 @@ next.config.web-backup.mjs
 next.config.web-backup.js
 src/app/layout.tsx.web-backup
 src/middleware.ts.web-backup
+.dev-login.web-backup/
+.env.local.web-backup
+.env.local.web-absent
 
 # Keystore files (sensitive)
 *.keystore

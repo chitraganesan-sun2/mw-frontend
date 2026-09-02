@@ -13,6 +13,11 @@ const layoutFile = path.join(root, 'src', 'app', 'layout.tsx');
 const layoutBackup = path.join(root, 'src', 'app', 'layout.tsx.web-backup');
 const middlewareFile = path.join(root, 'src', 'middleware.ts');
 const middlewareBackup = path.join(root, 'src', 'middleware.ts.web-backup');
+const devLoginDir = path.join(root, 'src', 'app', 'dev-login');
+const devLoginBackup = path.join(root, '.dev-login.web-backup');
+const envLocal = path.join(root, '.env.local');
+const envLocalBackup = path.join(root, '.env.local.web-backup');
+const envLocalAbsentMarker = path.join(root, '.env.local.web-absent');
 
 // Restore next.config.js from backup
 if (fs.existsSync(backupConfigJs)) {
@@ -44,4 +49,27 @@ if (fs.existsSync(middlewareBackup)) {
   console.log('✓ Restored middleware.ts from backup');
 } else {
   console.warn('⚠ No middleware backup found');
+}
+
+// Restore the /dev-login route
+if (fs.existsSync(devLoginBackup)) {
+  if (fs.existsSync(devLoginDir)) {
+    fs.rmSync(devLoginDir, { recursive: true, force: true });
+  }
+  fs.renameSync(devLoginBackup, devLoginDir);
+  console.log('✓ Restored src/app/dev-login from backup');
+}
+
+// Restore .env.local
+if (fs.existsSync(envLocalBackup)) {
+  if (fs.existsSync(envLocal)) fs.unlinkSync(envLocal);
+  fs.renameSync(envLocalBackup, envLocal);
+  console.log('✓ Restored .env.local from backup');
+} else if (fs.existsSync(envLocalAbsentMarker)) {
+  // There was no .env.local before the build; remove the one we copied in.
+  if (fs.existsSync(envLocal)) fs.unlinkSync(envLocal);
+  fs.unlinkSync(envLocalAbsentMarker);
+  console.log('✓ Removed the temporary .env.local (none existed before the build)');
+} else {
+  console.warn('⚠ No .env.local backup or absent-marker found — leaving .env.local as is');
 }

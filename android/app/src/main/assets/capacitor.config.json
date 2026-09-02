@@ -3,7 +3,7 @@
 	"appName": "MelodyWings",
 	"webDir": "out",
 	"android": {
-		"webContentsDebuggingEnabled": true
+		"webContentsDebuggingEnabled": false
 	},
 	"server": {
 		"androidScheme": "https",
