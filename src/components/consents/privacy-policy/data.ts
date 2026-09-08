@@ -417,15 +417,15 @@ export const sectionsData = [
                             `Email: ${emailLink("support@vercel.com")} <br /> Address: 440 N Barranca Ave #4133, Covina, CA 91723`
                         ],
                         [
-                            "Render",
-                            `Email: ${emailLink("support@render.com")} <br /> Address: 525 Brannan St Suite 300, San Francisco, CA 94107`
+                            "Google Cloud Platform (Cloud Run)",
+                            "Address: 1600 Amphitheatre Parkway in Mountain View, California"
                         ],
                         [
                             "Github",
                             "Address: 88 Colin P. Kelly Jr. Street in San Francisco"
                         ],
                         [
-                            "Alphabet, Inc.",
+                            "Alphabet, Inc. (Google Sign-In, Firebase Cloud Messaging &amp; Analytics, Gemini API)",
                             "Address: 1600 Amphitheatre Parkway in Mountain View, California"
                         ],
                         [

@@ -20,22 +20,22 @@ Ganesan, per the CONTACT US section).
 
 ## ⚠️ Gaps / mismatches to fix before submission
 
-### 1. Third-party service provider list is out of date for the mobile app
-`data.ts` → section **"LIST OF THIRD-PARTY SERVICE PROVIDERS"** currently lists:
-Vercel, Render, GitHub, Alphabet, Cloudinary, Cloudflare, Stripe, PayPal.
+### 1. Third-party service provider list is out of date for the mobile app — ✅ fixed 2026-09-08
+`data.ts` → section **"LIST OF THIRD-PARTY SERVICE PROVIDERS"** used to list:
+Vercel, Render, GitHub, Alphabet, Cloudinary, Cloudflare, Stripe, PayPal — verified against
+actual live infra (no repo/deploy config references `render.com` anywhere) and corrected:
+- **"Render"** removed — the backend no longer runs there, confirmed retired in favor of
+  Google Cloud Run.
+- **"Google Cloud Platform (Cloud Run)"** added as its own row — backend hosting.
+- **"Alphabet, Inc."** row relabeled to **"Alphabet, Inc. (Google Sign-In, Firebase Cloud
+  Messaging & Analytics, Gemini API)"** so Firebase and Gemini (previously not listed at all)
+  and Google Sign-In (previously only implied) are now explicit, without adding redundant
+  rows for services that share the same corporate entity/address.
+- Cloudinary, Stripe, PayPal, GitHub, Vercel left as-is (still accurate).
 
-The mobile app actually relies on:
-
-| Add / correct | Used for |
-|---|---|
-| **Google Cloud (Cloud Run)** | backend hosting — replaces/【joins】 "Render" for the app backend |
-| **Google Firebase (Cloud Messaging + Analytics)** | push notifications, native analytics — **not listed at all** |
-| **Google Identity / Sign-In** | authentication — implied by "Alphabet" but should be explicit |
-| **Google Gemini API** | generating the volunteer↔learner match shortlist from profile text — **not listed at all** |
-| Cloudinary | already listed ✓ (media storage) |
-| Stripe / PayPal | donations only, via an external page — keep, but clarify scope |
-
-→ Update the table so the Data safety "processors" (see `03` §4) all appear.
+→ Still needs deploying: this only changes the `data.ts` source — someone with deploy access
+must ship `melody-wings-frontend/main` so `melodywings.org/privacy-policy` reflects it before
+submission (see the sign-off checklist below).
 
 ### 2. Device identifiers / push tokens
 Confirm the "INFORMATION WE COLLECT" / "HOW DO WE COLLECT INFORMATION?" sections
