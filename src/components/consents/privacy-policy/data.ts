@@ -171,6 +171,15 @@ export const sectionsData = [
         ]
     },
     {
+        title: "DATA RETENTION",
+        contextType: "parent",
+        content: [
+            "We retain your personal information for as long as your account remains active, so that we can provide the matching, scheduling, and communication features of our Website and Platform.",
+            `You may delete your account and personal information at any time from your account Settings. Deletion is immediate and permanent: your profile, messages, community posts, session records, and other personal information tied to your account are removed from our systems, and this action cannot be undone. To request deletion instead by email, contact us at ${supportEmailLink}.`,
+            "Some information cannot be deleted along with your account, including donation records, which we retain for the period required by applicable tax and accounting law, and information we are required to retain to comply with a legal obligation, resolve a dispute, or enforce our agreements."
+        ]
+    },
+    {
         title: "DISCLOSURE OF PERSONAL INFORMATION",
         contextType: "parent",
         content: [
@@ -264,7 +273,7 @@ export const sectionsData = [
                             "g) Under 16. We will not sell your Personal Information of any Users, including any persons under the age of 16.",
                             "h) Opt In Consent. We will only process, collect, use and store your Personal Information upon receiving your express consent to do so. YOU EXPRESSLY AGREE THAT YOU HAVE READ, UNDERSTOOD, AND CONSENT TO MW COLLECTING, USING, PROCESSING, DISCLOSING, STORING, AND RETAINING YOUR PERSONAL INFORMATION IN ACCORDANCE WITH THIS PRIVACY POLICY AND OUR TERMS OF SERVICE WHEN YOU CHECK THE APPLICABLE BOX SIGNIFYING YOUR CONSENT. YOU EXPRESSLY AGREE THAT THIS CONSENT IS FREELY GIVEN, EXPRESS, AND AFFIRMATIVE.",
                             "i) Right to Opt-Out. At any time, upon your request, we will stop selling your Personal Information (sometimes called your Opt Out-Right). You may send the request to Opt Out (i) to support@melodywings.org, or (ii) by writing to us at Privacy Officer, MelodyWings at 9852 Wesbourne Way, Granite Bay - CA 95746.",
-                            "j) Data Protection Officer. We have appointed a Privacy and Data Protection Officer, Chitra Ganesan] at [9852 Wesbourne Way, Granite Bay - 95746 to make sure the privacy rights of our Users are protected.",
+                            "j) Data Protection Officer. We have appointed a Privacy and Data Protection Officer, Chitra Ganesan, at 9852 Wesbourne Way, Granite Bay - CA 95746 to make sure the privacy rights of our Users are protected.",
                             "k) Personal Information that We Store. For your information, we store/collect the following Personal Information on you:",
                             {
                                 contextType: "list",
@@ -443,6 +452,16 @@ export const sectionsData = [
                         [
                             "PayPal",
                             `Website: ${createLink("https://www.paypal.com", "www.paypal.com")} <br /> Address: 2211 North First Street San Jose, CA 95131`
+                        ],
+                        [
+                            // TODO: verify current legal name/address before publishing.
+                            "PostHog Inc. (product analytics)",
+                            `Email: ${emailLink("hey@posthog.com")} <br /> Address: 2261 Market Street #4008, San Francisco, CA 94114`
+                        ],
+                        [
+                            // TODO: verify current legal name/address before publishing.
+                            "Functional Software, Inc. dba Sentry (crash/error reporting)",
+                            `Email: ${emailLink("support@sentry.io")} <br /> Address: 45 Fremont Street, 8th Floor, San Francisco, CA 94105`
                         ]
                     ]
                 }
