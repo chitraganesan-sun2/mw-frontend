@@ -112,7 +112,7 @@ const ProfileInfo = ({
         <div className="flex items-center gap-3">
             <div className="relative w-[80px] h-[80px] rounded-full shrink-0">
                 <Image
-                    src={volunteerData?.profile_picture?.image_url}
+                    src={volunteerData?.profile_picture?.image_url || DummyProfileImg}
                     alt="avatar"
                     fill
                     className="object-cover rounded-full w-full h-full"
