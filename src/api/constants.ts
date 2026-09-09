@@ -215,4 +215,7 @@ export const endpoints: EndpointProps = {
     contact: {
         create: "contact",
     },
+    push_notifications: {
+        registerDevice: "notifications/register-device",
+    },
 };

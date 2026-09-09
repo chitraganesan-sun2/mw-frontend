@@ -7,8 +7,6 @@ import { initNativeGoogleAuth } from '@/services/native-auth';
 import { initPushNotifications, registerPushListeners, registerTokenWithBackend } from '@/services/push-notifications';
 import { initAppLifecycle } from '@/services/app-lifecycle';
 import { getCookie } from '@/utils/auth';
-import { getApiUrl } from '@/config/api';
-import { getAPI_URL } from '@/definitions';
 
 /**
  * Hook to initialize all mobile-specific features.
@@ -44,10 +42,12 @@ export default function useMobileInit() {
       }
 
       if (fcmToken) {
-        // Register token with backend if user is logged in
+        // Covers app resume while already logged in - a fresh login/signup instead
+        // registers the token itself once auth succeeds, since this mount effect
+        // runs once at app start, typically before the user has signed in yet.
         const userId = getCookie('learner_id') || getCookie('volunteer_id');
         if (userId) {
-          await registerTokenWithBackend(fcmToken, userId, getAPI_URL());
+          await registerTokenWithBackend(fcmToken);
         }
       }
 

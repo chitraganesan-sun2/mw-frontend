@@ -10,23 +10,35 @@ The final gate before **Send for review**. Work top to bottom.
 keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodywings
 ```
 
-- [ ] Copy the **SHA-1** and **SHA-256**.
-- [ ] Firebase Console → Project settings → your Android app (`org.melodywings.app`)
-      → **Add fingerprint** → paste the release SHA-1 (keep the debug one too).
-- [ ] Google Cloud Console → APIs & Services → Credentials → create/confirm an
+- [x] Copy the **SHA-1** and **SHA-256**. *(verified 2026-09-09: SHA-1 =
+      `33:31:8E:24:91:D0:7C:40:6C:02:72:7E:33:BC:ED:D1:92:13:3C:5D`, via
+      `keytool -list -v` against `keystores/melodywings-release.keystore` using
+      `keystores/release-keystore-credentials.txt`)*
+- [x] Firebase Console → Project settings → your Android app (`org.melodywings.app`)
+      → **Add fingerprint** → paste the release SHA-1. *(done 2026-09-09 — confirmed the
+      registered fingerprint is an exact match for the release keystore's SHA-1 above, not
+      a leftover debug one as first suspected. Debug fingerprint not separately added — only
+      needed if you plan to test Google Sign-In from debug builds too.)*
+- [x] Google Cloud Console → APIs & Services → Credentials → create/confirm an
       **Android OAuth client** for package `org.melodywings.app` + release SHA-1.
-- [ ] Note the **Web** OAuth client id (Identity for the token exchange) →
-      put it in `.env.mobile` as `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` (runbook step 1).
-- [ ] Firebase → Download the updated **`google-services.json`** → replace
-      `android/app/google-services.json` (gitignored — do this on the build machine).
-- [ ] Backend: set the token-audience env on Cloud Run (it is a **no-op until set** —
-      per backend memory `auth-jwt-audit-2026-08-28`):
-  ```bash
-  gcloud run services update melodywings-backend --region us-central1 \
-    --update-env-vars GOOGLE_OAUTH_CLIENT_ID=<web client id>[,<android client id>]
-  ```
-- [ ] Rebuild the AAB (`08`) **after** `google-services.json` + `.env.mobile` are updated.
-- [ ] Smoke-test Google Sign-In on a device running the **release-signed** build.
+      *(auto-created by Firebase when the fingerprint above was added — confirmed present
+      in `google-services.json`'s `oauth_client` list as `client_type: 1` with the matching
+      `certificate_hash`, client id `781782361175-vj7vahqnqubn995ifalqg8fdt4vma094...`. No
+      separate manual step needed.)*
+- [x] Note the **Web** OAuth client id (Identity for the token exchange) →
+      put it in `.env.mobile` as `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` (runbook step 1). *(done 2026-09-08)*
+- [x] Firebase → Download the updated **`google-services.json`** → replace
+      `android/app/google-services.json`. *(present and current as of 2026-09-09 — content
+      matches what Firebase Console shows now.)*
+- [x] Backend: set the token-audience env on Cloud Run (it is a **no-op until set** —
+      per backend memory `auth-jwt-audit-2026-08-28`). *(done 2026-09-09, revision
+      `melodywings-backend-00123-bcd`)*
+- [x] Rebuild the AAB (`08`) **after** `google-services.json` + `.env.mobile` are updated.
+      *(done 2026-09-09 via Android Studio Generate Signed Bundle/APK)*
+- [x] Smoke-test Google Sign-In on a device running the **release-signed** build. *(done
+      2026-09-09 — found and fixed a real bug: the app's access token is minted under the
+      Android OAuth client, not just the Web one, so `GOOGLE_OAUTH_CLIENT_ID` needed both ids.
+      Now returns 200 on revision `melodywings-backend-00124-hxk`.)*
 
 ## 2. Keystore safety
 
@@ -47,7 +59,7 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
       `allowNavigation` scoped to the Cloud Run host.
 - [x] `AndroidManifest.xml`: `usesCleartextTraffic="false"` + `network_security_config.xml`.
 - [x] `build.gradle` release: `minifyEnabled`, `shrinkResources`, ProGuard rules, release `signingConfig`.
-- [ ] `.env.mobile` `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` no longer the placeholder.
+- [x] `.env.mobile` `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` no longer the placeholder. *(done 2026-09-08)*
 - [ ] `versionCode` / `versionName` correct for this upload (`06`).
 - [ ] (tidy, optional) add `android:maxSdkVersion="32"` to `WRITE_EXTERNAL_STORAGE`
       in `AndroidManifest.xml` (`05`).

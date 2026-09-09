@@ -1,6 +1,8 @@
 import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { isNativePlatform } from '@/utils/platform';
+import { POST_API } from '@/api/request';
+import { endpoints } from '@/api/constants';
 
 /**
  * Push Notifications Service for MelodyWings Mobile App.
@@ -15,6 +17,14 @@ import { isNativePlatform } from '@/utils/platform';
 export interface PushNotificationToken {
   value: string;
 }
+
+// initPushNotifications() runs once at app mount, which is usually before the user
+// has logged in - caching the token here lets a login success handler register it
+// with the backend later, once there's actually an authenticated user to attach it to.
+let cachedFcmToken: string | null = null;
+
+/** The FCM token from the most recent initPushNotifications() call, if any. */
+export const getCachedFcmToken = (): string | null => cachedFcmToken;
 
 /** Request permission and register for push notifications */
 export const initPushNotifications = async (): Promise<string | null> => {
@@ -44,6 +54,7 @@ export const initPushNotifications = async (): Promise<string | null> => {
 
         PushNotifications.addListener('registration', (token) => {
           clearTimeout(timeout);
+          cachedFcmToken = token.value;
           resolve(token.value);
         });
 
@@ -93,21 +104,18 @@ export const registerPushListeners = (
   });
 };
 
-/** Send FCM token to backend for targeted notifications */
-export const registerTokenWithBackend = async (
-  token: string,
-  userId: string,
-  apiUrl: string
-): Promise<void> => {
+/**
+ * Send the FCM token to the backend for targeted notifications.
+ *
+ * Uses the authenticated POST_API (attaches the JWT the backend's register-device
+ * route requires) rather than a raw fetch - the backend derives the recipient from
+ * the token itself, not a client-supplied user id.
+ */
+export const registerTokenWithBackend = async (token: string): Promise<void> => {
   try {
-    await fetch(`${apiUrl}/notifications/register-device`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fcm_token: token,
-        user_id: userId,
-        platform: 'android',
-      }),
+    await POST_API(endpoints.push_notifications.registerDevice, {
+      fcm_token: token,
+      platform: 'android',
     });
   } catch (error) {
     console.error('[Push] Failed to register token with backend:', error);

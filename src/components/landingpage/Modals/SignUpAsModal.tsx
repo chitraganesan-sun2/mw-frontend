@@ -16,6 +16,7 @@ import { handleCookie } from "@/api/auth";
 import dayjs from "dayjs";
 import { isNativePlatform } from "@/utils/platform";
 import { nativeGoogleSignIn } from "@/services/native-auth";
+import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications";
 import { getDefaultRouteForRole } from "@/utils/routeGuard";
 
 const learnerOptions = [
@@ -154,6 +155,10 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         await apiGoogleSignUp(access_token, payloads)
             .then((response: any) => {
                 setModalLoader(true);
+                if (isNativePlatform()) {
+                    const fcmToken = getCachedFcmToken();
+                    if (fcmToken) registerTokenWithBackend(fcmToken);
+                }
                 const { onboarded_status } = response;
                 const role = getCookie("role") as "learner" | "volunteer" | undefined;
                 const defaultRoute = getDefaultRouteForRole(role);

@@ -175,6 +175,9 @@ export type EndpointProps = {
     contact: {
         create: string;
     };
+    push_notifications: {
+        registerDevice: string;
+    };
 };
 
 // (string & {}) keeps literal autocomplete for known paths while still accepting any

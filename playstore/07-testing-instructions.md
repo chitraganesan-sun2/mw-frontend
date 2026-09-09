@@ -71,8 +71,20 @@ full learner + volunteer walkthrough and attach it — Play accepts either.)*
 - **Delete Account** → sign-in is blocked afterward for that account.
 
 ### Release-build-only checks (do these on the signed AAB, not a debug build)
-- Google Sign-In works when installed from Play / signed with the **release** key
+- [x] Google Sign-In works when installed from Play / signed with the **release** key
   (this is the #1 thing that breaks — needs the release SHA-1 on the OAuth client;
-  see `09`).
-- No cleartext / mixed-content errors in `adb logcat`.
-- Push notification received and tapping it deep-links to the right screen.
+  see `09`). *(2026-09-09: found + fixed a real bug — GOOGLE_OAUTH_CLIENT_ID on Cloud Run
+  needed both the Web and Android client ids, not just Web.)*
+- [x] No cleartext / mixed-content errors in `adb logcat`. *(2026-09-09: verified clean
+  across a full walkthrough — dashboard, Learners, Start Chat, Schedule, Community.)*
+- [ ] Push notification received and tapping it deep-links to the right screen.
+  *(not verified 2026-09-09 — needs a second device/account to receive it.)*
+- [ ] Delete Account. *(deliberately deferred — don't want to burn the current test
+  account; do this with a throwaway Google account before final submission.)*
+
+**Note on testing method:** synthetic `adb shell input tap` does not reliably trigger
+this app's WebView button handlers (some appear to listen for `pointerdown`/`touchstart`
+rather than `click`) — a tap that looks correctly targeted (verified via `uiautomator dump`
+bounds) can silently do nothing even though the button works fine on a real physical tap.
+Don't conclude a button is broken from a synthetic-tap non-response alone; confirm with an
+actual finger tap first.

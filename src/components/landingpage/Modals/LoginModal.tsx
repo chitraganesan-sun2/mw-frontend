@@ -12,6 +12,7 @@ import { showToast } from "@/components/common/Toast"
 import ModalLoader from "@/components/common/Loader/Modal"
 import { isNativePlatform } from "@/utils/platform"
 import { nativeGoogleSignIn } from "@/services/native-auth"
+import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications"
 import { getDefaultRouteForRole } from "@/utils/routeGuard"
 
 export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
@@ -29,6 +30,10 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
         await apiGoogleLogin(access_token)
             .then((response: any) => {
                 setModalLoader(true);
+                if (isNativePlatform()) {
+                    const fcmToken = getCachedFcmToken();
+                    if (fcmToken) registerTokenWithBackend(fcmToken);
+                }
                 const { onboarded_status } = response;
                 const role = getCookie("role") as "learner" | "volunteer" | undefined;
                 const defaultRoute = getDefaultRouteForRole(role);
