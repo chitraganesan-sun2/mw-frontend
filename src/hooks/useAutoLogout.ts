@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import Cookies from "js-cookie";
 import { clearCookies, getCookie } from "@/utils/auth";
+import { unregisterTokenFromBackend } from "@/services/push-notifications";
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 const COOKIE_EXPIRY_DAYS = INACTIVITY_TIMEOUT / (1000 * 60 * 60 * 24);
@@ -12,6 +13,9 @@ const useAutoLogout = (router: any) => {
   const initializedRef = useRef(false);
 
   const clearSession = useCallback(() => {
+    // Fire-and-forget, and before clearCookies() - it needs the still-valid auth
+    // cookie to identify which device's token to remove.
+    unregisterTokenFromBackend();
     clearCookies();
     router.refresh();
   }, [router]);

@@ -1,7 +1,7 @@
 import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { isNativePlatform } from '@/utils/platform';
-import { POST_API } from '@/api/request';
+import { DELETE_API, POST_API } from '@/api/request';
 import { endpoints } from '@/api/constants';
 
 /**
@@ -119,6 +119,21 @@ export const registerTokenWithBackend = async (token: string): Promise<void> => 
     });
   } catch (error) {
     console.error('[Push] Failed to register token with backend:', error);
+  }
+};
+
+/**
+ * Clear this device's registered token at logout - a shared/reused device
+ * (someone else signs in next) shouldn't keep receiving pushes meant for the
+ * account that just signed out. Best-effort: a failure here shouldn't block
+ * logout itself.
+ */
+export const unregisterTokenFromBackend = async (): Promise<void> => {
+  if (!isNativePlatform()) return;
+  try {
+    await DELETE_API(endpoints.push_notifications.unregisterDevice);
+  } catch (error) {
+    console.error('[Push] Failed to unregister token with backend:', error);
   }
 };
 

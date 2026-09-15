@@ -217,5 +217,6 @@ export const endpoints: EndpointProps = {
     },
     push_notifications: {
         registerDevice: "notifications/register-device",
+        unregisterDevice: "notifications/unregister-device",
     },
 };

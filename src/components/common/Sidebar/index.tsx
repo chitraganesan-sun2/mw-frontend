@@ -20,6 +20,7 @@ import InnerWidth from "@/utils/innerWidth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { clearCookies } from "@/utils/auth";
+import { unregisterTokenFromBackend } from "@/services/push-notifications";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const router = useRouter();
@@ -83,6 +84,9 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const linksData = [instantSessionsLink, ...baseLinksData, roleBasedLink, ...remainingLinks];
 
     const handleSignOut = () => {
+        // Fire-and-forget, and before clearCookies() - it needs the still-valid
+        // auth cookie to identify which device's token to remove.
+        unregisterTokenFromBackend();
         clearCookies();
 
         if (typeof window !== "undefined") {

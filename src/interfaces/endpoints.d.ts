@@ -177,6 +177,7 @@ export type EndpointProps = {
     };
     push_notifications: {
         registerDevice: string;
+        unregisterDevice: string;
     };
 };
 
