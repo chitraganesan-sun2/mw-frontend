@@ -45,6 +45,7 @@ export const endpoints: EndpointProps = {
         matchTrigger: "learner/match/trigger",
         matchHistory: "learner/match",
         matchWithVolunteer: (volunteerId: string) => `learner/match/with/${volunteerId}`,
+        exportData: "learner/export-data",
     },
     volunteer: {
         update: (id: string) => `volunteers/${id}`,
@@ -56,6 +57,7 @@ export const endpoints: EndpointProps = {
         matchTrigger: "volunteers/match/trigger",
         matchHistory: "volunteers/match",
         matchWithLearner: (learnerId: string) => `volunteers/match/with/${learnerId}`,
+        exportData: "volunteers/export-data",
     },
     volunteer_slot: {
         update: "volunteer_slots",

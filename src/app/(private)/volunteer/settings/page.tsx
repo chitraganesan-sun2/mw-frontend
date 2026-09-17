@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { getCookie } from "@/utils/auth";
 import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
+import ExportDataSection from "@/components/common/ExportDataSection";
 
 const SESSION_MATCH_OPTIONS = [
     {
@@ -164,6 +165,7 @@ const Settings = () => {
                     />
                 </div>
 
+                <ExportDataSection role="volunteer" />
                 <DeleteAccountSection userId={volunteerId as string} role="volunteer" />
             </div>
         </div>

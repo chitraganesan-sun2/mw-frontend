@@ -28,6 +28,7 @@ export type EndpointProps = {
         matchTrigger: string;
         matchHistory: string;
         matchWithVolunteer: (volunteerId: string) => string;
+        exportData: string;
     };
     volunteer: {
         update: (id: string) => string;
@@ -39,6 +40,7 @@ export type EndpointProps = {
         matchTrigger: string;
         matchHistory: string;
         matchWithLearner: (learnerId: string) => string;
+        exportData: string;
     };
     volunteer_slot: {
         update: string;

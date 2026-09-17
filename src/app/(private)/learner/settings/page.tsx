@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
+import ExportDataSection from "@/components/common/ExportDataSection";
 
 const SESSION_MATCH_OPTIONS = [
     {
@@ -163,6 +164,7 @@ const Settings = () => {
                     />
                 </div>
 
+                <ExportDataSection role="learner" />
                 <DeleteAccountSection userId={learnerId as string} role="learner" />
             </div>
         </div>
