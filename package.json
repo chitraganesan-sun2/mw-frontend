@@ -62,7 +62,6 @@
     "javascript-time-ago": "^2.5.11",
     "js-cookie": "^3.0.8",
     "jwt-decode": "^4.0.0",
-    "lodash": "^4.17.21",
     "next": "^14.2.21",
     "nookies": "^2.5.2",
     "numeral": "^2.0.6",
@@ -94,7 +93,6 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
-    "@types/lodash": "^4.17.13",
     "@types/node": "^20",
     "@types/numeral": "^2.0.5",
     "@types/react": "^18",
