@@ -47,7 +47,7 @@
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.3",
     "@mui/x-date-pickers": "^7.25.0",
-    "@react-oauth/google": "^0.12.1",
+    "@react-oauth/google": "^0.13.5",
     "@sentry/capacitor": "^4.3.0",
     "@sentry/react": "10.69.0",
     "@tanstack/react-query": "^5.62.3",
