@@ -101,6 +101,7 @@ export const endpoints: EndpointProps = {
             `session/instant_session/${volunteer_slot_id}`,
         getLearnerSessions: (id: string) => `session/learner/${id}`,
         getVolunteerSessions: (id: string) => `session/volunteer/${id}`,
+        downloadIcs: (sessionId: string) => `session/${sessionId}/ics`,
         cancelSession: (id: string) => `session/${id}`,
         getApprovalNotifications: (id: string) => `session/pending_invites/${id}`,
         getCalendarEvents: (id: string, userType: UserType, month?: string, status?: string) =>

@@ -8,6 +8,9 @@ import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
 import { formatTime } from "@/utils/calender";
 import { useAppStore } from "@/store/useAppStore";
+import { downloadFile } from "@/utils/downloadFile";
+import { isNativePlatform } from "@/utils/platform";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
 
 dayjs.extend(customParseFormat);
 
@@ -103,6 +106,10 @@ const AcceptedSessionsList: React.FC<AcceptedSessionsListProps> = ({ role }) => 
         return { upcoming: up, past: pa };
     }, [data, role]);
 
+    const handleAddToCalendar = (sessionId: string) => {
+        downloadFile(endpoints.session.downloadIcs(sessionId), `session-${sessionId}.ics`, "text/calendar");
+    };
+
     const renderRow = (s: NormalizedSession, isUpcoming: boolean) => {
         const dateLabel = s.start ? s.start.format("ddd, MMM D") : s.date || "";
         const timeLabel = [
@@ -129,16 +136,29 @@ const AcceptedSessionsList: React.FC<AcceptedSessionsListProps> = ({ role }) => 
                         {timeLabel}
                         {timeLabel && tzLabel ? ` ${tzLabel}` : ""}
                     </p>
-                    {isUpcoming && s.raw.meet_link && (
-                        <a
-                            href={s.raw.meet_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs font-medium text-primary hover:underline"
-                        >
-                            Join
-                        </a>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {!isNativePlatform() && (
+                            <button
+                                type="button"
+                                onClick={() => handleAddToCalendar(s.raw.session_id)}
+                                aria-label="Add to calendar"
+                                title="Add to calendar"
+                                className="flex items-center text-gray-light hover:text-primary bg-transparent border-0 p-0 cursor-pointer"
+                            >
+                                <HiOutlineCalendarDays size={16} />
+                            </button>
+                        )}
+                        {isUpcoming && s.raw.meet_link && (
+                            <a
+                                href={s.raw.meet_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-medium text-primary hover:underline"
+                            >
+                                Join
+                            </a>
+                        )}
+                    </div>
                 </div>
             </div>
         );

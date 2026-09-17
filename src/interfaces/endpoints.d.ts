@@ -70,6 +70,7 @@ export type EndpointProps = {
         withdrawInstantSession: (volunteer_slot_id: string) => string;
         getLearnerSessions: (id: string) => string;
         getVolunteerSessions: (id: string) => string;
+        downloadIcs: (sessionId: string) => string;
         cancelSession: (id: string) => string;
         getApprovalNotifications: (id: string) => string;
         updateNotificationStatus: (id: string) => string;
