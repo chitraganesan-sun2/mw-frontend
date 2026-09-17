@@ -36,12 +36,14 @@ const ProfileHeader = ({
 }) => (
     <div className="flex items-center justify-between px-5">
         <div className="flex items-center gap-2">
-            <span
+            <button
+                type="button"
                 onClick={onClose}
-                className="cursor-pointer md:hidden border border-black rounded-full p-2"
+                aria-label="Back"
+                className="bg-transparent cursor-pointer md:hidden border border-black rounded-full p-2"
             >
                 <IoIosArrowBack className="text-lg" />
-            </span>
+            </button>
             <p className="font-medium text-xl">Profile</p>
         </div>
         <div className="flex items-center gap-2">
@@ -50,9 +52,14 @@ const ProfileHeader = ({
                 title="Schedule a meeting"
                 className="text-sm !text-black !bg-primary !border-primary !border"
             />
-            <span onClick={onClose} className="cursor-pointer max-md:hidden">
+            <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="bg-transparent border-0 cursor-pointer max-md:hidden"
+            >
                 <ModalCloseIcon />
-            </span>
+            </button>
         </div>
     </div>
 );
