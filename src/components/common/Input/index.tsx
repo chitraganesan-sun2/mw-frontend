@@ -250,6 +250,7 @@ export const Input: React.FC<InputProps> = (props) => {
             case "text":
                 return (
                     <AntInput
+                        id={name}
                         name={name}
                         type={props.contentType}
                         placeholder={props.placeholder}
@@ -277,6 +278,7 @@ export const Input: React.FC<InputProps> = (props) => {
                         {...props}
                         maxLength={props?.maxLength}
                         min={props?.min}
+                        id={name}
                         name={name}
                         type={props.inputType}
                         placeholder={props.placeholder}
@@ -298,6 +300,7 @@ export const Input: React.FC<InputProps> = (props) => {
             case "textarea":
                 return (
                     <TextArea
+                        id={name}
                         name={name}
                         placeholder={props.placeholder}
                         value={props.value}
@@ -320,6 +323,8 @@ export const Input: React.FC<InputProps> = (props) => {
             case "search":
                 return (
                     <AntInput
+                        id={name}
+                        name={name}
                         inputMode="search"
                         placeholder={props.placeholder}
                         onChange={(e) => props.onChange(e.target.value)}
@@ -404,6 +409,7 @@ export const Input: React.FC<InputProps> = (props) => {
             case "checkbox":
                 return (
                     <Checkbox
+                        id={name}
                         className={`max-md:!text-sm ${props.inputClassName}`}
                         name={name}
                         checked={props.value}
