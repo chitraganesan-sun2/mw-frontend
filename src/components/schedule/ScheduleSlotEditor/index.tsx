@@ -107,6 +107,17 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
 }) => {
     const timePickerClass = cn("!text-sm");
 
+    // Every interactive control in this editor is a styled div/span rather than a
+    // <button> (icon-only controls, or elements that can't be a real <button>
+    // because they contain one), so keyboard access needs to be added explicitly
+    // to each - this whole flow was previously entirely keyboard-inert.
+    const keyActivate = (handler: () => void) => (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handler();
+        }
+    };
+
     return (
         <div>
             <div className="flex flex-col gap-1 px-5 py-4">
@@ -121,7 +132,14 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                         const isExpanded = expandedDays[day];
                         return (
                             <div key={day} className="flex flex-col gap-2 border bg-white md:bg-transparent border-gray-200 rounded-lg p-4">
-                                <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDay(day)}>
+                                <div
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-expanded={isExpanded}
+                                    className="flex items-center justify-between cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
+                                    onClick={() => toggleDay(day)}
+                                    onKeyDown={keyActivate(() => toggleDay(day))}
+                                >
                                     <p className="font-semibold">{day}</p>
                                     <ChevronRightIcon className={`transition-transform ${isExpanded ? "rotate-90" : ""}`} />
                                 </div>
@@ -156,8 +174,12 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                                 />
                                                             </div>
                                                             <span
+                                                                role="button"
+                                                                tabIndex={0}
+                                                                aria-label="Remove time slot"
                                                                 onClick={() => removeTimeSlot(day, slotIndex)}
-                                                                className="text-red-500 hover:text-red-700 cursor-pointer"
+                                                                onKeyDown={keyActivate(() => removeTimeSlot(day, slotIndex))}
+                                                                className="text-red-500 hover:text-red-700 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 rounded"
                                                             >
                                                                 <TrashIcon />
                                                             </span>
@@ -176,11 +198,16 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                                 return (
                                                                     <>
                                                                         <div
-                                                                            className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50 cursor-pointer hover:border-gray-300 transition-colors"
+                                                                            role="button"
+                                                                            tabIndex={0}
+                                                                            aria-haspopup="listbox"
+                                                                            aria-expanded={!!openDropdowns[day]?.[slotId]}
+                                                                            className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50 cursor-pointer hover:border-gray-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
                                                                                 toggleRepeatDropdown(day, slotId);
                                                                             }}
+                                                                            onKeyDown={keyActivate(() => toggleRepeatDropdown(day, slotId))}
                                                                         >
                                                                             <span className="text-sm font-medium text-gray-700">
                                                                                 {slot?.slot_type === "custom"
@@ -217,14 +244,23 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                                                 {repeatOptions.map((option) => (
                                                                                     <div
                                                                                         key={option.value}
+                                                                                        role="option"
+                                                                                        tabIndex={0}
+                                                                                        aria-selected={
+                                                                                            repeatFrequency[day]?.[slotId] === option.value ||
+                                                                                            (!repeatFrequency[day]?.[slotId] && option.value === "weekly")
+                                                                                        }
                                                                                         className={cn(
-                                                                                            "flex items-center justify-between p-3 text-sm cursor-pointer transition-colors",
+                                                                                            "flex items-center justify-between p-3 text-sm cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                                                                                             repeatFrequency[day]?.[slotId] === option.value ||
                                                                                                 (!repeatFrequency[day]?.[slotId] && option.value === "weekly")
                                                                                                 ? "bg-gray-50 text-gray-900 font-medium"
                                                                                                 : "text-gray-700 hover:bg-gray-50"
                                                                                         )}
                                                                                         onClick={() => handleRepeatFrequencyChange(day, slotId, option.value)}
+                                                                                        onKeyDown={keyActivate(() =>
+                                                                                            handleRepeatFrequencyChange(day, slotId, option.value)
+                                                                                        )}
                                                                                     >
                                                                                         <span>{option.label}</span>
                                                                                         {(repeatFrequency[day]?.[slotId] === option.value ||
@@ -248,11 +284,15 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                             )}
                                         </div>
                                         <span
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label={`Add time slot for ${day}`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 addTimeSlot(day);
                                             }}
-                                            className="text-primary mt-1.5 hover:opacity-80 w-fit"
+                                            onKeyDown={keyActivate(() => addTimeSlot(day))}
+                                            className="text-primary mt-1.5 hover:opacity-80 w-fit cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
                                         >
                                             <AddSlotIcon />
                                         </span>

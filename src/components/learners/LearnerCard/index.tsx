@@ -41,29 +41,38 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
     return (
         <div className="bg-white rounded-xl w-full shadow-sm h-auto p-4 flex flex-col gap-4">
             {/* Profile Header */}
-            <div onClick={() => onSeeMoreClick(learnerId)} className="flex items-center gap-4">
-                <div className="w-[36px] h-[36px] rounded-full relative cursor-pointer">
+            <div
+                role="button"
+                tabIndex={0}
+                onClick={() => onSeeMoreClick(learnerId)}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onSeeMoreClick(learnerId);
+                    }
+                }}
+                className="flex items-center gap-4 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-lg"
+                aria-label={`View details for ${name}`}
+            >
+                <div className="w-[36px] h-[36px] rounded-full relative">
                     {profileImage !== "image_url" ? (
                         <Image
                             src={profileImage}
-                            alt="avatar"
+                            alt={`${name}'s avatar`}
                             fill
                             className="w-full h-full object-cover rounded-full"
                         />
                     ) : (
                         <Image
                             src={DummyProfileImg}
-                            alt="avatar"
+                            alt={`${name}'s avatar`}
                             fill
                             className="w-full h-full object-cover rounded-full"
                         />
                     )}
                 </div>
                 <div className="flex flex-col">
-                    <p
-                        onClick={() => onSeeMoreClick(learnerId)}
-                        className="text-base font-semibold lg:text-normal underline text-primary cursor-pointer lg:font-medium"
-                    >
+                    <p className="text-base font-semibold lg:text-normal underline text-primary lg:font-medium">
                         {name}
                     </p>
                     <p className="text-sm font-medium">
