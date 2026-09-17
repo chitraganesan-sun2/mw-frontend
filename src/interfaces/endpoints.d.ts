@@ -27,6 +27,7 @@ export type EndpointProps = {
         emailPreference: (id: string) => string;
         matchTrigger: string;
         matchHistory: string;
+        matchWithVolunteer: (volunteerId: string) => string;
     };
     volunteer: {
         update: (id: string) => string;
@@ -37,6 +38,7 @@ export type EndpointProps = {
         emailPreference: (id: string) => string;
         matchTrigger: string;
         matchHistory: string;
+        matchWithLearner: (learnerId: string) => string;
     };
     volunteer_slot: {
         update: string;

@@ -44,6 +44,7 @@ export const endpoints: EndpointProps = {
         emailPreference: (id: string) => `learner/${id}/email_preference`,
         matchTrigger: "learner/match/trigger",
         matchHistory: "learner/match",
+        matchWithVolunteer: (volunteerId: string) => `learner/match/with/${volunteerId}`,
     },
     volunteer: {
         update: (id: string) => `volunteers/${id}`,
@@ -54,6 +55,7 @@ export const endpoints: EndpointProps = {
         emailPreference: (id: string) => `volunteers/${id}/email_preference`,
         matchTrigger: "volunteers/match/trigger",
         matchHistory: "volunteers/match",
+        matchWithLearner: (learnerId: string) => `volunteers/match/with/${learnerId}`,
     },
     volunteer_slot: {
         update: "volunteer_slots",

@@ -16,6 +16,7 @@ import DetailCard from "@/components/profile/Bio/DetailCard";
 import DetailChipCard from "@/components/profile/Bio/DetailChipCard";
 import RatingCard from "@/components/profile/Overview/RatingCard";
 import RatingHeader from "@/components/profile/Overview/RatingHeader";
+import WhyMatchedPanel from "@/components/common/WhyMatchedPanel";
 import InnerWidth from "@/utils/innerWidth";
 import { getLocalStorage } from "@/utils/localStorage";
 import { formatString } from "@/utils/stringFormats";
@@ -217,7 +218,19 @@ const TabButtons = ({
     </div>
 );
 
-const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) => {
+interface MatchInfo {
+    matched_skills?: string[];
+    matched_languages?: string[];
+    compatibility_score?: number;
+}
+
+const OverviewContent = ({
+    volunteerData,
+    matchInfo,
+}: {
+    volunteerData: VolunteerData;
+    matchInfo?: MatchInfo | null;
+}) => {
     const showSupportPreferenceDetails = SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS.includes(
         volunteerData?.support_preference || ""
     );
@@ -349,6 +362,11 @@ const OverviewContent = ({ volunteerData }: { volunteerData: VolunteerData }) =>
                     />
                 </div>
             </div>
+            <WhyMatchedPanel
+                matchedSkills={matchInfo?.matched_skills}
+                matchedLanguages={matchInfo?.matched_languages}
+                compatibilityScore={matchInfo?.compatibility_score}
+            />
             {overviewDetails.map((item, index) =>
                 item.type === "tags" ? (
                     item.tags && item.tags.length > 0 && (
@@ -436,6 +454,13 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
         return response.data;
     };
 
+    const getMatchInfo = async () => {
+        const response: any = await GET_API(
+            endpoints.learner.matchWithVolunteer(volunteerId as string)
+        );
+        return response.data;
+    };
+
     const {
         data: volunteerData,
         isLoading,
@@ -453,6 +478,12 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
     const { data: volunteerFeedback } = useQuery({
         queryKey: ["volunteerFeedback", volunteerId],
         queryFn: getVolunterFeedback,
+        enabled: !!volunteerId,
+    });
+
+    const { data: matchInfo } = useQuery({
+        queryKey: ["learnerMatchWithVolunteer", volunteerId],
+        queryFn: getMatchInfo,
         enabled: !!volunteerId,
     });
 
@@ -548,7 +579,7 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
                             }`}
                         >
                             {activeTab === "overview" && (
-                                <OverviewContent volunteerData={volunteerData} />
+                                <OverviewContent volunteerData={volunteerData} matchInfo={matchInfo} />
                             )}
                         </div>
                         <div

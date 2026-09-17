@@ -15,6 +15,7 @@ import DetailCard from "@/components/profile/Bio/DetailCard";
 import DetailChipCard from "@/components/profile/Bio/DetailChipCard";
 import RatingCard from "@/components/profile/Overview/RatingCard";
 import RatingHeader from "@/components/profile/Overview/RatingHeader";
+import WhyMatchedPanel from "@/components/common/WhyMatchedPanel";
 import InnerWidth from "@/utils/innerWidth";
 import { getLocalStorage } from "@/utils/localStorage";
 import { formatString } from "@/utils/stringFormats";
@@ -260,8 +261,20 @@ const ContentRender = ({
     );
 };
 
-const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
-    
+interface MatchInfo {
+    matched_skills?: string[];
+    matched_languages?: string[];
+    compatibility_score?: number;
+}
+
+const OverviewContent = ({
+    learnerData,
+    matchInfo,
+}: {
+    learnerData: VolunteerData;
+    matchInfo?: MatchInfo | null;
+}) => {
+
     const personalDetails = [
         {
             title: "Name",
@@ -463,6 +476,11 @@ const OverviewContent = ({ learnerData }: { learnerData: VolunteerData }) => {
 
     return (
         <div className="flex flex-col gap-5">
+            <WhyMatchedPanel
+                matchedSkills={matchInfo?.matched_skills}
+                matchedLanguages={matchInfo?.matched_languages}
+                compatibilityScore={matchInfo?.compatibility_score}
+            />
             <div className="px-5">
                 <h3 className="font-medium mb-3 text-xl">Personal Details</h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -595,6 +613,13 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
         return response.data;
     };
 
+    const getMatchInfo = async () => {
+        const response: any = await GET_API(
+            endpoints.volunteer.matchWithLearner(learnerId as string)
+        );
+        return response.data;
+    };
+
     const {
         data: learnerData,
         isLoading,
@@ -608,6 +633,12 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
     const { data: learnerFeedback } = useQuery({
         queryKey: ["learnerFeedback", learnerId],
         queryFn: getLearnerFeedback,
+        enabled: !!learnerId,
+    });
+
+    const { data: matchInfo } = useQuery({
+        queryKey: ["volunteerMatchWithLearner", learnerId],
+        queryFn: getMatchInfo,
         enabled: !!learnerId,
     });
 
@@ -670,7 +701,7 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
                             }`}
                         >
                             {activeTab === "overview" && (
-                                <OverviewContent learnerData={learnerData} />
+                                <OverviewContent learnerData={learnerData} matchInfo={matchInfo} />
                             )}
                         </div>
                         <div
