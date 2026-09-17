@@ -74,6 +74,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
             case "session_accepted":
             case "session_rejected":
             case "session_cancelled":
+            case "session_reminder":
                 router.push(`/${role}/schedule`);
                 break;
             default:
