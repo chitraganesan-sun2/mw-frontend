@@ -132,14 +132,10 @@ export const getFileData = async (
 
         throw new Error("Unsupported file type");
     } catch (error: any) {
-        // Re-throw validation errors as-is
-        if (error.message && !error.response) {
-            throw error;
-        }
-
-        // Handle server errors with user-friendly messages
-        const status = error.response?.status;
-        const detail = error.response?.data?.detail;
+        // POST_API rejects with api-client.ts's flattened ApiError ({message, status,
+        // data}), never a raw axios error - there's no error.response here.
+        const status = error?.status;
+        const detail = error?.data?.detail;
 
         if (status === 413) {
             throw new Error(detail || "File is too large for upload.");
@@ -147,6 +143,8 @@ export const getFileData = async (
             throw new Error(detail || "Invalid file. Please check the format.");
         } else if (status === 401) {
             throw new Error("Session expired. Please log in again.");
+        } else if (status === 403) {
+            throw new Error("You don't have permission to upload this file.");
         } else {
             throw new Error(
                 detail || "Upload failed. Please check your connection and try again."

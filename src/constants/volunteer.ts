@@ -609,8 +609,8 @@ export const VolunteerFormSections: FormSectionConfig[] = [
         type: "card",
     },
     {
-        //TODO: Need Clarification
-        title: "Volunteer snapshot",
+        title: "Profile Media",
+        parent: null,
         fields: [
             {
                 id: "profile_picture",

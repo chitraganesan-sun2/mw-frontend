@@ -1,6 +1,7 @@
 import { getAPI_URL } from "@/definitions";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getCookie, clearCookies } from "@/utils/auth";
+import { showToast } from "@/components/common/Toast";
 
 // Define custom error interface
 interface ApiError {
@@ -63,7 +64,11 @@ axiosInstance.interceptors.response.use(
                     }
                     break;
                 case 403:
+                    // Unlike 401, the session itself is still valid here - the caller
+                    // is just not allowed to do this one thing. Surface it and let
+                    // them stay on the page, don't force a logout.
                     apiError.message = "Access forbidden";
+                    showToast({ type: "error", message: "You don't have permission to do that." });
                     break;
                 case 404:
                     apiError.message = "Resource not found";
