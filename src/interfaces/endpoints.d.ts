@@ -41,6 +41,7 @@ export type EndpointProps = {
         matchHistory: string;
         matchWithLearner: (learnerId: string) => string;
         exportData: string;
+        hoursCertificate: string;
     };
     volunteer_slot: {
         update: string;

@@ -58,6 +58,7 @@ export const endpoints: EndpointProps = {
         matchHistory: "volunteers/match",
         matchWithLearner: (learnerId: string) => `volunteers/match/with/${learnerId}`,
         exportData: "volunteers/export-data",
+        hoursCertificate: "volunteers/hours-certificate",
     },
     volunteer_slot: {
         update: "volunteer_slots",

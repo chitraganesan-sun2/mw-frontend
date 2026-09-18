@@ -11,6 +11,7 @@ import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
+import VolunteerCertificateSection from "@/components/common/VolunteerCertificateSection";
 
 const SESSION_MATCH_OPTIONS = [
     {
@@ -167,6 +168,7 @@ const Settings = () => {
                 </div>
 
                 <DonationHistorySection />
+                <VolunteerCertificateSection />
                 <ExportDataSection role="volunteer" />
                 <DeleteAccountSection userId={volunteerId as string} role="volunteer" />
             </div>
