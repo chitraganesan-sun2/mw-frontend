@@ -16,7 +16,6 @@ export const getHeaderTitle = (pathname: string) => {
     return path;
 };
 
-//TODO: Need Redandunt work here
 export const getHeaderIcon = (pathname: string) => {
     if (pathname === "backIcon") return <IoIosArrowBack />;
     switch (getHeaderTitle(pathname)) {
@@ -39,7 +38,6 @@ export const getHeaderIcon = (pathname: string) => {
     }
 };
 
-//TODO: Need Redandunt work here
 export const renderHeader = (pathname: string) => {
     switch (getHeaderTitle(pathname)) {
         case "schedule":

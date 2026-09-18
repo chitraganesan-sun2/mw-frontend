@@ -86,9 +86,6 @@ export const endpoints: EndpointProps = {
         getInstantSessions: "session/instant_session/active",
         validateInstantSession: (session_date: string, session_start_time: string, session_end_time: string) =>
             `session/instant_session/validate?session_date=${encodeURIComponent(session_date)}&session_start_time=${encodeURIComponent(session_start_time)}&session_end_time=${encodeURIComponent(session_end_time)}`,
-        /** GET instant session by slot (query: volunteer_slot_id, date YYYY-MM-DD, volunteer_id) */
-        getVolunteerInstantSession: (volunteer_slot_id: string, date: string, volunteer_id: string) =>
-            `session/volunteer/instant_session?volunteer_slot_id=${encodeURIComponent(volunteer_slot_id)}&date=${encodeURIComponent(date)}&volunteer_id=${encodeURIComponent(volunteer_id)}`,
         /** GET learner instant sessions (query: date YYYY-MM-DD, is_accepted boolean, free-text search) */
         getLearnerInstantSession: (date: string, isAccepted?: boolean, query?: string) =>
             `session/learner/instant_session?date=${encodeURIComponent(date)}${isAccepted !== undefined ? `&is_accepted=${isAccepted}` : ""}${query ? `&query=${encodeURIComponent(query)}` : ""}`,

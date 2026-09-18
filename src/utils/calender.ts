@@ -92,16 +92,6 @@ export const getCalendarEvents = async (
     return mapLearnerSessionsToEvents(data);
 };
 
-/** One GET per slot when you need instant session details (e.g. modal). Do not call in a loop for calendar. */
-export const getVolunteerInstantSession = async (
-    volunteer_slot_id: string,
-    date: string,
-    volunteer_id: string
-) => {
-    const url = endpoints.session.getVolunteerInstantSession(volunteer_slot_id, date, volunteer_id);
-    return GET_API(url);
-};
-
 function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
     if (!Array.isArray(data)) return [];
     const events: CalendarEvent[] = [];
