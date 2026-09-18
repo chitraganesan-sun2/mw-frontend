@@ -51,6 +51,8 @@ const Settings = () => {
     const [isEnabled, setIsEnabled] = useState(false);
     const [sessionMatchPreference, setSessionMatchPreference] =
         useState<SessionMatchValue>("all_sessions");
+    const [pushEnabled, setPushEnabled] = useState(true);
+    const [isPushLoading, setIsPushLoading] = useState(false);
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
     const learnerId = getCookie("learner_id");
@@ -74,6 +76,15 @@ const Settings = () => {
         });
     };
 
+    const handlePushPreferenceChange = (value: boolean) => {
+        setPushEnabled(value);
+        PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
+            push_notifications_enabled: value,
+        }).catch((err) => {
+            console.error(err, "PUSH PREFERENCE");
+        });
+    };
+
     useEffect(() => {
         setHeaderOptions({
             title: "Settings",
@@ -90,6 +101,9 @@ const Settings = () => {
                 const apiPref = res.data?.instant_session_email_preference;
                 if (apiPref && API_TO_UI_PREFERENCE[apiPref] !== undefined) {
                     setSessionMatchPreference(API_TO_UI_PREFERENCE[apiPref]);
+                }
+                if (typeof res.data?.push_notifications_enabled === "boolean") {
+                    setPushEnabled(res.data.push_notifications_enabled);
                 }
             })
             .finally(() => {
@@ -115,6 +129,23 @@ const Settings = () => {
                         onChange={(value) => {
                             handlePermission(value);
                         }}
+                        className="w-fit [&.ant-switch-checked]:bg-black"
+                    />
+                </div>
+
+                <p className="md:text-2xl text-[16px] font-medium mt-4 md:mt-0">Notification Preferences</p>
+
+                <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
+                    <div className="flex flex-col gap-2">
+                        <p className="md:text-base text-[14px] font-medium">Push notifications</p>
+                        <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
+                            Get push notifications on your device for sessions, messages, and matches.
+                        </p>
+                    </div>
+                    <Switch
+                        checked={pushEnabled}
+                        loading={isPushLoading}
+                        onChange={(value) => handlePushPreferenceChange(value)}
                         className="w-fit [&.ant-switch-checked]:bg-black"
                     />
                 </div>
