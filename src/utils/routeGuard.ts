@@ -51,7 +51,7 @@ export const LANDING_PAGE_ROUTES = [
     "/terms-and-conditions",
 ];
 
-export const ALWAYS_ACCESSIBLE_ROUTES = ["/donate", "/privacy-policy", "/terms-and-conditions"];
+export const ALWAYS_ACCESSIBLE_ROUTES = ["/donate", "/donate/history", "/privacy-policy", "/terms-and-conditions"];
 
 export const PROTECTED_ROUTES = ["/learner", "/volunteer"];
 

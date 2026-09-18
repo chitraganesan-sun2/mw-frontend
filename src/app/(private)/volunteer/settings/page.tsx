@@ -10,6 +10,7 @@ import { getCookie } from "@/utils/auth";
 import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
+import DonationHistorySection from "@/components/common/DonationHistorySection";
 
 const SESSION_MATCH_OPTIONS = [
     {
@@ -165,6 +166,7 @@ const Settings = () => {
                     />
                 </div>
 
+                <DonationHistorySection />
                 <ExportDataSection role="volunteer" />
                 <DeleteAccountSection userId={volunteerId as string} role="volunteer" />
             </div>

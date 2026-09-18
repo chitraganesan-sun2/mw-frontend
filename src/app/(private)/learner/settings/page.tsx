@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
+import DonationHistorySection from "@/components/common/DonationHistorySection";
 
 const SESSION_MATCH_OPTIONS = [
     {
@@ -164,6 +165,7 @@ const Settings = () => {
                     />
                 </div>
 
+                <DonationHistorySection />
                 <ExportDataSection role="learner" />
                 <DeleteAccountSection userId={learnerId as string} role="learner" />
             </div>

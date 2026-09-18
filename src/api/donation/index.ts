@@ -44,3 +44,7 @@ export async function getDonorWall() {
 export async function getDonationFaqs() {
 	return await GET_API(`${DONATION_PREFIX}/faqs`);
 }
+
+export async function getDonationHistory() {
+	return await GET_API(`${DONATION_PREFIX}/history`);
+}
