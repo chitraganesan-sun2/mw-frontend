@@ -102,8 +102,14 @@ live on Internal testing**, full roll-out; **Production is still a Draft, 0 of 1
 countries** — nothing has ever been published publicly. This upload is therefore a first
 production release, not an update, so everything in §4 gates it and review can take ~14 days.
 
-- [ ] Upload AAB (versionCode 3 / 1.1.0) to **Internal testing** first — it will supersede
-      the versionCode 2 build currently serving testers.
+- [x] Upload AAB (versionCode 3 / 1.1.0) to **Internal testing** first — it will supersede
+      the versionCode 2 build currently serving testers. *(done 2026-09-21 15:24 — track
+      Active, "Available to internal testers", latest release 3 (1.1.0). Pre-verified from
+      the AAB itself: versionCode 3, versionName 1.1.0, signer SHA1 matches the release
+      keystore, and the AAB (15:12) is newer than the cap sync (14:57) so it carries the
+      current web bundle. **First attempt was rejected — "Version code 1 has already been
+      used" — because the stale Gradle-path AAB got uploaded instead of the Android Studio
+      one; see the warning box in `08` §5.**)*
 - [ ] Run `07-testing-instructions.md` end to end on the internal build, including the
       release-build-only checks and **Delete Account**.
 - [ ] Promote to **Production**, paste "What's new" from `06`.

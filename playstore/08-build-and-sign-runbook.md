@@ -102,7 +102,25 @@ export JAVA_HOME="/c/Program Files/Java/jdk-21.0.12"   # if needed (step 0)
 ```
 
 Output:
-- **AAB:** `android/app/build/outputs/bundle/release/app-release.aab`  ← upload this
+- **AAB (Gradle CLI):** `android/app/build/outputs/bundle/release/app-release.aab`
+
+> ### ⚠️ Two different output paths — check which one you actually built
+>
+> **Android Studio → Generate Signed Bundle/APK does NOT write to the Gradle path above.**
+> It writes to **`android/app/release/app-release.aab`**.
+>
+> Both paths can hold a valid, correctly-signed AAB from different days, and nothing
+> warns you — you just get *"Version code N has already been used"* from the Console
+> after the upload finishes. This bit us on 2026-09-21: the Gradle path still held a
+> versionCode 1 build from 9 Sept while the fresh versionCode 3 build sat in
+> `app/release/`.
+>
+> **Before every upload, confirm the version inside the file you are about to upload**
+> (§6 below), and prefer sorting by modified time over trusting either path. Also note
+> `output-metadata.json` next to the AAB is written by the *APK* build and can be stale —
+> it is not a reliable version source.
+>
+> After a successful upload, delete the losing artifact so there is only ever one.
 - **ProGuard mapping:** `android/app/build/outputs/mapping/release/mapping.txt`
   ← upload to Play (Release → App bundle → upload deobfuscation file) for readable
   crash traces
@@ -116,6 +134,36 @@ Also build a signed APK for local device testing if you want one:
 ```
 
 ## 6. Verify the artifact
+
+**Do this on the exact file you are about to upload, every time.** Point `AAB` at it:
+
+```bash
+AAB=app/release/app-release.aab    # or app/build/outputs/bundle/release/app-release.aab
+
+# 1. versionCode / versionName, read out of the AAB itself (not output-metadata.json,
+#    which is written by the APK build and goes stale). The AAB manifest is protobuf,
+#    so pull the value that follows each attribute name:
+unzip -o -q "$AAB" base/manifest/AndroidManifest.xml -d /tmp/aabchk
+python -c "
+d=open('/tmp/aabchk/base/manifest/AndroidManifest.xml','rb').read()
+for a in (b'versionCode', b'versionName'):
+    i=d.find(a); j=i+len(a); n=d[j+1]
+    print(a.decode(), '=', d[j+2:j+2+n].decode())"
+
+# 2. signing cert - SHA1 must equal the release keystore fingerprint registered in
+#    Firebase, or Google Sign-In fails on the installed build:
+keytool -printcert -jarfile "$AAB" | grep -E "SHA1|Owner"
+```
+
+Expected SHA1: `33:31:8E:24:91:D0:7C:40:6C:02:72:7E:33:BC:ED:D1:92:13:3C:5D`
+
+Also sanity-check that the AAB is **newer than the last `cap sync`** — otherwise it
+carries a stale web bundle:
+
+```bash
+find app/src/main/assets/public -maxdepth 1 -name index.html -printf "synced %TF %TH:%TM\n"
+find "$(dirname "$AAB")" -name "$(basename "$AAB")" -printf "built  %TF %TH:%TM\n"
+```
 
 ```bash
 # signature / alias / SHA-256 of the signing cert:
