@@ -21,9 +21,14 @@ What's new in 1.1
 
 ## Internal changelog — what 1.1.0 contains
 
-Covers everything since versionCode 1. **versionCode 2 (1.0.1)** was cut for the AD_ID
-permission fix (`18ddd79`); if it never reached a Play track, that is fine — Play only
-requires versionCode to *increase*, gaps are allowed.
+Covers everything since versionCode 1.
+
+**Play Console state, confirmed 2026-09-21:** versionCode 1 (1.0.0) is *Inactive*;
+**versionCode 2 (1.0.1) is live on the Internal testing track**, full roll-out, uploaded
+10 Sept 2026. **Production has never been published — it is still a Draft, 0 of 177
+countries.** So versionCode 3 is both correct and required (it must exceed 2), and this
+upload is still a *first production release*, not an update: the full store-listing /
+data-safety / content-rating gate in `09` applies, and new-app review can take ~14 days.
 
 **New features**
 - "Why You Matched" panel on volunteer/learner profile views

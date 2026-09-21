@@ -97,7 +97,13 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
 
 ## 5. Release
 
-- [ ] Upload AAB to **Internal testing** first.
+**Console state as of 2026-09-21:** versionCode 1 *Inactive*; **versionCode 2 (1.0.1)
+live on Internal testing**, full roll-out; **Production is still a Draft, 0 of 177
+countries** — nothing has ever been published publicly. This upload is therefore a first
+production release, not an update, so everything in §4 gates it and review can take ~14 days.
+
+- [ ] Upload AAB (versionCode 3 / 1.1.0) to **Internal testing** first — it will supersede
+      the versionCode 2 build currently serving testers.
 - [ ] Run `07-testing-instructions.md` end to end on the internal build, including the
       release-build-only checks and **Delete Account**.
 - [ ] Promote to **Production**, paste "What's new" from `06`.
