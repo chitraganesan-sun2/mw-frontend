@@ -48,27 +48,45 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
 - [ ] Consider enrolling in **Play App Signing** (recommended) — you still keep the
       upload key; Google manages the app signing key.
 
-## 3. Build hygiene (verified 2026-09-02, re-verify on the real build)
+## 3. Build hygiene (re-verified 2026-09-21 against `main@912830b`)
 
 - [x] `cap sync` run against current `main` — native bundle has all latest features.
+      *(re-run 2026-09-21. The previous sync was made at 1e7e0cc and had gone stale: two
+      later commits — 5bdf1f0 and 912830b, the 403-toast fix — were missing from the
+      shipped bundle. Rebuilt and re-synced; all 14 plugins register, Sentry included.)*
 - [x] `/dev-login` excluded from the mobile export (build script) — no `dev-login`
-      string in `android/app/src/main/assets/public/`.
+      string in `android/app/src/main/assets/public/`. *(re-verified 2026-09-21)*
 - [x] `.env.mobile` used for the build, not a developer `.env.local` — no
-      `localhost` / `ENABLE_DEV_LOGIN=true` in the synced bundle.
+      `ENABLE_DEV_LOGIN=true` in the synced bundle; API base is the Cloud Run host.
+      *(re-verified 2026-09-21. Note: `localhost` DOES appear in 5 vendor chunks and that
+      is expected — Sentry stripping `capacitor://localhost` from stack-trace filenames,
+      PostHog's localhost capture guard, a URL-validation regex, a default fallback, and
+      the whatwg-url polyfill. None is a baked config value. Don't treat a bare
+      `grep localhost` hit as a failure; check the surrounding context.)*
 - [x] `capacitor.config.json`: `webContentsDebuggingEnabled:false`, `cleartext:false`,
       `allowNavigation` scoped to the Cloud Run host.
 - [x] `AndroidManifest.xml`: `usesCleartextTraffic="false"` + `network_security_config.xml`.
 - [x] `build.gradle` release: `minifyEnabled`, `shrinkResources`, ProGuard rules, release `signingConfig`.
 - [x] `.env.mobile` `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` no longer the placeholder. *(done 2026-09-08)*
-- [ ] `versionCode` / `versionName` correct for this upload (`06`).
+- [x] `versionCode` / `versionName` correct for this upload (`06`). *(2026-09-21:
+      versionCode **3**, versionName **1.1.0**, and `.env.mobile`'s
+      `NEXT_PUBLIC_CURRENT_VERSION=1.1.0` matches. versionCode 2 (1.0.1) was cut for the
+      AD_ID fix; 3 is above both, and Play allows gaps as long as it increases.)*
 - [ ] (tidy, optional) add `android:maxSdkVersion="32"` to `WRITE_EXTERNAL_STORAGE`
-      in `AndroidManifest.xml` (`05`).
-- [ ] (tidy, optional) `AD_ID` removal line if Play flags it (`05` / `08`).
+      in `AndroidManifest.xml` (`05`). *(still open — deliberately not done right before a
+      release build. Low risk either way: Play's broad-storage review targets
+      MANAGE_EXTERNAL_STORAGE, not this, and the permission is inert on API 33+ anyway.)*
+- [x] (tidy, optional) `AD_ID` removal line if Play flags it (`05` / `08`). *(done in
+      `5ca505a` — `tools:node="remove"` on `com.google.android.gms.permission.AD_ID`,
+      confirmed in the manifest 2026-09-21)*
 
 ## 4. Store listing & policy (Console)
 
 - [ ] Main store listing complete — `01` (name, short & full description, contact email, category **Education**).
 - [ ] Graphics uploaded — `02` (512 icon, 1024×500 feature graphic, ≥2 phone screenshots).
+      *(the files themselves are ready in `playstore/assets/` — `icon-512.png`,
+      `feature-graphic-1024x500.png` — and `playstore/screenshots/` (7 phone shots).
+      Uploading them in the Console is still a manual step.)*
 - [ ] Privacy policy URL live at `https://melodywings.org/privacy-policy` and covers
       everything in the Data safety form — `10`.
 - [ ] Data safety form submitted — `03`.
@@ -88,6 +106,6 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
 
 ## 6. Post-approval
 
-- [ ] Tag the release commit (`git tag v1.0.0`).
+- [ ] Tag the release commit (`git tag v1.1.0`).
 - [ ] Upload `mapping.txt` for the release if not done at upload time.
 - [ ] No branch merge-back needed — the mobile project tracks `main`.
