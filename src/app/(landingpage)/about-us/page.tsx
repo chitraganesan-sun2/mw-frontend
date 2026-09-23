@@ -2,6 +2,20 @@ import MeetOurTeam from "@/components/landingpage/AboutUs/MeetOurTeam";
 import TitleSection from "@/components/onboarding/TitleSection";
 import AboutSectionCard from "@/components/landingpage/AboutUs/AboutSectionCard";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "About Us",
+    description: "MelodyWings is a heartfelt initiative providing free tutoring for students with disabilities and special needs, connecting them with volunteers who gain valuable experience and community service hours.",
+    alternates: {
+        canonical: "/about-us",
+    },
+    openGraph: {
+        title: "About Us | MelodyWings",
+        description: "MelodyWings is a heartfelt initiative providing free tutoring for students with disabilities and special needs, connecting them with volunteers who gain valuable experience and community service hours.",
+        url: "/about-us",
+    },
+};
 
 const AboutUs = () => {
     return (

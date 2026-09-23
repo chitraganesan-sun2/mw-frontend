@@ -40,7 +40,7 @@ export default function SchedulePage() {
 
     const getEvents = () => getCalendarEvents(volunteerId as string, "volunteer", currentMonth);
 
-    const { data, isFetching } = useQuery({
+    const { data, isFetching, isError } = useQuery({
         queryKey: ["volunteer-events", currentMonth],
         queryFn: getEvents,
         // A learner booking/cancelling happens in their own separate browser session - query
@@ -118,6 +118,8 @@ export default function SchedulePage() {
             <AcceptedSessionsList role="volunteer" />
             {isFetching ? (
                 <LottieLoader isLoading={true} fullscreen={false} />
+            ) : isError ? (
+                <div className="flex-center h-full w-full">Something went wrong loading your schedule.</div>
             ) : isMobileOrTabScreen ? (
                 <MobileCalender events={data || []} onDateSelect={handleDateSelect} />
             ) : (

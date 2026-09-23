@@ -1,6 +1,15 @@
 import React from "react";
 import PrivacyPolicyHeader from "@/components/consents/privacy-policy/header";
 import PrivacyPolicySections from "@/components/consents/privacy-policy/sections";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Privacy Policy",
+    description: "How MelodyWings collects, uses, and protects the personal information of learners, volunteers, and donors on our platform.",
+    alternates: {
+        canonical: "/privacy-policy",
+    },
+};
 
 const PrivacyPolicy = () => {
     return (

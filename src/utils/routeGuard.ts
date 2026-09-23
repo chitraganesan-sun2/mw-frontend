@@ -42,6 +42,7 @@ export const LANDING_PAGE_ROUTES = [
     "/",
     "/about-us",
     "/donate",
+    "/donate/success",
     "/join-us",
     "/join-us/step-1",
     "/join-us/step-2",
@@ -50,6 +51,32 @@ export const LANDING_PAGE_ROUTES = [
     "/privacy-policy",
     "/terms-and-conditions",
 ];
+
+// Public routes with a dynamic sub-path (e.g. /blogs/[id]) that LANDING_PAGE_ROUTES'
+// exact-match `.includes()` can never match. Before this existed, every unauthenticated
+// visitor AND search-engine bot hitting /blogs or any individual post was redirected to
+// "/" - the public blog was structurally unreachable by anyone not logged in, which is
+// the entire audience it exists for (see [[production-readiness-audit-2026-09-23]]).
+export const PUBLIC_ROUTE_PREFIXES = ["/blogs"];
+
+export function isPublicLandingRoute(pathname: string): boolean {
+    if (LANDING_PAGE_ROUTES.includes(pathname)) return true;
+    return PUBLIC_ROUTE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+const AUTH_ROUTE_PREFIXES = ["/onboarding"];
+
+// A path under a real section of the app (protected app routes, onboarding) that an
+// unauthenticated visitor isn't allowed to see yet - as opposed to a path that isn't
+// part of the app at all. Only the former should bounce to "/"; a genuinely unknown
+// path (typo, dead backlink, old bookmark) should fall through and let Next.js render
+// its real not-found page instead of silently landing on the homepage with no
+// indication anything was wrong.
+function isKnownGatedRoute(pathname: string): boolean {
+    return [...PROTECTED_ROUTES, ...AUTH_ROUTE_PREFIXES].some(
+        (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    );
+}
 
 export const ALWAYS_ACCESSIBLE_ROUTES = ["/donate", "/donate/history", "/privacy-policy", "/terms-and-conditions"];
 
@@ -69,7 +96,8 @@ export function getRedirectForRoute(pathname: string, auth: AuthState): string |
     auth = { ...auth, onboardedStatus };
 
     if (!auth.isAuthenticated) {
-        return LANDING_PAGE_ROUTES.includes(pathname) ? null : "/";
+        if (isPublicLandingRoute(pathname)) return null;
+        return isKnownGatedRoute(pathname) ? "/" : null;
     }
 
     if (auth.onboardedStatus !== "verification_completed" && LANDING_PAGE_ROUTES.includes(pathname)) {

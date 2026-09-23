@@ -105,9 +105,14 @@ const Footer = (props: Props) => {
 
                     <div className="flex-center flex-col gap-6">
                         <div className="flex flex-col items-center gap-2">
-                            <Logo className="flex !flex-col" />
+                            <Link href="/" aria-label="MelodyWings home">
+                                <Logo className="flex !flex-col" />
+                            </Link>
                             <p className="text-gray-500 text-center text-sm">
                                 501c.3 | EIN:33-3734582
+                            </p>
+                            <p className="text-gray-400 text-center text-xs">
+                                &copy; {new Date().getFullYear()} MelodyWings
                             </p>
                         </div>
 

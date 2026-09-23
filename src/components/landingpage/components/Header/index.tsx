@@ -28,6 +28,14 @@ const Header = () => {
         setMounted(true);
     }, []);
 
+    // Close the drawer on any route change, not just clicks routed through
+    // handleLinkClick - browser back/forward or a link that bypasses that
+    // handler used to leave it open. Matches the already-correct pattern in
+    // the authenticated app's header (src/components/common/Header/index.tsx).
+    useEffect(() => {
+        setIsSideNavBarOpen(false);
+    }, [pathname]);
+
     const handleSideNavBar = () => {
         setIsSideNavBarOpen(!isSideNavBarOpen);
     };
@@ -97,7 +105,8 @@ const Header = () => {
                         </div>
                         <button
                             type="button"
-                            aria-label="Open navigation menu"
+                            aria-label={isSideNavBarOpen ? "Close navigation menu" : "Open navigation menu"}
+                            aria-expanded={isSideNavBarOpen}
                             className="md:hidden cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none touch-manipulation focus:outline-none focus-visible:outline-none active:outline-none"
                             onClick={handleSideNavBar}
                             style={noTapHighlight}
@@ -123,24 +132,27 @@ const Header = () => {
                             >
                                 <Logo />
                             </Link>
-                            <div
+                            <button
+                                type="button"
+                                aria-label="Close navigation menu"
                                 onClick={handleSideNavBar}
-                                className="cursor-pointer focus:outline-none focus-visible:outline-none"
+                                className="cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none focus:outline-none focus-visible:outline-none"
                                 style={noTapHighlight}
                             >
                                 <IoMdClose className="text-[28px] mt-1 font-bold" />
-                            </div>
+                            </button>
                         </div>
                         <div className="flex flex-col gap-10 justify-center items-center mt-16">
                             {links.map((link, index) => (
-                                <div
+                                <button
+                                    type="button"
                                     onClick={() => handleLinkClick(link.link)}
                                     key={index}
-                                    className="underline font-medium hover:text-gray-600 transition-all duration-300 text-base focus:outline-none focus-visible:outline-none active:outline-none"
+                                    className="underline font-medium hover:text-gray-600 transition-all duration-300 text-base appearance-none border-0 bg-transparent p-0 leading-none focus:outline-none focus-visible:outline-none active:outline-none"
                                     style={noTapHighlight}
                                 >
                                     {link.title}
-                                </div>
+                                </button>
                             ))}
                             <div className="relative w-full flex-center">
                                 <Button

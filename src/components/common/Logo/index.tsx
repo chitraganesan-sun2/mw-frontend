@@ -1,3 +1,5 @@
+"use client";
+
 import { LogoFooterIcon, LogoIcon } from "@/assets/icons";
 import { cn } from "@/utils/merge-class";
 import InnerWidth from "@/utils/innerWidth";

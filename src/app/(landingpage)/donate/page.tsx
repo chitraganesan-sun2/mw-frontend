@@ -348,6 +348,15 @@ const Donate = () => {
             return;
         }
 
+        // An invalid-but-non-empty email passed the check above and would otherwise go
+        // straight to checkout - the donor's receipt (and any post-donation contact) has
+        // nowhere valid to go.
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showToast({ type: "error", message: "Please enter a valid email address" });
+            return;
+        }
+
         // Map name visibility enum to API label
         const nameVisibilityLabel =
             nameVisibilityOptions.find((o) => o.value === nameVisibility)?.label ||

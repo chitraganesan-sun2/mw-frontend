@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 Allow: /about-us
+Allow: /donate
+Allow: /join-us
 Allow: /privacy-policy
 Allow: /terms-and-conditions
 

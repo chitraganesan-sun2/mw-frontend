@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isCookiesFound, isTokenValid } from "./utils/auth";
-import { LANDING_PAGE_ROUTES, getRedirectForRoute, type OnboardedStatus } from "./utils/routeGuard";
+import { getRedirectForRoute, isPublicLandingRoute, type OnboardedStatus } from "./utils/routeGuard";
 
 const EXCLUDED_PATHS = ["/favicon.ico", "/logo.png"];
 
@@ -42,9 +42,8 @@ export default function middleware(req: NextRequest) {
 
   // Allow search engine bots to access public pages
   const isBot = isSearchEngineBot(userAgent);
-  const PUBLIC_ROUTES = [...LANDING_PAGE_ROUTES, "/robots.txt", "/sitemap.xml"];
 
-  if (isBot && PUBLIC_ROUTES.includes(pathname)) {
+  if (isBot && (isPublicLandingRoute(pathname) || pathname === "/robots.txt" || pathname === "/sitemap.xml")) {
     return NextResponse.next();
   }
 
