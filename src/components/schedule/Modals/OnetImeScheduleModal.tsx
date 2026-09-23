@@ -502,18 +502,21 @@ const OnetImeScheduleModal = ({
                                     disabledTimes={disabledTimes}
                                 />
                                 <button
+                                    type="button"
                                     onClick={addSlot}
                                     className="mt- text-primary flex items-center"
                                 >
                                     {idx === slots.length - 1 && <AddSlotIcon />}
                                 </button>
                                 {slots.length > 1 && (
-                                    <span
+                                    <button
+                                        type="button"
+                                        aria-label="Remove slot"
                                         onClick={() => removeSlot(idx)}
-                                        className="cursor-pointer text-red-500"
+                                        className="cursor-pointer text-red-500 appearance-none border-0 bg-transparent p-0 leading-none"
                                     >
                                         <TrashIcon />
-                                    </span>
+                                    </button>
                                 )}
                             </div>
                         ))}

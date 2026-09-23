@@ -14,15 +14,16 @@ const gradientReverse =
 const TopicCard = ({ rootClassName, index, item, onClick }: Props) => {
     return (
         <>
-            <div
+            <button
+                type="button"
                 onClick={onClick}
-                className={`w-full md:w-[200px] cursor-pointer hover:opacity-80 transition-all duration-300 h-[100px] rounded-xl flex items-center justify-center ${rootClassName}`}
+                className={`w-full md:w-[200px] cursor-pointer hover:opacity-80 transition-all duration-300 h-[100px] rounded-xl flex items-center justify-center appearance-none border-0 ${rootClassName}`}
                 style={{
                     backgroundImage: index % 2 === 0 ? gradient : gradientReverse,
                 }}
             >
                 <p className=" font-medium ">{item?.category_name}</p>
-            </div>
+            </button>
         </>
     );
 };

@@ -104,9 +104,14 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     <div className="shrink-0 flex items-center justify-between">
                         <Image src="/logo.png" alt="Logo" height={44} width={50} />
                         {onClose && (
-                            <span onClick={onClose} className="cursor-pointer">
+                            <button
+                                type="button"
+                                aria-label="Close"
+                                onClick={onClose}
+                                className="cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none"
+                            >
                                 <FeedModalCloseIcon />
-                            </span>
+                            </button>
                         )}
                     </div>
                 ) : (

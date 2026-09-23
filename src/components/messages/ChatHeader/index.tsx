@@ -35,12 +35,14 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                     </svg>
                 </button>
             )}
-            <div
+            <button
+                type="button"
+                aria-label="View profile"
                 onClick={onSeeMoreClick}
-                className="relative md:w-11 md:h-11 w-[46px] h-[46px] rounded-full overflow-hidden transition-transform duration-300 md:hover:scale-105 flex-shrink-0"
+                className="relative md:w-11 md:h-11 w-[46px] h-[46px] rounded-full overflow-hidden transition-transform duration-300 md:hover:scale-105 flex-shrink-0 appearance-none border-0 bg-transparent p-0"
             >
                 <Image src={image} alt="message" fill className="object-cover" />
-            </div>
+            </button>
             <div className="min-w-0 flex-1 flex flex-col md:gap-1 gap-[8px]">
                 <div className="flex items-center gap-2 justify-between">
                     <p className="md:text-base text-[20px] font-medium transition-colors duration-300 truncate">{name}</p>

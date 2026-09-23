@@ -40,9 +40,11 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
         <div className="bg-white rounded-xl w-full shadow-sm h-auto p-4 flex flex-col gap-4">
             {/* Profile Header */}
             <div className="flex items-center gap-4">
-                <div
+                <button
+                    type="button"
+                    aria-label={`View ${name}'s profile`}
                     onClick={() => onSeeMoreClick(volunteerId)}
-                    className="w-[36px] h-[36px] rounded-full relative cursor-pointer"
+                    className="w-[36px] h-[36px] rounded-full relative cursor-pointer appearance-none border-0 bg-transparent p-0 shrink-0"
                 >
                     <Image
                         src={profileImage || DummyProfileImg}
@@ -50,14 +52,15 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                         fill
                         className="w-full h-full object-cover rounded-full"
                     />
-                </div>
+                </button>
                 <div className="flex flex-col">
-                    <p
+                    <button
+                        type="button"
                         onClick={() => onSeeMoreClick(volunteerId)}
-                        className="text-base font-semibold lg:text-normal underline text-primary cursor-pointer lg:font-medium"
+                        className="text-base font-semibold lg:text-normal underline text-primary cursor-pointer lg:font-medium appearance-none border-0 bg-transparent p-0 text-left"
                     >
                         {name}
-                    </p>
+                    </button>
                     <p className="text-sm font-medium">
                         <span className="text-gray-light">
                             {location && `From ${formatString(location || "")}`}

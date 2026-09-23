@@ -73,12 +73,18 @@ const ContactUsModal = ({ isOpen, onClose }: ContactUsModalProps) => {
             <div className="w-full md:w-[450px]">
                 <div className="flex justify-between items-center">
                     <span className="text-xl font-medium">Contact Us</span>
-                    <ModalCloseIcon
+                    <button
+                        type="button"
+                        aria-label="Close"
                         onClick={handleClose}
-                        width={35}
-                        height={35}
-                        className="cursor-pointer rounded-full hover:shadow-lg"
-                    />
+                        className="appearance-none border-0 bg-transparent p-0 leading-none"
+                    >
+                        <ModalCloseIcon
+                            width={35}
+                            height={35}
+                            className="cursor-pointer rounded-full hover:shadow-lg"
+                        />
+                    </button>
                 </div>
                 <div className="mt-5 flex flex-col gap-4">
                     <Input

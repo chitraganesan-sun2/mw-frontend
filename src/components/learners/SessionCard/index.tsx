@@ -7,6 +7,7 @@ import TagComponent from "@/components/common/Tag";
 import { TimeIcon } from "@/assets/icons";
 import DummyProfileImg from "@/assets/images/dummy-profile.webp";
 import PersonImg from "@/assets/images/Person.png";
+import { onEnterOrSpace } from "@/utils/a11y";
 
 interface SessionCardProps {
     session: {
@@ -60,6 +61,9 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
     return (
         <div
             onClick={onClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={onEnterOrSpace(onClick)}
             className="bg-white rounded-xl  p-[12px] md:p-6 shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow"
         >
             {/* Header: Title and Status */}

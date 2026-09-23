@@ -57,10 +57,15 @@ const ScheduleAvailabilitySection: React.FC<ScheduleAvailabilitySectionProps> = 
 
     return (
         <div className="bg-white rounded-xl p-4 mb-4">
-            <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+            <button
+                type="button"
+                aria-expanded={isOpen}
+                className="flex items-center justify-between cursor-pointer w-full appearance-none border-0 bg-transparent p-0 text-left"
+                onClick={() => setIsOpen(!isOpen)}
+            >
                 <p className="font-medium">Schedule my Availability</p>
                 <ChevronRightIcon className={`transition-transform ${isOpen ? "rotate-90" : ""}`} />
-            </div>
+            </button>
             {!isOpen && (
                 <div className="flex flex-col gap-1 mt-3">
                     {summaryBullets.length > 0 ? (

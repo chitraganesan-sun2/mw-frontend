@@ -34,13 +34,15 @@ const ImageUpload: React.FC<BaseUploaderProps> = ({ ...props }) => {
                     >
                         <div className="relative w-full h-full">
                             {maxFiles > 1 && (file?.url || file?.image_url) ? (
-                                <span
+                                <button
+                                    type="button"
+                                    aria-label="Remove image"
                                     // @ts-ignore
                                     onClick={() => handleRemove(index, "image/*", file?.image_id)}
-                                    className="absolute bg-white rounded-full -top-2 z-50 -right-2 text-2xl"
+                                    className="absolute bg-white rounded-full -top-2 z-50 -right-2 text-2xl appearance-none border-0 p-0 leading-none"
                                 >
                                     <IoCloseCircle />
-                                </span>
+                                </button>
                             ) : null}
                             <Image
                                 src={file?.url || file?.image_url}
@@ -73,8 +75,12 @@ const ImageUpload: React.FC<BaseUploaderProps> = ({ ...props }) => {
                     props.variant === "cover-image" ? "h-[250px] active:!scale-100 w-full" : "h-24 w-24")} >
                     <div className="relative w-full h-full">
                         <div className="absolute top-1 right-1 z-50 px-2 py-1 rounded flex gap-1 bg-white">
-                            <MdChangeCircle size={25} className="cursor-pointer" onClick={handleClick} />
-                            <MdDelete size={25} className="cursor-pointer !text-red-600" onClick={() => handleRemove(0, "image/*", value?.image_id)} />
+                            <button type="button" aria-label="Change image" onClick={handleClick} className="appearance-none border-0 bg-transparent p-0 leading-none">
+                                <MdChangeCircle size={25} className="cursor-pointer" />
+                            </button>
+                            <button type="button" aria-label="Remove image" onClick={() => handleRemove(0, "image/*", value?.image_id)} className="appearance-none border-0 bg-transparent p-0 leading-none">
+                                <MdDelete size={25} className="cursor-pointer !text-red-600" />
+                            </button>
                         </div>
                         <Image
                             src={value?.image_url}

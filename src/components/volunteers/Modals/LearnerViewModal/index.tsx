@@ -222,10 +222,11 @@ const TabButtons = ({
             ) : (
                 <div className="flex items-center justify-between border-stroke border-2 rounded-full">
                     {["overview", "reviews"].map((tab) => (
-                        <div
+                        <button
                             key={tab}
+                            type="button"
                             onClick={() => handleTabChange(tab)}
-                            className={`font-medium text-center w-[50%] rounded-full py-2.5 px-5 ${
+                            className={`font-medium text-center w-[50%] rounded-full py-2.5 px-5 appearance-none ${
                                 activeTab === tab
                                     ? `${backgroundColor} border-primary border-2`
                                     : "border-2 border-transparent"
@@ -234,7 +235,7 @@ const TabButtons = ({
                             {tab === "overview"
                                 ? "Overview"
                                 : `Reviews - ${rating} (${totalReviews})`}
-                        </div>
+                        </button>
                     ))}
                 </div>
             )}

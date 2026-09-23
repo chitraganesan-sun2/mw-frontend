@@ -48,9 +48,10 @@ const MessageCard = ({
         }
     };
     return (
-        <div
+        <button
+            type="button"
             onClick={handleClick}
-            className={`flex w-full max-w-[407px] items-center gap-4 border-b border-gray-200 p-4 hover:bg-[#f4f7fb] cursor-pointer transition-all duration-300 ${
+            className={`flex w-full max-w-[407px] items-center gap-4 border-b border-gray-200 p-4 hover:bg-[#f4f7fb] cursor-pointer transition-all duration-300 appearance-none text-left ${
                 chat_id === chatId ? "bg-[#f4f7fb]" : ""
             }`}
         >
@@ -88,7 +89,7 @@ const MessageCard = ({
                     )}
                 </div>
             </div>
-        </div>
+        </button>
     );
 };
 

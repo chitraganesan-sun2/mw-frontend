@@ -229,12 +229,18 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 <div className="w-full md:w-[450px]">
                     <div className="flex justify-between items-center">
                         <span className="text-xl font-medium">Enroll as {role}</span>
-                        <ModalCloseIcon
+                        <button
+                            type="button"
+                            aria-label="Close"
                             onClick={onClose}
-                            width={35}
-                            height={35}
-                            className="cursor-pointer rounded-full hover:shadow-lg"
-                        />
+                            className="appearance-none border-0 bg-transparent p-0 leading-none"
+                        >
+                            <ModalCloseIcon
+                                width={35}
+                                height={35}
+                                className="cursor-pointer rounded-full hover:shadow-lg"
+                            />
+                        </button>
                     </div>
                     <div className="mt-5">
                         {role === "learner" ? (

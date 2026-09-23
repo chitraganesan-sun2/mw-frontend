@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertModal } from "../Modals";
 import EventCard from "../Calender/EventCard";
 import MobileMeetingPreviewModal from "./MeetingPreview";
+import { onEnterOrSpace } from "@/utils/a11y";
 
 interface CalendarProps {
     events: any;
@@ -103,6 +104,9 @@ const MobileCalender: React.FC<CalendarProps> = ({ events = [], onDateSelect }) 
                 {groupedEvents.map((eventsByDate: any, index: number) => (
                     <div
                         key={index}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={onEnterOrSpace(() => handleDateClick(eventsByDate[0]?.date))}
                         className="h-full w-full p-4 rounded-xl bg-white cursor-pointer hover:bg-gray-50"
                         onClick={() => handleDateClick(eventsByDate[0]?.date)}
                     >
@@ -112,9 +116,17 @@ const MobileCalender: React.FC<CalendarProps> = ({ events = [], onDateSelect }) 
                         </p>
                         <div className="space-y-2">
                             {eventsByDate.map((event: any, i: number) => (
-                                <div key={i} onClick={() => handleEventClick(event)}>
+                                <button
+                                    type="button"
+                                    key={i}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEventClick(event);
+                                    }}
+                                    className="w-full text-left appearance-none border-0 bg-transparent p-0"
+                                >
                                     {renderEventContent(event)}
-                                </div>
+                                </button>
                             ))}
                         </div>
                     </div>

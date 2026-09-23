@@ -45,12 +45,13 @@ const NoMessage = () => {
             </Button>
             <p className="flex flex-col md:flex-row md:text-base text-[12px] text-center">
                 Let volunteers reach out and help - turn on messages.{"  "}
-                <span
-                    className=" mt-1 md:mt-0 md:text-base underline md:underline-none text-[16px] font-medium hover:underline cursor-pointer"
+                <button
+                    type="button"
+                    className="mt-1 md:mt-0 md:text-base underline md:underline-none text-[16px] font-medium hover:underline cursor-pointer appearance-none border-0 bg-transparent p-0"
                     onClick={handleGoToSettings}
                 >
                     Go to settings
-                </span>
+                </button>
             </p>
         </div>
     );

@@ -86,9 +86,10 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
     };
 
     return (
-        <div
+        <button
+            type="button"
             onClick={handleClick}
-            className={`flex gap-2 sm:gap-3 items-start sm:items-center justify-between pb-3 cursor-pointer ${notification.read ? "opacity-50" : ""}`}
+            className={`flex gap-2 sm:gap-3 items-start sm:items-center justify-between pb-3 cursor-pointer appearance-none border-0 bg-transparent p-0 w-full text-left ${notification.read ? "opacity-50" : ""}`}
         >
             <div className="flex items-center gap-2 sm:gap-3 flex-1">
                 <div className="w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] relative flex-shrink-0">
@@ -118,7 +119,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
                     <Image src={notification?.post_image || PostImg} alt="Post preview" fill className="rounded-md object-cover" />
                 </div>
             )}
-        </div>
+        </button>
     );
 };
 

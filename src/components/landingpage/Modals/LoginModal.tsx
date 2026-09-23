@@ -100,7 +100,14 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 <div className='w-full'>
                     <div className='flex justify-between items-center'>
                         <span className='text-xl font-medium'>Existing User?</span>
-                        <ModalCloseIcon onClick={onClose} width={35} height={35} className='cursor-pointer rounded-full hover:shadow-lg' />
+                        <button
+                            type="button"
+                            aria-label="Close"
+                            onClick={onClose}
+                            className="appearance-none border-0 bg-transparent p-0 leading-none"
+                        >
+                            <ModalCloseIcon width={35} height={35} className='cursor-pointer rounded-full hover:shadow-lg' />
+                        </button>
                     </div>
                     <div className='mt-3 flex flex-col gap-5 divide-y'>
                         <Button

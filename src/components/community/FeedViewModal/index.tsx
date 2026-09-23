@@ -35,24 +35,28 @@ import "slick-carousel/slick/slick-theme.css";
 const CustomNextArrow = (props: any) => {
     const { onClick } = props;
     return (
-        <div
+        <button
+            type="button"
+            aria-label="Next image"
             onClick={onClick}
-            className="!z-50 absolute right-3 top-1/2 transform -translate-y-1/2 text-primary border border-primary bg-gray-200 p-2 rounded-full shadow-md cursor-pointer"
+            className="!z-50 absolute right-3 top-1/2 transform -translate-y-1/2 text-primary border border-primary bg-gray-200 p-2 rounded-full shadow-md cursor-pointer appearance-none"
         >
             <FaChevronRight className="text-xs md:text-lg" />
-        </div>
+        </button>
     );
 };
 
 const CustomPrevArrow = (props: any) => {
     const { onClick } = props;
     return (
-        <div
+        <button
+            type="button"
+            aria-label="Previous image"
             onClick={onClick}
-            className="!z-50 absolute left-3 top-1/2 transform -translate-y-1/2 text-primary border border-primary bg-gray-200 p-2 rounded-full shadow-md cursor-pointer"
+            className="!z-50 absolute left-3 top-1/2 transform -translate-y-1/2 text-primary border border-primary bg-gray-200 p-2 rounded-full shadow-md cursor-pointer appearance-none"
         >
             <FaChevronLeft className="text-xs md:text-lg" />
-        </div>
+        </button>
     );
 };
 

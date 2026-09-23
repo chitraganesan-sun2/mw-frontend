@@ -37,9 +37,10 @@ const ActionPanel = () => {
             <p className="text-xl font-medium">Action Panel</p>
             <div className="flex flex-col gap-3">
                 {CommunityTabs.map((tab) => (
-                    <div
+                    <button
                         key={tab.route}
-                        className={`flex items-center gap-2 rounded-full px-4 p-3 border-[1px] transition-all cursor-pointer duration-300 ease-in-out hover:bg-background ${
+                        type="button"
+                        className={`flex items-center gap-2 rounded-full px-4 p-3 border-[1px] transition-all cursor-pointer duration-300 ease-in-out hover:bg-background appearance-none text-left ${
                             activeTab === tab.route
                                 ? "bg-background border-primary"
                                 : "bg-[#f4f7fb] border-stroke"
@@ -47,7 +48,7 @@ const ActionPanel = () => {
                         onClick={() => handleTabClick(tab.route)}
                     >
                         <p className="text-sm font-medium">{tab.name}</p>
-                    </div>
+                    </button>
                 ))}
             </div>
         </div>

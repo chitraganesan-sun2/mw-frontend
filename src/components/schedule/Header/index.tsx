@@ -84,12 +84,14 @@ const Header = (props: Props) => {
                 {/* Row 1 (mobile): menu + title + View Demo + Bell. Desktop: same row, no View Demo here */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                        <div
-                            className="lg:hidden cursor-pointer"
+                        <button
+                            type="button"
+                            aria-label="Open navigation menu"
+                            className="lg:hidden cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none"
                             onClick={() => setIsSideNavBarOpen(true)}
                         >
                             <SideMenuIcon height="22px" width="22px" />
-                        </div>
+                        </button>
                         <Button
                             onClick={() => { }}
                             title={isMobileOrTabScreen ? "Schedule" : "My Schedule"}

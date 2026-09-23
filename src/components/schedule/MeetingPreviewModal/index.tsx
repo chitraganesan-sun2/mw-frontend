@@ -117,6 +117,17 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
         }
     }, [isOpen]);
 
+    // This popover has no other way to dismiss via keyboard - it's a custom portal, not the
+    // shared Modal/Drawer wrappers that get AntD's Escape handling for free.
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isOpen, onClose]);
+
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event._def;
@@ -255,6 +266,9 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
 
         return createPortal(
             <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Availability slot"
                 className={`meeting-preview-modal border border-stroke bg-white rounded-lg shadow-lg ${isVisible ? "modal-visible" : "modal-hidden"
                     }`}
                 style={{
@@ -302,6 +316,9 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
 
     return createPortal(
         <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Meeting preview"
             className={`meeting-preview-modal border border-stroke bg-white rounded-lg shadow-lg ${isVisible ? "modal-visible" : "modal-hidden"
                 }`}
             style={{

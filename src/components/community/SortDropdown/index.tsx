@@ -48,8 +48,11 @@ const SortDropdown = ({ selectedSort, onSort }: SortDropdownProps) => {
         <div className="md:hidden w-full p-4 relative">
             <div className="flex flex-row items-center justify-center w-full gap-3">
                 <p className="text-sm font-medium text-[#4F4F4F]">Sort by:</p>
-                <div
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white gap-4 w-[270px] cursor-pointer hover:border-gray-300 transition-colors"
+                <button
+                    type="button"
+                    aria-expanded={showSortDropdown}
+                    aria-haspopup="listbox"
+                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white gap-4 w-[270px] cursor-pointer hover:border-gray-300 transition-colors appearance-none"
                     onClick={() => setShowSortDropdown(!showSortDropdown)}
                 >
                     <span className="text-base font-medium text-gray-700">
@@ -60,15 +63,18 @@ const SortDropdown = ({ selectedSort, onSort }: SortDropdownProps) => {
                             showSortDropdown ? "rotate-180" : ""
                         } w-6 h-6`}
                     />
-                </div>
+                </button>
             </div>
 
             {showSortDropdown && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[350px] bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[350px] bg-white border border-gray-200 rounded-lg shadow-lg z-10" role="listbox">
                     {sortOptions.map((option) => (
-                        <div
+                        <button
                             key={option.value}
-                            className={`p-4 text-base cursor-pointer transition-colors
+                            type="button"
+                            role="option"
+                            aria-selected={option.value === selectedSort}
+                            className={`w-full text-left p-4 text-base cursor-pointer transition-colors appearance-none
                                 ${
                                     option.value === selectedSort
                                         ? "bg-gray-50 text-gray-900 font-medium"
@@ -77,7 +83,7 @@ const SortDropdown = ({ selectedSort, onSort }: SortDropdownProps) => {
                             onClick={() => handleSort(option.value)}
                         >
                             {option.label}
-                        </div>
+                        </button>
                     ))}
                 </div>
             )}

@@ -135,12 +135,14 @@ const DetailModal = ({
                             className="object-contain min-w-[60%]"
                             alt="Resource"
                         />
-                        <span
+                        <button
+                            type="button"
+                            aria-label="Close"
                             onClick={onClose}
-                            className="cursor-pointer absolute top-4 left-4 md:static md:top-auto md:left-auto md:hidden"
+                            className="cursor-pointer absolute top-4 left-4 md:static md:top-auto md:left-auto md:hidden appearance-none border-0 bg-transparent p-0 leading-none"
                         >
                             <ModalCloseIcon />
-                        </span>
+                        </button>
                         <div className="flex items-center gap-4 w-fit absolute top-4 right-4">
                             {isMyResource ? (
                                 <Button
@@ -154,25 +156,31 @@ const DetailModal = ({
                             ) : (
                                 <div className="h-full px-4 py-2.5 rounded-full bg-[#FEE2E299]/50 flex items-center gap-2 backdrop-blur-[5px]">
                                     {isLiked ? (
-                                        <motion.div
+                                        <motion.button
+                                            type="button"
+                                            aria-label="Unlike"
                                             key="liked"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             exit={{ scale: 0 }}
                                             onClick={() => handleLikeDislike(false)}
+                                            className="appearance-none border-0 bg-transparent p-0 leading-none"
                                         >
                                             <HeartLikeIcon className="cursor-pointer" />
-                                        </motion.div>
+                                        </motion.button>
                                     ) : (
-                                        <motion.div
+                                        <motion.button
+                                            type="button"
+                                            aria-label="Like"
                                             key="unliked"
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             exit={{ scale: 0 }}
                                             onClick={() => handleLikeDislike(true)}
+                                            className="appearance-none border-0 bg-transparent p-0 leading-none"
                                         >
                                             <UnlikeHeartIcon className="cursor-pointer" />
-                                        </motion.div>
+                                        </motion.button>
                                     )}
                                     <p className="text-sm font-medium text-black">{likedCount}</p>
                                 </div>
@@ -187,16 +195,24 @@ const DetailModal = ({
                                         icon={<MdEdit size={16} />}
                                     />
                                 ) : (
-                                    <span
+                                    <button
+                                        type="button"
+                                        aria-label="Report"
                                         onClick={() => handleReportClick?.(resource?.resource_id)}
+                                        className="appearance-none border-0 bg-transparent p-0 leading-none"
                                     >
                                         <ReportIcon />
-                                    </span>
+                                    </button>
                                 )}
                             </span>
-                            <span onClick={onClose} className="md:block hidden cursor-pointer">
+                            <button
+                                type="button"
+                                aria-label="Close"
+                                onClick={onClose}
+                                className="md:block hidden cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none"
+                            >
                                 <ModalCloseIcon />
-                            </span>
+                            </button>
                         </div>
                     </div>
                     <div

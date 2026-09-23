@@ -81,12 +81,15 @@ const CommonHeader: React.FC = () => {
                 <div className="flex items-center gap-5">
                     <div className="flex capitalize items-center">
                         {showTitleButton || (
-                            <div
-                                className="lg:hidden cursor-pointer mr-2"
+                            <button
+                                type="button"
+                                aria-label="Open navigation menu"
+                                aria-expanded={isSideNavBarOpen}
+                                className="lg:hidden cursor-pointer mr-2 appearance-none border-0 bg-transparent p-0 leading-none"
                                 onClick={() => setIsSideNavBarOpen(true)}
                             >
                                 <SideMenuIcon height="22px" width="22px" />
-                            </div>
+                            </button>
                         )}
                         {isMobileOrTabScreen && leftButton?.showButton && !pathname?.includes("/instant-sessions") ? (
                             <Button
@@ -301,9 +304,14 @@ const CommonHeader: React.FC = () => {
                         onChange={handleSearch}
                         placeholder={searchPlaceholder ?? "Search"}
                     />
-                    <span onClick={handleMobileSearchClose} className="cursor-pointer">
+                    <button
+                        type="button"
+                        aria-label="Close search"
+                        onClick={handleMobileSearchClose}
+                        className="cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none"
+                    >
                         <FeedModalCloseIcon width="25" height="25" />
-                    </span>
+                    </button>
                 </div>
             )}
             {isMobileOrTabScreen && (

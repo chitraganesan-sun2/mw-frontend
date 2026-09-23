@@ -43,12 +43,14 @@ const ProfileHeader = ({
 }) => (
     <div className="flex items-center justify-between px-5">
         <div className="flex items-center gap-2">
-            <span
+            <button
+                type="button"
+                aria-label="Close"
                 onClick={onClose}
-                className="cursor-pointer md:hidden border border-black rounded-full p-2"
+                className="cursor-pointer md:hidden border border-black rounded-full p-2 appearance-none bg-transparent leading-none"
             >
                 <IoIosArrowBack className="text-lg" />
-            </span>
+            </button>
             <p className="font-medium text-xl">Profile</p>
         </div>
         <div className="flex items-center gap-2">
@@ -67,9 +69,14 @@ const ProfileHeader = ({
             >
                 <MessageIcon />
             </button>
-            <span onClick={onClose} className="cursor-pointer max-md:hidden">
+            <button
+                type="button"
+                aria-label="Close"
+                onClick={onClose}
+                className="cursor-pointer max-md:hidden appearance-none border-0 bg-transparent p-0 leading-none"
+            >
                 <ModalCloseIcon />
-            </span>
+            </button>
         </div>
     </div>
 );
@@ -201,17 +208,18 @@ const TabButtons = ({
         ) : (
             <div className="flex items-center justify-between border-stroke border-2 rounded-full">
                 {["overview", "reviews"].map((tab) => (
-                    <div
+                    <button
                         key={tab}
+                        type="button"
                         onClick={() => handleTabChange(tab)}
-                        className={`font-medium text-center w-[50%] rounded-full py-2.5 px-5 ${
+                        className={`font-medium text-center w-[50%] rounded-full py-2.5 px-5 appearance-none ${
                             activeTab === tab
                                 ? "bg-[#dff5ff] border-primary border-2"
                                 : "border-2 border-transparent"
                         } transition-all duration-200 cursor-pointer`}
                     >
                         {tab === "overview" ? "Overview" : `Reviews - ${rating} (${totalReviews})`}
-                    </div>
+                    </button>
                 ))}
             </div>
         )}

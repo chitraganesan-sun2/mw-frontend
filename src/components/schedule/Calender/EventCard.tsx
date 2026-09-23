@@ -1,6 +1,7 @@
 import { cn } from "@/utils/merge-class";
 import dayjs from "dayjs";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import type { KeyboardEvent } from "react";
 
 const EventCard = ({
     title,
@@ -42,9 +43,28 @@ const EventCard = ({
     const startTime = dayjs(start).local().format("h:mm A");
     const endTime = dayjs(end).local().format("h:mm A");
 
+    // AllEventsModal's onEventClick reads e?.currentTarget off whatever event this fires
+    // with (see src/components/schedule/Modals/AllEventsModal.tsx), so the keyboard path
+    // forwards the KeyboardEvent itself rather than calling a plain () => void - it needs
+    // the same DOM element a click would have given it, e.g. for popover positioning.
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onEventClick?.(e);
+        }
+    };
+
+    // Some callers (MobileCalender) render this purely for display, with their own
+    // separate wrapping element owning the actual click - don't make this focusable
+    // with nothing for it to do.
+    const interactiveProps = onEventClick
+        ? { role: "button" as const, tabIndex: 0, onKeyDown: handleKeyDown }
+        : {};
+
     return (
         <div
             onClick={onEventClick}
+            {...interactiveProps}
             className={cn(
                 "flex items-center w-full text-sm px-2 py-1 border cursor-pointer overflow-hidden event-card-container",
                 showDotAndTitle ? "justify-between" : "justify-center",

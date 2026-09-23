@@ -78,9 +78,9 @@ const SectionWrapper = ({
             >
                 <div className="flex flex-col items-center md:items-start gap-4 md:flex-row px-2 md:gap-4 md:px-4 pb-4 w-full justify-center md:justify-normal">
                     {placeHolderComponent && (
-                        <div onClick={onPlaceHolderClick} className="cursor-pointer">
+                        <button type="button" onClick={onPlaceHolderClick} className="cursor-pointer appearance-none border-0 bg-transparent p-0">
                             {placeHolderComponent}
-                        </div>
+                        </button>
                     )}
                     {isLoading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 w-full">
