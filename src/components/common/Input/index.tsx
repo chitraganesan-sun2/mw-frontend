@@ -23,6 +23,7 @@ const isAvailableDay = (date: any, availableDays: string[]) => {
 
 // Separate component for DatePicker to properly use hooks
 const DatePickerComponent: React.FC<{
+    name?: string;
     value: Date | null;
     onChange: (value: Date | null) => void;
     onOpenChange?: (open: boolean) => void;
@@ -35,6 +36,7 @@ const DatePickerComponent: React.FC<{
     inputClassName?: string;
     format?: string;
 }> = ({
+    name,
     value,
     onChange,
     onOpenChange,
@@ -80,6 +82,7 @@ const DatePickerComponent: React.FC<{
     return (
         <div className="relative">
             <AntDatePicker
+                id={name}
                 value={parseDate(value)}
                 pickerValue={pickerValue || undefined}
                 onChange={(date) => {
@@ -252,6 +255,7 @@ export const Input: React.FC<InputProps> = (props) => {
                     <AntInput
                         id={name}
                         name={name}
+                        aria-label={props.ariaLabel}
                         type={props.contentType}
                         placeholder={props.placeholder}
                         value={props.value}
@@ -355,6 +359,7 @@ export const Input: React.FC<InputProps> = (props) => {
             case "datepicker":
                 return (
                     <DatePickerComponent
+                        name={name}
                         value={props.value}
                         onChange={props.onChange}
                         onOpenChange={props.onOpenChange}
@@ -390,6 +395,7 @@ export const Input: React.FC<InputProps> = (props) => {
                 return (
                     <div>
                         <AntDatePicker
+                            id={name}
                             value={parseBirthDate(value) || null}
                             disabledDate={disabledDate}
                             onChange={handleDateChange}
@@ -436,6 +442,7 @@ export const Input: React.FC<InputProps> = (props) => {
                 return (
                     <DateRangePicker
                         {...props}
+                        id={name}
                         format="YYYY-MM-DD"
                         placeholder={["Start Date", "End Date"]}
                         onChange={(date) => props.onChange(date)}

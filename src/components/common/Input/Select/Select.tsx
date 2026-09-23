@@ -6,6 +6,12 @@ const Select = ({ disabled, inputType, inputClassName, isLoading, ...props }: Se
 
     return (
         <AntSelect
+            id={props.name}
+            // No aria-label here: rc-select's Selector only forwards an explicit, closed
+            // prop list to the real combobox input, and aria-label isn't on it (id is,
+            // which is why that one works). A caller needing an accessible name without
+            // a visible label should render its own <label htmlFor={name}> instead - see
+            // ContactInput for the pattern.
             placeholder={props.placeholder}
             value={props.value || undefined}
             onChange={props.onChange}

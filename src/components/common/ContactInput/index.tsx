@@ -69,8 +69,23 @@ const ContactInput = (props: ContactInputProps) => {
     return (
         <>
             <div className="flex items-center gap-2">
+                {/* AntD's Select drops an aria-label prop before it reaches the real
+                    combobox input (rc-select's Selector only forwards an explicit, closed
+                    prop list - id is on it, aria-label isn't; confirmed by reading
+                    rc-select's source, not assumed). A real sr-only <label htmlFor> is the
+                    one mechanism proven to reach it, since id demonstrably does. */}
+                <label htmlFor={`${props.name}_country_code`} className="sr-only">
+                    Country code
+                </label>
                 <Select
-                    name="country_code"
+                    // The DOM-facing name/id is namespaced by the outer field's own name
+                    // (e.g. "contact_number" vs "parent_contact_number") - both learner and
+                    // volunteer forms render two separate ContactInput fields on the same
+                    // page, and a hardcoded "country_code"/"number" here would give both a
+                    // duplicate id, breaking label association for whichever renders second.
+                    // The literal "country_code" passed to handleChange below is unrelated -
+                    // that's the data key inside formData, not a DOM id, and must stay as-is.
+                    name={`${props.name}_country_code`}
                     value={formData?.country_code }
                     onChange={(e) => handleChange(e, "country_code")}
                     options={mobileCountryCodes}
@@ -81,7 +96,8 @@ const ContactInput = (props: ContactInputProps) => {
                     disabled={disabled}
                 />
                 <Input
-                    name="number"
+                    name={`${props.name}_number`}
+                    ariaLabel="Phone number"
                     inputType="text"
                     placeholder="Enter Number Here"
                     className="!w-full !mb-0"

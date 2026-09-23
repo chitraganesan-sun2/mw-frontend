@@ -59,6 +59,7 @@ const SelectInputCreatable = ({
             )}
             <CreatableSelect
                 {...props}
+                inputId={props.name}
                 required={false}
                 options={filteredOptions}
                 value={selectedValue}

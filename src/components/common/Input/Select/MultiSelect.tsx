@@ -6,6 +6,7 @@ import TagComponent from "../../Tag";
 
 
 const MultiSelect: React.FC<MultiSelectInputProps> = ({
+    name,
     value = [],
     onChange,
     options = [],
@@ -17,6 +18,7 @@ const MultiSelect: React.FC<MultiSelectInputProps> = ({
     return (
         <div className="flex flex-col gap-2 h-fit">
             <Select
+                id={name}
                 mode='multiple'
                 showSearch
                 value={value}

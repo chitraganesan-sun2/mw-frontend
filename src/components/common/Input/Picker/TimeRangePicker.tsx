@@ -44,6 +44,15 @@ const TimePickerComponent = ({ name, time, type, onTimeChange, }: TimePickerComp
         }
       }}
       closeOnSelect={false}
+      // A single outer <label> can't describe two separate time inputs - each gets its
+      // own real accessible name instead (MUI X v7's slot-prop API for the underlying
+      // text field, not a plain id/aria-label prop on TimePicker itself).
+      slotProps={{
+        textField: {
+          id: `${name}-${type}`,
+          "aria-label": type === "from" ? "Start time" : "End time",
+        },
+      }}
       sx={{
         "& .MuiOutlinedInput-root": {
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {

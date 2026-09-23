@@ -19,6 +19,11 @@ type BaseInputProps = {
     labelClassName?: string;
     inputClassName?: string;
     contentType?: "number" | "text";
+    // For a field rendered without its own visible `label` (e.g. a sub-field inside a
+    // composite widget like ContactInput's country-code + number pair, where one outer
+    // label can't correctly describe two separate inputs) - gives it a real accessible
+    // name anyway instead of leaving it unlabeled.
+    ariaLabel?: string;
 };
 
 type TextInputProps = BaseInputProps & {

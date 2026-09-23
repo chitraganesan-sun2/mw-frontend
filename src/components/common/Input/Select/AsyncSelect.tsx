@@ -205,6 +205,7 @@ const AsyncSelect = ({
         <div className="flex flex-col gap-2 w-full">
             <CreatableSelect
                 {...props}
+                inputId={props.name}
                 required={false}
                 isMulti={variant === "multi"}
                 options={filteredOptions}
