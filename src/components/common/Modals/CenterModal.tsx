@@ -151,7 +151,7 @@ const CenterModal: React.FC<CenterModalProps> = ({
                                     <button
                                         type="button"
                                         onClick={onClose}
-                                        className="flex-shrink-0 p-1 rounded-full hover:bg-gray-100 active:scale-90 transition-all duration-200 inline-flex items-center justify-center"
+                                        className="focus-ring flex-shrink-0 p-1 rounded-full hover:bg-gray-100 active:scale-90 transition-all duration-200 inline-flex items-center justify-center"
                                         aria-label="Close"
                                     >
                                         <ModalCloseIcon className="w-[26px] h-[26px] md:w-6 md:h-6 active:scale-90 transition-all duration-200" />

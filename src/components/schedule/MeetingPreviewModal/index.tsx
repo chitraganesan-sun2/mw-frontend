@@ -16,6 +16,7 @@ import "./styles.css";
 import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
+import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 
 interface MeetingPreviewModalProps {
     data: any;
@@ -38,6 +39,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const [loadingAccept, setLoadingAccept] = useState(false);
     const [loadingDecline, setLoadingDecline] = useState(false);
     const [loadingCompleted, setLoadingCompleted] = useState(false);
+    const { copy: copyLink } = useCopyToClipboard();
 
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -166,9 +168,13 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
         });
     };
 
-    const handleLinkCopy = () => {
-        navigator.clipboard.writeText(meetLink);
-        showToast({ type: "success", message: "Link copied to clipboard" });
+    const handleLinkCopy = async () => {
+        const succeeded = await copyLink(meetLink);
+        showToast(
+            succeeded
+                ? { type: "success", message: "Link copied to clipboard" }
+                : { type: "error", message: "Couldn't copy the link. Please copy it manually." }
+        );
     };
 
     const handleDeleteSlot = async (volunteer_slot_id: string) => {

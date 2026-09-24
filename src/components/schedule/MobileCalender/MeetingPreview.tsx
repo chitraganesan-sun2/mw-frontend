@@ -16,6 +16,7 @@ import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
+import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 
 interface MobileMeetingPreviewModalProps {
     data: any;
@@ -42,6 +43,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     const [loadingAccept, setLoadingAccept] = useState(false);
     const [loadingDecline, setLoadingDecline] = useState(false);
     const [loadingCompleted, setLoadingCompleted] = useState(false);
+    const { copy: copyLink } = useCopyToClipboard();
 
     const handleNotificationStatus = async (status: string, sessionId: string) => {
         if (status === "accepted") {
@@ -138,9 +140,13 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         });
     };
 
-    const handleLinkCopy = () => {
-        navigator.clipboard.writeText(meetLink);
-        showToast({ type: "success", message: "Link copied to clipboard" });
+    const handleLinkCopy = async () => {
+        const succeeded = await copyLink(meetLink);
+        showToast(
+            succeeded
+                ? { type: "success", message: "Link copied to clipboard" }
+                : { type: "error", message: "Couldn't copy the link. Please copy it manually." }
+        );
     };
 
     const renderFooter = () => {

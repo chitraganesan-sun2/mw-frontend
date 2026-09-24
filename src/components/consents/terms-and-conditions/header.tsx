@@ -1,3 +1,5 @@
+import { LEGAL_LAST_UPDATED, formatLastUpdated } from "@/constants/legalDates";
+
 const createLink = (href: string, text: string) => `<a href="${href}" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
 
 const headerContents = [
@@ -18,7 +20,12 @@ const TermsAndConditionsHeader = () => {
             <div className="flex flex-col gap-3 text-center">
                 <h5 className="text-xl font-bold">MelodyWings</h5>
                 <h6 className="text-2xl font-bold uppercase">Terms of Service</h6>
-                <p className="text-base text-gray-700">Last Updated: March 2025</p>
+                <p className="text-base text-gray-700">
+                    Last Updated:{" "}
+                    <time dateTime={LEGAL_LAST_UPDATED.termsAndConditions.toISOString()}>
+                        {formatLastUpdated(LEGAL_LAST_UPDATED.termsAndConditions)}
+                    </time>
+                </p>
             </div>
             <div className="flex flex-col gap-3">
                 {headerContents.map((content, index) => (

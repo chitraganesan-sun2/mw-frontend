@@ -10,6 +10,7 @@ import Footer from "@/components/onboarding/Footer";
 import SkillsToLearn from "@/components/landingpage/SkillsToLearn";
 import InstantSessions from "@/components/landingpage/InstantSessions";
 import HomeClientEffects from "@/components/landingpage/HomeClientEffects";
+import PublicPageChrome from "@/components/landingpage/PublicPageChrome";
 
 export default function Page() {
     return (
@@ -48,6 +49,7 @@ export default function Page() {
                 </div>
             </div>
             <Footer />
+            <PublicPageChrome />
         </div>
     );
 }

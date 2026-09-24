@@ -1,35 +1,47 @@
-import React, { useState } from "react";
+import React from "react";
 import { IoMdCopy } from "react-icons/io";
 import { TiTickOutline } from "react-icons/ti";
+import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 
-const ContactDetails = ({ tags = [] }: any) => {
-    if(!tags?.length) return null;
+const ContactDetailItem = ({ tag }: { tag: any }) => {
+    const { copied, copy } = useCopyToClipboard();
 
-    const renderElement = (tag: any) => {
-        if(!tag?.value) return null;
-        const [isTextCopied, setIsTextCopied] = useState(false);
+    if (!tag?.value) return null;
 
-        const copyContact = async (text: string) => {
-            await navigator.clipboard.writeText(text)
-            setIsTextCopied(true)
-            setTimeout(() => setIsTextCopied(false), 2000)
-        }
-        return <div className="flex flex-col gap-1" key={tag?.title}>
-            <p className="text-sm flex gap-1 items-center">{tag?.icon} {tag?.title}</p>
+    return (
+        <div className="flex flex-col gap-1" key={tag?.title}>
+            <p className="text-sm flex gap-1 items-center">
+                {tag?.icon} {tag?.title}
+            </p>
             <p className="font-medium flex items-center gap-1">
                 {tag?.value}
-                {isTextCopied ? <TiTickOutline size={20} /> : <IoMdCopy onClick={() => copyContact(tag?.value)} className="!text-red-500 cursor-pointer" size={20} />}
+                {copied ? (
+                    <TiTickOutline size={20} aria-hidden="true" />
+                ) : (
+                    <button
+                        type="button"
+                        onClick={() => copy(tag?.value)}
+                        aria-label={`Copy ${tag?.title || "value"}`}
+                        className="focus-ring appearance-none border-0 bg-transparent p-0 leading-none"
+                    >
+                        <IoMdCopy className="!text-red-500 cursor-pointer" size={20} />
+                    </button>
+                )}
             </p>
         </div>
-    }
+    );
+};
+
+const ContactDetails = ({ tags = [] }: any) => {
+    if (!tags?.length) return null;
 
     return (
         <div className="flex flex-col gap-2">
             <p className="font-normal text-sm text-gray-light">Contact Information</p>
             <div className="flex gap-1 flex-wrap justify-between">
-                {tags?.map((tag: any) => 
-                    renderElement(tag)
-                )}
+                {tags?.map((tag: any) => (
+                    <ContactDetailItem key={tag?.title} tag={tag} />
+                ))}
             </div>
         </div>
     );

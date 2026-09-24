@@ -1,6 +1,7 @@
 import React from "react";
 import TermsAndConditionsHeader from "@/components/consents/terms-and-conditions/header";
 import TermsAndConditionsSections from "@/components/consents/terms-and-conditions/sections";
+import ScrollProgressBar from "@/components/common/ScrollProgressBar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,11 +14,14 @@ export const metadata: Metadata = {
 
 const TermsAndConditions = () => {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-5">
-            <TermsAndConditionsHeader />
-            <TermsAndConditionsSections />
-        </div>
-    ) 
+        <>
+            <ScrollProgressBar />
+            <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-5">
+                <TermsAndConditionsHeader />
+                <TermsAndConditionsSections />
+            </div>
+        </>
+    )
 };
 
 export default TermsAndConditions;
