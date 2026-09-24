@@ -1,3 +1,4 @@
+import { LEGAL_LAST_UPDATED, formatLastUpdated } from "@/constants/legalDates";
 
 const headerContents = [
     "WE WILL POST ANY CHANGES TO THIS PRIVACY POLICY IN A NOTICE OF THE CHANGE AT THE BOTTOM OF OUR WEB PAGE WITH A HYPERLINK THERETO. PLEASE REGULARLY REVIEW THIS PRIVACY POLICY. NOTWITHSTANDING IF YOU CONTINUE TO USE OUR SERVICES, YOU ARE BOUND BY ANY CHANGES THAT WE MAKE TO THIS PRIVACY POLICY."
@@ -9,7 +10,12 @@ const PrivacyPolicyHeader = () => {
             <div className="flex flex-col gap-3 text-center">
                 <h5 className="text-xl font-bold">MelodyWings</h5>
                 <h6 className="text-2xl font-bold uppercase">Privacy Policy</h6>
-                <p className="text-base text-gray-700">Last Updated: March 2025</p>
+                <p className="text-base text-gray-700">
+                    Last Updated:{" "}
+                    <time dateTime={LEGAL_LAST_UPDATED.privacyPolicy.toISOString()}>
+                        {formatLastUpdated(LEGAL_LAST_UPDATED.privacyPolicy)}
+                    </time>
+                </p>
             </div>
             <div className="flex flex-col gap-3">
                 {headerContents.map((content, index) => (

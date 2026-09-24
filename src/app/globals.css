@@ -35,6 +35,101 @@ body {
 
 html {
     scroll-behavior: smooth;
+    /* Keeps anchor targets from landing underneath the sticky marketing header. */
+    scroll-padding-top: 96px;
+}
+
+/* Respect the OS-level motion preference across every animation/transition
+   in the app, including Tailwind's `transition-*`/`animate-*` utilities and
+   Ant Design/MUI's built-in CSS animations. This is a CSS-only guard - it
+   does not stop framer-motion's JS-driven (WAAPI) animations, which need
+   `useReducedMotion()` at each call site. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Visible keyboard-focus ring. Pair with `focus:outline-none` where a
+   component needs to suppress the default outline for mouse users -
+   :focus-visible below still shows a ring for keyboard/AT users. */
+.focus-ring {
+    outline: none;
+}
+
+.focus-ring:focus-visible {
+    outline: 2px solid var(--primary-color, #08547a);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Skip-to-content link: visually hidden until keyboard-focused. */
+.skip-to-content {
+    position: absolute;
+    left: 1rem;
+    top: -100px;
+    z-index: 100;
+    background: var(--black-color);
+    color: var(--white-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0 0 8px 8px;
+    font-weight: var(--font-medium);
+    font-size: 0.875rem;
+    transition: top 0.2s ease;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    a {
+        color: #000 !important;
+        text-decoration: underline !important;
+    }
+
+    a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.75em;
+        font-weight: normal;
+    }
+
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    table,
+    img,
+    figure {
+        break-inside: avoid;
+    }
+
+    h1,
+    h2,
+    h3 {
+        break-after: avoid;
+    }
 }
 
 @layer base {

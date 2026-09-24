@@ -3,13 +3,14 @@
 import dynamic from "next/dynamic";
 import * as SentryReact from "@sentry/react";
 import QueryProvider from "@/providers/QueryWrapper";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import useAutoLogout from "@/hooks/useAutoLogout";
 import useMobileInit from "@/hooks/useMobileInit";
 import { useRouter } from "next/navigation";
 import RouteGuard from "@/components/guards/RouteGuard";
 import NetworkStatus from "@/components/common/NetworkStatus";
 import { initSentry } from "@/services/sentry";
+import { captureUtmParams } from "@/utils/utm";
 
 // Module scope, not component body - runs exactly once per page load rather
 // than on every render.
@@ -25,6 +26,10 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
     useAutoLogout(router);
     useMobileInit();
 
+    useEffect(() => {
+        captureUtmParams();
+    }, []);
+
     return (
         <SentryReact.ErrorBoundary
             fallback={
@@ -34,6 +39,9 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
                 </div>
             }
         >
+            <a href="#main-content" className="skip-to-content">
+                Skip to main content
+            </a>
             <Suspense
                 fallback={
                     <div className="h-[100vh] w-[100vw] flex-center">
@@ -43,7 +51,9 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
             >
                 <NetworkStatus />
                 <QueryProvider>
-                    <RouteGuard>{children}</RouteGuard>
+                    <RouteGuard>
+                        <main id="main-content">{children}</main>
+                    </RouteGuard>
                 </QueryProvider>
             </Suspense>
         </SentryReact.ErrorBoundary>

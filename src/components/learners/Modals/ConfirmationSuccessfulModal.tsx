@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import Button from "@/components/common/Button";
@@ -8,6 +8,7 @@ import { TimeIcon, HostedByIcon, VerifyTickIcon } from "@/assets/icons";
 import ModalCloseIcon from "@/assets/icons/ModalCloseIcon";
 import PersonImg from "@/assets/images/Person.png";
 import useInnerWidth from "@/hooks/useInnerWidth";
+import useCopyToClipboard from "@/hooks/useCopyToClipboard";
 
 interface ConfirmationSuccessfulModalProps {
     isOpen: boolean;
@@ -38,13 +39,11 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
     onCancelMeeting,
     onJoinMeeting,
 }) => {
-    const [copied, setCopied] = useState(false);
+    const { copied, copy } = useCopyToClipboard();
 
     const handleCopyLink = () => {
         if (session.meetingLink) {
-            navigator.clipboard.writeText(session.meetingLink);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            copy(session.meetingLink);
         }
     };
 

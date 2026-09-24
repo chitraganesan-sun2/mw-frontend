@@ -460,7 +460,11 @@ export const Input: React.FC<InputProps> = (props) => {
         >
             {renderLabel()}
             {renderInput()}
-            {error && <p className="text-xs text-red-500 capitalize font-medium">{error}</p>}
+            {error && (
+                <p id={`${name}-error`} role="alert" className="text-xs text-red-500 capitalize font-medium">
+                    {error}
+                </p>
+            )}
         </div>
     );
 };
