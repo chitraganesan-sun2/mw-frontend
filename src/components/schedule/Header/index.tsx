@@ -17,11 +17,18 @@ import { useIsFetching, useQuery } from "@tanstack/react-query";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { useEffect } from "react";
 
 type Props = {};
 
 const Header = (props: Props) => {
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server's button set (learner vs volunteer) differ
+    // from the client's, triggering a hydration mismatch on every schedule page load.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+    }, []);
     const router = useRouter();
     const [isSideNavBarOpen, setIsSideNavBarOpen] = useState<boolean>(false);
 

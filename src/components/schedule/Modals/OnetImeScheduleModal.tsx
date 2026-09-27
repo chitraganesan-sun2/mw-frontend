@@ -10,6 +10,9 @@ import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { PickersActionBarProps } from "@mui/x-date-pickers/PickersActionBar";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
 import { useAppStore } from "@/store/useAppStore";
 import TrashIcon from "@/assets/icons/TrashIcon";
 import AddSlotIcon from "@/assets/icons/AddSlotIcon";
@@ -32,6 +35,10 @@ interface TimePickerComponentProps {
     value: string;
     onChange: (value: string) => void;
     disabledTimes?: string[];
+    error?: boolean;
+    volunteerTimezone: string;
+    currentDate: string;
+    existingSlots: Slot[];
 }
 
 const timezoneMapping: Record<string, string> = {
@@ -64,6 +71,123 @@ interface Slot {
     title?: string;
     volunteer_slot_id?: string;
 }
+
+// MUI's own OK button only calls `onAccept` when the *committed* value differs
+// from what it last considered "published" - but our default-time seeding (below,
+// in onOpen) sets the controlled `value` directly, which MUI treats as already
+// published+committed in the same pass. So clicking OK without first touching the
+// clock face never fires `onAccept` at all. A custom action bar sidesteps MUI's
+// internal diffing entirely and always commits whatever is currently displayed.
+function TimeSlotActionBar(props: PickersActionBarProps) {
+    const { className } = props;
+    const { onCancelClick, onAcceptClick } = props as unknown as {
+        onCancelClick: () => void;
+        onAcceptClick: () => void;
+    };
+    return (
+        <DialogActions className={className}>
+            <Button onClick={onCancelClick}>Cancel</Button>
+            <Button onClick={onAcceptClick}>OK</Button>
+        </DialogActions>
+    );
+}
+
+// Hoisted out of OnetImeScheduleModal: defining this inline in the parent's render
+// body would give it a new function identity on every parent re-render (e.g. the
+// header's unread-count poll), forcing React to unmount/remount it - which silently
+// closes an open MobileTimePicker dialog and resets its internal state.
+const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
+    value,
+    onChange,
+    error,
+    volunteerTimezone,
+    currentDate,
+    existingSlots,
+}) => {
+    const getNowInVolunteerTimezone = () => dayjs.tz(undefined, volunteerTimezone || "UTC");
+
+    const [tempTime, setTempTime] = useState<dayjs.Dayjs | null>(
+        value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null
+    );
+    const [pickerOpen, setPickerOpen] = useState(false);
+
+    useEffect(() => {
+        setTempTime(value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null);
+    }, [value, volunteerTimezone]);
+
+    return (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MobileTimePicker
+                format="h:mm A"
+                minutesStep={1}
+                timezone={volunteerTimezone || "UTC"}
+                value={tempTime}
+                open={pickerOpen}
+                onChange={(time) => setTempTime(time)}
+                onOpen={() => {
+                    setPickerOpen(true);
+                    if (!tempTime) {
+                        // Default to current minute in volunteer's timezone
+                        const nowInTz = getNowInVolunteerTimezone();
+                        setTempTime(nowInTz.second(0));
+                    }
+                }}
+                onClose={() => {
+                    // A genuine cancel/dismiss (backdrop click, Escape) - discard the
+                    // in-progress draft and fall back to the last committed value.
+                    setPickerOpen(false);
+                    setTempTime(value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null);
+                }}
+                closeOnSelect={false}
+                slots={{ actionBar: TimeSlotActionBar }}
+                shouldDisableTime={(timeValue: dayjs.Dayjs, clockType: string) => {
+                    const nowInTz = getNowInVolunteerTimezone();
+                    const isToday = currentDate === nowInTz.format("YYYY-MM-DD");
+
+                    // Keep blocking past times for current day.
+                    if (isToday && timeValue.isBefore(nowInTz, "minute")) {
+                        return true;
+                    }
+
+                    // Only restrict booked values in the minute picker.
+                    // This allows selecting the same hour again (e.g. 4:30 after 4:20 is booked).
+                    if (clockType === "minutes") {
+                        const timeStr = timeValue.format("HH:mm");
+                        return existingSlots.some((slot) => {
+                            if (!slot.start_time || !slot.end_time) return false;
+                            return timeStr >= slot.start_time && timeStr < slot.end_time;
+                        });
+                    }
+
+                    return false;
+                }}
+                slotProps={{
+                    actionBar: {
+                        onCancelClick: () => setPickerOpen(false),
+                        onAcceptClick: () => {
+                            if (tempTime) {
+                                onChange(tempTime.format("HH:mm"));
+                            }
+                            setPickerOpen(false);
+                        },
+                    } as any,
+                    textField: {
+                        sx: {
+                            ...(error
+                                ? { border: "2px solid #ef4444", borderRadius: "12px" }
+                                : {}),
+                            "@media (max-width: 767px)": {
+                                "& .MuiOutlinedInput-root": {
+                                    backgroundColor: "#F4F7FB",
+                                },
+                            },
+                        },
+                    },
+                }}
+            />
+        </LocalizationProvider>
+    );
+};
 
 const OnetImeScheduleModal = ({
     isOpen,
@@ -312,87 +436,6 @@ const OnetImeScheduleModal = ({
         setSlots(updatedSlots);
     };
 
-    const TimePickerComponent: React.FC<TimePickerComponentProps & { error?: boolean }> = ({
-        value,
-        onChange,
-        error,
-        disabledTimes = [],
-    }) => {
-        const [tempTime, setTempTime] = useState<dayjs.Dayjs | null>(
-            value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null
-        );
-        const [originalTempTime, setOriginalTempTime] = useState<dayjs.Dayjs | null>(null);
-
-        return (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileTimePicker
-                    format="h:mm A"
-                    minutesStep={1}
-                    timezone={volunteerTimezone || "UTC"}
-                    value={tempTime}
-                    onChange={(time) => setTempTime(time)}
-                    onOpen={() => {
-                        setOriginalTempTime(tempTime);
-                        if (!tempTime) {
-                            // Default to current minute in volunteer's timezone
-                            const nowInTz = getNowInVolunteerTimezone();
-                            const defaultTime = nowInTz.second(0);
-                            setTempTime(defaultTime);
-                        }
-                    }}
-                    onClose={() => {
-                        setTempTime(originalTempTime);
-                        setOriginalTempTime(null);
-                    }}
-                    onAccept={(time) => {
-                        setOriginalTempTime(null);
-                        if (time) {
-                            setTempTime(time);
-                            onChange(time.format("HH:mm"));
-                        }
-                    }}
-                    closeOnSelect={false}
-                    shouldDisableTime={(timeValue: dayjs.Dayjs, clockType: string) => {
-                        const nowInTz = getNowInVolunteerTimezone();
-                        const isToday = currentDate === nowInTz.format("YYYY-MM-DD");
-
-                        // Keep blocking past times for current day.
-                        if (isToday && timeValue.isBefore(nowInTz, "minute")) {
-                            return true;
-                        }
-
-                        // Only restrict booked values in the minute picker.
-                        // This allows selecting the same hour again (e.g. 4:30 after 4:20 is booked).
-                        if (clockType === "minutes") {
-                            const timeStr = timeValue.format("HH:mm");
-                            return existingSlots.some((slot) => {
-                                if (!slot.start_time || !slot.end_time) return false;
-                                return timeStr >= slot.start_time && timeStr < slot.end_time;
-                            });
-                        }
-
-                        return false;
-                    }}
-
-                    slotProps={{
-                        textField: {
-                            sx: {
-                                ...(error
-                                    ? { border: "2px solid #ef4444", borderRadius: "12px" }
-                                    : {}),
-                                "@media (max-width: 767px)": {
-                                    "& .MuiOutlinedInput-root": {
-                                        backgroundColor: "#F4F7FB",
-                                    },
-                                },
-                            },
-                        },
-                    }}
-                />
-            </LocalizationProvider>
-        );
-    };
-
     // Collect all start and end times from existingSlots
     const disabledTimes = [
         ...existingSlots.map((slot) => slot.start_time),
@@ -493,6 +536,9 @@ const OnetImeScheduleModal = ({
                                     onChange={(val) => handleTimeChange(idx, "start_time", val)}
                                     error={invalidSlots.includes(idx)}
                                     disabledTimes={disabledTimes}
+                                    volunteerTimezone={volunteerTimezone}
+                                    currentDate={currentDate}
+                                    existingSlots={existingSlots}
                                 />
                                 <span>to</span>
                                 <TimePickerComponent
@@ -500,6 +546,9 @@ const OnetImeScheduleModal = ({
                                     onChange={(val) => handleTimeChange(idx, "end_time", val)}
                                     error={invalidSlots.includes(idx)}
                                     disabledTimes={disabledTimes}
+                                    volunteerTimezone={volunteerTimezone}
+                                    currentDate={currentDate}
+                                    existingSlots={existingSlots}
                                 />
                                 <button
                                     type="button"

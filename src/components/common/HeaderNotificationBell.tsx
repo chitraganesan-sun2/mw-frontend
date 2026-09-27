@@ -9,9 +9,17 @@ import { getCookie } from "@/utils/auth";
 import { useState, useEffect, useRef } from "react";
 
 const HeaderNotificationBell = () => {
-    const role = getCookie("role");
-    const volunteerId = getCookie("volunteer_id");
-    const learnerId = getCookie("learner_id");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role undefined -> renders null) differ from
+    // the client's first render, triggering a hydration mismatch on every page.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    const [volunteerId, setVolunteerId] = useState<string | undefined>(undefined);
+    const [learnerId, setLearnerId] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+        setVolunteerId(getCookie("volunteer_id"));
+        setLearnerId(getCookie("learner_id"));
+    }, []);
     const [isOpen, setIsOpen] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const prevCount = useRef<number>(0);

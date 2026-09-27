@@ -7,6 +7,9 @@ import Button from "@/components/common/Button";
 import TagComponent from "@/components/common/Tag";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { PickersActionBarProps } from "@mui/x-date-pickers/PickersActionBar";
+import MuiButton from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -113,6 +116,27 @@ const timezoneMapping: Record<string, string> = {
     IST: "Asia/Kolkata",
 };
 
+// MUI's OK button only calls `onAccept` when its internal "published" value differs
+// from its "committed" value - but the onOpen handler below seeds a default time
+// straight into the controlled `value` prop, which MUI treats as already
+// published+committed in that same pass. So clicking OK without first touching the
+// clock face never fires `onAccept`, and the field silently reverts on close. A
+// custom action bar sidesteps that internal diffing and always commits whatever is
+// currently displayed. (Same root cause as OnetImeScheduleModal.tsx's time picker.)
+function StartTimeActionBar(props: PickersActionBarProps) {
+    const { className } = props;
+    const { onCancelClick, onAcceptClick } = props as unknown as {
+        onCancelClick: () => void;
+        onAcceptClick: () => void;
+    };
+    return (
+        <DialogActions className={className}>
+            <MuiButton onClick={onCancelClick}>Cancel</MuiButton>
+            <MuiButton onClick={onAcceptClick}>OK</MuiButton>
+        </DialogActions>
+    );
+}
+
 export default function NewEventModal({
     isOpen,
     onClose,
@@ -140,8 +164,9 @@ export default function NewEventModal({
     const [isSubmitting, setIsSubmitting] = useState(false);
     // Temporary time state for mobile time picker dialog
     const [tempTime, setTempTime] = useState<dayjs.Dayjs | null>(null);
-    // Track the original tempTime when picker opens, so we can reset on cancel
-    const [originalTempTime, setOriginalTempTime] = useState<dayjs.Dayjs | null>(null);
+    // Fully controlled open state, so the custom action bar (below) can close the
+    // picker itself instead of relying on MUI's internal accept/dismiss diffing.
+    const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
     // Track selected meridiem explicitly to ensure PM hours show immediately
     const [selectedMeridiem, setSelectedMeridiem] = useState<string | null>(null);
 
@@ -215,7 +240,7 @@ export default function NewEventModal({
             setSelectedAcademic([]);
             setSelectedNonAcademic([]);
             setTempTime(null);
-            setOriginalTempTime(null);
+            setIsTimePickerOpen(false);
             setSelectedMeridiem(null);
         }
     }, [isOpen, volunteerUtcOffsetValue, volunteerTimezone]);
@@ -592,7 +617,7 @@ export default function NewEventModal({
                 setAcademicSelectValue(null);
                 setNonAcademicSelectValue(null);
                 setTempTime(null);
-                setOriginalTempTime(null);
+                setIsTimePickerOpen(false);
                 onClose();
             } else {
                 showToast({ message: "Failed to create event", type: "error" });
@@ -618,7 +643,7 @@ export default function NewEventModal({
         setAcademicSelectValue(null);
         setNonAcademicSelectValue(null);
         setTempTime(null);
-        setOriginalTempTime(null);
+        setIsTimePickerOpen(false);
         setSelectedMeridiem(null);
         onClose();
     };
@@ -715,6 +740,7 @@ export default function NewEventModal({
                                     minutesStep={1}
                                     timezone={volunteerTimezone || "UTC"}
                                     value={tempTime}
+                                    open={isTimePickerOpen}
                                     onChange={(time) => {
                                         // Always update tempTime when time changes
                                         // This includes when user clicks AM/PM (meridiem changes)
@@ -727,8 +753,7 @@ export default function NewEventModal({
                                         }
                                     }}
                                     onOpen={() => {
-                                        // Save the original tempTime value before opening
-                                        setOriginalTempTime(tempTime);
+                                        setIsTimePickerOpen(true);
 
                                         // Fetch slots when time picker opens
                                         // This ensures we have the latest slot data for overlap checking
@@ -756,19 +781,28 @@ export default function NewEventModal({
                                         }
                                     }}
                                     onClose={() => {
-                                        // If user cancels without accepting, reset tempTime to original value
-                                        // This ensures the input field stays empty if no time was selected
-                                        setTempTime(originalTempTime);
-                                        setOriginalTempTime(null);
-                                    }}
-                                    onAccept={(time) => {
-                                        // Clear the original tempTime tracking since user accepted
-                                        setOriginalTempTime(null);
-                                        handleTimeAccept(time);
+                                        // A genuine cancel/dismiss (backdrop click, Escape) - discard
+                                        // the in-progress draft and fall back to the committed value.
+                                        setIsTimePickerOpen(false);
+                                        setTempTime(
+                                            formData.start_time
+                                                ? dayjs.tz(formData.start_time, "HH:mm", volunteerTimezone || "UTC")
+                                                : null
+                                        );
                                     }}
                                     shouldDisableTime={shouldDisableTime}
                                     closeOnSelect={false}
+                                    slots={{ actionBar: StartTimeActionBar }}
                                     slotProps={{
+                                        actionBar: {
+                                            onCancelClick: () => setIsTimePickerOpen(false),
+                                            onAcceptClick: () => {
+                                                if (tempTime) {
+                                                    handleTimeAccept(tempTime);
+                                                }
+                                                setIsTimePickerOpen(false);
+                                            },
+                                        } as any,
                                         textField: {
                                             placeholder: "Select Time",
                                             sx: {

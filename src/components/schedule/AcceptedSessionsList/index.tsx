@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -54,7 +54,14 @@ const parseDateTime = (date?: string, time?: string): dayjs.Dayjs | null => {
 // Reuses the existing session/volunteer/{id} and session/learner/{id} routes with
 // status=accepted - no new backend endpoint.
 const AcceptedSessionsList: React.FC<AcceptedSessionsListProps> = ({ role }) => {
-    const userId = getCookie(role === "volunteer" ? "volunteer_id" : "learner_id");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (userId unknown -> query disabled ->
+    // "No accepted sessions yet.") differ from the client's first render (real id ->
+    // query enabled -> "Loading...") - a hydration mismatch on every schedule page.
+    const [userId, setUserId] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setUserId(getCookie(role === "volunteer" ? "volunteer_id" : "learner_id"));
+    }, [role]);
     const { volunteerTimeZone, learnerTimeZone } = useAppStore();
     const tzLabel = role === "volunteer" ? volunteerTimeZone : learnerTimeZone;
 

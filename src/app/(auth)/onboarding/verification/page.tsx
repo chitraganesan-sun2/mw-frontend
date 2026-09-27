@@ -10,7 +10,7 @@ import { getDefaultRouteForRole } from "@/utils/routeGuard";
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type UserRole = "volunteer" | "learner";
 type OnboardingStatus = {
@@ -20,20 +20,31 @@ type OnboardingStatus = {
 export default function VerificationPage() {
     const router = useRouter();
 
-    const role = getCookie("role") as UserRole;
-    const onboarded_status = getCookie("onboarded_status");
-    const currentId = role === "volunteer" ? "volunteer_id" : "learner_id";
-    const id = getCookie(currentId);
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role/id unknown -> query disabled ->
+    // renders the ThankYou content immediately) differ from the client's first
+    // render (real role/id -> query enabled -> renders the spinner), a hydration
+    // mismatch on every load of this page. Deferring to an effect keeps the first
+    // client render identical to the server's.
+    const [role, setRole] = useState<UserRole | undefined>(undefined);
+    const [onboarded_status, setOnboardedStatus] = useState<string | undefined>(undefined);
+    const [id, setId] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        const r = getCookie("role") as UserRole;
+        setRole(r);
+        setOnboardedStatus(getCookie("onboarded_status"));
+        setId(getCookie(r === "volunteer" ? "volunteer_id" : "learner_id"));
+    }, []);
 
     useEffect(() => { if (typeof window !== "undefined") window.scrollTo({ top: 0 }) }, []);
     useEffect(() => { if (!id) router.push("/"); }, [id, router]);
 
     const getOnboardingStatus = async () => {
-        const { data } = await GET_API(endpoints.onboarding.getOnboardingStatus(id as string, role));
+        const { data } = await GET_API(endpoints.onboarding.getOnboardingStatus(id as string, role as UserRole));
         const currentStatus = data?.onboarded_status;
         if (currentStatus === "verification_completed") {
             Cookies.set("onboarded_status", "verification_completed", { expires: 1 });
-            router.push(getDefaultRouteForRole(role));
+            router.push(getDefaultRouteForRole(role as UserRole));
         }else if(currentStatus === "verification_rejected"){
             Cookies.set("onboarded_status", "verification_rejected", { expires: 1 });
         }
@@ -47,7 +58,7 @@ export default function VerificationPage() {
         refetchInterval: 15000,
     });
 
-    if (isLoading) {
+    if (isLoading || !role) {
         return (
             <div className="flex h-[60dvh] bg-background-input items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>

@@ -60,6 +60,11 @@ const SelectInputCreatable = ({
             <CreatableSelect
                 {...props}
                 inputId={props.name}
+                // Stable, content-derived instanceId instead of react-select's default
+                // global auto-incrementing counter, which diverges between server and
+                // client render passes and causes a hydration mismatch (see AsyncSelect
+                // for the fuller explanation - same fix, same library quirk).
+                instanceId={props.name}
                 required={false}
                 options={filteredOptions}
                 value={selectedValue}

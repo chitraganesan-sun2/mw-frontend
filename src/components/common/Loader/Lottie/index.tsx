@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import LearnerLoadingAnimation from "@/assets/json/animations/Learner.json";
 import VolunteerLoadingAnimation from "@/assets/json/animations/Volunteer.json";
@@ -24,8 +24,17 @@ const LottieLoader: React.FC<Props> = ({
     fullscreen = false,
 }) => {
     const role = getCookie("role");
+    // The fullscreen variant portals into document.body, which doesn't exist during
+    // SSR. Gating the whole component on `typeof window` used to make the server
+    // render null while the client's first render (isLoading=true) showed the
+    // loader immediately, causing a hydration mismatch on every page with a loader.
+    // Deferring to an effect keeps the first client render identical to the server's.
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
-    if (!isLoading || typeof window === "undefined") return null;
+    if (!isLoading) return null;
 
     const loaderContent = (
         <div
@@ -50,6 +59,8 @@ const LottieLoader: React.FC<Props> = ({
             </div>
         );
     }
+
+    if (!mounted) return null;
 
     return createPortal(
         <div

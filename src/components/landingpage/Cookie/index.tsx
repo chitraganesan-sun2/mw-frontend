@@ -7,7 +7,13 @@ import Button from "@/components/common/Button";
 import { Modal } from "antd";
 
 export default function CookieConsent() {
-  const [showBanner, setShowBanner] = useState(true);
+  // Whether to show the banner depends on a cookie, which isn't readable during
+  // SSR - and antd's Modal renders via a Portal that only exists client-side
+  // regardless, so starting "open" on the server (or on the client's first,
+  // server-matching render) always mismatches once it hydrates for real. Starting
+  // hidden and only showing it once mounted keeps the first render identical to
+  // the server's; the effect below then reveals it if consent hasn't been given.
+  const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
     const cookies = parseCookies();

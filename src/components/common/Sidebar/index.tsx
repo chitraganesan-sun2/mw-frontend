@@ -21,10 +21,17 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { clearCookies } from "@/utils/auth";
 import { unregisterTokenFromBackend } from "@/services/push-notifications";
+import { useEffect, useState } from "react";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const router = useRouter();
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server's nav-item set differ from the client's role,
+    // triggering a full hydration-mismatch remount of the whole sidebar on every page.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+    }, []);
     const isMobileOrTabScreen = InnerWidth() < 1024;
 
     // Instant Sessions - for both learners and volunteers
