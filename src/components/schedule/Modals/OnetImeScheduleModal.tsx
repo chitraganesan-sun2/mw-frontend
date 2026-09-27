@@ -1,5 +1,5 @@
 import SideModal from "@/components/common/Modals/SideModal";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/common/Input";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
@@ -322,6 +322,11 @@ const OnetImeScheduleModal = ({
             value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null
         );
         const [originalTempTime, setOriginalTempTime] = useState<dayjs.Dayjs | null>(null);
+        const wasAcceptedRef = useRef(false);
+
+        useEffect(() => {
+            setTempTime(value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null);
+        }, [value]);
 
         return (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -332,6 +337,7 @@ const OnetImeScheduleModal = ({
                     value={tempTime}
                     onChange={(time) => setTempTime(time)}
                     onOpen={() => {
+                        wasAcceptedRef.current = false;
                         setOriginalTempTime(tempTime);
                         if (!tempTime) {
                             // Default to current minute in volunteer's timezone
@@ -341,10 +347,15 @@ const OnetImeScheduleModal = ({
                         }
                     }}
                     onClose={() => {
-                        setTempTime(originalTempTime);
+                        // onAccept fires immediately before onClose when the user clicks OK,
+                        // so only revert here on a genuine cancel/dismiss, not after an accept.
+                        if (!wasAcceptedRef.current) {
+                            setTempTime(originalTempTime);
+                        }
                         setOriginalTempTime(null);
                     }}
                     onAccept={(time) => {
+                        wasAcceptedRef.current = true;
                         setOriginalTempTime(null);
                         if (time) {
                             setTempTime(time);
