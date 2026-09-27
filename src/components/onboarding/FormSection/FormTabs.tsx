@@ -46,7 +46,20 @@ const FormTabs = ({
     reset,
     getValues,
 }: FormTabsProps) => {
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role/userId unknown) differ from the
+    // client's first render (real cookie values), a hydration mismatch. This
+    // component is still mounted (just visually covered by the parent's loading
+    // modal) while that parent waits on its own deferred role, so the same fix
+    // applies here independently. Deferring to an effect keeps the first client
+    // render identical to the server's.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    const [userId, setUserId] = useState("");
+    useEffect(() => {
+        const r = getCookie("role");
+        setRole(r);
+        setUserId(getCookie(r === "volunteer" ? "volunteer_id" : "learner_id") || "");
+    }, []);
     const isVolunteer = role === "volunteer";
     const volunteer_birth_date = useWatch({ name: "volunteer_birth_date", control: control });
     const enrolled_by = useWatch({ name: "enrolled_by", control: control });
@@ -61,7 +74,6 @@ const FormTabs = ({
     // it wipes whatever the user just typed on the new step before the refetch lands.
     const hasHydratedRef = useRef(false);
     const queryClient = useQueryClient();
-    const userId = getCookie(isVolunteer ? "volunteer_id" : "learner_id") || "";
 
     // Utility function to filter out null values from API data
     const filterNullValues = (data: any): any => {

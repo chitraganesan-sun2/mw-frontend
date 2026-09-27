@@ -38,7 +38,7 @@ export default function LearnerSchedulePage() {
 
     const getEvents = () => getCalendarEvents(learnerId as string, "learner", currentMonth);
 
-    const { data, isFetching } = useQuery({
+    const { data, isFetching, isError } = useQuery({
         queryKey: ["learner-events", currentMonth],
         queryFn: getEvents,
         // A volunteer accepting/declining happens in their own separate browser session -
@@ -98,6 +98,8 @@ export default function LearnerSchedulePage() {
                 <AcceptedSessionsList role="learner" />
                 {isFetching ? (
                     <LottieLoader isLoading={true} fullscreen={false} />
+                ) : isError ? (
+                    <div className="flex-center h-full w-full">Something went wrong loading your schedule.</div>
                 ) : isMobileOrTabScreen ? (
                     <MobileCalender events={data || []} />
                 ) : (

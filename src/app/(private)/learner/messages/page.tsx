@@ -130,8 +130,10 @@ const Messages = () => {
             // Don't redirect here; desktop redirect is handled in useEffect so isMobile is current
             return res.data;
         } catch (err: any) {
-            setNoChats(true);
-            return [];
+            // Re-throw so react-query's isError reflects a real failure, instead of
+            // silently mapping it onto noChats - a failed fetch was indistinguishable
+            // from a genuinely empty inbox before this.
+            throw err;
         } finally {
             setIsLoading(false);
             setIsRefetching(false);
@@ -440,15 +442,17 @@ const Messages = () => {
         );
     }, [isMobile, chats, urlChatId, urlVolunteerId, router]);
 
-    if (noChats === null) {
-        return null;
+    if (noChats === null && !isErrorChats) {
+        return <LottieLoader isLoading={true} />;
     }
     return (
         <>
             <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleScheduleMeeting} />
 
             <VolunteerViewModal isOpen={isOpen} onClose={handleModal} />
-            {noChats ? (
+            {isErrorChats && noChats === null ? (
+                <div className="flex-center h-full w-full">Something went wrong loading your messages.</div>
+            ) : noChats ? (
                 <NoMessage />
             ) : (
                 <div className="w-full h-full bg-white flex border border-gray-200 rounded-tl-[3rem] max-md:rounded-tl-none">

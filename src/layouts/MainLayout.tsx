@@ -1,7 +1,7 @@
 "use client";
 
 import Sidebar from "@/components/common/Sidebar";
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useEffect, useState } from "react";
 import { renderHeader } from "./helper";
 import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/utils/merge-class";
@@ -15,8 +15,18 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const width = InnerWidth();
-    const onboardedStatus = getCookie("onboarded_status");
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (status/role unknown, always renders the real
+    // page) differ from the client's first render (real cookie -> may render the
+    // ThankYou card instead), a hydration mismatch on every page load for any
+    // pending/rejected user, since this layout wraps every private page. Deferring to
+    // an effect keeps the first client render identical to the server's.
+    const [onboardedStatus, setOnboardedStatus] = useState<string | undefined>(undefined);
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setOnboardedStatus(getCookie("onboarded_status"));
+        setRole(getCookie("role"));
+    }, []);
     const isProfile = pathname.includes("profile");
     const isMessagesChatPage =
         (pathname?.includes("/volunteer/messages") || pathname?.includes("/learner/messages")) &&

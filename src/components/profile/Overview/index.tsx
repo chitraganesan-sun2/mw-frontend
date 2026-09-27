@@ -9,9 +9,18 @@ import Divider from "@/components/common/Divider";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { getCookie } from "@/utils/auth";
+import { useEffect, useState } from "react";
 
 const Overview = ({ data, reviewEndpoint }: any) => {
-    const role = getCookie("role") || "";
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role unknown -> always shows the volunteer
+    // labels) differ from the client's first render (real role), a hydration mismatch
+    // on this shared component used by both profile pages. Deferring to an effect
+    // keeps the first client render identical to the server's.
+    const [role, setRole] = useState("");
+    useEffect(() => {
+        setRole(getCookie("role") || "");
+    }, []);
     const isLearner = role === "learner";
 
     const overViewCard = [

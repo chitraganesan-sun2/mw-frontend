@@ -5,9 +5,18 @@ import Image from "next/image";
 import EditProfileIcon from "@/assets/icons/EditProfileIcon";
 import { getCookie } from "@/utils/auth";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const BioHeader = ({ data }: any) => {
-    const role = getCookie("role") || "";
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role unknown -> blank badge, broken edit-
+    // profile link) differ from the client's first render (real role), a hydration
+    // mismatch on every profile page view. Deferring to an effect keeps the first
+    // client render identical to the server's.
+    const [role, setRole] = useState("");
+    useEffect(() => {
+        setRole(getCookie("role") || "");
+    }, []);
 
     return (
         <div className="flex flex-col gap-4 w-full px-5">
