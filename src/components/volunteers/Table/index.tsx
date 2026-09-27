@@ -61,6 +61,9 @@ const VolunteersTable: React.FC<VolunteersTableProps> = ({
                         onClick={() => handleMessageVolunteer(record.id)}
                         btnVariant="link"
                         title="Message Volunteer"
+                        className={`${
+                            !record.chatPermission ? "!text-gray-400" : "!text-primary"
+                        }`}
                     />
                     {/* <Button
                         onClick={() => handleUploadTestimonial(record.id)}

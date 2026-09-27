@@ -45,7 +45,7 @@ export default function ProfilePage() {
     const triggerReload = async () => await refetch();
 
     const handleBackButton = () => {
-        router.replace("/learner/schedule");
+        router.push("/learner/schedule");
     };
 
     useEffect(() => {

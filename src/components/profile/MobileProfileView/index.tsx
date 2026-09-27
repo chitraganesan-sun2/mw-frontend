@@ -92,7 +92,15 @@ const TabButtons = ({
 );
 
 const OverviewContent = ({ userData }: { userData: any }) => {
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role unknown) differ from the client's
+    // first render (real role), a hydration mismatch on this shared mobile profile
+    // view. Deferring to an effect keeps the first client render identical to the
+    // server's.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+    }, []);
     const isLearner = role === "learner";
 
     const details = isLearner ?
@@ -224,7 +232,15 @@ const volunteerTabs = [
 
 const FullProfileDetails = ({ data }: { data: any }) => {
     const tabContentRef = useRef<HTMLDivElement>(null);
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server (role unknown) differ from the client's
+    // first render (real role), a hydration mismatch on this shared mobile profile
+    // view. Deferring to an effect keeps the first client render identical to the
+    // server's.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+    }, []);
 
     const tabs = role === "learner" ? learnerTabs : volunteerTabs;
     const [activeTab, setActiveTab] = useState(tabs[0].id);

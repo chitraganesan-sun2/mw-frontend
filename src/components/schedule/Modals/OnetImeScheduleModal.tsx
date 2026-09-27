@@ -308,15 +308,18 @@ const OnetImeScheduleModal = ({
             return;
         }
 
-        if (invalidSlots.length > 0) {
+        // Re-derive fresh rather than trusting `invalidSlots` state, in case existingSlots
+        // resolved after the user last touched a time field and the effect hasn't caught
+        // up yet - submitting must never rely on a possibly-stale validity flag.
+        const freshInvalidSlots = computeInvalidSlots(slots, existingSlots);
+        if (freshInvalidSlots.length > 0) {
+            setInvalidSlots(freshInvalidSlots);
             showToast({
                 message: "Please fix invalid or overlapping slots before submitting.",
                 type: "error",
             });
             return;
         }
-        finalSlots.forEach((slot, idx) => {
-        });
         setIsSaving(true);
         const formattedData = finalSlots.map((slot) => ({
             date: dayjs(currentDate, "YYYY-MM-DD").format("DD-MM-YYYY"),
@@ -372,31 +375,18 @@ const OnetImeScheduleModal = ({
         return startA.isBefore(endB) && endA.isAfter(startB);
     }
 
-    const handleTimeChange = (
-        index: number,
-        type: "start_time" | "end_time",
-        value: string | null
-    ) => {
-        const updatedSlots = [...slots];
-        updatedSlots[index][type] = value || "";
-
-        // Swap logic: if both times are set and start_time > end_time, swap them
-        const start = updatedSlots[index].start_time;
-        const end = updatedSlots[index].end_time;
-        if (start && end && dayjs(start, "HH:mm").isAfter(dayjs(end, "HH:mm"))) {
-            // Swap
-            updatedSlots[index].start_time = end;
-            updatedSlots[index].end_time = start;
-        }
-
-        // Fully recalculate invalid slots to ensure errors are correctly cleared
+    // Pulled out so it can be re-run whenever `existingSlots` itself changes (e.g. its
+    // fetch resolves after the user already picked times), not only from handleTimeChange -
+    // otherwise a slot picked while existingSlots was still [] never gets re-checked once
+    // the real data arrives, and an overlapping slot could be submitted with no warning.
+    const computeInvalidSlots = (slotsToCheck: Slot[], existingSlotsToCheck: Slot[]) => {
         const newInvalidSlots: number[] = [];
 
-        updatedSlots.forEach((slotA, idxA) => {
+        slotsToCheck.forEach((slotA, idxA) => {
             if (!slotA.start_time || !slotA.end_time) return;
 
             // 1. Check for overlaps/duplicates with OTHER NEW slots
-            updatedSlots.forEach((slotB, idxB) => {
+            slotsToCheck.forEach((slotB, idxB) => {
                 if (idxA === idxB) return;
                 if (!slotB.start_time || !slotB.end_time) return;
 
@@ -407,7 +397,7 @@ const OnetImeScheduleModal = ({
             });
 
             // 2. Check for overlaps with EXISTING slots
-            const hasExistingOverlap = existingSlots.some((existingSlot) => {
+            const hasExistingOverlap = existingSlotsToCheck.some((existingSlot) => {
                 if (!existingSlot.start_time || !existingSlot.end_time) return false;
                 const eStart = dayjs(existingSlot.start_time, "HH:mm");
                 const eEnd = dayjs(existingSlot.end_time, "HH:mm");
@@ -432,7 +422,33 @@ const OnetImeScheduleModal = ({
             }
         });
 
-        setInvalidSlots(newInvalidSlots);
+        return newInvalidSlots;
+    };
+
+    // Re-validate against the latest existingSlots whenever it changes (see comment above).
+    useEffect(() => {
+        setInvalidSlots(computeInvalidSlots(slots, existingSlots));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [existingSlots]);
+
+    const handleTimeChange = (
+        index: number,
+        type: "start_time" | "end_time",
+        value: string | null
+    ) => {
+        const updatedSlots = slots.map((slot) => ({ ...slot }));
+        updatedSlots[index][type] = value || "";
+
+        // Swap logic: if both times are set and start_time > end_time, swap them
+        const start = updatedSlots[index].start_time;
+        const end = updatedSlots[index].end_time;
+        if (start && end && dayjs(start, "HH:mm").isAfter(dayjs(end, "HH:mm"))) {
+            // Swap
+            updatedSlots[index].start_time = end;
+            updatedSlots[index].end_time = start;
+        }
+
+        setInvalidSlots(computeInvalidSlots(updatedSlots, existingSlots));
         setSlots(updatedSlots);
     };
 

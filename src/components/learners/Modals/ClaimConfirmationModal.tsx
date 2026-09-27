@@ -92,7 +92,11 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
                                 profilePicture: apiData.volunteer_image?.image_url || "/dummy-profile.webp",
                             },
                             meetingLink: apiData.meet_link,
-                            guests: [apiData.volunteer_email, apiData.learner_email],
+                            // The backend deliberately stops returning volunteer_email/
+                            // learner_email here (privacy fix) - apiData.volunteer_name is
+                            // the only participant name this endpoint actually provides, so
+                            // that's the only "guest" (the host) we can show.
+                            guests: [apiData.volunteer_name],
                         };
                         setSuccessSession(formattedSession);
                     }
