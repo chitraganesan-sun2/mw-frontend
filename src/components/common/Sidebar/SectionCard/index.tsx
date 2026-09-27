@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { getLocalStorage } from "@/utils/localStorage";
 import { getCookie } from "@/utils/auth";
@@ -16,7 +16,13 @@ interface SectionCardProps {
 const SectionCard = ({ href, text, icon, textColor, onClick }: SectionCardProps) => {
     const pathname = usePathname();
     const isActive = pathname.includes(href);
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR - reading it
+    // directly in render made the server's href differ from the client's, triggering
+    // a hydration mismatch on every page (see Sidebar/index.tsx for the same fix).
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+    }, []);
 
     // Normalize: strip any leading slash from href so we never produce
     // a double slash like "/learner//community" (which 404s in static export).

@@ -7,11 +7,23 @@ import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const Avatar = () => {
-    const role = getCookie("role");
-    const volunteerId = getCookie("volunteer_id");
-    const learnerId = getCookie("learner_id");
+    // getCookie reads document.cookie, which doesn't exist during SSR - reading it
+    // directly in render made the server-rendered href/role differ from the client's
+    // first render, triggering a full hydration-mismatch remount on every page load.
+    // Deferring to an effect keeps the first client render identical to the server's.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    const [volunteerId, setVolunteerId] = useState<string | undefined>(undefined);
+    const [learnerId, setLearnerId] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        setRole(getCookie("role"));
+        setVolunteerId(getCookie("volunteer_id"));
+        setLearnerId(getCookie("learner_id"));
+    }, []);
+
     const isVolunteer = role === "volunteer";
 
     const {
@@ -58,12 +70,15 @@ const Avatar = () => {
     const { data } = useQuery({
         queryKey: queryKey,
         queryFn: async () => await getUserDetails(),
+        enabled: !!role,
     });
 
     return (
         <Link href={`/${role}/profile`} className="flex flex-col items-center gap-2 p-2">
-            <div className="relative w-[80px] h-[80px]">
-                <Image src={userImage} alt="avatar" fill className="object-cover rounded-full" />
+            <div className="relative w-[80px] h-[80px] rounded-full bg-gray-100">
+                {userImage && (
+                    <Image src={userImage} alt="avatar" fill className="object-cover rounded-full" />
+                )}
             </div>
             <p className="font-medium text-center">{userName}</p>
             <TagComponent text={role || ""} />
