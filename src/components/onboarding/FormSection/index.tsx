@@ -10,7 +10,7 @@ import { validateVolunteerParentDetails, validateLearnerParentFields } from "./c
 import FormTabs from "./FormTabs";
 import { getCookie } from "@/utils/auth";
 import ModalLoader from "@/components/common/Loader/Modal";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type FormSectionProps = {
     schema: z.ZodSchema;
@@ -30,22 +30,34 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
         getValues,
     } = form;
 
-    const role = getCookie("role");
+    // getCookie reads document.cookie, which isn't available during SSR. Reading it
+    // directly in render made the server (role/userId unknown) differ from the
+    // client's first render (real cookie values), triggering a hydration mismatch
+    // on every onboarding page load. Deferring to an effect keeps the first client
+    // render identical to the server's; `enabled` also stops the query from ever
+    // firing with an empty user id.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    const [userId, setUserId] = useState("");
+    useEffect(() => {
+        const r = getCookie("role");
+        setRole(r);
+        setUserId(getCookie(r === "volunteer" ? "volunteer_id" : "learner_id") || "");
+    }, []);
     const isVolunteer = role === "volunteer";
     const isLearner = role === "learner";
-    const userId = getCookie(isVolunteer ? "volunteer_id" : "learner_id") || "";
 
     const endpoint = isVolunteer
         ? endpoints.volunteer.getIndividualVolunteer(userId)
         : endpoints.learner.getIndividualLearner(userId);
 
     const { data: userData, isFetching: isUserLoading } = useQuery({
-        queryKey: [role],
+        queryKey: [role, userId],
 
         queryFn: async () => {
             const res = await GET_API(endpoint);
             return res.data;
         },
+        enabled: !!role && !!userId,
     });
 
     // Set form values when userData changes
@@ -129,8 +141,8 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
 
     return (
         <div>
-            {isUserLoading && (
-                <ModalLoader isLoading={isUserLoading} title="Fetching user details..." />
+            {(isUserLoading || !role) && (
+                <ModalLoader isLoading={true} title="Fetching user details..." />
             )}
             {isRedirecting && <ModalLoader isLoading={isRedirecting} title="Loading..." />}
             <FormTabs

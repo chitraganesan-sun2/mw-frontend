@@ -206,6 +206,12 @@ const AsyncSelect = ({
             <CreatableSelect
                 {...props}
                 inputId={props.name}
+                // react-select derives its aria-* ids from a global auto-incrementing
+                // counter by default, which starts fresh on the server vs the client
+                // and diverges whenever more than one Select is on the page - causing
+                // a hydration mismatch on every page with 2+ of these. A stable,
+                // content-derived instanceId keeps server and client ids identical.
+                instanceId={props.name}
                 required={false}
                 isMulti={variant === "multi"}
                 options={filteredOptions}

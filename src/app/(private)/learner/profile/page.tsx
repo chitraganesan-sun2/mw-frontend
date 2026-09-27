@@ -25,7 +25,16 @@ export default function ProfilePage() {
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const [mode, setMode] = useQueryState("mode");
 
-    const learnerId = getCookie("learner_id") || "";
+    // getCookie reads document.cookie, which isn't available during SSR. Reading it
+    // synchronously here made the server (learnerId="" -> query disabled ->
+    // isLoading=false -> renders the loaded layout) differ from the client's first
+    // render (real id -> query enabled -> isLoading=true -> renders the skeleton),
+    // a hydration mismatch on every profile page load. Deferring to an effect keeps
+    // the first client render identical to the server's.
+    const [learnerId, setLearnerId] = useState("");
+    useEffect(() => {
+        setLearnerId(getCookie("learner_id") || "");
+    }, []);
     const [learnerData, setLearnerData] = useState({ bio: {}, overview: {} });
 
     const { data, isLoading, refetch } = useQuery({
@@ -90,7 +99,7 @@ export default function ProfilePage() {
         setLearnerData({ bio: bioData, overview: overviewData });
     }, [data]);
 
-    if (isLoading) {
+    if (isLoading || !learnerId) {
         return (
             <div className="h-full w-full flex gap-4 p-4">
                 <div className="flex-1"><ProfileSkeleton /></div>
