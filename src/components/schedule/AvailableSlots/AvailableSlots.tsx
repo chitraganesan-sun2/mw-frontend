@@ -102,7 +102,7 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
                         ) : selectedDate ? (
                             <span>No slots available for this date.</span>
                         ) : (
-                            <span>To see available slots, select a volunteer and date.</span>
+                            <span>To see available slots, select a date.</span>
                         )}
                     </p>
                 )}

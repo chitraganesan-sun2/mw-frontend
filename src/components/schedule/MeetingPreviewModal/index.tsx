@@ -205,12 +205,13 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 <div>
                     <div className="flex items-center justify-between gap-3">
                         <p className="font-medium text-sm text-gray-light">Meeting Completed</p>
-                        <p
+                        <button
+                            type="button"
                             onClick={handleFeedBack}
-                            className="text-primary text-sm underline cursor-pointer font-medium"
+                            className="text-primary text-sm underline cursor-pointer font-medium bg-transparent border-0 p-0"
                         >
                             Complete Feedback
-                        </p>
+                        </button>
                     </div>
                 </div>
             );
@@ -237,12 +238,13 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 <div>
                     <div className="flex items-center justify-between gap-3">
                         <p className="font-medium text-sm text-gray-light">Meeting Completed</p>
-                        <p
+                        <button
+                            type="button"
                             onClick={handleFeedBack}
-                            className="text-primary text-sm underline cursor-pointer font-medium"
+                            className="text-primary text-sm underline cursor-pointer font-medium bg-transparent border-0 p-0"
                         >
                             Complete Feedback
-                        </p>
+                        </button>
                     </div>
                 </div>
             );

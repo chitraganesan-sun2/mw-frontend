@@ -364,7 +364,19 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
         onSave(formData);
     };
 
+    // Slot times come back from the API already in the LEARNER's local time, so they must be
+    // labelled with the learner's own timezone - this used to use the volunteer's (and fall
+    // back to "UTC"), mislabelling every slot for a cross-timezone pair.
     const [volunteerTimezone, setVolunteerTimezone] = useState<string>("");
+    useEffect(() => {
+        if (!learnerId) return;
+        GET_API(endpoints.learner.getIndividualLearner(learnerId))
+            .then(({ data }: any) => {
+                const tzCode = data?.learner_personal_info?.learner_contact_details?.timezone;
+                setVolunteerTimezone(timezoneMapping[tzCode] || "");
+            })
+            .catch(() => setVolunteerTimezone(""));
+    }, [learnerId]);
 
     useEffect(() => {
         setFormData((prev) => ({
@@ -383,8 +395,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                     const { data } = await GET_API(
                         endpoints.volunteer.getIndividualVolunteer(formData.select_volunteer)
                     );
-                    const tzCode = data?.volunteer_contact_details?.timezone;
-                    setVolunteerTimezone(timezoneMapping[tzCode] || "UTC");
                     setVolunteerAcademicOptions(
                         (data?.volunteer_subjects || [])
                             .filter((s: any) => s?.subject_name)
@@ -397,7 +407,6 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
                     );
                 } catch (error) {
                     console.error("Error fetching volunteer details:", error);
-                    setVolunteerTimezone("UTC");
                     setVolunteerAcademicOptions([]);
                     setVolunteerNonAcademicOptions([]);
                 }

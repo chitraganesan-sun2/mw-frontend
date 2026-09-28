@@ -61,16 +61,20 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
         enabled: category === "my-resources",
     });
 
-    const { isFetching } = useQuery({
+    const { data: allResourcesItems, isFetching } = useQuery({
         queryKey: ["resources", debouncedSearchQuery],
         queryFn: async () => {
-            setResources([]);
             const allResources = await getResources({ query: debouncedSearchQuery || "" });
-            setResources(allResources?.items || []);
-            return allResources;
+            return allResources?.items || [];
         },
         enabled: !category,
     });
+    // Sync from the query's data rather than setting state inside queryFn: on a revisit
+    // within the cache window queryFn doesn't re-run, so the list used to render empty.
+    // (Kept as local state for the optimistic like/unlike updates below.)
+    useEffect(() => {
+        if (allResourcesItems) setResources(allResourcesItems);
+    }, [allResourcesItems]);
 
     const { data: ResourceCategories, isFetching: isFetchingCategories } = useQuery({
         queryKey: ["resource-categories"],

@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef } from "react";
+import { formatUtcTimestamp } from "@/utils/timeFunctions";
 
 interface MatchRecord {
     match_id: string;
@@ -160,7 +161,7 @@ export default function VolunteerDashboardPage() {
                     <div className="bg-white rounded-xl divide-y divide-stroke">
                         {matches.map((m) => (
                             <div key={m.match_id} className="flex items-center justify-between p-4 text-sm">
-                                <span>{new Date(m.created_at).toLocaleString()}</span>
+                                <span>{formatUtcTimestamp(m.created_at)}</span>
                                 <span className={m.status === "notified" ? "text-success" : "text-gray-light"}>
                                     {m.status === "notified" ? "Matched" : "No match found"}
                                 </span>

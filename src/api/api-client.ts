@@ -59,7 +59,8 @@ axiosInstance.interceptors.response.use(
                     // by skipping it if we're already at the landing/login page.
                     if (typeof window !== "undefined" && window.location.pathname !== "/") {
                         clearCookies();
-                        window.location.href = "/";
+                        // ?session=expired -> SessionExpiredNotice explains the sign-out.
+                        window.location.href = "/?session=expired";
                     }
                     break;
                 case 403:

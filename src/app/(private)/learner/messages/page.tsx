@@ -22,6 +22,8 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { SendIcon } from "@/assets/icons";
 import LottieLoader from "@/components/common/Loader/Lottie";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { showToast } from "@/components/common/Toast";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -88,7 +90,11 @@ const Messages = () => {
     // fetch can start immediately instead of waiting on a navigation round trip.
     const firstChat = !isMobile ? chats[0] : undefined;
     const chatId = urlChatId ?? firstChat?.chat_id ?? null;
-    const volunteerId = urlVolunteerId ?? firstChat?.volunteer_id ?? null;
+    // If the URL has a chatId but no volunteerId (notification deep links, narrow screens where
+    // firstChat is deliberately undefined), take the recipient from that chat's own record -
+    // it used to fall through to null and the send went to .../volunteer/null.
+    const chatRecord = chats.find((c) => c.chat_id === chatId);
+    const volunteerId = urlVolunteerId ?? chatRecord?.volunteer_id ?? firstChat?.volunteer_id ?? null;
     const [individualChat, setIndividualChat] = useState<ChatMessage[]>([]);
     const [recieverName, setRecieverName] = useState("");
     const [recieverImage, setRecieverImage] = useState("");
@@ -223,6 +229,10 @@ const Messages = () => {
             return response.data;
         } catch (error) {
             if (isFirstLoadForThisChat) setIsIndividualLoading(false);
+            // Rethrow instead of returning undefined: react-query then keeps the last good
+            // messages on a failed 4s poll (undefined blanked the conversation and logged
+            // "Query data cannot be undefined").
+            throw error;
         }
     };
 
@@ -231,9 +241,14 @@ const Messages = () => {
         isLoading: isLoadingChats,
         isError: isErrorChats,
     } = useQuery({
-        queryKey: ["chats"],
+        // Role in the key: learner and volunteer pages shared ["chats"], so switching role in
+        // one browser could briefly show the other role's list. (["chats"] invalidations still
+        // match by prefix.) refetchOnMount "always": this queryFn is what fills the page's
+        // state, so serving the cache on a revisit showed a spinner until the next 8s poll.
+        queryKey: ["chats", "learner"],
         queryFn: () => getAllChatsForLearners(),
         refetchInterval: 8000,
+        refetchOnMount: "always",
     });
 
     const { data: individualChatData, refetch: refetchIndividualChat } = useQuery({
@@ -241,6 +256,7 @@ const Messages = () => {
         queryFn: () => getIndividualChat(),
         enabled: !!chatId,
         refetchInterval: 4000,
+        refetchOnMount: "always",
     });
 
     const handleSearch = (value: string) => {
@@ -391,8 +407,10 @@ const Messages = () => {
                     newMap.delete(tempMessageId);
                     return newMap;
                 });
-                // Restore message text so user can retry
+                // Restore message text so user can retry - and say so; this used to be silent,
+                // so the text just reappeared in the box with no explanation.
                 setMessage(messageText);
+                showToast({ type: "error", message: getApiErrorMessage(error, "Your message wasn't sent. Please try again.") });
             });
     };
 

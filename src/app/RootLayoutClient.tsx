@@ -9,6 +9,7 @@ import useMobileInit from "@/hooks/useMobileInit";
 import { useRouter } from "next/navigation";
 import RouteGuard from "@/components/guards/RouteGuard";
 import NetworkStatus from "@/components/common/NetworkStatus";
+import SessionExpiredNotice from "@/components/common/SessionExpiredNotice";
 import { initSentry } from "@/services/sentry";
 
 // Module scope, not component body - runs exactly once per page load rather
@@ -42,6 +43,7 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
                 }
             >
                 <NetworkStatus />
+                <SessionExpiredNotice />
                 <QueryProvider>
                     <RouteGuard>{children}</RouteGuard>
                 </QueryProvider>

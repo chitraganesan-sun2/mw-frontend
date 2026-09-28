@@ -89,3 +89,14 @@ export const extractTimezoneOffset = (timezoneLabel: string): string | null => {
 
     return null;
 };
+
+/**
+ * Format a backend timestamp that is UTC but carries no offset (e.g. Python's
+ * datetime.utcnow().isoformat() -> "2026-09-28T09:51:48"). `new Date(x)` parses such a
+ * string as LOCAL time, shifting it by the viewer's UTC offset (5h30 for IST).
+ */
+export const formatUtcTimestamp = (date: string | undefined | null, format = "D MMM YYYY, h:mm A") => {
+    if (!date) return "";
+    const d = dayjs.utc(date);
+    return d.isValid() ? d.local().format(format) : "";
+};

@@ -13,6 +13,7 @@ import { cn } from "@/utils/merge-class";
 import { showToast } from "@/components/common/Toast";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 dayjs.extend(customParseFormat);
 
@@ -112,18 +113,22 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
     const { mutate: onSave, isPending } = useSendData({
         // @ts-ignore
         fn: (status: string) => handleNotificationStatus(status, data?.session_id),
-        invalidateKey: ["events"],
+        invalidateKey: [isLearnerViewer ? "learner-accepted-sessions" : "volunteer-accepted-sessions"],
         success: () => {
             queryClient.invalidateQueries({
                 queryKey: [isLearnerViewer ? "learner-approval-notifications" : "approval-notifications"],
             });
-            queryClient.invalidateQueries({ queryKey: ["events"] });
+            // ["events"] matched no query - the calendars are keyed per role.
+            queryClient.invalidateQueries({ queryKey: [isLearnerViewer ? "learner-events" : "volunteer-events"] });
             setLoadingAccept(false);
             setLoadingDecline(false);
         },
         error: (err) => {
             setLoadingAccept(false);
             setLoadingDecline(false);
+            // Was silent: a failed accept/decline (e.g. the session changed, or the calendar
+            // invite couldn't be created) left the card unchanged with no explanation.
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update this request. Please try again.") });
         },
     });
 

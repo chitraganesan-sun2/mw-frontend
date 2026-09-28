@@ -17,7 +17,14 @@ const useAutoLogout = (router: any) => {
     // cookie to identify which device's token to remove.
     unregisterTokenFromBackend();
     clearCookies();
-    router.refresh();
+    // Full reload (like Sign Out) rather than router.refresh(): an SPA refresh kept the
+    // previous user's react-query cache and in-memory store alive on a shared device, and
+    // the user landed on the homepage with no idea why they'd been signed out.
+    if (typeof window !== "undefined") {
+      window.location.href = "/?session=expired";
+    } else {
+      router.refresh();
+    }
   }, [router]);
 
   const resetTimer = useCallback(() => {

@@ -14,6 +14,7 @@ import { MdClose } from "react-icons/md";
 
 import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 import { useSendData } from "@/hooks/useReactQuery";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
 
@@ -63,7 +64,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     const { mutate: onSave, isPending } = useSendData({
         // @ts-ignore
         fn: (status: string) => handleNotificationStatus(status, sessionId),
-        invalidateKey: ["events "],
+        invalidateKey: [`${role}-accepted-sessions`],
         success: () => {
             queryClient.invalidateQueries({
                 queryKey: [role === "learner" ? "learner-approval-notifications" : "approval-notifications"],
@@ -80,6 +81,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         error: (err) => {
             setLoadingAccept(false);
             setLoadingDecline(false);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update the invitation. Please try again.") });
         },
     });
 
@@ -127,15 +129,22 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
 
     const handleMarkAsCompleted = () => {
         setLoadingCompleted(true)
-        PUT_API(endpoints.session.markAsCompleted(sessionId), {}).then(() => {
-            if (role === "volunteer") {
-                queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
-            } else {
-                queryClient.invalidateQueries({ queryKey: ["learner-events"] });
-            }
-            onClose();
-            setLoadingCompleted(false)
-        });
+        PUT_API(endpoints.session.markAsCompleted(sessionId), {})
+            .then(() => {
+                if (role === "volunteer") {
+                    queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
+                } else {
+                    queryClient.invalidateQueries({ queryKey: ["learner-events"] });
+                }
+                queryClient.invalidateQueries({ queryKey: [`${role}-accepted-sessions`] });
+                onClose();
+            })
+            // No catch before: any rejection (e.g. "hasn't started yet") left the button
+            // spinning forever with no message - same fix as the desktop MeetingPreviewModal.
+            .catch((err) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't mark the session as completed.") });
+            })
+            .finally(() => setLoadingCompleted(false));
     };
 
     const handleLinkCopy = () => {
@@ -148,7 +157,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
 
         const feedBackStatus = {
             label: isFeedBackCompleted ? "Feedback Submited" : "Meeting Completed",
-            value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Meeting Completed</p> : <p onClick={handleFeedBack} className="text-sm underline text-primary">Complete Feedback</p>
+            value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Meeting Completed</p> : <button type="button" onClick={handleFeedBack} className="text-sm underline text-primary bg-transparent border-0 p-0 cursor-pointer">Complete Feedback</button>
         }
         const statusMap = {
             pending: { label: "Status", value: <p className="text-orange-700 text-sm">Pending</p> },
