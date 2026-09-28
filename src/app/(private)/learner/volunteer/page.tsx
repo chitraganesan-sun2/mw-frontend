@@ -18,6 +18,7 @@ import InnerWidth from "@/utils/innerWidth";
 import { useDebounce } from "use-debounce";
 import Pagination from "@/components/common/Pagination";
 import { PAGINATION } from "@/definitions";
+import { joinNames } from "@/utils/joinNames";
 
 interface VolunteerCardData {
     volunteerId: string;
@@ -110,7 +111,7 @@ export default function LearnersPage() {
             const formattedData: VolunteerCardData[] = data.items.map((volunteer: any) => ({
                 volunteerId: volunteer?.volunteer_id,
                 profileImage: volunteer?.profile_picture?.image_url,
-                name: `${volunteer?.volunteer_first_name} ${volunteer?.volunteer_last_name}`,
+                name: joinNames(volunteer?.volunteer_first_name, volunteer?.volunteer_last_name),
                 location: volunteer?.country,
                 volunteerHrs: volunteer?.total_volunteered_hours?.toString(),
                 studentConnected: volunteer?.students_connected?.toString(),

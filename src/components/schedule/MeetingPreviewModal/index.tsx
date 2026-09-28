@@ -39,6 +39,10 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const [loadingAccept, setLoadingAccept] = useState(false);
     const [loadingDecline, setLoadingDecline] = useState(false);
     const [loadingCompleted, setLoadingCompleted] = useState(false);
+    // Two-step inline confirm: deleting a slot used to fire on a single click. A separate
+    // modal isn't workable here - this popup is a z-9999 portal that closes on mouse-leave.
+    const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const [deletingSlot, setDeletingSlot] = useState(false);
 
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -181,6 +185,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     };
 
     const handleDeleteSlot = async (volunteer_slot_id: string) => {
+        setDeletingSlot(true);
         const payload = [
             {
                 date: dayjs(event.start).format("YYYY-MM-DD"),
@@ -196,6 +201,10 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             })
             .catch((err) => {
                 showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't delete the slot. Please try again.") });
+            })
+            .finally(() => {
+                setDeletingSlot(false);
+                setConfirmingDelete(false);
             });
     };
 
@@ -311,12 +320,32 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                         <span className="text-gray-light font-medium text-base">
                             Availability Status
                         </span>
-                        <Button
-                            onClick={() => handleDeleteSlot(extendedProps.volunteer_slot_id)}
-                            customClassName="w-fit bg-white !text-[#DC2626] border border-[#DC2626] hover:bg-white hover:!text-[#DC2626] hover:border hover:border-[#DC2626] text-base rounded-full !py-2 !px-8"
-                        >
-                            Delete
-                        </Button>
+                        {confirmingDelete ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-black">Delete this slot?</span>
+                                <Button
+                                    onClick={() => setConfirmingDelete(false)}
+                                    disabled={deletingSlot}
+                                    customClassName="w-fit bg-white !text-black border border-stroke hover:bg-white text-sm rounded-full !py-1.5 !px-4"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={() => handleDeleteSlot(extendedProps.volunteer_slot_id)}
+                                    loading={deletingSlot}
+                                    customClassName="w-fit !bg-[#DC2626] !text-white border border-[#DC2626] hover:!bg-[#B91C1C] text-sm rounded-full !py-1.5 !px-4"
+                                >
+                                    Yes, delete
+                                </Button>
+                            </div>
+                        ) : (
+                            <Button
+                                onClick={() => setConfirmingDelete(true)}
+                                customClassName="w-fit bg-white !text-[#DC2626] border border-[#DC2626] hover:bg-white hover:!text-[#DC2626] hover:border hover:border-[#DC2626] text-base rounded-full !py-2 !px-8"
+                            >
+                                Delete
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>,

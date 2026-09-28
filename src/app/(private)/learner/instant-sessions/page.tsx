@@ -23,6 +23,7 @@ import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
+import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 
 export interface Session {
     id: string;
@@ -291,6 +292,8 @@ export default function InstantSessionsPage() {
     const {
         data: myRequestsData,
         isLoading: isMyRequestsLoading,
+        isError: isMyRequestsError,
+        refetch: refetchMyRequests,
     } = useQuery({
         queryKey: ["learner-my-requests", requestsPage, debouncedQuery],
         queryFn: async () => {
@@ -522,6 +525,8 @@ export default function InstantSessionsPage() {
                     <div className="flex justify-center py-6">
                         <LottieLoader isLoading={true} />
                     </div>
+                ) : isMyRequestsError && !myRequestsData ? (
+                    <QueryErrorNotice message="Couldn't load your requests." onRetry={() => refetchMyRequests()} />
                 ) : myRequests.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

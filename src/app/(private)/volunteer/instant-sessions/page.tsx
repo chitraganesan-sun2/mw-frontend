@@ -19,6 +19,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
+import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
@@ -218,6 +219,8 @@ export default function VolunteerInstantSessionsPage() {
         data: learnerRequestsData,
         isLoading: isLearnerRequestsLoading,
         isFetching: isLearnerRequestsFetching,
+        isError: isLearnerRequestsError,
+        refetch: refetchLearnerRequests,
     } = useQuery({
         queryKey: ["volunteer-learner-requests", requestsPage, debouncedQuery],
         queryFn: async () => {
@@ -237,6 +240,7 @@ export default function VolunteerInstantSessionsPage() {
         data: mySessionsData,
         isLoading: isMySessionsLoading,
         isFetching: isMySessionsFetching,
+        isError: isMySessionsError,
         refetch: refetchMySessions,
     } = useQuery({
         queryKey: ["volunteer-my-instant-sessions", sessionsPage, sessionsStatus, debouncedQuery],
@@ -393,7 +397,9 @@ export default function VolunteerInstantSessionsPage() {
                     </select>
                 </div>
 
-                {mySessions.length === 0 ? (
+                {isMySessionsError && !mySessionsData ? (
+                    <QueryErrorNotice message="Couldn't load your instant sessions." onRetry={() => refetchMySessions()} />
+                ) : mySessions.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                         <div className="text-5xl mb-4">📺</div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No Instant Sessions</h3>
@@ -449,7 +455,9 @@ export default function VolunteerInstantSessionsPage() {
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
                     Available Learner Requests
                 </h2>
-                {learnerRequests.length > 0 ? (
+                {isLearnerRequestsError && !learnerRequestsData ? (
+                    <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />
+                ) : learnerRequests.length > 0 ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {learnerRequests.map((req) => (

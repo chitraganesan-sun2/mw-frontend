@@ -9,6 +9,7 @@ import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { formatRatingSummary } from "@/utils/formatRating";
 
 const VolunteerCard: React.FC<VolunteerCardProps> = ({
     onSeeMoreClick,
@@ -78,7 +79,7 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                                 </span>
                                 <p className="text-sm font-medium flex items-center">
                                     <span>
-                                        {overallRating} - {totalReviews} Reviews
+                                        {formatRatingSummary(overallRating, totalReviews)}
                                     </span>
                                 </p>
                             </>

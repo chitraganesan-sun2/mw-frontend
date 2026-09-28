@@ -19,6 +19,7 @@ import { RiFilter3Line } from "react-icons/ri";
 import { useDebounce } from "use-debounce";
 import { PAGINATION } from "@/definitions";
 import { cn } from "@/utils/merge-class";
+import { joinNames } from "@/utils/joinNames";
 
 interface LearnerCardData {
     learnerId: string;
@@ -142,7 +143,7 @@ export default function LearnersPage() {
             const formattedData: LearnerCardData[] = data?.items?.map((learner: any) => ({
                 learnerId: learner?.learner_id,
                 profileImage: learner?.profile_picture?.image_url,
-                name: `${learner?.learner_personal_info?.learner_first_name} ${learner?.learner_personal_info?.learner_last_name}`,
+                name: joinNames(learner?.learner_personal_info?.learner_first_name, learner?.learner_personal_info?.learner_last_name),
                 location: learner?.learner_personal_info?.learner_contact_details?.country,
                 learnerHrs: learner?.total_classes_attended?.toString(),
                 studentConnected: learner?.students_connected?.toString(),

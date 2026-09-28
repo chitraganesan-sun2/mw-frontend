@@ -17,6 +17,7 @@ import InnerWidth from "@/utils/innerWidth";
 import EditProfileModal from "@/components/profile/EditProfile";
 import { useQueryState } from "nuqs";
 import LearnerProfileBio from "@/components/learners/profile";
+import { joinNames } from "@/utils/joinNames";
 
 export default function ProfilePage() {
     const { setHeaderOptions } = useComponentStore();
@@ -78,12 +79,12 @@ export default function ProfilePage() {
 
         const bioData = {
             userId: learnerId,
-            full_name: `${learner_first_name} ${learner_last_name}`,
+            full_name: joinNames(learner_first_name, learner_last_name),
             bio_description: description,
             profile_picture: data?.profile_picture?.image_url,
             subjects: subjects,
             languages: learner_primary_language,
-            phone_number: `${contactDetail?.contact_number?.country_code} ${contactDetail?.contact_number?.number}`,
+            phone_number: joinNames(contactDetail?.contact_number?.country_code, contactDetail?.contact_number?.number),
             country: contactDetail?.country,
             gender: data?.learner_personal_info?.learner_gender,
             email: contactDetail?.email,

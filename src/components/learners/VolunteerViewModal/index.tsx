@@ -27,6 +27,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
+import { joinNames } from "@/utils/joinNames";
 
 const ProfileHeader = ({
     text,
@@ -128,7 +129,7 @@ const ProfileInfo = ({
             </div>
             <div className="flex flex-col gap-1 md:gap-2">
                 <p className="max-md:text-xl font-medium">
-                    {`${volunteerData?.volunteer_first_name} ${volunteerData?.volunteer_last_name}`}
+                    {joinNames(volunteerData?.volunteer_first_name, volunteerData?.volunteer_last_name)}
                 </p>
                 <TagComponent
                     text="Volunteer"

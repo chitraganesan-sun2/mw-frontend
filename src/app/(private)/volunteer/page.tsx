@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef } from "react";
 import { formatUtcTimestamp } from "@/utils/timeFunctions";
+import { joinNames } from "@/utils/joinNames";
 
 interface MatchRecord {
     match_id: string;
@@ -139,7 +140,7 @@ export default function VolunteerDashboardPage() {
                         onSeeMoreClick={handleSeeMoreClick}
                         learnerId={matchedLearner.learner_id}
                         profileImage={matchedLearner.profile_picture?.image_url}
-                        name={`${matchedLearner.learner_personal_info?.learner_first_name} ${matchedLearner.learner_personal_info?.learner_last_name}`}
+                        name={joinNames(matchedLearner.learner_personal_info?.learner_first_name, matchedLearner.learner_personal_info?.learner_last_name)}
                         location={matchedLearner.country}
                         learnerHrs={matchedLearner.total_attended_hours?.toString()}
                         studentConnected={matchedLearner.total_volunteers_connected?.toString()}

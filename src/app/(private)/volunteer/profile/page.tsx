@@ -17,6 +17,7 @@ import InnerWidth from "@/utils/innerWidth";
 import { useQueryState } from "nuqs";
 import EditProfileModal from "@/components/profile/EditProfile";
 import VolunteerProfileBio from "@/components/volunteers/profile";
+import { joinNames } from "@/utils/joinNames";
 
 export default function ProfilePage() {
     const { setHeaderOptions } = useComponentStore();
@@ -75,7 +76,7 @@ export default function ProfilePage() {
 
         const bioData = {
             userId: volunteerId,
-            full_name: `${volunteer_first_name} ${volunteer_last_name}`,
+            full_name: joinNames(volunteer_first_name, volunteer_last_name),
             bio_description: description,
             profile_picture: data?.profile_picture?.image_url,
             subjects: data?.volunteer_subjects?.map((subject: any) => subject?.subject_name),

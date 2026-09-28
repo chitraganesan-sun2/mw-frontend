@@ -6,6 +6,7 @@ import TagComponent from "@/components/common/Tag";
 import ProfileCompletionBar, { calculateVolunteerCompletion } from "@/components/profile/ProfileCompletionBar";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { ProfileDetails, VolunteerContactDetails } from "./tabs";
+import { joinNames } from "@/utils/joinNames";
 
 const tabs = [
     { id: "profile-details", title: "Profile Details" },
@@ -21,7 +22,7 @@ const VolunteerProfileBio = ({ data }: any) => {
     const contactDetail = data?.volunteer_contact_details;
 
     const profileHeader = {
-        full_name: `${volunteer_first_name} ${volunteer_last_name}`,
+        full_name: joinNames(volunteer_first_name, volunteer_last_name),
         profile_picture: data?.profile_picture?.image_url,
         country: contactDetail?.country,
         gender: data?.volunteer_gender,

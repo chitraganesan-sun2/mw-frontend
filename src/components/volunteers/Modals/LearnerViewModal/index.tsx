@@ -25,6 +25,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
+import { joinNames } from "@/utils/joinNames";
 
 const ProfileHeader = ({
     text,
@@ -322,7 +323,7 @@ const OverviewContent = ({
             description:
                 learnerData?.parent_info?.parent_first_name &&
                 learnerData?.parent_info?.parent_last_name
-                    ? `${learnerData.parent_info.parent_first_name} ${learnerData.parent_info.parent_last_name}`
+                    ? joinNames(learnerData.parent_info.parent_first_name, learnerData.parent_info.parent_last_name)
                     : "",
         },
     ].filter((item) => item.description !== "");

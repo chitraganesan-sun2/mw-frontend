@@ -26,7 +26,7 @@ interface ChatListProps {
 
 const ChatListSkeleton = () => {
     return (
-        <div className="animate-pulse w-[407px] shrink-0">
+        <div className="animate-pulse w-full max-w-[407px] shrink-0">
             {[1, 2, 3, 4, 5].map((item) => (
                 <div
                     key={item}

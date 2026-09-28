@@ -14,6 +14,7 @@ import { showToast } from "@/components/common/Toast";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { joinNames } from "@/utils/joinNames";
 
 dayjs.extend(customParseFormat);
 
@@ -54,7 +55,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
     const isLearnerViewer = viewerRole === "learner";
     const otherPartyName = isLearnerViewer
         ? data?.volunteer_full_name
-        : `${data?.learner_first_name} ${data?.learner_last_name}`;
+        : joinNames(data?.learner_first_name, data?.learner_last_name);
     const otherPartyPicture = isLearnerViewer
         ? data?.volunteer_picture?.image_url
         : data?.learner_picture?.image_url;

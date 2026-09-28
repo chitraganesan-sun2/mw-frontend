@@ -11,6 +11,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { downloadFile } from "@/utils/downloadFile";
 import { isNativePlatform } from "@/utils/platform";
 import { HiOutlineCalendarDays } from "react-icons/hi2";
+import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 
 dayjs.extend(customParseFormat);
 
@@ -65,7 +66,7 @@ const AcceptedSessionsList: React.FC<AcceptedSessionsListProps> = ({ role }) => 
     const { volunteerTimeZone, learnerTimeZone } = useAppStore();
     const tzLabel = role === "volunteer" ? volunteerTimeZone : learnerTimeZone;
 
-    const { data, isFetching } = useQuery({
+    const { data, isLoading, isError, refetch } = useQuery({
         queryKey: [`${role}-accepted-sessions`, userId],
         queryFn: async () => {
             if (!userId) return [];
@@ -174,8 +175,11 @@ const AcceptedSessionsList: React.FC<AcceptedSessionsListProps> = ({ role }) => 
     return (
         <div className="bg-white rounded-xl p-4 mb-6">
             <p className="font-medium mb-3">My Accepted Sessions</p>
-            {isFetching ? (
+            {/* isLoading, not isFetching: a background refetch used to flash "Loading..." */}
+            {isLoading ? (
                 <p className="text-sm text-gray-light">Loading...</p>
+            ) : isError ? (
+                <QueryErrorNotice message="Couldn't load your accepted sessions." onRetry={() => refetch()} />
             ) : upcoming.length === 0 && past.length === 0 ? (
                 <p className="text-sm text-gray-light">No accepted sessions yet.</p>
             ) : (

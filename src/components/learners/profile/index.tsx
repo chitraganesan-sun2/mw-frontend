@@ -6,6 +6,7 @@ import TagComponent from "@/components/common/Tag";
 import ProfileCompletionBar, { calculateLearnerCompletion } from "@/components/profile/ProfileCompletionBar";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { ParentGuardianInformation, ProfileDetails, LearnerInformation } from "./tabs";
+import { joinNames } from "@/utils/joinNames";
 
 const tabs = [
     { id: "profile-details", title: "Profile Details" },
@@ -23,7 +24,7 @@ const LearnerProfileBio = ({ data }: any) => {
     const timezone = contactDetail?.timezone;
 
     const profileHeader = {
-        full_name: `${learner_first_name} ${learner_last_name}`,
+        full_name: joinNames(learner_first_name, learner_last_name),
         profile_picture: data?.profile_picture?.image_url,
         country: contactDetail?.country,
         gender: data?.learner_personal_info?.learner_gender,
