@@ -30,7 +30,7 @@ const Overview = ({ data, reviewEndpoint }: any) => {
             icon: <ClockIcon />,
         },
         {
-            title: isLearner ? "Volunteer Connected" : "Students Connected",
+            title: isLearner ? "Volunteers Connected" : "Students Connected",
             value: data?.connections,
             icon: <LearnerConnectIcon />,
         },

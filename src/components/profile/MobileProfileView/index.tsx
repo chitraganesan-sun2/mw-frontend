@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 
 interface UserBioDataProps {
     full_name: string;
@@ -29,14 +30,16 @@ interface UserBioDataProps {
 
 const ProfileInfo = ({
     bioData,
+    isLearner,
 }: {
     bioData: UserBioDataProps;
+    isLearner: boolean;
 }) => (
     <div className="gap-4 px-5 max-md:py-5 max-lg:py-10 sm:mx-auto">
         <div className="flex items-center gap-3">
             <div className="relative w-[80px] h-[80px] md:w-[100px] md:h-[100px] rounded-full shrink-0">
                 <Image
-                    src={bioData?.profile_picture}
+                    src={bioData?.profile_picture || DummyProfileImg}
                     alt="avatar"
                     fill
                     className="object-cover rounded-full w-full h-full"
@@ -47,13 +50,15 @@ const ProfileInfo = ({
                     {bioData?.full_name}
                 </p>
                 <OverViewCard
-                    title="Hours Volunteered"
+                    // Was hard-coded to the volunteer wording, so learners saw
+                    // "Hours Volunteered / Students Connected" on their own profile.
+                    title={isLearner ? "Hours Attended" : "Hours Volunteered"}
                     value={bioData?.total_hours || 0}
                     icon={""}
                     className="rounded-xl"
                 />
                 <OverViewCard
-                    title="Students Connected"
+                    title={isLearner ? "Volunteers Connected" : "Students Connected"}
                     value={bioData?.connections}
                     icon={""}
                     className="rounded-xl"
@@ -297,6 +302,11 @@ const FullProfileDetails = ({ data }: { data: any }) => {
 
 const MobileProfileView = ({ data, userData, reviewEndpoint }: { data: any, userData: any, reviewEndpoint: string }) => {
     const [activeTab, setActiveTab] = useState("overview");
+    // Read after mount, not in render (document.cookie doesn't exist during SSR).
+    const [isLearner, setIsLearner] = useState(false);
+    useEffect(() => {
+        setIsLearner(getCookie("role") === "learner");
+    }, []);
 
     const getUserFeedback = async () => {
         const response: any = await GET_API(reviewEndpoint);
@@ -318,7 +328,7 @@ const MobileProfileView = ({ data, userData, reviewEndpoint }: { data: any, user
 
     return (
         <div className="flex flex-col gap-0 lg:gap-4 lg:py-4 h-full">
-            <ProfileInfo bioData={userData} />
+            <ProfileInfo bioData={userData} isLearner={isLearner} />
             <TabButtons
                 activeTab={activeTab}
                 handleTabChange={handleTabChange}
