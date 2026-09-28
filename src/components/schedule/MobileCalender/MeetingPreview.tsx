@@ -55,7 +55,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
             if (status === "accepted") {
                 showToast({ type: "success", message: "Invitation Accepted" });
             } else {
-                showToast({ type: "error", message: "Invitation Declined" });
+                showToast({ type: "info", message: "Invitation declined" });
             }
         });
     };

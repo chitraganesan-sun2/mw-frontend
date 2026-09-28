@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { isNativePlatform } from "@/utils/platform";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 interface DeleteAccountSectionProps {
     userId: string;
@@ -40,8 +41,7 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
             }
         } catch (error: any) {
             toast.error(
-                error?.response?.data?.detail ||
-                    "Failed to delete account. Please try again or contact support."
+                getApiErrorMessage(error, "Failed to delete account. Please try again or contact support.")
             );
         } finally {
             setIsDeleting(false);

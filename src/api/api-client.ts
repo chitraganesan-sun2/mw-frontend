@@ -16,7 +16,6 @@ const axiosInstance: AxiosInstance = axios.create({
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
-        "Accept-Encoding": "identity",
         "ngrok-skip-browser-warning": "any",
         "bypass-tunnel-reminder": "yup",
     },

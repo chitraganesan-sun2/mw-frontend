@@ -1,5 +1,6 @@
 import React from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 interface ToastParams {
     type?: "success" | "error" | "info";
@@ -51,7 +52,9 @@ export const callbackToast = (
     return toast.promise(apiCall, {
         loading: loadingMsg,
         success: () => successMsg,
-        error: errorMsg,
+        // Prefer the backend's specific reason (e.g. "overlaps another session") over
+        // the caller's generic fallback whenever the server sent one.
+        error: (err: any) => getApiErrorMessage(err, errorMsg),
     });
 };
 

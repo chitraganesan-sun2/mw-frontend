@@ -46,6 +46,7 @@ import { z } from "zod";
 import InnerWidth from "@/utils/innerWidth";
 import { showToast } from "@/components/common/Toast";
 import { getCookie } from "@/utils/auth";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 // Define Zod schema for form validation
 const meetingFormSchema = z.object({
@@ -324,7 +325,7 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
 
     const { mutate: onSave, isPending } = useSendData({
         fn: () => handleSave(),
-        invalidateKey: ["learner-events"],
+        invalidateKey: ["learner-events", "learner-accepted-sessions"],
         success: () => {
             setFormData({
                 title_of_the_meeting: "",
@@ -346,6 +347,12 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             });
         },
         error: (err) => {
+            // Previously empty: a conflict / double-booking rejection from the backend
+            // left the modal open with no indication anything went wrong.
+            showToast({
+                message: getApiErrorMessage(err, "Couldn't schedule the meeting. Please try again."),
+                type: "error",
+            });
         },
     });
 

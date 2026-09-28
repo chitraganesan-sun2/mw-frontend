@@ -29,15 +29,20 @@ export default function VerificationPage() {
     const [role, setRole] = useState<UserRole | undefined>(undefined);
     const [onboarded_status, setOnboardedStatus] = useState<string | undefined>(undefined);
     const [id, setId] = useState<string | undefined>(undefined);
+    // `cookiesRead` gates the "no id -> go home" redirect below. Without it that effect
+    // ran in the same commit as the cookie-reading effect, still saw the initial
+    // `id === undefined`, and pushed every pending/rejected user to "/" on every visit.
+    const [cookiesRead, setCookiesRead] = useState(false);
     useEffect(() => {
         const r = getCookie("role") as UserRole;
         setRole(r);
         setOnboardedStatus(getCookie("onboarded_status"));
         setId(getCookie(r === "volunteer" ? "volunteer_id" : "learner_id"));
+        setCookiesRead(true);
     }, []);
 
     useEffect(() => { if (typeof window !== "undefined") window.scrollTo({ top: 0 }) }, []);
-    useEffect(() => { if (!id) router.push("/"); }, [id, router]);
+    useEffect(() => { if (cookiesRead && !id) router.push("/"); }, [cookiesRead, id, router]);
 
     const getOnboardingStatus = async () => {
         const { data } = await GET_API(endpoints.onboarding.getOnboardingStatus(id as string, role as UserRole));
@@ -47,6 +52,9 @@ export default function VerificationPage() {
             router.push(getDefaultRouteForRole(role as UserRole));
         }else if(currentStatus === "verification_rejected"){
             Cookies.set("onboarded_status", "verification_rejected", { expires: 1 });
+            // Keep the rendered message in sync with what polling just found, instead
+            // of only switching to the rejection copy after a manual reload.
+            setOnboardedStatus("verification_rejected");
         }
         return data;
     }

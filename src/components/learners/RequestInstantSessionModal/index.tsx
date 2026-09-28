@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { getApiErrorMessage } from "@/utils/apiError";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { showToast } from "@/components/common/Toast";
 import dayjs from "dayjs";
@@ -165,7 +166,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 showToast({ message: res.data?.detail || "Failed to create request", type: "error" });
             }
         } catch (error: any) {
-            showToast({ message: error?.response?.data?.detail || "An error occurred", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "An error occurred"), type: "error" });
         } finally {
             setIsLoading(false);
         }

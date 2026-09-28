@@ -21,6 +21,8 @@ import InnerWidth from "@/utils/innerWidth";
 import DummyProfile from "@/assets/images/DummyProfile.png";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useDebounce } from "use-debounce";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { showToast } from "@/components/common/Toast";
 
 interface PaginationParams {
     page: number;
@@ -153,7 +155,11 @@ export default function VolunteerPage() {
 
     const handleMessageVolunteer = (volunteedId: string) => {
         GET_API(endpoints.chat.createChatForVolunteer(volunteedId)).then((res: any) => {
-            router.push(`/learner/messages?chatId=${res.data.chat_id}&volunteedId=${volunteedId}`);
+            // Must be `volunteerId` - the messages page reads that exact param. The old
+            // `volunteedId` typo made it fall back to the wrong/null recipient.
+            router.push(`/learner/messages?chatId=${res.data.chat_id}&volunteerId=${volunteedId}`);
+        }).catch((err: any) => {
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't open the chat. Please try again.") });
         });
     };
 

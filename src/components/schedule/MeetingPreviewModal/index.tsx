@@ -16,6 +16,7 @@ import "./styles.css";
 import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 interface MeetingPreviewModalProps {
     data: any;
@@ -72,7 +73,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             if (status === "accepted") {
                 showToast({ type: "success", message: "Invitation Accepted" });
             } else {
-                showToast({ type: "error", message: "Invitation Declined" });
+                showToast({ type: "info", message: "Invitation declined" });
             }
         });
     };
@@ -80,7 +81,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const { mutate: onSave, isPending } = useSendData({
         // @ts-ignore
         fn: (status: string) => handleNotificationStatus(status, sessionId),
-        invalidateKey: ["events "],
+        invalidateKey: [`${role}-accepted-sessions`],
         success: () => {
             queryClient.invalidateQueries({
                 queryKey: [role === "learner" ? "learner-approval-notifications" : "approval-notifications"],
@@ -97,6 +98,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
         error: (err) => {
             setLoadingAccept(false);
             setLoadingDecline(false);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update the invitation. Please try again.") });
         },
     });
 
@@ -155,15 +157,22 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
 
     const handleMarkAsCompleted = () => {
         setLoadingCompleted(true);
-        PUT_API(endpoints.session.markAsCompleted(sessionId), {}).then(() => {
-            if (role === "volunteer") {
-                queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
-            } else {
-                queryClient.invalidateQueries({ queryKey: ["learner-events"] });
-            }
-            onClose();
-            setLoadingCompleted(false);
-        });
+        PUT_API(endpoints.session.markAsCompleted(sessionId), {})
+            .then(() => {
+                if (role === "volunteer") {
+                    queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
+                } else {
+                    queryClient.invalidateQueries({ queryKey: ["learner-events"] });
+                }
+                queryClient.invalidateQueries({ queryKey: [`${role}-accepted-sessions`] });
+                onClose();
+            })
+            // Previously no catch: any rejection (e.g. the backend's "can't complete before
+            // the session ends" gate) left the button spinning forever with no message.
+            .catch((err) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't mark the session as completed.") });
+            })
+            .finally(() => setLoadingCompleted(false));
     };
 
     const handleLinkCopy = () => {
@@ -186,6 +195,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
             })
             .catch((err) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't delete the slot. Please try again.") });
             });
     };
 

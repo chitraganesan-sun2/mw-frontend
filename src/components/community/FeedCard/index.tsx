@@ -186,11 +186,15 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
             loadingMsg: "Posting Comment",
             successMsg: "Comment Posted Successfully",
             errorMsg: "Failed to Post Comment",
-        }).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab, debouncedSearchQuery] });
-            setComment("");
-            setIsCommentLoading(false);
-        });
+        })
+            .then(() => {
+                queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab, debouncedSearchQuery] });
+                setComment("");
+            })
+            // toast.promise re-rejects on failure, so the reset must not live in .then -
+            // otherwise a failed post left the comment button stuck in its loading state.
+            .catch(() => {})
+            .finally(() => setIsCommentLoading(false));
     };
 
     const toggleCommentPanel = (postId: string) => {

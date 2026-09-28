@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
+import { getApiErrorMessage } from "@/utils/apiError";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import SessionCard from "@/components/learners/SessionCard";
@@ -290,7 +291,6 @@ export default function InstantSessionsPage() {
     const {
         data: myRequestsData,
         isLoading: isMyRequestsLoading,
-        isFetching: isMyRequestsFetching,
     } = useQuery({
         queryKey: ["learner-my-requests", requestsPage, debouncedQuery],
         queryFn: async () => {
@@ -438,7 +438,7 @@ export default function InstantSessionsPage() {
             queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
             showToast({ message: "Request cancelled successfully", type: "success" });
         } catch (e: any) {
-            showToast({ message: e?.response?.data?.detail || "Failed to cancel request", type: "error" });
+            showToast({ message: getApiErrorMessage(e, "Failed to cancel request"), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -460,7 +460,7 @@ export default function InstantSessionsPage() {
             queryClient.invalidateQueries({ queryKey: ["learner-accepted-instant-sessions"] });
             setSessionDetail(null);
         } catch (error: any) {
-            showToast({ message: error?.response?.data?.detail || "Failed to cancel session", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Failed to cancel session"), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -518,7 +518,7 @@ export default function InstantSessionsPage() {
                     </button>
                 </div>
 
-                {isMyRequestsLoading || isMyRequestsFetching ? (
+                {isMyRequestsLoading ? (
                     <div className="flex justify-center py-6">
                         <LottieLoader isLoading={true} />
                     </div>

@@ -55,21 +55,16 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
                 aria-label={`View details for ${name}`}
             >
                 <div className="w-[36px] h-[36px] rounded-full relative">
-                    {profileImage !== "image_url" ? (
-                        <Image
-                            src={profileImage}
-                            alt={`${name}'s avatar`}
-                            fill
-                            className="w-full h-full object-cover rounded-full"
-                        />
-                    ) : (
-                        <Image
-                            src={DummyProfileImg}
-                            alt={`${name}'s avatar`}
-                            fill
-                            className="w-full h-full object-cover rounded-full"
-                        />
-                    )}
+                    {/* Was `profileImage !== "image_url"` - comparing the actual URL against
+                        the literal field-name string, which is always true for a real URL
+                        (and for undefined/null), so the fallback branch below never ran and
+                        every learner without a photo rendered <Image src="" .../>. */}
+                    <Image
+                        src={profileImage || DummyProfileImg}
+                        alt={`${name}'s avatar`}
+                        fill
+                        className="w-full h-full object-cover rounded-full"
+                    />
                 </div>
                 <div className="flex flex-col">
                     <p className="text-base font-semibold lg:text-normal underline text-primary lg:font-medium">

@@ -101,7 +101,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
             if (status === "accepted") {
                 showToast({ type: "success", message: "Invitation Accepted" });
             } else {
-                showToast({ type: "error", message: "Invitation Declined" });
+                showToast({ type: "info", message: "Invitation declined" });
             }
             queryClient.invalidateQueries({
                 queryKey: [isLearnerViewer ? "learner-events" : "volunteer-events"],

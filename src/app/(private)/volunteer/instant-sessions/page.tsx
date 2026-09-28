@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getApiErrorMessage } from "@/utils/apiError";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useComponentStore } from "@/store/useComponenetStore";
@@ -265,7 +266,7 @@ export default function VolunteerInstantSessionsPage() {
             queryClient.invalidateQueries({ queryKey: ["volunteer-learner-requests"] });
             queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
         } catch (error: any) {
-            showToast({ message: error?.response?.data?.detail || "Failed to accept request", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Failed to accept request"), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -291,7 +292,7 @@ export default function VolunteerInstantSessionsPage() {
             queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
             setSessionDetail(null);
         } catch (error: any) {
-            showToast({ message: error?.response?.data?.detail || "Failed to complete session", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Failed to complete session"), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -305,7 +306,7 @@ export default function VolunteerInstantSessionsPage() {
             showToast({ message: "Instant session withdrawn", type: "success" });
             queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
         } catch (error: any) {
-            showToast({ message: error?.response?.data?.detail || "Failed to withdraw session", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Failed to withdraw session"), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -320,7 +321,7 @@ export default function VolunteerInstantSessionsPage() {
             queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
             setSessionDetail(null);
         } catch (error: any) {
-            showToast({ message: error?.response?.data?.detail || "Failed to cancel session", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Failed to cancel session"), type: "error" });
         } finally {
             setIsActionLoading(false);
         }

@@ -4,6 +4,7 @@ import React from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getCookie } from "@/utils/auth";
 import dayjs from "dayjs";
+import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 const formatDateTime = (dateTimeString: string) => {
     const date = new Date(dateTimeString);
 
@@ -38,6 +39,9 @@ const MessageCard = ({
     const params = useSearchParams();
     const chatId = params.get("chatId");
     const role = getCookie("role");
+    // A chat with no messages yet has no real timestamp (the API sends a
+    // placeholder epoch) - show no date rather than "01/01/0001".
+    const hasDate = Boolean(message) && dayjs(date).isValid() && dayjs(date).year() > 1970;
 
     const handleClick = () => {
         if (isIndividualChatLoading) return;
@@ -56,13 +60,13 @@ const MessageCard = ({
             }`}
         >
             <div className="relative w-11 h-11 rounded-full overflow-hidden">
-                <Image src={image} alt={name} fill className="object-cover" />
+                <Image src={image || DummyProfileImg} alt={name} fill className="object-cover" />
             </div>
             <div className="min-w-0 flex-1 flex flex-col gap-1">
                 <div className="flex items-center gap-2 justify-between">
                     <p className="text-base font-medium">{name}</p>
                     <div>
-                        {unreadMessages > 0 ? (
+                        {!hasDate ? null : unreadMessages > 0 ? (
                             <p className="text-xs font-normal text-[#22c55e]">
                                 {dayjs(date).format("h.mm a")}
                             </p>

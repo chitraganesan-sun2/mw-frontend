@@ -38,7 +38,7 @@ export default function LearnerSchedulePage() {
 
     const getEvents = () => getCalendarEvents(learnerId as string, "learner", currentMonth);
 
-    const { data, isFetching, isError } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ["learner-events", currentMonth],
         queryFn: getEvents,
         // A volunteer accepting/declining happens in their own separate browser session -
@@ -96,7 +96,9 @@ export default function LearnerSchedulePage() {
         <>
             <div className="w-full h-full animate-fadeIn">
                 <AcceptedSessionsList role="learner" />
-                {isFetching ? (
+                {/* isLoading (first load / uncached month) - not isFetching, which is also true on
+                    every 30s background poll and was unmounting the whole calendar each time. */}
+                {isLoading ? (
                     <LottieLoader isLoading={true} fullscreen={false} />
                 ) : isError ? (
                     <div className="flex-center h-full w-full">Something went wrong loading your schedule.</div>

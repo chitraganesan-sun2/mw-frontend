@@ -11,6 +11,8 @@ import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { showToast } from "@/components/common/Toast";
 
 const SESSION_MATCH_OPTIONS = [
     {
@@ -59,29 +61,38 @@ const Settings = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handlePermission = (value: any) => {
+        const previous = isEnabled;
         setIsEnabled(value);
         PUT_API(endpoints.chat.learnerPermission(learnerId as string), {
             chat_permission: value,
-        }).then((res) => {
+        }).catch((err) => {
+            // Roll back the switch and say so - it previously stayed flipped even when the
+            // save failed, which is misleading for a privacy-relevant control.
+            setIsEnabled(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
         });
     };
 
     const handleEmailPreferenceChange = (value: SessionMatchValue) => {
+        const previous = sessionMatchPreference;
         setSessionMatchPreference(value);
         const apiValue = UI_TO_API_PREFERENCE[value];
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
             instant_session_email_preference: apiValue,
         }).catch((err) => {
-            console.error(err, "EMAIL PREFERENCE");
+            setSessionMatchPreference(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
         });
     };
 
     const handlePushPreferenceChange = (value: boolean) => {
+        const previous = pushEnabled;
         setPushEnabled(value);
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
             push_notifications_enabled: value,
         }).catch((err) => {
-            console.error(err, "PUSH PREFERENCE");
+            setPushEnabled(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
         });
     };
 
