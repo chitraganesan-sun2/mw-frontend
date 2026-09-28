@@ -18,7 +18,7 @@ const SideModal: React.FC<SideNavBarProps> = ({ children, isOpen, onClose }) => 
                 open={isOpen}
                 width={"100%"}
                 className="py-4 !px-0"
-                bodyStyle={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
             >
                 {children}
             </Drawer>
