@@ -247,6 +247,9 @@ const OnetImeScheduleModal = ({
     const { data: availableDays, isLoading } = useQuery({
         queryKey: ["availableDays", currentDate],
         queryFn: () => getAvailableDaysForDate(),
+        // No date picked yet: the queryFn returned undefined, which React Query rejects
+        // ("Query data cannot be undefined") on every schedule page load.
+        enabled: currentDate !== "",
     });
 
     useEffect(() => {

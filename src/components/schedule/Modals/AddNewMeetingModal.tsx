@@ -47,6 +47,7 @@ import InnerWidth from "@/utils/innerWidth";
 import { showToast } from "@/components/common/Toast";
 import { getCookie } from "@/utils/auth";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { joinNames } from "@/utils/joinNames";
 
 // Define Zod schema for form validation
 const meetingFormSchema = z.object({
@@ -139,16 +140,25 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
         setFormData((prev) => ({ ...prev, select_volunteer: data?.volunteer_id }));
         setVolunteers([
             {
-                label: data?.volunteer_first_name + " " + data?.volunteer_last_name,
+                label: joinNames(data?.volunteer_first_name, data?.volunteer_last_name),
                 value: data?.volunteer_id,
             },
         ]);
     };
 
     const { data } = useQuery({
-        queryKey: ["volunteers"],
-        queryFn: () => (volunteerId ? getIndividualVolunteer() : getVolunteers()),
+        // Per-person key + no caching: the options are populated as a side effect of the
+        // queryFn, so a cache hit under the old constant key (["learners"]/["volunteers"])
+        // skipped it and reopening the modal for someone else within the 5-min staleTime
+        // showed an empty/previous recipient. Also the queryFn must return a value.
+        queryKey: ["meeting-modal-volunteers", volunteerId || "all"],
+        queryFn: async () => {
+            await (volunteerId ? getIndividualVolunteer() : getVolunteers());
+            return true;
+        },
         enabled: isOpen,
+        staleTime: 0,
+        gcTime: 0,
     });
 
     const getAvailableDays = async () => {

@@ -308,7 +308,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                                 {`${startTime} - ${endTime}`}
                             </p>
                         </div>
-                        <Button
+                        <Button aria-label="Close"
                             onClick={onClose}
                             customClassName="!bg-transparent !border-none !p-0 !w-fit !h-fit"
                         >
@@ -378,7 +378,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                             {`${startTime} - ${endTime}`}
                         </p>
                     </div>
-                    <Button
+                    <Button aria-label="Close"
                         onClick={onClose}
                         customClassName="!bg-transparent !border-none !p-0 !w-fit !h-fit"
                     >

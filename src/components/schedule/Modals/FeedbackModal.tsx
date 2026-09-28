@@ -99,7 +99,7 @@ const FeedbackModal = ({
         <MobileSideModal placement="left" isOpen={isOpen} onClose={onClose}>
             <div className="flex flex-col justify-between h-full">
                 <div className="p-4 flex items-center justify-between">
-                    <Button
+                    <Button aria-label="Close"
                         onClick={onClose}
                         customClassName="!bg-transparent !border-none !p-0 !w-fit !h-fit"
                     >
@@ -108,6 +108,7 @@ const FeedbackModal = ({
                     <div className="flex gap-2">
                         {Object.values(buttonProps)?.map((button) => (
                             <Button
+                                key={button?.title}
                                 title={button?.title}
                                 btnVariant={button?.btnVariant}
                                 onClick={button?.onClick}

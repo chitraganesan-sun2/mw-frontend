@@ -180,7 +180,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         <MobileSideModal isOpen={isOpen} onClose={onClose}>
             <div className="flex flex-col justify-between h-full">
                 <div className="p-5 h-full">
-                    <Button
+                    <Button aria-label="Close"
                         onClick={onClose}
                         customClassName="!bg-transparent !border-none !p-0 !w-fit !h-fit"
                     >
