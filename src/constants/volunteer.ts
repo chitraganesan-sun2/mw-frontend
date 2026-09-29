@@ -36,15 +36,6 @@ export const TestimonialFormConstants: FormField[] = [
     },
 ];
 
-export const MessageModalConstants: FormField[] = [
-    {
-        name: "message",
-        inputType: "textarea",
-        placeholder: "Type message here",
-        rows: 10,
-    },
-];
-
 //* Volunteer Onboarding Form Fields
 
 // "Volunteer Info" tab - renamed from the old "Profile Details" tab, now split into three

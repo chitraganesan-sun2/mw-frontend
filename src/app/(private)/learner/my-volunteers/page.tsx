@@ -3,7 +3,6 @@
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import { TestmonialModal } from "@/components/volunteers/Modals";
-import { MessageModal } from "@/components/learners/Modals";
 import VolunteerTable from "@/components/volunteers/Table";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";
@@ -13,7 +12,6 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { getCookie } from "@/utils/auth";
 import { useRouter } from "next/navigation";
-import MobileMessageModal from "@/components/learners/Modals/MobileMessageModal";
 import Image from "next/image";
 import CardChips from "@/components/learners/VolunteerCard/CardChips";
 import Button from "@/components/common/Button";
@@ -183,16 +181,8 @@ export default function VolunteerPage() {
         });
     }, [setHeaderOptions]);
 
-    const VolunteerMessageModal = isMobileScreen ? MobileMessageModal : MessageModal;
-
     return (
         <div className="w-full h-full p-6 animate-fadeIn">
-            {/* <VolunteerMessageModal
-                key={volunteedId}
-                receiverId={volunteedId}
-                isOpen={mode === "message"}
-                onClose={handleClose}
-            /> */}
             <TestmonialModal
                 isOpen={mode === "testimonial"}
                 mode={"create"}
