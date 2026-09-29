@@ -24,6 +24,7 @@ import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { useConfirm } from "@/hooks/useConfirm";
 
 export interface Session {
     id: string;
@@ -230,6 +231,7 @@ function RequestedSessionCard({
 }
 
 export default function InstantSessionsPage() {
+    const { confirm: askConfirm, confirmModal } = useConfirm();
     const [selectedSession, setSelectedSession] = useState<Session | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
@@ -434,7 +436,7 @@ export default function InstantSessionsPage() {
     };
 
     const handleCancelRequest = async (requestId: string) => {
-        if (!confirm("Are you sure you want to cancel this request?")) return;
+        if (!(await askConfirm({ title: "Cancel request", description: "Are you sure you want to cancel this request?", confirmText: "Cancel request", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             await DELETE_API(endpoints.session.cancelLearnerRequest(requestId));
@@ -449,7 +451,7 @@ export default function InstantSessionsPage() {
 
     const handleCancelDetail = async () => {
         if (!sessionDetail?.identifier || sessionDetail.cancelAction === "none") return;
-        if (!confirm("Are you sure you want to cancel this session?")) return;
+        if (!(await askConfirm({ title: "Cancel session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel session", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             if (sessionDetail.cancelAction === "unclaim") {
@@ -492,6 +494,7 @@ export default function InstantSessionsPage() {
 
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
+            {confirmModal}
             {(isPageLoading || isActionLoading || isDetailLoading) && (
                 <div className="fixed top-4 right-4 z-20 bg-white rounded-full shadow-md p-2">
                     <Spin size="small" />

@@ -20,6 +20,7 @@ import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { useConfirm } from "@/hooks/useConfirm";
 
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
@@ -188,6 +189,7 @@ function MySessionCard({
 }
 
 export default function VolunteerInstantSessionsPage() {
+    const { confirm: askConfirm, confirmModal } = useConfirm();
     const { setHeaderOptions } = useComponentStore();
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -303,7 +305,7 @@ export default function VolunteerInstantSessionsPage() {
     };
 
     const handleWithdrawOpenSession = async (volunteerSlotId: string) => {
-        if (!confirm("Withdraw this open instant session? Learners will no longer see it.")) return;
+        if (!(await askConfirm({ title: "Withdraw session", description: "Withdraw this open instant session? Learners will no longer see it.", confirmText: "Withdraw", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             await DELETE_API(endpoints.session.withdrawInstantSession(volunteerSlotId));
@@ -317,7 +319,7 @@ export default function VolunteerInstantSessionsPage() {
     };
 
     const handleCancelSession = async (sessionId: string) => {
-        if (!confirm("Are you sure you want to cancel this session?")) return;
+        if (!(await askConfirm({ title: "Cancel session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel session", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             await PUT_API(endpoints.session.cancelSession(sessionId), { status: "cancelled" });
@@ -343,6 +345,7 @@ export default function VolunteerInstantSessionsPage() {
 
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
+            {confirmModal}
             {(isLearnerRequestsFetching || isMySessionsFetching || isActionLoading) && (
                 <div className="fixed top-4 right-4 z-20 bg-white rounded-full shadow-md p-2">
                     <Spin size="small" />
