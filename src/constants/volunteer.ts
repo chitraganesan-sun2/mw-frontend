@@ -1,7 +1,9 @@
 import nationalities from "@/data/nationalities.json";
 import timezones from "@/data/selectiveTimeZones.json";
 
-export const ADULT_VOLUNTEER_AGE = 21;
+// 18, matching the backend VOLUNTEER_AGE_LIMIT. This was 21, so 18-20 year olds were asked for
+// a guardian in the app but the backend (18) never emailed that guardian.
+export const ADULT_VOLUNTEER_AGE = 18;
 
 // The two support_preference options that require a follow-up free-text explanation -
 // must match the LOV option text exactly (migrations/seed_preferred_learner_age_group_and_support_preference.py).
