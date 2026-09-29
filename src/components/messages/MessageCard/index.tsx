@@ -69,17 +69,10 @@ const MessageCard = ({
                     <div>
                         {!hasDate ? null : unreadMessages > 0 ? (
                             <p className="text-xs font-normal text-[#22c55e]">
-                                {dayjs(date).format("h.mm a")}
+                                {dayjs(date).format("h:mm A")}
                             </p>
                         ) : (
-                            <>
-                                <p className="text-xs text-[#4F4F4F] max-md:block md:hidden">
-                                    {formatDisplayDate(date)}
-                                </p>
-                                <p className="text-xs text-[#4F4F4F] hidden md:block">
-                                    {dayjs(date).format("DD MMM, YYYY")}
-                                </p>
-                            </>
+                            <p className="text-xs text-[#4F4F4F]">{formatDisplayDate(date)}</p>
                         )}
                     </div>
                 </div>
