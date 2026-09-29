@@ -1,3 +1,53 @@
+# Release notes — v1.2.0 (versionCode 4)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.2
+
+• Time picker OK button now always saves your choice
+• Clearer messages when something fails to load or send
+• Consistent wording and dates across the app (e.g. 28 Sep 2026)
+• Only see sessions and tutors from your own country
+• Fixed profile labels, missing avatars and a few crashes
+• Faster tutor search, now including skills like Guitar or Piano
+• Accessibility improvements for keyboard and screen-reader users
+```
+
+*(~440 chars.)*
+
+---
+
+## Internal changelog — what 1.2.0 contains
+
+Bundle synced 2026-09-29 from `main@a330bd3`. Covers everything since 1.1.0 (`482e125`).
+Server-side changes (same-country rule, deleted-account session revocation, rate
+limits, search/sort) are already live for every client via the shared API; the items
+below are what the app build itself changes.
+
+**Fixes**
+- MUI time picker OK was silently reverted (schedule + New Instant Session modals)
+- Hydration mismatch on every private page (cookies read during render) + follow-ups
+- antd button wave threw "reactRender is not a function" on every click
+- Learner mobile profile showed volunteer stat labels; avatar fallbacks; "undefined undefined" names
+- Chat send feedback / wrong recipient; meeting-modal recipient cache; silent accept failures
+- Error states instead of empty lists when a request fails; session-expiry handling
+- Adult volunteer age 18 (was 21), matching the backend
+- Native `window.confirm` replaced with the app's confirm modal (instant sessions)
+
+**Copy / UX**
+- "session" terminology everywhere; one date format (`28 Sep 2026`)
+- Production-readiness: unreachable blog/donate pages, SEO metadata, 404/error pages
+
+**Accessibility**
+- ~30 click-only div/span targets made keyboard-accessible
+- Select / date-picker / contact inputs associated with their labels
+
+**Excluded from the mobile build (verified in the synced bundle)**
+- `/dev-login` route and its strings; no localhost API URL
+
+---
+
 # Release notes — v1.1.0 (versionCode 3)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
