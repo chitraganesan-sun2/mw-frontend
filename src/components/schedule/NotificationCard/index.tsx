@@ -101,9 +101,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
             status: status,
         }).then(() => {
             if (status === "accepted") {
-                showToast({ type: "success", message: "Invitation Accepted" });
+                showToast({ type: "success", message: "Session request accepted" });
             } else {
-                showToast({ type: "info", message: "Invitation declined" });
+                showToast({ type: "info", message: "Session request declined" });
             }
             queryClient.invalidateQueries({
                 queryKey: [isLearnerViewer ? "learner-events" : "volunteer-events"],
@@ -141,7 +141,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                 </div>
                 <p className="font-normal">
                     <span className="font-semibold">{otherPartyName}</span>{" "}
-                    requested for a meeting
+                    requested a session
                 </p>
             </div>
             <div className="flex gap-2 items-center justify-between">
@@ -182,7 +182,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                 <div className="bg-[#FEFCE8] p-3 rounded-xl">
                     <p className="text-xs text-[#CA8A04]">
                         <span className="mr-2 font-semibold text-[#A16207]">Conflict Alert:</span>
-                        Accepting one meeting request for this date and time will decline all others. Please choose carefully.
+                        Accepting one session request for this date and time will decline all others. Please choose carefully.
                     </p>
                 </div>
              }

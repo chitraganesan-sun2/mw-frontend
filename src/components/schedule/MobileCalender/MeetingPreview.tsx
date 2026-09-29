@@ -17,6 +17,7 @@ import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { useSendData } from "@/hooks/useReactQuery";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 interface MobileMeetingPreviewModalProps {
     data: any;
@@ -105,7 +106,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event;
-    const startTime = dayjs(event.start).local().format("dddd, MMMM D, h:mm A");
+    const startTime = dayjs(event.start).local().format(`dddd, ${DISPLAY_DATE_FORMAT}, h:mm A`);
     const endTime = dayjs(event.end).local().format("h:mm A");
     const { title, extendedProps } = eventData;
     const {
@@ -156,8 +157,8 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         const isFeedBackCompleted = (role === "volunteer" && feedBackCollectedFromVolunteer) || (role === "learner" && feedBackCollectedFromLearner)
 
         const feedBackStatus = {
-            label: isFeedBackCompleted ? "Feedback Submited" : "Meeting Completed",
-            value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Meeting Completed</p> : <button type="button" onClick={handleFeedBack} className="text-sm underline text-primary bg-transparent border-0 p-0 cursor-pointer">Complete Feedback</button>
+            label: isFeedBackCompleted ? "Feedback Submitted" : "Session Completed",
+            value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Session Completed</p> : <button type="button" onClick={handleFeedBack} className="text-sm underline text-primary bg-transparent border-0 p-0 cursor-pointer">Complete Feedback</button>
         }
         const statusMap = {
             pending: { label: "Status", value: <p className="text-orange-700 text-sm">Pending</p> },

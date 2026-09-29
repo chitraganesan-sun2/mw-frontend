@@ -8,6 +8,7 @@ import { AlertModal } from "../Modals";
 import EventCard from "../Calender/EventCard";
 import MobileMeetingPreviewModal from "./MeetingPreview";
 import { onEnterOrSpace } from "@/utils/a11y";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 interface CalendarProps {
     events: any;
@@ -112,7 +113,7 @@ const MobileCalender: React.FC<CalendarProps> = ({ events = [], onDateSelect }) 
                     >
                         <p className="font-medium text-sm mb-4">
                             {eventsByDate[0]?.date &&
-                                dayjs(eventsByDate[0]?.date).format("DD-MMM-YYYY")}
+                                formatDisplayDate(eventsByDate[0]?.date)}
                         </p>
                         <div className="space-y-2">
                             {eventsByDate.map((event: any, i: number) => (
@@ -133,7 +134,7 @@ const MobileCalender: React.FC<CalendarProps> = ({ events = [], onDateSelect }) 
                 ))}
                 {groupedEvents?.length === 0 && (
                     <div className="col-span-2 min-h-[70vh] h-full flex-center">
-                        <p className="text-base">No Events Found</p>
+                        <p className="text-base">No Sessions Found</p>
                     </div>
                 )}
             </div>

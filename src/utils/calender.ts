@@ -152,7 +152,7 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                 });
             } else if (dayDate) {
                 events.push({
-                    title: slot.title || "No Event",
+                    title: slot.title || "Available",
                     date: dayDate,
                     start: dayjs(`${dayDate} ${slot.start_time}`).format(),
                     end: dayjs(`${dayDate} ${slot.end_time}`).format(),
@@ -222,7 +222,7 @@ export const formatTime = (railwayTimeString: string) =>
 export const formatDate = (date: string) => dayjs(date).format("YYYY-MM-DD");
 
 // Fun: Converts date into day with month i.e. 12th Apr
-export const formatDateSuffix = (date: Date | string) => dayjs(date).format("Do MMM");
+export const formatDateSuffix = (date: Date | string) => dayjs(date).format("DD MMM YYYY");
 
 export const checkCalendarScope = async () => {
     const response = await GET_API(endpoints.auth.checkCalendarScope);

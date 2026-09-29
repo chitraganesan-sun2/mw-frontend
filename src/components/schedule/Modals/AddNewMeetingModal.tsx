@@ -488,7 +488,7 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
     if (!isOpen) return null;
     return (
         <SideModal
-            title="Add New Meeting"
+            title="Add New Session"
             onClose={onClose}
             isOpen={isOpen}
             onSave={handleSubmit}

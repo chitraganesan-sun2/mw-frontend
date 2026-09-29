@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { formatDisplayDate } from "@/utils/timeFunctions";
 
 interface RawSlot {
     start_time: string;
@@ -31,7 +32,7 @@ export function summarizeAvailability(slotsData: RawDaySchedule[], timezoneLabel
             let bullet = `Available all ${dayData.day}s ${formatTime(slot.start_time)}-${formatTime(slot.end_time)}`;
             if (timezoneLabel) bullet += ` ${timezoneLabel}`;
             if (slot.slot_type === "custom" && slot.end_date) {
-                bullet += ` until ${dayjs(slot.end_date).format("MMM D, YYYY")}`;
+                bullet += ` until ${formatDisplayDate(slot.end_date)}`;
             }
             bullets.push(bullet);
         });

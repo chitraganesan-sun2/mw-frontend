@@ -505,7 +505,7 @@ const Messages = () => {
                                 //     isMobile ? (
                                 //         <Button
                                 //             onClick={handleScheduleMeeting}
-                                //             title="Schedule Meeting"
+                                //             title="Schedule Session"
                                 //             btnVariant="secondary"
                                 //             className="!rounded-xl !text-[12px] !bg-black hover:!bg-black !text-white transition-all duration-300 !p-2"
                                 //         />
@@ -515,7 +515,7 @@ const Messages = () => {
                             <div className="w-full  md:w-fit pb-4 md:pb-0 px-3">
                                 <Button
                                     onClick={handleScheduleMeeting}
-                                    title="Schedule Meeting"
+                                    title="Schedule Session"
                                     btnVariant="secondary"
                                     className="!rounded-xl !w-full md:w-fit  !text-sm !bg-black hover:!bg-black !text-white transition-all duration-300"
                                 />

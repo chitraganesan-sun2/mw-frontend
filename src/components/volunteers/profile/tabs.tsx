@@ -6,6 +6,7 @@ import { SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunt
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useEffect, useRef } from "react";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 dayjs.extend(customParseFormat);
 
@@ -74,7 +75,7 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
     const details = [
         { label: "First Name", value: data?.volunteer_first_name },
         { label: "Last Name", value: data?.volunteer_last_name },
-        { label: "Date of Birth", value: dayjs(data?.volunteer_birth_date, "DD-MM-YYYY").format("DD-MMM-YYYY") },
+        { label: "Date of Birth", value: formatDisplayDate(data?.volunteer_birth_date, "DD-MM-YYYY") },
         { label: "Gender", value: formatString(data?.volunteer_gender) },
         { label: "Languages Spoken", value: data?.volunteer_languages?.map((language) => language.language_name) },
         { label: "Preferred Learner Age Group", value: data?.preferred_learner_age_group },

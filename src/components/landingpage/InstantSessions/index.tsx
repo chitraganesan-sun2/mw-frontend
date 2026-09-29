@@ -8,6 +8,7 @@ import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { TimeIcon } from "@/assets/icons";
 import Link from "next/link";
+import { formatDisplayDate } from "@/utils/timeFunctions";
 
 interface PublicSession {
     volunteer_slot_id: string;
@@ -39,7 +40,7 @@ const SessionPill = ({ session }: { session: PublicSession }) => {
         if (d === todayStr) return "Today";
         if (d === tomorrowStr) return "Tomorrow";
         const date = new Date(d + "T00:00:00");
-        return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+        return `${date.toLocaleDateString("en-US", { weekday: "short" })}, ${formatDisplayDate(date)}`;
     };
 
     return (

@@ -51,7 +51,7 @@ const ProfileHeader = ({
         <div className="flex items-center gap-2">
             <Button
                 onClick={onScheduleMeeting}
-                title="Schedule a meeting"
+                title="Schedule a session"
                 className="text-sm !text-black !bg-primary !border-primary !border"
             />
             <button

@@ -15,6 +15,7 @@ import { cn } from "@/utils/merge-class";
 import { getCookie } from "@/utils/auth";
 import { useEffect, useState } from "react";
 import { FeedbackModalProps } from "./index.type.d";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 const FeedbackModal = ({
     isOpen,
@@ -34,11 +35,7 @@ const FeedbackModal = ({
 
     const feedBackEventDetails = {
         Name: role === "volunteer" ? eventDetails?.learner_name : eventDetails?.volunteer_name,
-        Date: new Date().toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        }).replace(/ /g, "-"),
+        Date: formatDisplayDate(new Date()),
         Time: new Date().toLocaleTimeString("en-US", {
             hour: "numeric",
             minute: "numeric",

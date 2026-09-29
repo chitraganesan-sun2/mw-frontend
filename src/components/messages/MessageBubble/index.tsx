@@ -6,6 +6,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useAppStore } from "@/store/useAppStore";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -91,7 +92,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                                 : "text-[#4F4F4F] md:text-gray-500"
                         }`}
                     >
-                        <span className="md:hidden">{formattedMessageTime.format("Do MMM")}</span>
+                        <span className="md:hidden">{formattedMessageTime.format(DISPLAY_DATE_FORMAT)}</span>
                         <span className="md:hidden font-black">•</span>
                         <span className="md:hidden">{formattedMessageTime.format("h:mm a")}</span>
                         <span className="hidden md:inline">

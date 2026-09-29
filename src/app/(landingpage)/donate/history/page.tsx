@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getDonationHistory } from "@/api/donation";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 interface DonationHistoryEntry {
     donation_id: string;
@@ -16,7 +17,7 @@ const formatDate = (iso: string | null) => {
     if (!iso) return "-";
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return "-";
-    return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    return formatDisplayDate(date);
 };
 
 export default function DonationHistoryPage() {

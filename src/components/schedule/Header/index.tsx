@@ -166,7 +166,7 @@ const Header = (props: Props) => {
                             />
                             <Button
                                 onClick={handleAddMeeting}
-                                title="Add New Meeting"
+                                title="Add New Session"
                                 customClassName="!bg-black max-lg:!text-sm !font-medium !text-white rounded-full p-1 lg:!p-3 max-lg:flex-1 lg:flex-initial"
                             />
                         </div>

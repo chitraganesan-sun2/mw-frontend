@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getCookie } from "@/utils/auth";
 import dayjs from "dayjs";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 const formatDateTime = (dateTimeString: string) => {
     const date = new Date(dateTimeString);
 
@@ -73,7 +74,7 @@ const MessageCard = ({
                         ) : (
                             <>
                                 <p className="text-xs text-[#4F4F4F] max-md:block md:hidden">
-                                    {dayjs(date).format("DD/MM/YYYY")}
+                                    {formatDisplayDate(date)}
                                 </p>
                                 <p className="text-xs text-[#4F4F4F] hidden md:block">
                                     {dayjs(date).format("DD MMM, YYYY")}

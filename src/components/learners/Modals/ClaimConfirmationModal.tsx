@@ -192,7 +192,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
             </p>
             <div className="bg-[#E0F2FE] rounded-lg p-4">
                 <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                    <span className="font-medium text-[#121212]">Note:</span> The appointment, including the meeting link, will be added to your calendar once it&apos;s confirmed.
+                    <span className="font-medium text-[#121212]">Note:</span> The appointment, including the session link, will be added to your calendar once it&apos;s confirmed.
                 </p>
             </div>
         </div>

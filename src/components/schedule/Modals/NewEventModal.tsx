@@ -602,7 +602,7 @@ export default function NewEventModal({
         try {
             const res = await POST_API(endpoints.session.createInstantSession, payload);
             if (res?.status === 200 || res?.status === 201) {
-                showToast({ message: "Event created successfully", type: "success" });
+                showToast({ message: "Instant session created successfully", type: "success" });
                 onSubmit?.({ ...formData, tags: allSelected.map((s) => s.skill_name) });
                 setFormData({
                     select_date: getTodayDateObject(),
@@ -620,10 +620,10 @@ export default function NewEventModal({
                 setIsTimePickerOpen(false);
                 onClose();
             } else {
-                showToast({ message: "Failed to create event", type: "error" });
+                showToast({ message: "Failed to create instant session", type: "error" });
             }
         } catch {
-            showToast({ message: "Failed to create event", type: "error" });
+            showToast({ message: "Failed to create instant session", type: "error" });
         } finally {
             setIsSubmitting(false);
         }
@@ -962,7 +962,7 @@ export default function NewEventModal({
                             customClassName="flex-1 !bg-white !text-black !font-medium !rounded-2xl !border !border-gray-200 hover:!bg-gray-50 !py-3"
                         />
                         <Button
-                            title={isSubmitting ? "Creating..." : "Create Event"}
+                            title={isSubmitting ? "Creating..." : "Create Session"}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
                             customClassName="flex-1 !bg-black !text-white !font-medium !rounded-2xl !py-3"
@@ -976,7 +976,7 @@ export default function NewEventModal({
                         customClassName="flex-1 !bg-white !text-black !font-medium !rounded-2xl !border !border-gray-200 !py-3"
                     />
                     <Button
-                        title={isSubmitting ? "Creating..." : "Create Event"}
+                        title={isSubmitting ? "Creating..." : "Create Session"}
                         onClick={handleSubmit}
                         disabled={isSubmitting}
                         customClassName="flex-1 !bg-black !text-white !font-medium !rounded-2xl !py-3"

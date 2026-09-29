@@ -1,7 +1,7 @@
 export const alertModalConstants = {
     title: "Alert!",
     content:
-        "Canceling a scheduled meeting less than 6 hours in advance can impact your credibility as a volunteer. Please notify us at least 6 hours before the meeting if you need to reschedule or cancel.",
+        "Canceling a scheduled session less than 6 hours in advance can impact your credibility as a volunteer. Please notify us at least 6 hours before the session if you need to reschedule or cancel.",
     placeholder: "Add notes here",
     rows: 6,
 };
@@ -50,9 +50,9 @@ export const LearnerFeedbackFormConstants: FormField[] = [
 export const LearnerScheduleModalConstants = [
     {
         name: "title_of_the_meeting",
-        label: "Title of the Meeting",
+        label: "Session Title",
         inputType: "text",
-        placeholder: "Enter meeting title",
+        placeholder: "Enter session title",
         required: true,
     },
     {
@@ -78,7 +78,7 @@ export const LearnerScheduleModalDescriptionConstants = [
         name: "description",
         label: "Description",
         inputType: "textarea",
-        placeholder: "Enter meeting description here",
+        placeholder: "Enter session description here",
         required: true,
     },
 ];
@@ -86,9 +86,9 @@ export const LearnerScheduleModalDescriptionConstants = [
 export const VolunteerScheduleModalConstants = [
     {
         name: "title_of_the_meeting",
-        label: "Title of the Meeting",
+        label: "Session Title",
         inputType: "text",
-        placeholder: "Enter meeting title",
+        placeholder: "Enter session title",
         required: true,
     },
     {
@@ -114,7 +114,7 @@ export const VolunteerScheduleModalDescriptionConstants = [
         name: "description",
         label: "Description",
         inputType: "textarea",
-        placeholder: "Enter meeting description here",
+        placeholder: "Enter session description here",
         required: true,
     },
 ];

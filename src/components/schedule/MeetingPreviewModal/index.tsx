@@ -17,6 +17,7 @@ import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 interface MeetingPreviewModalProps {
     data: any;
@@ -137,7 +138,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event._def;
-    const startTime = dayjs(event.start).local().format("dddd, MMMM D, h:mm A");
+    const startTime = dayjs(event.start).local().format(`dddd, ${DISPLAY_DATE_FORMAT}, h:mm A`);
     const endTime = dayjs(event.end).local().format("h:mm A");
     const { title, extendedProps } = eventData;
     const {
@@ -213,7 +214,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             return (
                 <div>
                     <div className="flex items-center justify-between gap-3">
-                        <p className="font-medium text-sm text-gray-light">Meeting Completed</p>
+                        <p className="font-medium text-sm text-gray-light">Session Completed</p>
                         <button
                             type="button"
                             onClick={handleFeedBack}
@@ -246,7 +247,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             return (
                 <div>
                     <div className="flex items-center justify-between gap-3">
-                        <p className="font-medium text-sm text-gray-light">Meeting Completed</p>
+                        <p className="font-medium text-sm text-gray-light">Session Completed</p>
                         <button
                             type="button"
                             onClick={handleFeedBack}

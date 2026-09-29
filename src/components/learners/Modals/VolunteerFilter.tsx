@@ -11,6 +11,7 @@ import InnerWidth from "@/utils/innerWidth";
 
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 const meetingFormSchema = z.object({
     country: z.any().optional(),
@@ -140,9 +141,7 @@ export default function VolunteerFilterModal({
                         onClick={() => setIsDateModalOpen((prev) => !prev)}
                     >
                         {filterData?.available_days?.[0] && filterData?.available_days?.[1]
-                            ? `${dayjs(filterData?.available_days[0]).format(
-                                  "DD-MM-YYYY"
-                              )} - ${dayjs(filterData?.available_days[1]).format("DD-MM-YYYY")}`
+                            ? `${formatDisplayDate(filterData?.available_days[0])} - ${formatDisplayDate(filterData?.available_days[1])}`
                             : "Select Available Date Range"}
                     </button>
                 </div>

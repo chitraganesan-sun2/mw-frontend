@@ -419,7 +419,7 @@ export default function AddNewMeetingModalVolunteer({
     if (!isOpen) return null;
     return (
         <SideModal
-            title="Add New Meeting"
+            title="Add New Session"
             onClose={onClose}
             isOpen={isOpen}
             onSave={handleSubmit}

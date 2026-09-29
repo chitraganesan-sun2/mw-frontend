@@ -25,6 +25,7 @@ import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 export interface Session {
     id: string;
@@ -201,7 +202,7 @@ function RequestedSessionCard({
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
-                    {dayjs(request.availability_date).format("MMM D")} @{" "}
+                    {formatDisplayDate(request.availability_date)} @{" "}
                     {dayjs(request.availability_start_time, "HH:mm").format("h:mm a")}
                 </span>
                 <span className="text-gray-400">({request.duration} mins)</span>

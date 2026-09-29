@@ -12,6 +12,7 @@ import { downloadFile } from "@/utils/downloadFile";
 import { isNativePlatform } from "@/utils/platform";
 import { HiOutlineCalendarDays } from "react-icons/hi2";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 dayjs.extend(customParseFormat);
 
@@ -119,7 +120,7 @@ const AcceptedSessionsList: React.FC<AcceptedSessionsListProps> = ({ role }) => 
     };
 
     const renderRow = (s: NormalizedSession, isUpcoming: boolean) => {
-        const dateLabel = s.start ? s.start.format("ddd, MMM D") : s.date || "";
+        const dateLabel = s.start ? s.start.format(`ddd, ${DISPLAY_DATE_FORMAT}`) : s.date || "";
         const timeLabel = [
             s.startTime ? formatTime(s.startTime) : "",
             s.endTime ? formatTime(s.endTime) : "",

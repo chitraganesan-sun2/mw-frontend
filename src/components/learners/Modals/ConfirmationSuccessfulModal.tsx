@@ -70,7 +70,7 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
     const cancelMeetingButton = (
         <div className="flex justify-end">
             <Button
-                title="Cancel Meeting"
+                title="Cancel Session"
                 btnVariant="tertiary"
                 customClassName="!h-10 !bg-white !text-red-600 !border !border-red-600 hover:!bg-red-50 !font-medium !rounded-full !px-6"
                 onClick={handleCancelMeeting}
@@ -157,7 +157,7 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
 
             <div className="flex flex-col gap-2 mb-4 relative py-2">
                 <div className="absolute left-0 right-0 -top-4 border-t border-gray-200" style={{ left: "0px", right: "0px" }} />
-                <span className="text-sm font-medium text-[#4F4F4F]">Guest</span>
+                <span className="text-sm font-medium text-[#4F4F4F]">Volunteer</span>
                 <div className="flex flex-wrap gap-1">
                     {session.guests && session.guests.length > 0 ? (
                         session.guests.map((guest, index) => {

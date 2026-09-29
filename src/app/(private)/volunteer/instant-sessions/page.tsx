@@ -21,6 +21,7 @@ import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
@@ -82,7 +83,7 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
-                    {dayjs(req.availability_date).format("MMM D")} @{" "}
+                    {formatDisplayDate(req.availability_date)} @{" "}
                     {dayjs(req.availability_start_time, "HH:mm").format("h:mm a")}
                 </span>
                 <span className="text-gray-400">({req.duration} mins)</span>

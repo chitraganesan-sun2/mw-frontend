@@ -535,7 +535,7 @@ const OnetImeScheduleModal = ({
                                     <div className="hidden md:flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-gray-500"></div>
                                         <span className="text-sm font-medium text-[#121212]">
-                                            {slot.title || "No Event"}
+                                            {slot.title || "Available"}
                                         </span>
                                     </div>
                                     <span className="hidden md:inline text-sm text-gray-500 font-medium">
