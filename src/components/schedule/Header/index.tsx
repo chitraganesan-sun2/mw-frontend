@@ -48,12 +48,12 @@ const Header = (props: Props) => {
         router.push("/learner/schedule?modal=my_availability");
     };
 
-    const handleAddEvent = () => {
-        router.push("/volunteer/schedule?modal=new_event");
-    };
-
     const handleMySchedule = () => {
         router.push("/volunteer/schedule?modal=my_schedule");
+    };
+
+    const handleAddSessionVolunteer = () => {
+        router.push("/volunteer/schedule?modal=add_new_session");
     };
 
     // "View Demo" now opens the admin-managed Tutorial Link (category learner_demo /
@@ -182,25 +182,17 @@ const Header = (props: Props) => {
                                     <HeaderNotificationBell />
                                 </div>
                             )}
-                            {isMobileOrTabScreen && (
-                                <Button
-                                    onClick={handleAddEvent}
-                                    title="Add New Instant Session"
-                                    customClassName="!bg-[#FFAC71] hover:!bg-[#FFAC71] focus:!bg-[#FFAC71] !text-[14px] lg:!text-sm !font-medium !text-black rounded-full !py-2 max-lg:flex-1 !border !border-[#FE5B11]"
-                                />
-                            )}
+                            {/* Same labels/styles as the learner's buttons above */}
                             <Button
                                 onClick={handleMySchedule}
-                                title={"My Schedule"}
+                                title="Schedule my Availability"
                                 customClassName="!bg-white !border !border-gray-200 !text-[14px] lg:!text-[16px] !font-medium !text-black rounded-full !py-2 lg:!py-3 lg:!px-3 max-lg:flex-1"
                             />
-                            {!isMobileOrTabScreen && (
-                                <Button
-                                    onClick={handleAddEvent}
-                                    title="Add New Instant Session"
-                                    customClassName="!bg-[#FFAC71] hover:!bg-[#FFAC71] focus:!bg-[#FFAC71] max-lg:!text-sm !font-medium !text-black rounded-full lg:!p-3 !py-3 !px-3 !border !border-[#FE5B11]"
-                                />
-                            )}
+                            <Button
+                                onClick={handleAddSessionVolunteer}
+                                title="Add New Session"
+                                customClassName="!bg-black max-lg:!text-sm !font-medium !text-white rounded-full p-1 lg:!p-3 max-lg:flex-1 lg:flex-initial"
+                            />
                         </div>
                     )}
                 </div>

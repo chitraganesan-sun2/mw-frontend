@@ -74,9 +74,12 @@ type FormData = z.infer<typeof meetingFormSchema>;
 interface AddNewMeetingModalProps {
     isOpen: boolean;
     onClose: () => void;
+    /** "YYYY-MM-DD" - the date clicked on the calendar. The date field only appears once a
+     *  volunteer is picked (and picking one resets it), so it's applied at that point. */
+    initialDate?: string | null;
 }
 
-export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingModalProps) {
+export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: AddNewMeetingModalProps) {
     const [formData, setFormData] = useState<FormData>({
         title_of_the_meeting: "",
         select_volunteer: "",
@@ -434,6 +437,12 @@ export default function AddNewMeetingModal({ isOpen, onClose }: AddNewMeetingMod
             setVolunteerAvailableDays([]);
             setVolunteerAvailableDates([]);
             setVolunteerUnavailableDates([]);
+
+            // Pre-fill the calendar-clicked date (also loads that volunteer's slots for it).
+            const preset = initialDate ? dayjs(initialDate) : null;
+            if (preset?.isValid() && !preset.isBefore(dayjs(), "day")) {
+                handleChange("select_date", preset.toDate());
+            }
         } else {
             setVolunteerTimezone("");
             setVolunteerAcademicOptions([]);

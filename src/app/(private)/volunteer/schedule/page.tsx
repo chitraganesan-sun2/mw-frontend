@@ -2,11 +2,10 @@
 
 import dynamic from "next/dynamic";
 import MyScheduleModal from "@/components/schedule/Modals/MyScheduleModal";
+import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
 import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
-// NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
-const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { POST_API } from "@/api/request";
@@ -27,7 +26,7 @@ import { GET_API } from "@/api/request";
 export default function SchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
     const [isOpenFeedback, setIsOpenFeedback] = useState(false);
-    const [isOpenNewEvent, setIsOpenNewEvent] = useState(false);
+    const [isOpenAddSession, setIsOpenAddSession] = useState(false);
     const queryClient = useQueryClient();
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
@@ -79,14 +78,6 @@ export default function SchedulePage() {
         setIsOpenOnetImeSchedule(!isOpenOnetImeSchedule);
     };
 
-    const handleNewEventSubmit = () => {
-        queryClient.invalidateQueries({ queryKey: ["volunteer-events", currentMonth] });
-        // This modal is also opened from the Instant Sessions page - keep that page's list
-        // in sync too, instead of leaving it stale until its own poll.
-        queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
-        handleNavigate();
-    };
-
     const handleSubmitFeedback = async (formData: any) => {
         const payload = {
             comment: formData?.notes,
@@ -110,7 +101,7 @@ export default function SchedulePage() {
     useEffect(() => {
         setIsOpenSchedule(modal === "my_schedule");
         setIsOpenFeedback(modal === "feedback");
-        setIsOpenNewEvent(modal === "new_event");
+        setIsOpenAddSession(modal === "add_new_session");
     }, [modal]);
 
     return (
@@ -128,11 +119,7 @@ export default function SchedulePage() {
                 <Calendar events={data || []} onDateSelect={handleDateSelect} />
             )}
             <MyScheduleModal isOpen={isOpenSchedule} onClose={handleNavigate} />
-            <NewEventModal
-                isOpen={isOpenNewEvent}
-                onClose={handleNavigate}
-                onSubmit={handleNewEventSubmit}
-            />
+            <AddNewMeetingModalVolunteer isOpen={isOpenAddSession} onClose={handleNavigate} />
             <FeedbackModal
                 mode="create"
                 isOpen={isOpenFeedback}

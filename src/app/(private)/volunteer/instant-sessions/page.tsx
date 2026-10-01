@@ -19,12 +19,20 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
+
+// dayjs(time, "HH:mm") needs this plugin - without it the parse is Invalid Date.
+dayjs.extend(customParseFormat);
+
+// Same style as the learner page's "+ Request a Session" (theme primary = volunteer orange).
+const START_SESSION_BTN_CLASS =
+    "bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity";
 
 const REQUEST_STATUS_LABELS: Record<string, string> = {
     pending: "Pending",
@@ -58,6 +66,13 @@ function getTimeAgo(dateString?: string): string {
     return `${Math.floor(diffHours / 24)}d ago`;
 }
 
+/** "HH:mm" -> "4:00 pm", matching the learner page; falls back to the raw value. */
+function formatTime(time?: string): string {
+    if (!time) return "";
+    const t = dayjs(time, "HH:mm");
+    return t.isValid() ? t.format("h:mm a") : time;
+}
+
 function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isActionLoading: boolean; onAccept: (id: string) => void }) {
     return (
         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
@@ -84,7 +99,7 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
                     {formatDisplayDate(req.availability_date)} @{" "}
-                    {dayjs(req.availability_start_time, "HH:mm").format("h:mm a")}
+                    {formatTime(req.availability_start_time)}
                 </span>
                 <span className="text-gray-400">({req.duration} mins)</span>
             </div>
@@ -143,7 +158,7 @@ function MySessionCard({
             )}
             <div className="flex items-center justify-between pt-3 border-t border-gray-50 mb-3">
                 <span className="text-xs text-gray-400">
-                    {session.volunteer_start_date} {session.volunteer_start_time}
+                    {formatDisplayDate(session.volunteer_start_date)} @ {formatTime(session.volunteer_start_time)}
                 </span>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -356,7 +371,9 @@ export default function VolunteerInstantSessionsPage() {
             <div className="flex flex-col items-center text-center gap-2 mb-8">
                 <h1 className="text-2xl font-bold text-gray-900">Instant Sessions</h1>
                 <p className="text-sm text-gray-500 max-w-2xl">
-                    Start a live session for learners to join instantly
+                    Instant Sessions are sessions available <strong>today or tomorrow.</strong> You
+                    can post an Instant Session for learners to join, or accept a session a learner
+                    has requested based on their preferred time and subject.
                 </p>
             </div>
 
@@ -366,21 +383,20 @@ export default function VolunteerInstantSessionsPage() {
                 onSubmit={() => {
                     setShowCreateForm(false);
                     refetchMySessions();
-                    // This modal is also opened from the Schedule page - keep that page's
-                    // calendar in sync too, instead of leaving it stale until its own poll.
+                    // A posted session also shows on the Schedule calendar - keep that cache
+                    // in sync too, instead of leaving it stale until its own poll.
                     queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
                 }}
             />
 
-            {/* My Sessions */}
+            {/* My Posted Instant Sessions (sessions this volunteer started or accepted) - shown first */}
             <div className="mb-10">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">My Sessions</h2>
-                    <button
-                        onClick={() => setShowCreateForm(true)}
-                        className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
-                    >
-                        + Start Instant Session
+                <div className="flex justify-between items-center gap-3 mb-4">
+                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
+                        My Posted Instant Sessions
+                    </h2>
+                    <button onClick={() => setShowCreateForm(true)} className={`${START_SESSION_BTN_CLASS} shrink-0`}>
+                        + Start a New Session
                     </button>
                 </div>
 
@@ -410,11 +426,8 @@ export default function VolunteerInstantSessionsPage() {
                         <p className="text-sm text-gray-500 mb-6">
                             Sessions you start or accept will show up here
                         </p>
-                        <button
-                            onClick={() => setShowCreateForm(true)}
-                            className="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
-                        >
-                            Start Instant Session
+                        <button onClick={() => setShowCreateForm(true)} className={START_SESSION_BTN_CLASS}>
+                            Start a New Session
                         </button>
                     </div>
                 ) : (
@@ -454,10 +467,10 @@ export default function VolunteerInstantSessionsPage() {
                 )}
             </div>
 
-            {/* Available Learner Requests */}
+            {/* Instant Sessions requested by Learners (open learner requests any volunteer can accept) */}
             <div>
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
-                    Available Learner Requests
+                    Instant Sessions requested by Learners
                 </h2>
                 {isLearnerRequestsError && !learnerRequestsData ? (
                     <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />
@@ -539,8 +552,8 @@ export default function VolunteerInstantSessionsPage() {
                         {sessionDetail.session_description && <p>{sessionDetail.session_description}</p>}
                         <p>
                             <span className="font-medium">When: </span>
-                            {sessionDetail.volunteer_start_date} {sessionDetail.volunteer_start_time} -{" "}
-                            {sessionDetail.volunteer_end_time}
+                            {formatDisplayDate(sessionDetail.volunteer_start_date)},{" "}
+                            {formatTime(sessionDetail.volunteer_start_time)} - {formatTime(sessionDetail.volunteer_end_time)}
                         </p>
                         {sessionDetail.learner_full_name && (
                             <p>

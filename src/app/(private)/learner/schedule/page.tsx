@@ -21,6 +21,7 @@ import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import InnerWidth from "@/utils/innerWidth";
 import MobileCalender from "@/components/schedule/MobileCalender";
+import dayjs from "dayjs";
 
 export default function LearnerSchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
@@ -34,6 +35,7 @@ export default function LearnerSchedulePage() {
     const queryClient = useQueryClient();
 
     const [modal] = useQueryState("modal");
+    const [presetDate] = useQueryState("date");
     const learnerId = getCookie("learner_id");
 
     const getEvents = () => getCalendarEvents(learnerId as string, "learner", currentMonth);
@@ -64,6 +66,13 @@ export default function LearnerSchedulePage() {
 
     const handleNavigate = () => {
         router.push(`/learner/schedule?current_month=${currentMonth}`);
+    };
+
+    // Clicking a day on the calendar opens Add New Session for that date - the learner
+    // counterpart of the volunteer's click-a-day-to-add-availability.
+    const handleDateSelect = (date: string) => {
+        if (!date || dayjs(date).isBefore(dayjs(), "day")) return;
+        router.push(`/learner/schedule?modal=add_new_meeting&date=${encodeURIComponent(date)}`);
     };
 
     const handleSubmitFeedback = async (formData: any) => {
@@ -103,11 +112,15 @@ export default function LearnerSchedulePage() {
                 ) : isError ? (
                     <div className="flex-center h-full w-full">Something went wrong loading your schedule.</div>
                 ) : isMobileOrTabScreen ? (
-                    <MobileCalender events={data || []} />
+                    <MobileCalender events={data || []} onDateSelect={handleDateSelect} />
                 ) : (
-                    <Calendar events={data || []} />
+                    <Calendar events={data || []} onDateSelect={handleDateSelect} />
                 )}
-                <AddNewMeetingModal isOpen={isOpenSchedule} onClose={handleNavigate} />
+                <AddNewMeetingModal
+                    isOpen={isOpenSchedule}
+                    onClose={handleNavigate}
+                    initialDate={presetDate}
+                />
                 <LearnerScheduleModal isOpen={isOpenAvailability} onClose={handleNavigate} />
                 <FeedbackModal
                     mode="create"
