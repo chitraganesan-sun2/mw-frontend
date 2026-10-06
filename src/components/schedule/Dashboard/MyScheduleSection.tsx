@@ -120,7 +120,10 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 aria-labelledby={`schedule-tab-${activeTab}`}
                 className="flex flex-col gap-2"
             >
-                {active.isLoading ? (
+                {/* isPending, not isLoading: the query stays disabled until the user id is read
+                    from the cookie, and a disabled query reports isLoading=false - the empty-state
+                    text used to flash before the real list. */}
+                {active.isPending ? (
                     <SessionListSkeleton />
                 ) : active.isError ? (
                     <QueryErrorNotice message="Couldn't load your sessions." onRetry={() => active.refetch()} />

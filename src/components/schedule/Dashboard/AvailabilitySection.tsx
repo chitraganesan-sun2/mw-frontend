@@ -137,7 +137,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             <h3 className="text-sm font-semibold">
                 {title} <span className="font-normal text-gray-500">({upcoming.data ? sessions.length : "…"})</span>
             </h3>
-            {upcoming.isLoading ? (
+            {/* isPending: see MyScheduleSection - avoids an empty-state flash. */}
+            {upcoming.isPending ? (
                 <SessionListSkeleton rows={1} />
             ) : upcoming.isError ? (
                 <QueryErrorNotice message="Couldn't load these sessions." onRetry={() => upcoming.refetch()} />
