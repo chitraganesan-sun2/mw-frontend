@@ -176,6 +176,17 @@ npx cap open android    # or: npm run mobile:run / mobile:live for live reload
 
 Native builds hit the hardcoded production API (`https://api.melodywings.org/api/v1`) rather than the web env var.
 
+## Schedule dashboard
+
+`/learner/schedule` and `/volunteer/schedule` are the signed-in landing page
+(`getDefaultRouteForRole`). Components live in `src/components/schedule/Dashboard/`:
+Availability (recurring + date-specific slots, volunteer "Slots I'm Offering / I've Taken"),
+My Schedule (Posted / Accepted / Direct tabs, Upcoming / Past), and the calendar with a
+legend and Month / Week / Day views. Session categories come from
+`scheduleCategories.ts`; status labels, the session date/time format and the Join rule
+from `src/utils/sessionDisplay.ts` — use those instead of screen-local maps. Business
+rules, API and privacy notes: `melody-wings-backend/docs/schedule-dashboard.md`.
+
 ## Known gaps
 
 - `src/api/query-client.ts` exports an unused, disconnected `QueryClient` instance — no current imports found; safe cleanup candidate (the real client lives in `src/providers/QueryWrapper`).

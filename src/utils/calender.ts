@@ -223,13 +223,3 @@ export const formatDate = (date: string) => dayjs(date).format("YYYY-MM-DD");
 
 // Fun: Converts date into day with month i.e. 12th Apr
 export const formatDateSuffix = (date: Date | string) => dayjs(date).format("DD MMM YYYY");
-
-export const checkCalendarScope = async () => {
-    const response = await GET_API(endpoints.auth.checkCalendarScope);
-    return response;
-};
-
-export const revokeGoogleAuth = async () => {
-    const response = await GET_API(endpoints.auth.revokeGoogleAuth);
-    return response;
-};

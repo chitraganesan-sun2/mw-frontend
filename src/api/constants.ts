@@ -27,8 +27,6 @@ export const endpoints: EndpointProps = {
     },
     auth: {
         oauth2callback: "auth/oauth2callback",
-        checkCalendarScope: "auth/check_calendar_scope",
-        revokeGoogleAuth: "auth/revoke_google_auth",
     },
     user: {
         signIn: "auth/signup",
