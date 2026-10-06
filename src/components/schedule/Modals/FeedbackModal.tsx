@@ -43,12 +43,18 @@ const FeedbackModal = ({
         }),
     };
 
+    // Only bail out when actually opened without a session to give feedback on. This ran on
+    // every mount (the modal is always mounted on the schedule pages), calling the page's
+    // onClose -> router.push("?current_month=<store month>") on each load, which blanked
+    // current_month and dropped deep-link params like ?modal=my_availability.
     useEffect(() => {
+        if (!isOpen) return;
         const userId = role === "volunteer" ? eventDetails?.learner_id : eventDetails?.volunteer_id;
         if (!userId || userId === "") {
             onClose();
         }
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     const handleSubmit = () => {
         const submissionData = {

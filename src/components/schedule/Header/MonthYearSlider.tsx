@@ -35,7 +35,20 @@ const MonthYearSlider: React.FC<Props> = ({ onChange, defaultDate }) => {
         router.push(`?${params.toString()}`);
     };
 
+    // Follow ?current_month= when something else changes it (the calendar's Week/Day
+    // stepping crosses month boundaries) - this used to read the URL only once on mount.
+    const urlMonth = searchParams.get("current_month");
+    useEffect(() => {
+        if (urlMonth && dayjs(urlMonth).isValid()) {
+            if (!dayjs(urlMonth).isSame(currentDate, "month")) setCurrentDate(dayjs(urlMonth));
+            setCurrentMonth(dayjs(urlMonth).format("YYYY-MM"));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [urlMonth]);
+
     // Update URL when component mounts
+    // (A month already in the URL is copied into the store by the effect above - the store
+    // used to stay empty on a reload, so the calendar fetched the current month instead.)
     useEffect(() => {
         if (!searchParams.get("current_month")) {
             const params = new URLSearchParams(searchParams.toString());
