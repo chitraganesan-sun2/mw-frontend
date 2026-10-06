@@ -22,15 +22,21 @@ const AsyncSelect = ({
     ...props
 }: AsyncSelectProps) => {
     const pathname = usePathname();
-    const [data, setData] = useState<any[]>([]);
+    // Options the user created in this session, scoped to the endpoint they were created
+    // under so switching e.g. skills?category=academic -> non_academic doesn't carry them over.
+    const [created, setCreated] = useState<{ endpoint: string; items: any[] }>({ endpoint, items: [] });
 
-    const { isLoading, refetch } = useQuery({
+    // Options come straight from the query result for the CURRENT endpoint. They used to be
+    // copied into local state inside queryFn - but queryFn doesn't run when the new key is
+    // already cached, so switching category back (Life Skills -> Academic) kept showing the
+    // previous category's list, and a slow response for the old category could overwrite
+    // the new one. React Query keys results by endpoint, so neither can happen now.
+    const { data: fetched, isLoading, isError, refetch } = useQuery({
         queryKey: ["async-select", props.name, endpoint],
         queryFn: async () => {
             try {
                 const { data } = await GET_API(endpoints.common(endpoint));
-                setData(data);
-                return data;
+                return Array.isArray(data) ? data : [];
             } catch (error) {
                 onError?.(error as Error);
                 throw error;
@@ -39,6 +45,11 @@ const AsyncSelect = ({
         enabled: !!endpoint && !!responseAsLabel && !!responseAsValue,
         staleTime: 5 * 60 * 1000,
     });
+
+    const data = useMemo(
+        () => [...(fetched ?? []), ...(created.endpoint === endpoint ? created.items : [])],
+        [fetched, created, endpoint]
+    );
 
     useEffect(() => {
         refetch();
@@ -164,8 +175,6 @@ const AsyncSelect = ({
         };
     }, [data, props.value, responseAsValue, responseAsLabel, variant, noneOption]);
 
-    // console.log("Get Value: ", getValue);
-
     const options = useMemo(() => {
         const fetched = convertToOptions(data, responseAsValue, responseAsLabel, isLoading);
         if (!noneOption) return fetched;
@@ -196,7 +205,10 @@ const AsyncSelect = ({
             const [key1 = "label", key2 = "value"] = keys;
             const randomId = key2.toLowerCase() === "language_id" ? uuidv4() : inputValue;
             const option = { [key1]: inputValue, [key2]: randomId };
-            setData((prev) => [...prev, option]);
+            setCreated((prev) => ({
+                endpoint,
+                items: [...(prev.endpoint === endpoint ? prev.items : []), option],
+            }));
             props.onCreate(Array.isArray(responseAsValue) ? option : inputValue);
         }
     };
@@ -228,6 +240,7 @@ const AsyncSelect = ({
                 }
                 hideSelectedOptions={variant === "multi"}
                 loadingMessage={() => "Loading..."}
+                noOptionsMessage={() => (isError ? "Couldn't load options. Please try again." : "No options")}
                 styles={
                     {
                         ...customStyles,
