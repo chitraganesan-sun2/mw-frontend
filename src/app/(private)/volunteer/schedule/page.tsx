@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import MyScheduleModal from "@/components/schedule/Modals/MyScheduleModal";
 import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
 import ScheduleDashboardLayout from "@/components/schedule/Dashboard/ScheduleDashboardLayout";
+import { CALENDAR_VIEW } from "@/components/schedule/Header";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
@@ -33,6 +34,8 @@ export default function SchedulePage() {
     const { eventDetails, currentMonth, setVolunteerUtcOffset, setVolunteerTimeZone, volunteerTimeZone } =
         useAppStore();
     const [modal, setModal] = useQueryState("modal");
+    const [view] = useQueryState("view");
+    const isCalendarView = view === CALENDAR_VIEW;
     const [learnerId, setLearnerId] = useQueryState("learnerId");
     const volunteerId = getCookie("volunteer_id");
     const [isOpenOnetImeSchedule, setIsOpenOnetImeSchedule] = useState(false);
@@ -45,7 +48,8 @@ export default function SchedulePage() {
         queryFn: getEvents,
         // Wait for the header to put the URL's month in the store - fetching before that
         // loaded the current month first, then the requested one.
-        enabled: Boolean(currentMonth),
+        // Only the calendar view shows these events.
+        enabled: Boolean(currentMonth) && isCalendarView,
         // Keep showing the previous month while the next one loads, so the calendar stays
         // mounted (and keeps its Week/Day view) when navigation crosses a month boundary.
         placeholderData: keepPreviousData,
@@ -73,7 +77,8 @@ export default function SchedulePage() {
     });
 
     const handleNavigate = () => {
-        router.push(`/volunteer/schedule?current_month=${currentMonth}`);
+        // Return to the view the modal was opened from.
+        router.push(`/volunteer/schedule?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
     };
 
     const handleDateSelect = (date: string) => {
@@ -113,6 +118,7 @@ export default function SchedulePage() {
         <>
             <ScheduleDashboardLayout
                 role="volunteer"
+                isCalendarView={isCalendarView}
                 timeZoneLabel={volunteerTimeZone}
                 onScheduleAvailability={() => setModal("my_schedule")}
                 onAddDateSlot={handleDateSelect}

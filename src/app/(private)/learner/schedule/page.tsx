@@ -5,6 +5,7 @@ import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal"
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
 import LearnerScheduleModal from "@/components/schedule/Modals/LearnerScheduleModal";
 import ScheduleDashboardLayout from "@/components/schedule/Dashboard/ScheduleDashboardLayout";
+import { CALENDAR_VIEW } from "@/components/schedule/Header";
 import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
@@ -35,6 +36,8 @@ export default function LearnerSchedulePage() {
     const queryClient = useQueryClient();
 
     const [modal, setModal] = useQueryState("modal");
+    const [view] = useQueryState("view");
+    const isCalendarView = view === CALENDAR_VIEW;
     const [presetDate] = useQueryState("date");
     const [volunteerId, setVolunteerId] = useQueryState("volunteerId");
     const learnerId = getCookie("learner_id");
@@ -46,7 +49,8 @@ export default function LearnerSchedulePage() {
         queryFn: getEvents,
         // Wait for the header to put the URL's month in the store - fetching before that
         // loaded the current month first, then the requested one.
-        enabled: Boolean(currentMonth),
+        // Only the calendar view shows these events.
+        enabled: Boolean(currentMonth) && isCalendarView,
         // Keep showing the previous month while the next one loads, so the calendar stays
         // mounted (and keeps its Week/Day view) when navigation crosses a month boundary.
         placeholderData: keepPreviousData,
@@ -72,14 +76,15 @@ export default function LearnerSchedulePage() {
     });
 
     const handleNavigate = () => {
-        router.push(`/learner/schedule?current_month=${currentMonth}`);
+        // Return to the view the modal was opened from.
+        router.push(`/learner/schedule?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
     };
 
     // Clicking a day on the calendar opens Add New Session for that date - the learner
     // counterpart of the volunteer's click-a-day-to-add-availability.
     const handleDateSelect = (date: string) => {
         if (!date || dayjs(date).isBefore(dayjs(), "day")) return;
-        router.push(`/learner/schedule?modal=add_new_meeting&date=${encodeURIComponent(date)}`);
+        router.push(`/learner/schedule?view=${CALENDAR_VIEW}&modal=add_new_meeting&date=${encodeURIComponent(date)}`);
     };
 
     const handleSubmitFeedback = async (formData: any) => {
@@ -110,6 +115,7 @@ export default function LearnerSchedulePage() {
         <>
             <ScheduleDashboardLayout
                 role="learner"
+                isCalendarView={isCalendarView}
                 timeZoneLabel={learnerTimeZone}
                 onScheduleAvailability={() => setModal("my_availability")}
                 onOpenProfile={(id) => setVolunteerId(id)}

@@ -1,6 +1,6 @@
 "use client";
 import dayjs from "dayjs";
-import { HiOutlineCalendarDays } from "react-icons/hi2";
+import { HiOutlineArrowDownTray } from "react-icons/hi2";
 import { endpoints } from "@/api/constants";
 import { downloadFile } from "@/utils/downloadFile";
 import { isNativePlatform } from "@/utils/platform";
@@ -129,11 +129,13 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                                     "text/calendar"
                                 )
                             }
-                            aria-label="Add to calendar"
-                            title="Add to calendar"
-                            className="flex items-center text-gray-500 hover:text-primary bg-transparent border-0 p-0 cursor-pointer"
+                            // A bare calendar icon read as "open my calendar" but downloads a file -
+                            // say what it does.
+                            title="Downloads an .ics file you can open in Google Calendar, Outlook or Apple Calendar"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 underline-offset-2 hover:underline hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
                         >
-                            <HiOutlineCalendarDays size={16} aria-hidden="true" />
+                            <HiOutlineArrowDownTray size={14} aria-hidden="true" />
+                            Download .ics
                         </button>
                     )}
                     {showJoin && (

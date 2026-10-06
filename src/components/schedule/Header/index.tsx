@@ -1,9 +1,8 @@
 "use client";
 
-import Button from "@/components/common/Button";
 import MonthYearSlider from "./MonthYearSlider";
 import { CalendarIcon, SideMenuIcon } from "@/assets/icons";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
 import MonthYearPicker from "./MonthYearPicker";
@@ -11,20 +10,13 @@ import SideModal from "@/components/common/Modals/MobileSideModal";
 import Sidebar from "@/components/common/Sidebar";
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
-import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlineCalendarDays, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
 
-export const CALENDAR_SECTION_ID = "my-calendar";
-
-/** Scroll the dashboard's calendar into view and move focus to it (keyboard/screen-reader
- * users land on the calendar, not just see it scroll by). */
-export function focusCalendarSection() {
-    const el = document.getElementById(CALENDAR_SECTION_ID);
-    if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-    el.focus({ preventScroll: true });
-}
+/** ?view=calendar shows the calendar on its own; no param = the schedule (availability +
+ * sessions). A URL param, not local state, so the view survives a refresh / can be linked. */
+export const CALENDAR_VIEW = "calendar";
 
 const Header = () => {
     // getCookie reads document.cookie, which isn't available during SSR - reading it
@@ -35,6 +27,7 @@ const Header = () => {
         setRole(getCookie("role"));
     }, []);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [isSideNavBarOpen, setIsSideNavBarOpen] = useState<boolean>(false);
 
     // Check if any schedule-related events are fetching
@@ -44,21 +37,30 @@ const Header = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isVolunteer = role === "volunteer";
+    const basePath = isVolunteer ? "/volunteer/schedule" : "/learner/schedule";
+    const isCalendarView = searchParams.get("view") === CALENDAR_VIEW;
 
-    const openAvailability = () =>
-        router.push(isVolunteer ? "/volunteer/schedule?modal=my_schedule" : "/learner/schedule?modal=my_availability");
-    const openAddSession = () =>
-        router.push(isVolunteer ? "/volunteer/schedule?modal=add_new_session" : "/learner/schedule?modal=add_new_meeting");
+    // Keep the current view and month when opening a modal, so closing it returns here.
+    const pushWith = (changes: Record<string, string | null>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        Object.entries(changes).forEach(([key, value]) => (value === null ? params.delete(key) : params.set(key, value)));
+        const query = params.toString();
+        router.push(query ? `${basePath}?${query}` : basePath);
+    };
+
+    const openAvailability = () => pushWith({ modal: isVolunteer ? "my_schedule" : "my_availability" });
+    const openAddSession = () => pushWith({ modal: isVolunteer ? "add_new_session" : "add_new_meeting" });
+    const toggleCalendar = () => pushWith({ view: isCalendarView ? null : CALENDAR_VIEW, modal: null });
     // Help lives in Resources (tutorials, guides, the demo) - no separate help content.
     const openHelp = () => router.push(`/${isVolunteer ? "volunteer" : "learner"}/resources`);
 
-    const secondaryBtn =
-        "!bg-white !border !border-gray-200 !text-[14px] !font-medium !text-black rounded-full !py-2 !px-3 max-lg:flex-1";
+    const actionBtn =
+        "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[13px] lg:text-sm font-medium leading-tight text-black hover:bg-gray-50 text-center";
 
     return (
-        <div className={`w-full h-full p-2 px-3 lg:min-h-[10vh] ${isScheduleLoading ? "opacity-80" : ""}`}>
-            <div className="w-full h-full flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-0 animate-fadeIn">
-                <div className="flex items-center justify-between">
+        <div className={`w-full p-2 px-3 lg:py-3 ${isScheduleLoading ? "opacity-80" : ""}`}>
+            <div className="w-full flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between animate-fadeIn">
+                <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center">
                         <button
                             type="button"
@@ -70,54 +72,65 @@ const Header = () => {
                         </button>
                         <h1 className="flex items-center gap-2 text-xl font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
-                            Schedule
+                            {isCalendarView ? "My Calendar" : "Schedule"}
                         </h1>
+                        {/* The month only drives the calendar, so it only shows there. */}
+                        {isCalendarView && (
+                            <div className="max-lg:hidden ml-2">
+                                <MonthYearSlider />
+                            </div>
+                        )}
                     </div>
-                    {/* Mobile: Help + bell in the top row */}
                     {role && (
-                        <div className="flex items-center gap-2 lg:hidden">
+                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={openHelp}
                                 aria-label="Help: tutorials, guides and demo"
-                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white"
+                                className="inline-flex h-9 items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 text-sm font-medium hover:bg-gray-50"
                             >
-                                <HiOutlineQuestionMarkCircle size={20} aria-hidden="true" />
+                                <HiOutlineQuestionMarkCircle size={18} aria-hidden="true" />
+                                <span className="max-lg:hidden">Help</span>
                             </button>
                             <HeaderNotificationBell />
                         </div>
                     )}
                 </div>
-                <div className="max-lg:hidden flex items-center gap-4">
-                    <MonthYearSlider />
-                </div>
-                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2">
-                    {isMobileOrTabScreen && <MonthYearPicker />}
-                    {role && (
-                        <div className="flex flex-wrap items-center gap-2">
-                            {/* CSS, not the JS width (0 on the first render), decides which copy
-                                of Help + bell shows - otherwise both appear on small screens. */}
-                            <div className="max-lg:hidden flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={openHelp}
-                                    className="inline-flex h-10 items-center gap-1 rounded-full border border-gray-200 bg-white px-3 text-sm font-medium hover:bg-gray-50"
-                                >
-                                    <HiOutlineQuestionMarkCircle size={18} aria-hidden="true" />
-                                    Help
-                                </button>
-                                <HeaderNotificationBell />
+                {role && (
+                    // Phones: two rows (calendar + availability side by side, Add below)
+                    // instead of three full-width rows.
+                    <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
+                        {isCalendarView && isMobileOrTabScreen && (
+                            <div className="col-span-2">
+                                <MonthYearPicker />
                             </div>
-                            <Button onClick={openAvailability} title={SCHEDULE_LABELS.scheduleAvailability} customClassName={secondaryBtn} />
-                            <Button onClick={focusCalendarSection} title={SCHEDULE_LABELS.viewCalendar} customClassName={secondaryBtn} />
-                            <Button
-                                onClick={openAddSession}
-                                title="Add New Session"
-                                customClassName="!bg-black !text-[14px] !font-medium !text-white rounded-full !py-2 !px-3 max-lg:flex-1 lg:flex-initial"
-                            />
-                        </div>
-                    )}
-                </div>
+                        )}
+                        <button type="button" onClick={toggleCalendar} className={actionBtn}>
+                            {isCalendarView ? (
+                                <>
+                                    <HiOutlineArrowLeft size={16} aria-hidden="true" />
+                                    Back to my schedule
+                                </>
+                            ) : (
+                                <>
+                                    <HiOutlineCalendarDays size={16} aria-hidden="true" />
+                                    {SCHEDULE_LABELS.viewCalendar}
+                                </>
+                            )}
+                        </button>
+                        <button type="button" onClick={openAvailability} className={actionBtn}>
+                            {SCHEDULE_LABELS.scheduleAvailability}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={openAddSession}
+                            className={`${actionBtn} col-span-2 !border-black !bg-black !text-white hover:!bg-gray-900`}
+                        >
+                            <HiOutlinePlus size={16} aria-hidden="true" />
+                            Add New Session
+                        </button>
+                    </div>
+                )}
             </div>
             {isMobileOrTabScreen && (
                 <SideModal isOpen={isSideNavBarOpen}>

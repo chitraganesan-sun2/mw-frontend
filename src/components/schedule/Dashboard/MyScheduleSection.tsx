@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import dayjs from "dayjs";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
@@ -48,6 +48,16 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         });
         return groups;
     }, [active.data, role]);
+
+    // Open on the first tab that has sessions (once per Upcoming/Past switch), rather than
+    // an empty "Posted" tab while e.g. Direct has bookings. Manual tab picks are respected.
+    const autoPicked = useRef<string | null>(null);
+    useEffect(() => {
+        if (!active.data || autoPicked.current === when) return;
+        autoPicked.current = when;
+        const firstWithItems = TABS.find((tab) => byTab[tab].length > 0);
+        if (firstWithItems) setActiveTab(firstWithItems);
+    }, [active.data, byTab, when]);
 
     const onTabKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
         const index = TABS.indexOf(activeTab);

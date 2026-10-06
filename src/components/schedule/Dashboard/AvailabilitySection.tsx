@@ -8,14 +8,81 @@ import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { showToast } from "@/components/common/Toast";
 import { useConfirm } from "@/hooks/useConfirm";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { formatSessionDate, formatSessionTime, getStatusPillClass } from "@/utils/sessionDisplay";
+import {
+    canJoinSession,
+    formatSessionDate,
+    formatSessionTime,
+    getLocalSessionBounds,
+    getStatusLabel,
+    getStatusPillClass,
+} from "@/utils/sessionDisplay";
+import { joinNames } from "@/utils/joinNames";
+import { safeHref } from "@/utils/safeHref";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
-import ScheduleSessionCard from "./ScheduleSessionCard";
 import OneTimeSlotEditModal, { type OneTimeSlot } from "./OneTimeSlotEditModal";
 import { SessionListSkeleton } from "./MyScheduleSection";
 import { SCHEDULE_LABELS, getVolunteerSlotGroup, type ScheduleRole } from "./scheduleCategories";
 
 const DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+/** Rows shown per volunteer session list before "Show all". */
+const COLLAPSED_ROWS = 3;
+
+/** One-line row for the volunteer's "Slots I'm Offering / I've Taken" lists. These used to
+ * repeat the full session card (already shown in My Schedule), doubling the page length. */
+function CompactSessionRow({
+    session,
+    timeZoneLabel,
+    onOpenProfile,
+}: {
+    session: ScheduleSession;
+    timeZoneLabel?: string;
+    onOpenProfile: (userId: string) => void;
+}) {
+    const learnerName = joinNames(session.learner_first_name, session.learner_last_name);
+    const bounds = getLocalSessionBounds(session.volunteer_start_date, session.volunteer_start_time, session.volunteer_end_time);
+    const joinHref = safeHref(session.meet_link);
+    const showJoin = Boolean(joinHref) && canJoinSession(session, bounds?.end);
+    return (
+        <li className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm">
+            <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{session.session_title || "Session"}</p>
+                <p className="text-xs text-gray-600">
+                    {bounds ? bounds.start.format("MMM D") : formatSessionDate(session.volunteer_start_date)} ·{" "}
+                    {formatSessionTime(session.volunteer_start_time)}
+                    {timeZoneLabel ? ` ${timeZoneLabel}` : ""}
+                    {learnerName && session.learner_id && (
+                        <>
+                            {" "}·{" "}
+                            <button
+                                type="button"
+                                onClick={() => onOpenProfile(session.learner_id as string)}
+                                aria-label={`View ${learnerName}'s profile`}
+                                className="underline decoration-gray-300 underline-offset-2 hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
+                            >
+                                {learnerName}
+                            </button>
+                        </>
+                    )}
+                </p>
+            </div>
+            <span className="flex items-center gap-2">
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass(session.status)}`}>
+                    {getStatusLabel(session.status)}
+                </span>
+                {showJoin && (
+                    <a
+                        href={joinHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white hover:opacity-90"
+                    >
+                        Join
+                    </a>
+                )}
+            </span>
+        </li>
+    );
+}
 
 interface WeeklySlot {
     start_time: string;
@@ -65,6 +132,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
     const { confirm, confirmModal } = useConfirm();
     const [editing, setEditing] = useState<OneTimeSlot | null>(null);
     const [newDate, setNewDate] = useState("");
+    const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     const weekly = useQuery({
         queryKey: weeklyKey(role),
@@ -145,9 +213,23 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             ) : sessions.length === 0 ? (
                 <p className="text-sm text-gray-600">{empty}</p>
             ) : (
-                sessions.map((s) => (
-                    <ScheduleSessionCard key={s.session_id} session={s} role={role} timeZoneLabel={timeZoneLabel} onOpenProfile={onOpenProfile} />
-                ))
+                <>
+                    <ul className="flex flex-col divide-y divide-gray-100 rounded-lg border border-gray-200">
+                        {(expanded[title] ? sessions : sessions.slice(0, COLLAPSED_ROWS)).map((s) => (
+                            <CompactSessionRow key={s.session_id} session={s} timeZoneLabel={timeZoneLabel} onOpenProfile={onOpenProfile} />
+                        ))}
+                    </ul>
+                    {sessions.length > COLLAPSED_ROWS && (
+                        <button
+                            type="button"
+                            aria-expanded={Boolean(expanded[title])}
+                            onClick={() => setExpanded((e) => ({ ...e, [title]: !e[title] }))}
+                            className="self-start text-xs font-medium underline bg-transparent border-0 p-0 cursor-pointer"
+                        >
+                            {expanded[title] ? "Show fewer" : `Show all ${sessions.length}`}
+                        </button>
+                    )}
+                </>
             )}
         </div>
     );
