@@ -7,7 +7,7 @@ import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 /**
  * Pops a toast when the unread chat-message count goes up while the user is elsewhere in
  * the app - previously a new message only showed up if they happened to open Messages.
- * Not on first load (that's existing mail, already badged in the sidebar), and not while
+ * Not for the first loaded count (that's existing mail, already badged in the sidebar), nor while
  * they are already on the Messages page.
  */
 const NewMessageAlert = () => {
@@ -16,6 +16,7 @@ const NewMessageAlert = () => {
     const previous = useRef<number | null>(null);
 
     useEffect(() => {
+        if (unreadMessages === undefined) return; // not loaded yet - no baseline
         const before = previous.current;
         previous.current = unreadMessages;
         if (before === null) return;

@@ -30,5 +30,7 @@ export function useUnreadMessages() {
         refetchInterval: 30000,
     });
 
-    return { unreadMessages: data ?? 0, role };
+    // undefined until the first response arrives - consumers must not read "not loaded yet"
+    // as 0 (NewMessageAlert would treat the first real count as a jump and toast on login).
+    return { unreadMessages: data, role };
 }

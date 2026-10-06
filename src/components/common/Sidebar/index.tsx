@@ -80,7 +80,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
             href: "/messages",
             text: "Messages",
             icon: <MessageIcon />,
-            badge: unreadMessages,
+            badge: unreadMessages ?? 0,
         },
         {
             href: "/settings",
