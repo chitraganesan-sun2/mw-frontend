@@ -144,7 +144,7 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
 
     const activeTabStyle = variant === 'learner'
         ? "bg-[#DFF5FF] text-black border border-[#09BAEE]"
-        : "bg-[#FFE9D4] text-black border border-[#FE5B11]";
+        : "bg-[#FFE9D4] text-black border border-primary";
 
     return (
         <div className="w-full pt-4 lg:pt-8 flex flex-col gap-2 p-4 animate-fadeIn">

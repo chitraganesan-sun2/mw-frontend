@@ -17,7 +17,7 @@ interface TutorialLink {
 const categoryIcons: Record<string, React.ReactNode> = {
     video: <FiVideo className="text-blue-500" size={18} />,
     doc: <FiFileText className="text-green-500" size={18} />,
-    guide: <FiBookOpen className="text-orange-500" size={18} />,
+    guide: <FiBookOpen className="text-orange-700" size={18} />,
 };
 
 const TutorialLinks = () => {
