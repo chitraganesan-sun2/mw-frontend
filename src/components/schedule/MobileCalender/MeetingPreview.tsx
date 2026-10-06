@@ -18,6 +18,7 @@ import { getApiErrorMessage } from "@/utils/apiError";
 import { useSendData } from "@/hooks/useReactQuery";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
 import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import { getStatusLabel, getStatusPillClass } from "@/utils/sessionDisplay";
 
 interface MobileMeetingPreviewModalProps {
     data: any;
@@ -161,9 +162,11 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
             value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Session Completed</p> : <button type="button" onClick={handleFeedBack} className="text-sm underline text-primary bg-transparent border-0 p-0 cursor-pointer">Complete Feedback</button>
         }
         const statusMap = {
-            pending: { label: "Status", value: <p className="text-orange-700 text-sm">Pending</p> },
-            rejected: { label: "Status", value: <p className="text-red-700 text-sm">Unavailable</p> },
-            accepted: { label: "Status", value: <p className="text-green-700 text-sm">Accepted</p> },
+            // Same labels/colours as everywhere else (utils/sessionDisplay); "rejected" used
+            // to read "Unavailable" here only.
+            pending: { label: "Status", value: <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass("pending")}`}>{getStatusLabel("pending")}</span> },
+            rejected: { label: "Status", value: <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass("rejected")}`}>{getStatusLabel("rejected")}</span> },
+            accepted: { label: "Status", value: <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass("accepted")}`}>{getStatusLabel("accepted")}</span> },
             completed: feedBackStatus,
         };
 

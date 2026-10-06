@@ -13,6 +13,7 @@ import { POST_API, GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "@/components/common/Toast";
 import { getCookie } from "@/utils/auth";
+import { getStatusLabel, getStatusPillClass } from "@/utils/sessionDisplay";
 import { useQueryClient } from "@tanstack/react-query";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { cn } from "@/utils/merge-class";
@@ -54,28 +55,24 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
     const queryClient = useQueryClient();
     const learnerId = getCookie("learner_id");
     const statusConfig = {
-        available: {
-            bg: "!bg-[#DCFCE7]",
-            text: "!text-[#16A34A]",
-            label: "Available",
-        },
-        claimed: {
-            bg: "!bg-[#DFF5FF]",
-            text: "!text-[#0096CC]",
-            label: "Claimed",
-        },
+        available: { className: getStatusPillClass("available"), label: getStatusLabel("available") },
+        claimed: { className: getStatusPillClass("booked"), label: getStatusLabel("booked") },
     };
 
     const status = statusConfig[session.status] || statusConfig.available;
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
     const [isValidated, setIsValidated] = useState<boolean>(true);
+    // The server's reason when a claim isn't allowed (today: a time overlap with another of
+    // the learner's sessions). There is no one-session-per-day limit any more.
+    const [validationMessage, setValidationMessage] = useState<string | null>(null);
     const [isCheckingValidation, setIsCheckingValidation] = useState(false);
 
     // Reset validation state when modal closes
     useEffect(() => {
         if (!isOpen) {
             setIsValidated(true);
+            setValidationMessage(null);
             setIsCheckingValidation(false);
         }
     }, [isOpen]);
@@ -86,6 +83,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                 setIsCheckingValidation(true);
                 // Reset to default state before checking
                 setIsValidated(true);
+                setValidationMessage(null);
 
                 try {
                     const sessionDate = session.date || "";
@@ -109,13 +107,13 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
 
                     if (typeof isValid === "boolean") {
                         setIsValidated(isValid);
+                        setValidationMessage(isValid ? null : res?.data?.error_message || null);
                     }
                 } catch (error) {
                     console.error("Validation check failed:", error);
                     // Don't fail-closed on a transient error - let the learner attempt the
                     // claim; the claim endpoint re-validates and will reject if it's truly
-                    // not allowed. Fail-closed here blocked ALL claims on any hiccup and
-                    // showed a misleading "you've already claimed one session" note.
+                    // not allowed. Fail-closed here blocked ALL claims on any hiccup.
                     setIsValidated(true);
                 } finally {
                     setIsCheckingValidation(false);
@@ -221,7 +219,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
             <h2 className="text-[20px] font-medium text-[#121212] flex-1 pr-2">{session.title}</h2>
             <TagComponent
                 text={status.label}
-                tagClassName={`${status.bg} ${status.text} !border-none !px-3 !py-1 !text-sm !font-medium`}
+                tagClassName={`${status.className} !border-none !px-3 !py-1 !text-sm !font-medium`}
             />
         </div>
     );
@@ -308,11 +306,10 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                 </div>
             </div>
             {session.status === "available" && displayNote && (
-                <div className="bg-[#FEF9C3] rounded-lg p-4 mb-1">
-                    <p className="text-sm text-[#A16207] leading-relaxed">
-                        <span className="font-semibold text-[#A16207] text-sm">Note:</span> You've
-                        already claimed one session. You can claim another starting 30 minutes before
-                        the session begins, if it hasn't been claimed by someone else.
+                <div role="status" className="bg-[#FEF9C3] rounded-lg p-4 mb-1">
+                    <p className="text-sm text-[#713F12] leading-relaxed">
+                        <span className="font-semibold text-sm">Note:</span>{" "}
+                        {validationMessage || "This session overlaps with another session in your schedule."}
                     </p>
                 </div>
             )}

@@ -25,7 +25,16 @@ import { useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import {
+    canJoinSession,
+    formatDuration,
+    formatSessionDate,
+    formatSessionTime,
+    getDurationMinutes,
+    getLocalSessionBounds,
+    getStatusLabel,
+    getStatusPillClass,
+} from "@/utils/sessionDisplay";
 
 export interface Session {
     id: string;
@@ -60,9 +69,11 @@ function mapItemToSession(item: any, date: string): Session {
     const desc = item.description ?? item.session_description ?? "";
     const startTimeRaw = item.start_time ?? item.learner_start_time ?? item.startTime ?? "00:00";
     const endTimeRaw = item.end_time ?? item.learner_end_time ?? item.endTime ?? "00:00";
-    const startTime = formatTime12h(startTimeRaw);
-    const endTime = formatTime12h(endTimeRaw);
-    const duration = item.duration ?? formatDuration(startTimeRaw, endTimeRaw);
+    const startTime = formatSessionTime(startTimeRaw);
+    const endTime = formatSessionTime(endTimeRaw);
+    const duration = formatDuration(
+        typeof item.duration === "number" ? item.duration : getDurationMinutes(startTimeRaw, endTimeRaw)
+    );
     const timezone =
         item.volunteer_timezone?.split(" - ")[0] ?? item.learner_timezone?.split(" - ")[0] ?? "";
     const instructorName =
@@ -115,39 +126,9 @@ function mapItemToSession(item: any, date: string): Session {
     };
 }
 
-function formatTime12h(time: string): string {
-    if (!time) return "12:00 am";
-    const [h = 0, m = 0] = String(time).split(":").map(Number);
-    const period = h >= 12 ? "pm" : "am";
-    const hour = h % 12 || 12;
-    return `${hour}:${String(m).padStart(2, "0")} ${period}`;
-}
 
-function formatDuration(start: string, end: string): string {
-    const [sh, sm] = String(start).split(":").map(Number);
-    const [eh, em] = String(end).split(":").map(Number);
-    const mins = (eh - sh) * 60 + (em - sm);
-    if (mins >= 60) return `${Math.floor(mins / 60)} Hr`;
-    return `${mins} mins`;
-}
 
-const REQUEST_STATUS_LABELS: Record<string, string> = {
-    pending: "Pending",
-    accepted: "Accepted",
-    active: "Active",
-    completed: "Completed",
-    cancelled: "Cancelled",
-    expired: "Expired",
-};
 
-const REQUEST_STATUS_STYLES: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    accepted: "bg-blue-100 text-blue-800",
-    active: "bg-green-100 text-green-700",
-    completed: "bg-gray-100 text-blue-700",
-    cancelled: "bg-red-100 text-red-700",
-    expired: "bg-gray-100 text-gray-500",
-};
 
 const REQUESTS_PAGE_SIZE = 5;
 
@@ -162,8 +143,8 @@ function RequestedSessionCard({
     onCancel: (requestId: string) => void;
     onView: (sessionId: string) => void;
 }) {
-    const statusClass = REQUEST_STATUS_STYLES[request.status] ?? "bg-gray-100 text-gray-700";
-    const statusLabel = REQUEST_STATUS_LABELS[request.status] ?? request.status;
+    const statusClass = getStatusPillClass(request.status);
+    const statusLabel = getStatusLabel(request.status);
     const canCancelPending = request.status === "pending";
     const canView = Boolean(request.session_id) && request.status !== "pending";
 
@@ -202,10 +183,9 @@ function RequestedSessionCard({
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
-                    {formatDisplayDate(request.availability_date)} @{" "}
-                    {dayjs(request.availability_start_time, "HH:mm").format("h:mm a")}
+                    {formatSessionDate(request.availability_date)} · {formatSessionTime(request.availability_start_time)}
                 </span>
-                <span className="text-gray-400">({request.duration} mins)</span>
+                <span className="text-gray-500">· {formatDuration(request.duration)}</span>
             </div>
             <div className="mt-4 flex justify-end gap-3">
                 {canView && (
@@ -373,12 +353,17 @@ export default function InstantSessionsPage() {
             setSessionDetail({
                 title: apiData?.title ?? session.title,
                 description: apiData?.description ?? session.description,
-                dateLabel: apiData?.date ?? session.date,
+                dateLabel: formatSessionDate(apiData?.date ?? session.date),
                 timeLabel: apiData?.start_time && apiData?.end_time
-                    ? `${formatTime12h(apiData.start_time)} - ${formatTime12h(apiData.end_time)}`
-                    : `${session.startTime} - ${session.endTime}`,
+                    ? `${formatSessionTime(apiData.start_time)} – ${formatSessionTime(apiData.end_time)}`
+                    : `${session.startTime} – ${session.endTime}`,
                 hostName: apiData?.volunteer_name ?? session.instructor.name,
                 meetLink: apiData?.meet_link,
+                endsAt: getLocalSessionBounds(
+                    apiData?.date ?? session.date,
+                    apiData?.start_time ?? session.start_time_24,
+                    apiData?.end_time ?? session.end_time_24
+                )?.end,
                 status: "accepted",
                 cancelAction: "unclaim",
                 identifier: session.id,
@@ -419,12 +404,17 @@ export default function InstantSessionsPage() {
             setSessionDetail({
                 title: apiData?.session_title,
                 description: apiData?.session_description,
-                dateLabel: apiData?.learner_start_date,
+                dateLabel: formatSessionDate(apiData?.learner_start_date),
                 timeLabel: apiData?.learner_start_time && apiData?.learner_end_time
-                    ? `${formatTime12h(apiData.learner_start_time)} - ${formatTime12h(apiData.learner_end_time)}`
+                    ? `${formatSessionTime(apiData.learner_start_time)} – ${formatSessionTime(apiData.learner_end_time)}`
                     : undefined,
                 hostName: apiData?.volunteer_full_name,
                 meetLink: apiData?.meet_link,
+                endsAt: getLocalSessionBounds(
+                    apiData?.learner_start_date,
+                    apiData?.learner_start_time,
+                    apiData?.learner_end_time
+                )?.end,
                 status: apiData?.status,
                 cancelAction: ["completed", "cancelled", "expired"].includes(apiData?.status) ? "none" : "cancel",
                 identifier: sessionId,
@@ -650,7 +640,8 @@ export default function InstantSessionsPage() {
                             customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
                             onClick={() => setSessionDetail(null)}
                         />
-                        {sessionDetail?.meetLink && (
+                        {sessionDetail &&
+                            canJoinSession({ status: sessionDetail.status, meet_link: sessionDetail.meetLink }, sessionDetail.endsAt) && (
                             <a
                                 href={sessionDetail.meetLink}
                                 target="_blank"

@@ -136,7 +136,7 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                 // session_details branch above instead) - was previously indistinguishable
                 // from a plain open-availability slot below.
                 events.push({
-                    title: slot.title || "Instant Session (Open)",
+                    title: slot.title || "Posted instant session",
                     date: dayDate,
                     start: dayjs(`${dayDate} ${slot.start_time}`).format(),
                     end: dayjs(`${dayDate} ${slot.end_time}`).format(),

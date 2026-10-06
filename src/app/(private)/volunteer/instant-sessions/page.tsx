@@ -22,7 +22,15 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import {
+    canJoinSession,
+    formatDuration,
+    formatSessionDate,
+    formatSessionTime,
+    getLocalSessionBounds,
+    getStatusLabel,
+    getStatusPillClass,
+} from "@/utils/sessionDisplay";
 
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
@@ -34,25 +42,7 @@ dayjs.extend(customParseFormat);
 const START_SESSION_BTN_CLASS =
     "bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity";
 
-const REQUEST_STATUS_LABELS: Record<string, string> = {
-    pending: "Pending",
-    open: "Open",
-    accepted: "Accepted",
-    active: "Active",
-    completed: "Completed",
-    cancelled: "Cancelled",
-    expired: "Expired",
-};
 
-const REQUEST_STATUS_STYLES: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    open: "bg-amber-100 text-amber-800",
-    accepted: "bg-blue-100 text-blue-800",
-    active: "bg-green-100 text-green-700",
-    completed: "bg-gray-100 text-blue-700",
-    cancelled: "bg-red-100 text-red-700",
-    expired: "bg-gray-100 text-gray-500",
-};
 
 const MY_SESSIONS_STATUS_FILTERS = ["", "open", "accepted", "active", "completed", "cancelled", "expired"];
 
@@ -66,19 +56,13 @@ function getTimeAgo(dateString?: string): string {
     return `${Math.floor(diffHours / 24)}d ago`;
 }
 
-/** "HH:mm" -> "4:00 pm", matching the learner page; falls back to the raw value. */
-function formatTime(time?: string): string {
-    if (!time) return "";
-    const t = dayjs(time, "HH:mm");
-    return t.isValid() ? t.format("h:mm a") : time;
-}
 
 function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isActionLoading: boolean; onAccept: (id: string) => void }) {
     return (
         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <div className="flex justify-between items-start mb-2">
                 <h3 className="font-semibold text-lg">{req.learner_name}</h3>
-                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">Pending Request</span>
+                <span className={`${getStatusPillClass("pending")} text-xs px-2 py-1 rounded-full font-medium`}>{getStatusLabel("pending")}</span>
             </div>
             <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === "academic" ? "Academic" : "Arts & Life Skills"}</p>
             <p className="text-sm text-gray-600 mb-2">Level: {req.grade_level || req.expertise_level || "N/A"}</p>
@@ -98,10 +82,9 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
-                    {formatDisplayDate(req.availability_date)} @{" "}
-                    {formatTime(req.availability_start_time)}
+                    {formatSessionDate(req.availability_date)} · {formatSessionTime(req.availability_start_time)}
                 </span>
-                <span className="text-gray-400">({req.duration} mins)</span>
+                <span className="text-gray-500">· {formatDuration(req.duration)}</span>
             </div>
             <div className="mt-4 flex justify-end">
                 <button
@@ -131,8 +114,8 @@ function MySessionCard({
     onCancel: (sessionId: string) => void;
     onWithdraw: (volunteerSlotId: string) => void;
 }) {
-    const statusClass = REQUEST_STATUS_STYLES[session.status] ?? "bg-gray-100 text-gray-700";
-    const statusLabel = REQUEST_STATUS_LABELS[session.status] ?? session.status;
+    const statusClass = getStatusPillClass(session.status);
+    const statusLabel = getStatusLabel(session.status);
     const isLive = session.status === "accepted" || session.status === "active";
     const isOpen = session.status === "open";
 
@@ -158,7 +141,7 @@ function MySessionCard({
             )}
             <div className="flex items-center justify-between pt-3 border-t border-gray-50 mb-3">
                 <span className="text-xs text-gray-400">
-                    {formatDisplayDate(session.volunteer_start_date)} @ {formatTime(session.volunteer_start_time)}
+                    {formatSessionDate(session.volunteer_start_date)} · {formatSessionTime(session.volunteer_start_time)}
                 </span>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -411,7 +394,7 @@ export default function VolunteerInstantSessionsPage() {
                     >
                         {MY_SESSIONS_STATUS_FILTERS.map((s) => (
                             <option key={s} value={s}>
-                                {s ? REQUEST_STATUS_LABELS[s] : "All statuses"}
+                                {s ? getStatusLabel(s) : "All statuses"}
                             </option>
                         ))}
                     </select>
@@ -523,7 +506,15 @@ export default function VolunteerInstantSessionsPage() {
                             customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
                             onClick={() => setSessionDetail(null)}
                         />
-                        {sessionDetail?.meet_link && (
+                        {sessionDetail &&
+                            canJoinSession(
+                                sessionDetail,
+                                getLocalSessionBounds(
+                                    sessionDetail.volunteer_start_date,
+                                    sessionDetail.volunteer_start_time,
+                                    sessionDetail.volunteer_end_time
+                                )?.end
+                            ) && (
                             <a href={sessionDetail.meet_link} target="_blank" rel="noopener noreferrer" className="flex-1">
                                 <Button title="Join" btnVariant="secondary" customClassName="w-full" />
                             </a>
@@ -552,8 +543,8 @@ export default function VolunteerInstantSessionsPage() {
                         {sessionDetail.session_description && <p>{sessionDetail.session_description}</p>}
                         <p>
                             <span className="font-medium">When: </span>
-                            {formatDisplayDate(sessionDetail.volunteer_start_date)},{" "}
-                            {formatTime(sessionDetail.volunteer_start_time)} - {formatTime(sessionDetail.volunteer_end_time)}
+                            {formatSessionDate(sessionDetail.volunteer_start_date)} ·{" "}
+                            {formatSessionTime(sessionDetail.volunteer_start_time)} – {formatSessionTime(sessionDetail.volunteer_end_time)}
                         </p>
                         {sessionDetail.learner_full_name && (
                             <p>

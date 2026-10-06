@@ -2,12 +2,12 @@
 
 import React from "react";
 import Image from "next/image";
-import dayjs from "dayjs";
 import TagComponent from "@/components/common/Tag";
 import { TimeIcon } from "@/assets/icons";
 import DummyProfileImg from "@/assets/images/dummy-profile.webp";
 import PersonImg from "@/assets/images/Person.png";
 import { onEnterOrSpace } from "@/utils/a11y";
+import { canJoinSession, formatSessionDate, getLocalSessionBounds, getStatusLabel, getStatusPillClass } from "@/utils/sessionDisplay";
 
 interface SessionCardProps {
     session: {
@@ -23,6 +23,9 @@ interface SessionCardProps {
         date?: string;
         meetLink?: string;
         claimedByMe?: boolean;
+        /** 24h local times, used to hide Join once the session has ended. */
+        start_time_24?: string;
+        end_time_24?: string;
         instructor: {
             name: string;
             profilePicture?: string;
@@ -31,32 +34,14 @@ interface SessionCardProps {
     onClick: () => void;
 }
 
-// The instant-sessions list combines today + tomorrow into one feed - a plain time no longer
-// tells you which day a card is for, so label it the same way the old single-date picker did.
-const dayLabel = (date?: string) => {
-    if (!date) return "";
-    const today = dayjs().format("YYYY-MM-DD");
-    const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
-    if (date === today) return "Today";
-    if (date === tomorrow) return "Tomorrow";
-    return dayjs(date).format("DD MMM");
-};
-
 const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
-    const statusConfig = {
-        available: {
-            bg: "!bg-[#DCFCE7]",
-            text: "!text-[#16A34A]",
-            label: "Available",
-        },
-        claimed: {
-            bg: "!bg-[#DFF5FF]",
-            text: "!text-[#0096CC]",
-            label: "Claimed",
-        },
-    };
-
-    const status = statusConfig[session.status] || statusConfig.available;
+    // "claimed" is shown as "Booked" - one status vocabulary across the app (sessionDisplay).
+    const status = { label: getStatusLabel(session.status), className: getStatusPillClass(session.status) };
+    const endsAt = getLocalSessionBounds(session.date, session.start_time_24, session.end_time_24)?.end;
+    const showJoin =
+        session.status === "claimed" &&
+        session.claimedByMe &&
+        canJoinSession({ status: "booked", meet_link: session.meetLink }, endsAt);
 
     return (
         <div
@@ -71,7 +56,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                 <h2 className="text-[20px] font-medium text-[#121212] flex-1 pr-2">{session.title}</h2>
                 <TagComponent
                     text={status.label}
-                    tagClassName={`${status.bg} ${status.text} !border-none !px-3 !py-1 md:!text-sm !text-[12px] !font-medium`}
+                    tagClassName={`${status.className} !border-none !px-3 !py-1 md:!text-sm !text-[12px] !font-medium`}
                 />
             </div>
 
@@ -104,8 +89,9 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                         </div>
                     
                     <span className="text-[16px] font-medium text-black whitespace-nowrap">
-                        {dayLabel(session.date) && `${dayLabel(session.date)}, `}
-                        {session.startTime} - {session.endTime} {session.timezone} ({session.duration})
+                        {session.date && `${formatSessionDate(session.date)} · `}
+                        {session.startTime} – {session.endTime} {session.timezone}
+                        {session.duration && ` · ${session.duration}`}
                     </span>
                 </div>
 
@@ -127,7 +113,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
 
             {/* Join - shown directly on the learner's own claimed cards, below the time,
                 so they don't have to open the detail modal to join. */}
-            {session.status === "claimed" && session.claimedByMe && session.meetLink && (
+            {showJoin && (
                 <a
                     href={session.meetLink}
                     target="_blank"
