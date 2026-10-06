@@ -6,7 +6,6 @@ import AvailabilitySection from "./AvailabilitySection";
 import CalendarLegend from "./CalendarLegend";
 import MyScheduleSection from "./MyScheduleSection";
 import type { ScheduleRole } from "./scheduleCategories";
-import { shortTimeZone } from "@/utils/sessionDisplay";
 
 interface ScheduleDashboardLayoutProps {
     role: ScheduleRole;
@@ -43,7 +42,8 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     onRetry,
     calendar,
 }) => {
-    const tz = shortTimeZone(timeZoneLabel);
+    // Raw profile label; each row resolves the in-effect abbreviation for its own date.
+    const tz = timeZoneLabel;
 
     if (isCalendarView) {
         return (

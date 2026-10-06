@@ -34,6 +34,7 @@ import {
     getLocalSessionBounds,
     getStatusLabel,
     getStatusPillClass,
+    shortTimeZone,
 } from "@/utils/sessionDisplay";
 
 export interface Session {
@@ -75,7 +76,7 @@ function mapItemToSession(item: any, date: string): Session {
         typeof item.duration === "number" ? item.duration : getDurationMinutes(startTimeRaw, endTimeRaw)
     );
     const timezone =
-        item.volunteer_timezone?.split(" - ")[0] ?? item.learner_timezone?.split(" - ")[0] ?? "";
+        shortTimeZone(item.volunteer_timezone ?? item.learner_timezone, item.date ?? date);
     const instructorName =
         item.volunteer_full_name ?? item.instructor?.name ?? item.volunteer_name ?? "Instructor";
     const rawTags = Array.isArray(item.tags)
@@ -92,6 +93,10 @@ function mapItemToSession(item: any, date: string): Session {
                 : t?.skill_name ?? t?.name ?? (t?.skill_id != null ? String(t.skill_id) : "")
         )
         .filter(Boolean);
+    // The level the volunteer is teaching at (grade or Beginner/Intermediate/Expert) - shown
+    // alongside the skill, like "Level" on the learner's own request cards.
+    const level: string = item.grade_level || item.expertise_level || "";
+    if (level) tags.push(level.charAt(0).toUpperCase() + level.slice(1));
     const isClaimed =
         item.is_accepted === true || item.status === "claimed" || item.status === "accepted";
     const startDateTime =

@@ -15,6 +15,7 @@ import {
     getLocalSessionBounds,
     getStatusLabel,
     getStatusPillClass,
+    shortTimeZone,
 } from "@/utils/sessionDisplay";
 import { joinNames } from "@/utils/joinNames";
 import { safeHref } from "@/utils/safeHref";
@@ -49,7 +50,7 @@ function CompactSessionRow({
                 <p className="text-xs text-gray-600">
                     {bounds ? bounds.start.format("MMM D") : formatSessionDate(session.volunteer_start_date)} ·{" "}
                     {formatSessionTime(session.volunteer_start_time)}
-                    {timeZoneLabel ? ` ${timeZoneLabel}` : ""}
+                    {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, session.volunteer_start_date)}` : ""}
                     {learnerName && session.learner_id && (
                         <>
                             {" "}·{" "}
@@ -287,7 +288,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                     <span className="font-medium">Every {day}</span>
                                     <span className="text-gray-700">
                                         {" "}· {formatSessionTime(slot.start_time)} – {formatSessionTime(slot.end_time)}
-                                        {timeZoneLabel ? ` ${timeZoneLabel}` : ""}
+                                        {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel)}` : ""}
                                     </span>
                                 </span>
                                 <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
@@ -301,7 +302,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                     <span className="font-medium">{formatSessionDate(slot.date)}</span>
                                     <span className="text-gray-700">
                                         {" "}· {formatSessionTime(slot.start_time)} – {formatSessionTime(slot.end_time)}
-                                        {timeZoneLabel ? ` ${timeZoneLabel}` : ""}
+                                        {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, slot.date)}` : ""}
                                     </span>
                                 </span>
                                 <span className="flex items-center gap-2">

@@ -15,6 +15,7 @@ import {
     getLocalSessionBounds,
     getStatusLabel,
     getStatusPillClass,
+    shortTimeZone,
 } from "@/utils/sessionDisplay";
 import type { ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
 import type { ScheduleRole } from "./scheduleCategories";
@@ -101,7 +102,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
 
             <p className="text-xs text-gray-700">
                 <span className="font-medium text-gray-900">{formatSessionDate(date) || "Date not set"}</span>
-                {timeRange && <span> · {timeRange}{timeZoneLabel ? ` ${timeZoneLabel}` : ""}</span>}
+                {timeRange && <span> · {timeRange}{timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, date)}` : ""}</span>}
                 {duration && <span> · {duration}</span>}
             </p>
 

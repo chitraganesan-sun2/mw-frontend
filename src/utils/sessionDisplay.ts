@@ -1,7 +1,13 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(advancedFormat);
 
 /**
  * One vocabulary for session / slot states across the app. Before this, the same state
@@ -125,11 +131,32 @@ export function getLocalSessionBounds(date?: string | null, start?: string | nul
     return { start: startAt, end: startAt.add(minutes, "minute") };
 }
 
-/** Profile timezone labels look like "EST - Eastern Standard Time (UTC-05:00)"; cards show
- * just the abbreviation. */
-export function shortTimeZone(label?: string | null): string {
+// Profile abbreviations -> IANA zones, for daylight-saving-aware labels.
+const ABBR_TO_IANA: Record<string, string> = {
+    AKST: "America/Anchorage", AKDT: "America/Anchorage",
+    AST: "America/Halifax", ADT: "America/Halifax",
+    CST: "America/Chicago", CDT: "America/Chicago", CT: "America/Chicago",
+    EST: "America/New_York", EDT: "America/New_York", ET: "America/New_York",
+    HST: "Pacific/Honolulu", HDT: "Pacific/Honolulu",
+    MST: "America/Denver", MDT: "America/Denver", MT: "America/Denver",
+    NST: "America/St_Johns", NDT: "America/St_Johns",
+    PST: "America/Los_Angeles", PDT: "America/Los_Angeles", PT: "America/Los_Angeles",
+    IST: "Asia/Kolkata",
+};
+
+/**
+ * Profile timezone labels look like "EST - Eastern Standard Time (UTC-05:00)". Show the
+ * abbreviation in effect on `date` (EST -> EDT in summer), so every form and card agrees -
+ * cards used to print the stored "EST" while the forms showed "EDT" for the same user.
+ * `date` (YYYY-MM-DD) defaults to today; pass the session's date for a session.
+ */
+export function shortTimeZone(label?: string | null, date?: string | null): string {
     if (!label) return "";
-    return label.split(" - ")[0].trim();
+    const abbr = label.split(" - ")[0].trim();
+    const iana = ABBR_TO_IANA[abbr];
+    if (!iana) return abbr;
+    const at = date ? dayjs.tz(`${date} 12:00`, iana) : dayjs().tz(iana);
+    return at.isValid() ? at.format("z") : abbr;
 }
 
 // ---------------------------------------------------------------- join rule
