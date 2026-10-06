@@ -10,6 +10,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import CommitActionBar from "@/components/common/Input/Picker/CommitActionBar";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -58,6 +59,8 @@ interface Skill {
 }
 
 const DURATIONS = [15, 30, 45, 60];
+// Matches the backend's NewInstantSessionRequestModel.session_details max_length.
+const DETAILS_MAX_LENGTH = 2000;
 
 const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     isOpen,
@@ -92,6 +95,12 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     const [time, setTime] = useState<string>("");
     const [duration, setDuration] = useState<number>(30);
     const [sessionDetails, setSessionDetails] = useState<string>("");
+    const [errors, setErrors] = useState<{ details?: string; time?: string }>({});
+    // Controlled picker + draft value: see CommitActionBar. The draft starts on a sensible
+    // default (next 5 minutes today, 9:00 AM tomorrow) so the clock never opens on an
+    // empty "-- : --" header with OK doing nothing.
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [draftTime, setDraftTime] = useState<dayjs.Dayjs | null>(null);
 
     // The picker carries a full datetime anchored to the selected date in the learner's
     // timezone, so MUI's `disablePast` greys out only the genuinely past slots for
@@ -108,6 +117,27 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         setTime("");
         setDuration(30);
         setSessionDetails("");
+        setErrors({});
+    };
+
+    const defaultDraft = () => {
+        if (date === todayStr) {
+            const now = learnerTz ? dayjs().tz(learnerTz) : dayjs();
+            const rounded = Math.ceil((now.minute() + 1) / 5) * 5;
+            return now.minute(0).second(0).millisecond(0).add(rounded, "minute");
+        }
+        return makeInTz(`${date}T09:00`);
+    };
+
+    const commitDraftTime = () => {
+        setPickerOpen(false);
+        if (!draftTime) return;
+        if (date === todayStr && draftTime.isBefore(dayjs())) {
+            setErrors((e) => ({ ...e, time: "That time has already passed. Please pick a later time." }));
+            return;
+        }
+        setTime(draftTime.format("HH:mm"));
+        setErrors((e) => ({ ...e, time: undefined }));
     };
 
     const handleClose = () => {
@@ -128,6 +158,11 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             showToast({ message: "Please select a level", type: "error" });
             return;
         }
+        if (!sessionDetails.trim()) {
+            setErrors((e) => ({ ...e, details: "Please describe the session details and expectations." }));
+            showToast({ message: "Please describe the session details and expectations", type: "error" });
+            return;
+        }
         if (!date || !time) {
             showToast({ message: "Please select both date and time", type: "error" });
             return;
@@ -139,6 +174,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         // isBefore compares absolute instants, so a fresh dayjs() is correct regardless
         // of zone - and re-reading the clock here avoids a stale render-time value.
         if (date === todayStr && makeInTz(`${date}T${time}`).isBefore(dayjs())) {
+            setErrors((e) => ({ ...e, time: "That time has already passed. Please pick a later time." }));
             showToast({ message: "Start time can't be in the past", type: "error" });
             return;
         }
@@ -153,7 +189,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 skill_ids: selectedSkills.map((s) => s.skill_id),
                 grade_level: sessionType === "academic" ? level : null,
                 expertise_level: sessionType === "non_academic" ? level : null,
-                session_details: sessionDetails.trim() || null,
+                session_details: sessionDetails.trim(),
             };
 
             const res = await POST_API(endpoints.session.createLearnerInstantSessionRequest, payload);
@@ -281,14 +317,50 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                     </div>
                 )}
 
+                {/* Session details and expectations - required (volunteers decide from this). */}
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="request-session-details" className="text-base font-medium text-[#121212]">
+                        Session Details and Expectations from Volunteers <span aria-hidden="true">*</span>
+                    </label>
+                    <textarea
+                        id="request-session-details"
+                        value={sessionDetails}
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.details)}
+                        aria-describedby={errors.details ? "request-session-details-error" : "request-session-details-hint"}
+                        maxLength={DETAILS_MAX_LENGTH}
+                        onChange={(e) => {
+                            setSessionDetails(e.target.value);
+                            if (e.target.value.trim()) setErrors((er) => ({ ...er, details: undefined }));
+                        }}
+                        placeholder="Let the volunteer know what you're hoping to cover or any specific expectations"
+                        rows={3}
+                        className={`w-full px-4 py-3 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] resize-none ${errors.details ? "border-red-600" : "border-gray-200"}`}
+                    />
+                    {errors.details ? (
+                        <p id="request-session-details-error" role="alert" className="text-sm text-red-700">
+                            {errors.details}
+                        </p>
+                    ) : (
+                        <p id="request-session-details-hint" className="text-xs text-gray-500">
+                            Required · {sessionDetails.length}/{DETAILS_MAX_LENGTH}
+                        </p>
+                    )}
+                </div>
+
                 {/* Date & Time */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-2">
-                        <label className="text-base font-medium text-[#121212]">Date</label>
+                        <label htmlFor="request-session-date" className="text-base font-medium text-[#121212]">Date</label>
                         <input
+                            id="request-session-date"
                             type="date"
                             value={date}
-                            onChange={(e) => setDate(e.target.value)}
+                            onChange={(e) => {
+                                setDate(e.target.value);
+                                setErrors((er) => ({ ...er, time: undefined }));
+                            }}
                             min={todayStr}
                             max={tomorrowStr}
                             className="w-full h-12 px-4 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212]"
@@ -303,16 +375,33 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                 format="h:mm A"
                                 minutesStep={5}
                                 timezone={learnerTz || undefined}
-                                value={timeValue}
-                                referenceDate={date === todayStr ? nowInTz : makeInTz(`${date}T09:00`)}
-                                // disablePast is evaluated live against "now"; the submit
-                                // guard re-checks with a fresh clock. (No stale minTime prop.)
+                                value={pickerOpen ? draftTime : timeValue}
+                                open={pickerOpen}
+                                onOpen={() => {
+                                    setDraftTime(timeValue ?? defaultDraft());
+                                    setPickerOpen(true);
+                                }}
+                                // Backdrop / Escape: discard the draft, keep the committed time.
+                                onClose={() => setPickerOpen(false)}
+                                onChange={(value) => setDraftTime(value)}
+                                closeOnSelect={false}
+                                // disablePast is evaluated live against "now"; OK and the
+                                // submit guard re-check with a fresh clock.
                                 disablePast={date === todayStr}
-                                onChange={(value) => setTime(value ? value.format("HH:mm") : "")}
+                                slots={{ actionBar: CommitActionBar }}
                                 slotProps={{
+                                    actionBar: {
+                                        onCancelClick: () => setPickerOpen(false),
+                                        onAcceptClick: commitDraftTime,
+                                    } as any,
                                     textField: {
+                                        id: "request-session-time",
                                         placeholder: "Select time",
                                         fullWidth: true,
+                                        error: Boolean(errors.time),
+                                        inputProps: {
+                                            "aria-describedby": errors.time ? "request-session-time-error" : undefined,
+                                        },
                                         InputProps: {
                                             sx: {
                                                 height: 48,
@@ -327,6 +416,11 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                 }}
                             />
                         </LocalizationProvider>
+                        {errors.time && (
+                            <p id="request-session-time-error" role="alert" className="text-sm text-red-700">
+                                {errors.time}
+                            </p>
+                        )}
                     </div>
                 </div>
 
@@ -349,20 +443,6 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                             </button>
                         ))}
                     </div>
-                </div>
-
-                {/* Session Details and Expectations from Volunteers */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-base font-medium text-[#121212]">
-                        Session Details and Expectations from Volunteers
-                    </label>
-                    <textarea
-                        value={sessionDetails}
-                        onChange={(e) => setSessionDetails(e.target.value)}
-                        placeholder="Let the volunteer know what you're hoping to cover or any specific expectations"
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] resize-none"
-                    />
                 </div>
 
                 {/* Actions */}

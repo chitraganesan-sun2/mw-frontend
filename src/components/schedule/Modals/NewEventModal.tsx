@@ -7,9 +7,8 @@ import Button from "@/components/common/Button";
 import TagComponent from "@/components/common/Tag";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { PickersActionBarProps } from "@mui/x-date-pickers/PickersActionBar";
-import MuiButton from "@mui/material/Button";
-import DialogActions from "@mui/material/DialogActions";
+// Commits the displayed time on OK - see CommitActionBar for the MUI onAccept quirk.
+import CommitActionBar from "@/components/common/Input/Picker/CommitActionBar";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -73,10 +72,10 @@ export interface NewEventData {
 }
 
 const durationOptions = [
-    { label: "15 mins", value: "15" },
-    { label: "30 mins", value: "30" },
-    { label: "45 mins", value: "45" },
-    { label: "1 hour", value: "60" },
+    { label: "15 min", value: "15" },
+    { label: "30 min", value: "30" },
+    { label: "45 min", value: "45" },
+    { label: "1 hr", value: "60" },
     // { label: "1.5 hours", value: "90" },
     // { label: "2 hours", value: "120" },
 ];
@@ -115,27 +114,6 @@ const timezoneMapping: Record<string, string> = {
     ET: "America/New_York",
     IST: "Asia/Kolkata",
 };
-
-// MUI's OK button only calls `onAccept` when its internal "published" value differs
-// from its "committed" value - but the onOpen handler below seeds a default time
-// straight into the controlled `value` prop, which MUI treats as already
-// published+committed in that same pass. So clicking OK without first touching the
-// clock face never fires `onAccept`, and the field silently reverts on close. A
-// custom action bar sidesteps that internal diffing and always commits whatever is
-// currently displayed. (Same root cause as OnetImeScheduleModal.tsx's time picker.)
-function StartTimeActionBar(props: PickersActionBarProps) {
-    const { className } = props;
-    const { onCancelClick, onAcceptClick } = props as unknown as {
-        onCancelClick: () => void;
-        onAcceptClick: () => void;
-    };
-    return (
-        <DialogActions className={className}>
-            <MuiButton onClick={onCancelClick}>Cancel</MuiButton>
-            <MuiButton onClick={onAcceptClick}>OK</MuiButton>
-        </DialogActions>
-    );
-}
 
 export default function NewEventModal({
     isOpen,
@@ -235,6 +213,7 @@ export default function NewEventModal({
                 description: "",
                 tags: [],
             });
+            setDescriptionError(null);
             setAcademicSelectValue(null);
             setNonAcademicSelectValue(null);
             setSelectedAcademic([]);
@@ -387,7 +366,9 @@ export default function NewEventModal({
         setFormData((prev) => ({ ...prev, title: Array.isArray(value) ? value[0] : value }));
     };
 
+    const [descriptionError, setDescriptionError] = useState<string | null>(null);
     const handleDescriptionChange = (value: string) => {
+        if (value.trim()) setDescriptionError(null);
         setFormData((prev) => ({ ...prev, description: value }));
     };
 
@@ -488,8 +469,18 @@ export default function NewEventModal({
     };
 
     const handleSubmit = async () => {
-        if (!formData.duration || !formData.start_time || !formData.title?.trim()) {
-            showToast({ message: "Please fill in Duration, start time and title", type: "error" });
+        if (!formData.title?.trim()) {
+            showToast({ message: "Please enter a title", type: "error" });
+            return;
+        }
+        // Required: learners decide whether to claim from this (the backend enforces it too).
+        if (!formData.description?.trim()) {
+            setDescriptionError("Please describe what this session will cover.");
+            showToast({ message: "Please add a description", type: "error" });
+            return;
+        }
+        if (!formData.duration || !formData.start_time) {
+            showToast({ message: "Please choose a date, start time and duration", type: "error" });
             return;
         }
         if (selectedAcademic.length === 0 && selectedNonAcademic.length === 0) {
@@ -593,7 +584,7 @@ export default function NewEventModal({
             duration: Number(formData.duration) || 0,
             start_time: formData.start_time,
             title: formData.title.trim(),
-            description: formData.description?.trim() ?? "",
+            description: formData.description.trim(),
             // Union of both pickers - each skill_id already carries its own academic /
             // non_academic category in the skills catalog, so downstream stays unchanged.
             tag_ids: allSelected.map((s) => s.skill_id),
@@ -638,6 +629,7 @@ export default function NewEventModal({
             description: "",
             tags: [],
         });
+        setDescriptionError(null);
         setSelectedAcademic([]);
         setSelectedNonAcademic([]);
         setAcademicSelectValue(null);
@@ -686,6 +678,112 @@ export default function NewEventModal({
                 bodyClassName="md:!px-6 !p-[20px]"
             >
                 <div className="flex flex-col gap-5 max-md:gap-5">
+                    {/* Title */}
+                    <div className="flex flex-col gap-2">
+                        <Input
+                            name="title"
+                            label="Title"
+                            inputType="text"
+                            value={formData.title}
+                            onChange={handleTitleChange}
+                            placeholder="Enter title here"
+                            labelClassName="!text-base !font-medium !text-[#121212]"
+                            inputClassName="w-full !h-12 !rounded-xl !border-gray-200 hover:!border-gray-400 focus:!border-black !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
+                        />
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex flex-col gap-2">
+                        <Input
+                            name="description"
+                            label="Description"
+                            required
+                            error={descriptionError ?? undefined}
+                            inputType="textarea"
+                            value={formData.description}
+                            onChange={handleDescriptionChange}
+                            placeholder="Enter description here"
+                            labelClassName="!text-base !font-medium !text-[#121212]"
+                            inputClassName="w-full !h-[100px] !rounded-xl !border-gray-200 hover:!border-gray-400 focus:!border-black !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
+                            rows={4}
+                        />
+                    </div>
+
+                    {/* Academic Skills – tags from the academic skills catalog */}
+                    <div className="flex flex-col md:gap-2">
+                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
+                            Academic Skills
+                        </label>
+                        <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
+                            {selectedAcademic.map((skill) => (
+                                <TagComponent
+                                    key={skill.skill_id}
+                                    text={skill.skill_name}
+                                    isClose={true}
+                                    onClose={() => handleRemoveSkill("academic", skill.skill_id)}
+                                />
+                            ))}
+                        </div>
+                        <Input
+                            key={`academic-select-${selectedAcademic.length}`}
+                            name="academic_skill_select"
+                            inputType="select-creatable"
+                            variant="single"
+                            placeholder="Search and select academic skills or create a new tag"
+                            value={academicSelectValue ? [academicSelectValue] : []}
+                            onChange={(value: string | number) => {
+                                if (value != null && value !== "") {
+                                    handleAddSkill("academic", String(value));
+                                }
+                            }}
+                            onCreate={(name: string) => handleCreateSkill("academic", name)}
+                            allowCreate={true}
+                            endpoint="skills"
+                            isLoading={isCreatingSkill}
+                            options={toOptions(academicSkills, selectedAcademic)}
+                            inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
+                        />
+                    </div>
+
+                    {/* Non-Academic Skills – tags from the non-academic skills catalog */}
+                    <div className="flex flex-col md:gap-2">
+                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
+                            Non-Academic Skills
+                        </label>
+                        <p className="text-xs text-gray-500 mb-1 md:-mt-1">
+                            Add at least one Academic or Non-Academic Skill.
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
+                            {selectedNonAcademic.map((skill) => (
+                                <TagComponent
+                                    key={skill.skill_id}
+                                    text={skill.skill_name}
+                                    isClose={true}
+                                    onClose={() => handleRemoveSkill("non_academic", skill.skill_id)}
+                                />
+                            ))}
+                        </div>
+                        <Input
+                            key={`non-academic-select-${selectedNonAcademic.length}`}
+                            name="non_academic_skill_select"
+                            inputType="select-creatable"
+                            variant="single"
+                            placeholder="Search and select non-academic skills or create a new tag"
+                            value={nonAcademicSelectValue ? [nonAcademicSelectValue] : []}
+                            onChange={(value: string | number) => {
+                                if (value != null && value !== "") {
+                                    handleAddSkill("non_academic", String(value));
+                                }
+                            }}
+                            onCreate={(name: string) => handleCreateSkill("non_academic", name)}
+                            allowCreate={true}
+                            endpoint="skills"
+                            isLoading={isCreatingSkill}
+                            options={toOptions(nonAcademicSkills, selectedNonAcademic)}
+                            inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
+                        />
+                    </div>
+
                     {/* Select Date */}
                     <div className="flex flex-col gap-2">
                         <Input
@@ -792,7 +890,7 @@ export default function NewEventModal({
                                     }}
                                     shouldDisableTime={shouldDisableTime}
                                     closeOnSelect={false}
-                                    slots={{ actionBar: StartTimeActionBar }}
+                                    slots={{ actionBar: CommitActionBar }}
                                     slotProps={{
                                         actionBar: {
                                             onCancelClick: () => setIsTimePickerOpen(false),
@@ -848,110 +946,6 @@ export default function NewEventModal({
                                 />
                             </LocalizationProvider>
                         </div>
-                    </div>
-
-                    {/* Title */}
-                    <div className="flex flex-col gap-2">
-                        <Input
-                            name="title"
-                            label="Title"
-                            inputType="text"
-                            value={formData.title}
-                            onChange={handleTitleChange}
-                            placeholder="Enter title here"
-                            labelClassName="!text-base !font-medium !text-[#121212]"
-                            inputClassName="w-full !h-12 !rounded-xl !border-gray-200 hover:!border-gray-400 focus:!border-black !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
-                        />
-                    </div>
-
-                    {/* Description */}
-                    <div className="flex flex-col gap-2">
-                        <Input
-                            name="description"
-                            label="Description (Optional)"
-                            inputType="textarea"
-                            value={formData.description}
-                            onChange={handleDescriptionChange}
-                            placeholder="Enter description here"
-                            labelClassName="!text-base !font-medium !text-[#121212]"
-                            inputClassName="w-full !h-[100px] !rounded-xl !border-gray-200 hover:!border-gray-400 focus:!border-black !text-base !text-[#121212] placeholder:!text-[#808080] placeholder:!text-base"
-                            rows={4}
-                        />
-                    </div>
-
-                    {/* Academic Skills – tags from the academic skills catalog */}
-                    <div className="flex flex-col md:gap-2">
-                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
-                            Academic Skills
-                        </label>
-                        <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
-                            {selectedAcademic.map((skill) => (
-                                <TagComponent
-                                    key={skill.skill_id}
-                                    text={skill.skill_name}
-                                    isClose={true}
-                                    onClose={() => handleRemoveSkill("academic", skill.skill_id)}
-                                />
-                            ))}
-                        </div>
-                        <Input
-                            key={`academic-select-${selectedAcademic.length}`}
-                            name="academic_skill_select"
-                            inputType="select-creatable"
-                            variant="single"
-                            placeholder="Search and select academic skills or create a new tag"
-                            value={academicSelectValue ? [academicSelectValue] : []}
-                            onChange={(value: string | number) => {
-                                if (value != null && value !== "") {
-                                    handleAddSkill("academic", String(value));
-                                }
-                            }}
-                            onCreate={(name: string) => handleCreateSkill("academic", name)}
-                            allowCreate={true}
-                            endpoint="skills"
-                            isLoading={isCreatingSkill}
-                            options={toOptions(academicSkills, selectedAcademic)}
-                            inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
-                        />
-                    </div>
-
-                    {/* Non-Academic Skills – tags from the non-academic skills catalog */}
-                    <div className="flex flex-col md:gap-2">
-                        <label className="md:text-base text-[14px] font-medium text-[#121212]">
-                            Non-Academic Skills
-                        </label>
-                        <p className="text-xs text-gray-500 mb-1 md:-mt-1">
-                            Add at least one Academic or Non-Academic Skill.
-                        </p>
-                        <div className="flex flex-wrap gap-2 mb-2 md:mb-0">
-                            {selectedNonAcademic.map((skill) => (
-                                <TagComponent
-                                    key={skill.skill_id}
-                                    text={skill.skill_name}
-                                    isClose={true}
-                                    onClose={() => handleRemoveSkill("non_academic", skill.skill_id)}
-                                />
-                            ))}
-                        </div>
-                        <Input
-                            key={`non-academic-select-${selectedNonAcademic.length}`}
-                            name="non_academic_skill_select"
-                            inputType="select-creatable"
-                            variant="single"
-                            placeholder="Search and select non-academic skills or create a new tag"
-                            value={nonAcademicSelectValue ? [nonAcademicSelectValue] : []}
-                            onChange={(value: string | number) => {
-                                if (value != null && value !== "") {
-                                    handleAddSkill("non_academic", String(value));
-                                }
-                            }}
-                            onCreate={(name: string) => handleCreateSkill("non_academic", name)}
-                            allowCreate={true}
-                            endpoint="skills"
-                            isLoading={isCreatingSkill}
-                            options={toOptions(nonAcademicSkills, selectedNonAcademic)}
-                            inputClassName="w-full !h-12 !rounded-xl [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-gray-200 [&_.ant-select-selector]:!text-base"
-                        />
                     </div>
 
                     {/* Action Buttons */}

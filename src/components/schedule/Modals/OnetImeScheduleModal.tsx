@@ -10,9 +10,8 @@ import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { PickersActionBarProps } from "@mui/x-date-pickers/PickersActionBar";
-import Button from "@mui/material/Button";
-import DialogActions from "@mui/material/DialogActions";
+// Commits the displayed time on OK - see CommitActionBar for the MUI onAccept quirk.
+import CommitActionBar from "@/components/common/Input/Picker/CommitActionBar";
 import { useAppStore } from "@/store/useAppStore";
 import TrashIcon from "@/assets/icons/TrashIcon";
 import AddSlotIcon from "@/assets/icons/AddSlotIcon";
@@ -73,26 +72,6 @@ interface Slot {
     volunteer_slot_id?: string;
 }
 
-// MUI's own OK button only calls `onAccept` when the *committed* value differs
-// from what it last considered "published" - but our default-time seeding (below,
-// in onOpen) sets the controlled `value` directly, which MUI treats as already
-// published+committed in the same pass. So clicking OK without first touching the
-// clock face never fires `onAccept` at all. A custom action bar sidesteps MUI's
-// internal diffing entirely and always commits whatever is currently displayed.
-function TimeSlotActionBar(props: PickersActionBarProps) {
-    const { className } = props;
-    const { onCancelClick, onAcceptClick } = props as unknown as {
-        onCancelClick: () => void;
-        onAcceptClick: () => void;
-    };
-    return (
-        <DialogActions className={className}>
-            <Button onClick={onCancelClick}>Cancel</Button>
-            <Button onClick={onAcceptClick}>OK</Button>
-        </DialogActions>
-    );
-}
-
 // Hoisted out of OnetImeScheduleModal: defining this inline in the parent's render
 // body would give it a new function identity on every parent re-render (e.g. the
 // header's unread-count poll), forcing React to unmount/remount it - which silently
@@ -140,7 +119,7 @@ const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
                     setTempTime(value ? dayjs.tz(value, "HH:mm", volunteerTimezone || "UTC") : null);
                 }}
                 closeOnSelect={false}
-                slots={{ actionBar: TimeSlotActionBar }}
+                slots={{ actionBar: CommitActionBar }}
                 shouldDisableTime={(timeValue: dayjs.Dayjs, clockType: string) => {
                     const nowInTz = getNowInVolunteerTimezone();
                     const isToday = currentDate === nowInTz.format("YYYY-MM-DD");
