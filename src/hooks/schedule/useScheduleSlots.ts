@@ -6,6 +6,7 @@ import { showToast } from "@/components/common/Toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSendData } from "@/hooks/useReactQuery";
 import { convertToUTC, generateTimeSlotId } from "@/utils/timeFunctions";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 export type ScheduleRole = "volunteer" | "learner";
 
@@ -374,7 +375,11 @@ export function useScheduleSlots({
             setDeletedSlots([]);
             onSaveSuccess?.();
         },
-        error: () => { },
+        // A rejected save (e.g. the backend's overlap / one-hour validation) used to fail
+        // silently - the request rejects before handleSave's own status check runs.
+        error: (err) => {
+            showToast({ message: getApiErrorMessage(err, "Failed to update schedule"), type: "error" });
+        },
     });
 
     const hasErrors = () => Object.values(errors).some((dayErrors) => dayErrors.length > 0);

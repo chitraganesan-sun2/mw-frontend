@@ -52,6 +52,8 @@ export type EndpointProps = {
         deleteParticularSlot: string;
         getAvailableDaysForDate: (date: string) => string;
         createSlotForParticularDate: string;
+        listOneTimeSlots: string;
+        oneTimeSlot: (date: string, slotId: string) => string;
     };
     learner_slot: {
         update: string;
@@ -72,6 +74,7 @@ export type EndpointProps = {
         withdrawInstantSession: (volunteer_slot_id: string) => string;
         getLearnerSessions: (id: string) => string;
         getVolunteerSessions: (id: string) => string;
+        getScheduleSessions: (role: "learner" | "volunteer", id: string, when: "upcoming" | "past", size?: number) => string;
         downloadIcs: (sessionId: string) => string;
         cancelSession: (id: string) => string;
         getApprovalNotifications: (id: string) => string;
@@ -173,7 +176,6 @@ export type EndpointProps = {
     };
     tutorialLinks: {
         getAll: string;
-        getByCategory: (category: string) => string;
     };
     publicSessions: {
         getInstantSessions: (limit?: number) => string;

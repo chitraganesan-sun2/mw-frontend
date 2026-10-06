@@ -82,8 +82,11 @@ export const ALWAYS_ACCESSIBLE_ROUTES = ["/donate", "/donate/history", "/privacy
 
 export const PROTECTED_ROUTES = ["/learner", "/volunteer"];
 
+// The Schedule dashboard is the signed-in landing page for both roles (the learner used to
+// land on Instant Sessions). Onboarding / verification / admin redirects are decided above
+// this in getRedirectForRoute and are unaffected.
 export function getDefaultRouteForRole(role: Role): string {
-    return role === "learner" ? "/learner/instant-sessions" : "/volunteer/schedule";
+    return role === "learner" ? "/learner/schedule" : "/volunteer/schedule";
 }
 
 /**

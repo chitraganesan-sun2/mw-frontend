@@ -2,26 +2,31 @@
 
 import Button from "@/components/common/Button";
 import MonthYearSlider from "./MonthYearSlider";
-import { CalendarDayOne, CalendarIcon, NotificationIcon, SideMenuIcon } from "@/assets/icons";
-import { IoIosSearch } from "react-icons/io";
+import { CalendarIcon, SideMenuIcon } from "@/assets/icons";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
 import MonthYearPicker from "./MonthYearPicker";
 import SideModal from "@/components/common/Modals/MobileSideModal";
 import Sidebar from "@/components/common/Sidebar";
-import { useState } from "react";
-import { VIEW_DEMO_LINK, VIEW_DEMO_LINK_FOR_VOLUNTEER } from "@/definitions";
-import { safeHref } from "@/utils/safeHref";
-import { useIsFetching, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useIsFetching } from "@tanstack/react-query";
+import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
-import { GET_API } from "@/api/request";
-import { endpoints } from "@/api/constants";
-import { useEffect } from "react";
+import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
 
-type Props = {};
+export const CALENDAR_SECTION_ID = "my-calendar";
 
-const Header = (props: Props) => {
+/** Scroll the dashboard's calendar into view and move focus to it (keyboard/screen-reader
+ * users land on the calendar, not just see it scroll by). */
+export function focusCalendarSection() {
+    const el = document.getElementById(CALENDAR_SECTION_ID);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.focus({ preventScroll: true });
+}
+
+const Header = () => {
     // getCookie reads document.cookie, which isn't available during SSR - reading it
     // directly in render made the server's button set (learner vs volunteer) differ
     // from the client's, triggering a hydration mismatch on every schedule page load.
@@ -37,58 +42,22 @@ const Header = (props: Props) => {
     const fetchingVolunteerEvents = useIsFetching({ queryKey: ["volunteer-events"] });
     const isScheduleLoading = fetchingLearnerEvents > 0 || fetchingVolunteerEvents > 0;
 
-    const innerWidth = InnerWidth();
-    const isMobileOrTabScreen = innerWidth < 1024;
+    const isMobileOrTabScreen = InnerWidth() < 1024;
+    const isVolunteer = role === "volunteer";
 
-    const handleAddMeeting = () => {
-        router.push("/learner/schedule?modal=add_new_meeting");
-    };
+    const openAvailability = () =>
+        router.push(isVolunteer ? "/volunteer/schedule?modal=my_schedule" : "/learner/schedule?modal=my_availability");
+    const openAddSession = () =>
+        router.push(isVolunteer ? "/volunteer/schedule?modal=add_new_session" : "/learner/schedule?modal=add_new_meeting");
+    // Help lives in Resources (tutorials, guides, the demo) - no separate help content.
+    const openHelp = () => router.push(`/${isVolunteer ? "volunteer" : "learner"}/resources`);
 
-    const handleMyAvailability = () => {
-        router.push("/learner/schedule?modal=my_availability");
-    };
-
-    const handleMySchedule = () => {
-        router.push("/volunteer/schedule?modal=my_schedule");
-    };
-
-    const handleAddSessionVolunteer = () => {
-        router.push("/volunteer/schedule?modal=add_new_session");
-    };
-
-    // "View Demo" now opens the admin-managed Tutorial Link (category learner_demo /
-    // volunteer_demo - the same entry the approval emails use). The NEXT_PUBLIC_VIEW_DEMO_LINK*
-    // env var stays as a fallback for when the admin hasn't configured one yet.
-    const demoCategory = role === "volunteer" ? "volunteer_demo" : "learner_demo";
-    const envDemoFallback = role === "volunteer" ? VIEW_DEMO_LINK_FOR_VOLUNTEER : VIEW_DEMO_LINK;
-
-    const { data: adminDemoLink } = useQuery({
-        queryKey: ["tutorial-demo-link", demoCategory],
-        queryFn: async () => {
-            const res: any = await GET_API(endpoints.tutorialLinks.getByCategory(demoCategory));
-            const list = (Array.isArray(res?.data) ? res.data : [])
-                .slice()
-                .sort((a: any, b: any) => (b?.created_at || "").localeCompare(a?.created_at || ""));
-            return (list[0]?.url as string) || null;
-        },
-        enabled: role === "learner" || role === "volunteer",
-        staleTime: 5 * 60 * 1000,
-    });
-
-    const openDemo = () => {
-        const url = safeHref(adminDemoLink || envDemoFallback);
-        if (url && typeof window !== "undefined") {
-            window.open(url, "_blank", "noopener,noreferrer");
-        }
-    };
-
-    const handleViewDemo = openDemo;
-    const handleViewDemoforvolunteer = openDemo;
+    const secondaryBtn =
+        "!bg-white !border !border-gray-200 !text-[14px] !font-medium !text-black rounded-full !py-2 !px-3 max-lg:flex-1";
 
     return (
-        <div className={`w-full h-full p-2 px-3 lg:min-h-[10vh] ${isScheduleLoading ? "opacity-50 pointer-events-none grayscale" : ""}`}>
+        <div className={`w-full h-full p-2 px-3 lg:min-h-[10vh] ${isScheduleLoading ? "opacity-80" : ""}`}>
             <div className="w-full h-full flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-0 animate-fadeIn">
-                {/* Row 1 (mobile): menu + title + View Demo + Bell. Desktop: same row, no View Demo here */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
                         <button
@@ -99,99 +68,52 @@ const Header = (props: Props) => {
                         >
                             <SideMenuIcon height="22px" width="22px" />
                         </button>
-                        <Button
-                            onClick={() => { }}
-                            title={isMobileOrTabScreen ? "Schedule" : "My Schedule"}
-                            icon={isMobileOrTabScreen ? undefined : <CalendarIcon />}
-                            rootClassName="bg-transparent text-xl border-none font-medium shadow-none max-lg:!px-2"
-                        />
+                        <h1 className="flex items-center gap-2 text-xl font-medium px-2">
+                            {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
+                            Schedule
+                        </h1>
                     </div>
-                    {/* Mobile: View Demo + Bell (volunteer) in top row */}
-                    <div className="flex items-center gap-2 max-lg:flex lg:hidden">
-                        {role === "learner" && (
-                            <>
-                                <Button
-                                    onClick={handleViewDemo}
-                                    title="View Demo"
-                                    customClassName="!bg-transparent !text-sm !font-medium !text-[#33D0FD] md:!text-orange-500 md:hover:!text-orange-600 !border-none !shadow-none underline"
-                                />
-                                <HeaderNotificationBell />
-                            </>
-                        )}
-                        {role === "volunteer" && (
-                            <>
-                                <Button
-                                    onClick={handleViewDemoforvolunteer}
-                                    title="View Demo"
-                                    customClassName="!bg-transparent !text-sm !font-medium !text-orange-500 hover:!text-orange-600 !border-none !shadow-none underline"
-                                />
-                                <HeaderNotificationBell />
-                            </>
-                        )}
-                    </div>
-                </div>
-                {/* Desktop: MonthYearSlider */}
-                <div className="max-lg:hidden flex items-center gap-4">
-                    <MonthYearSlider
-                        onChange={(date) => {
-                        }}
-                    />
-                </div>
-                {/* Row 2 (mobile): date picker + search. Row 3 (mobile): action buttons. Desktop: single row */}
-                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2 lg:mt-0">
-                    {isMobileOrTabScreen && (
-                        <div className="flex items-center gap-2">
-                            <div className="flex-1 min-w-0">
-                                <MonthYearPicker />
-                            </div>
-                            <Button
-                                onClick={() => { }}
-                                icon={<IoIosSearch size={22} className="text-black" />}
-                                customClassName="!bg-white !rounded-full !border !border-gray-200 !p-2.5 !min-w-0"
-                            />
+                    {/* Mobile: Help + bell in the top row */}
+                    {role && (
+                        <div className="flex items-center gap-2 lg:hidden">
+                            <button
+                                type="button"
+                                onClick={openHelp}
+                                aria-label="Help: tutorials, guides and demo"
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white"
+                            >
+                                <HiOutlineQuestionMarkCircle size={20} aria-hidden="true" />
+                            </button>
+                            <HeaderNotificationBell />
                         </div>
                     )}
-                    {role === "learner" ? (
-                        <div className="flex items-center gap-2">
-                            {!isMobileOrTabScreen && <HeaderNotificationBell />}
+                </div>
+                <div className="max-lg:hidden flex items-center gap-4">
+                    <MonthYearSlider />
+                </div>
+                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2">
+                    {isMobileOrTabScreen && <MonthYearPicker />}
+                    {role && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {/* CSS, not the JS width (0 on the first render), decides which copy
+                                of Help + bell shows - otherwise both appear on small screens. */}
+                            <div className="max-lg:hidden flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={openHelp}
+                                    className="inline-flex h-10 items-center gap-1 rounded-full border border-gray-200 bg-white px-3 text-sm font-medium hover:bg-gray-50"
+                                >
+                                    <HiOutlineQuestionMarkCircle size={18} aria-hidden="true" />
+                                    Help
+                                </button>
+                                <HeaderNotificationBell />
+                            </div>
+                            <Button onClick={openAvailability} title={SCHEDULE_LABELS.scheduleAvailability} customClassName={secondaryBtn} />
+                            <Button onClick={focusCalendarSection} title={SCHEDULE_LABELS.viewCalendar} customClassName={secondaryBtn} />
                             <Button
-                                onClick={handleViewDemo}
-                                title="View Demo"
-                                customClassName="max-lg:hidden !bg-white max-lg:!text-sm !font-medium !text-black rounded-full p-1 lg:!p-3"
-                            />
-                            <Button
-                                onClick={handleMyAvailability}
-                                title="Schedule my Availability"
-                                customClassName="!bg-white !border !border-gray-200 !text-[14px] lg:!text-[16px] !font-medium !text-black rounded-full !py-2 lg:!py-3 lg:!px-3 max-lg:flex-1"
-                            />
-                            <Button
-                                onClick={handleAddMeeting}
+                                onClick={openAddSession}
                                 title="Add New Session"
-                                customClassName="!bg-black max-lg:!text-sm !font-medium !text-white rounded-full p-1 lg:!p-3 max-lg:flex-1 lg:flex-initial"
-                            />
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            {!isMobileOrTabScreen && (
-                                <div className="relative gap-2 flex items-center">
-                                    <Button
-                                        onClick={handleViewDemoforvolunteer}
-                                        title="View Demo"
-                                        customClassName="!bg-white max-lg:!text-sm !font-medium !text-black rounded-full lg:!p-3  !py-3 !px-3"
-                                    />
-                                    <HeaderNotificationBell />
-                                </div>
-                            )}
-                            {/* Same labels/styles as the learner's buttons above */}
-                            <Button
-                                onClick={handleMySchedule}
-                                title="Schedule my Availability"
-                                customClassName="!bg-white !border !border-gray-200 !text-[14px] lg:!text-[16px] !font-medium !text-black rounded-full !py-2 lg:!py-3 lg:!px-3 max-lg:flex-1"
-                            />
-                            <Button
-                                onClick={handleAddSessionVolunteer}
-                                title="Add New Session"
-                                customClassName="!bg-black max-lg:!text-sm !font-medium !text-white rounded-full p-1 lg:!p-3 max-lg:flex-1 lg:flex-initial"
+                                customClassName="!bg-black !text-[14px] !font-medium !text-white rounded-full !py-2 !px-3 max-lg:flex-1 lg:flex-initial"
                             />
                         </div>
                     )}

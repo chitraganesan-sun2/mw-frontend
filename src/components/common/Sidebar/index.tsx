@@ -90,8 +90,9 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     ];
 
     // Combine all links in the desired order
-    // For both roles: Instant Sessions, My Schedule, Role-based link, Resources, Community, Messages, Settings
-    const linksData = [instantSessionsLink, ...baseLinksData, roleBasedLink, ...remainingLinks];
+    // For both roles: My Schedule (the landing dashboard), Instant Sessions, Role-based link,
+    // Resources, Community, Messages, Settings
+    const linksData = [...baseLinksData, instantSessionsLink, roleBasedLink, ...remainingLinks];
 
     const handleSignOut = () => {
         // Fire-and-forget, and before clearCookies() - it needs the still-valid

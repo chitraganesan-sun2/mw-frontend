@@ -71,6 +71,11 @@ export const endpoints: EndpointProps = {
         deleteParticularSlot: `volunteer_slots/add_unavailable_slots`,
         getAvailableDaysForDate: (date: string) => `volunteer_slots/get_slots_by_date/${date}`,
         createSlotForParticularDate: `volunteer_slots/add_available_slots`,
+        /** GET the caller's upcoming date-specific slots (with is_booked). */
+        listOneTimeSlots: `volunteer_slots/one_time`,
+        /** PUT {start_time,end_time} / DELETE one date-specific slot. */
+        oneTimeSlot: (date: string, slotId: string) =>
+            `volunteer_slots/one_time/${encodeURIComponent(date)}/${encodeURIComponent(slotId)}`,
     },
     learner_slot: {
         update: "learner_slots",
@@ -101,6 +106,9 @@ export const endpoints: EndpointProps = {
             `session/instant_session/${volunteer_slot_id}`,
         getLearnerSessions: (id: string) => `session/learner/${id}`,
         getVolunteerSessions: (id: string) => `session/volunteer/${id}`,
+        /** Schedule dashboard: upcoming (pending+accepted, soonest first) or past sessions. */
+        getScheduleSessions: (role: "learner" | "volunteer", id: string, when: "upcoming" | "past", size = 100) =>
+            `session/${role}/${encodeURIComponent(id)}?when=${when}&page=1&size=${size}`,
         downloadIcs: (sessionId: string) => `session/${sessionId}/ics`,
         cancelSession: (id: string) => `session/${id}`,
         getApprovalNotifications: (id: string) => `session/pending_invites/${id}`,
@@ -211,7 +219,6 @@ export const endpoints: EndpointProps = {
     },
     tutorialLinks: {
         getAll: "tutorial-links/",
-        getByCategory: (category: string) => `tutorial-links/?category=${category}`,
     },
     publicSessions: {
         getInstantSessions: (limit?: number) => `session/public/instant_sessions${limit ? `?limit=${limit}` : ""}`,

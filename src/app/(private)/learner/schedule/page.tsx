@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
 import LearnerScheduleModal from "@/components/schedule/Modals/LearnerScheduleModal";
-import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
+import ScheduleDashboardLayout from "@/components/schedule/Dashboard/ScheduleDashboardLayout";
+import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useAppStore } from "@/store/useAppStore";
@@ -12,12 +13,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import { getCalendarEvents } from "@/utils/calender";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSendData } from "@/hooks/useReactQuery";
-import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import InnerWidth from "@/utils/innerWidth";
 import MobileCalender from "@/components/schedule/MobileCalender";
@@ -31,18 +31,25 @@ export default function LearnerSchedulePage() {
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
 
-    const { eventDetails, currentMonth, setLearnerUtcOffset, setLearnerTimeZone } = useAppStore();
+    const { eventDetails, currentMonth, setLearnerUtcOffset, setLearnerTimeZone, learnerTimeZone } = useAppStore();
     const queryClient = useQueryClient();
 
-    const [modal] = useQueryState("modal");
+    const [modal, setModal] = useQueryState("modal");
     const [presetDate] = useQueryState("date");
+    const [volunteerId, setVolunteerId] = useQueryState("volunteerId");
     const learnerId = getCookie("learner_id");
 
     const getEvents = () => getCalendarEvents(learnerId as string, "learner", currentMonth);
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ["learner-events", currentMonth],
         queryFn: getEvents,
+        // Wait for the header to put the URL's month in the store - fetching before that
+        // loaded the current month first, then the requested one.
+        enabled: Boolean(currentMonth),
+        // Keep showing the previous month while the next one loads, so the calendar stays
+        // mounted (and keeps its Week/Day view) when navigation crosses a month boundary.
+        placeholderData: keepPreviousData,
         // A volunteer accepting/declining happens in their own separate browser session -
         // query invalidation in the volunteer's client can't reach this learner's cache, so
         // this needs to self-refresh. Matches the header bell's existing 30s poll cadence.
@@ -59,7 +66,7 @@ export default function LearnerSchedulePage() {
         return null;
     };
 
-    const { data: learnerDetails } = useQuery<any>({
+    useQuery<any>({
         queryKey: ["learner-details", learnerId],
         queryFn: getLearnerDetails,
     });
@@ -91,8 +98,6 @@ export default function LearnerSchedulePage() {
             handleNavigate();
             queryClient.invalidateQueries({ queryKey: ["learner-events", currentMonth] });
         },
-        error: (err) => {
-        },
     });
 
     useEffect(() => {
@@ -103,34 +108,46 @@ export default function LearnerSchedulePage() {
 
     return (
         <>
-            <div className="w-full h-full animate-fadeIn">
-                <AcceptedSessionsList role="learner" />
-                {/* isLoading (first load / uncached month) - not isFetching, which is also true on
-                    every 30s background poll and was unmounting the whole calendar each time. */}
-                {isLoading ? (
-                    <LottieLoader isLoading={true} fullscreen={false} />
-                ) : isError ? (
-                    <div className="flex-center h-full w-full">Something went wrong loading your schedule.</div>
-                ) : isMobileOrTabScreen ? (
-                    <MobileCalender events={data || []} onDateSelect={handleDateSelect} />
-                ) : (
-                    <Calendar events={data || []} onDateSelect={handleDateSelect} />
-                )}
-                <AddNewMeetingModal
-                    isOpen={isOpenSchedule}
-                    onClose={handleNavigate}
-                    initialDate={presetDate}
-                />
-                <LearnerScheduleModal isOpen={isOpenAvailability} onClose={handleNavigate} />
-                <FeedbackModal
-                    mode="create"
-                    isOpen={isOpenFeedback}
-                    onClose={handleNavigate}
-                    onSubmit={onSave}
-                    data={eventDetails}
-                    Loading={isPending}
-                />
-            </div>
+            <ScheduleDashboardLayout
+                role="learner"
+                timeZoneLabel={learnerTimeZone}
+                onScheduleAvailability={() => setModal("my_availability")}
+                onOpenProfile={(id) => setVolunteerId(id)}
+                events={data}
+                isLoading={isLoading || !currentMonth}
+                isError={isError}
+                onRetry={() => refetch()}
+                calendar={
+                    isMobileOrTabScreen ? (
+                        <MobileCalender events={data || []} onDateSelect={handleDateSelect} />
+                    ) : (
+                        <Calendar events={data || []} onDateSelect={handleDateSelect} />
+                    )
+                }
+            />
+            {/* Volunteer profile from a session card. Hidden while Add New Session is open -
+                the profile's own "book a session" action routes through that modal. */}
+            <VolunteerViewModal
+                isOpen={!!volunteerId && modal !== "add_new_meeting"}
+                onClose={() => {
+                    setVolunteerId(null);
+                    setModal(null);
+                }}
+            />
+            <AddNewMeetingModal
+                isOpen={isOpenSchedule}
+                onClose={handleNavigate}
+                initialDate={presetDate}
+            />
+            <LearnerScheduleModal isOpen={isOpenAvailability} onClose={handleNavigate} />
+            <FeedbackModal
+                mode="create"
+                isOpen={isOpenFeedback}
+                onClose={handleNavigate}
+                onSubmit={onSave}
+                data={eventDetails}
+                Loading={isPending}
+            />
         </>
     );
 }

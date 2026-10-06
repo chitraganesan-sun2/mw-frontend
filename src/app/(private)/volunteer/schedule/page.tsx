@@ -3,20 +3,20 @@
 import dynamic from "next/dynamic";
 import MyScheduleModal from "@/components/schedule/Modals/MyScheduleModal";
 import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
-import AcceptedSessionsList from "@/components/schedule/AcceptedSessionsList";
+import ScheduleDashboardLayout from "@/components/schedule/Dashboard/ScheduleDashboardLayout";
+import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
 import { useAppStore } from "@/store/useAppStore";
 import { getCookie } from "@/utils/auth";
 import { getCalendarEvents } from "@/utils/calender";
 import { useSendData } from "@/hooks/useReactQuery";
-import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import MobileCalender from "@/components/schedule/MobileCalender";
 import InnerWidth from "@/utils/innerWidth";
@@ -30,18 +30,25 @@ export default function SchedulePage() {
     const queryClient = useQueryClient();
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
-    const { eventDetails, currentMonth, setVolunteerUtcOffset, setVolunteerTimeZone } =
+    const { eventDetails, currentMonth, setVolunteerUtcOffset, setVolunteerTimeZone, volunteerTimeZone } =
         useAppStore();
-    const [modal] = useQueryState("modal");
+    const [modal, setModal] = useQueryState("modal");
+    const [learnerId, setLearnerId] = useQueryState("learnerId");
     const volunteerId = getCookie("volunteer_id");
     const [isOpenOnetImeSchedule, setIsOpenOnetImeSchedule] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string>("");
 
     const getEvents = () => getCalendarEvents(volunteerId as string, "volunteer", currentMonth);
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ["volunteer-events", currentMonth],
         queryFn: getEvents,
+        // Wait for the header to put the URL's month in the store - fetching before that
+        // loaded the current month first, then the requested one.
+        enabled: Boolean(currentMonth),
+        // Keep showing the previous month while the next one loads, so the calendar stays
+        // mounted (and keeps its Week/Day view) when navigation crosses a month boundary.
+        placeholderData: keepPreviousData,
         // A learner booking/cancelling happens in their own separate browser session - query
         // invalidation in the learner's client can't reach this volunteer's cache, so this
         // needs to self-refresh. Matches the header bell's existing 30s poll cadence.
@@ -60,7 +67,7 @@ export default function SchedulePage() {
         return null;
     };
 
-    const { data: volunteerDetails } = useQuery<any>({
+    useQuery<any>({
         queryKey: ["volunteer-details", volunteerId],
         queryFn: getVolunteerDetails,
     });
@@ -94,8 +101,6 @@ export default function SchedulePage() {
             handleNavigate();
             queryClient.invalidateQueries({ queryKey: ["volunteer-events", currentMonth] });
         },
-        error: (err) => {
-        },
     });
 
     useEffect(() => {
@@ -105,19 +110,32 @@ export default function SchedulePage() {
     }, [modal]);
 
     return (
-        <div className="w-full h-full animate-fadeIn">
-            <AcceptedSessionsList role="volunteer" />
-            {/* isLoading (first load / uncached month) - not isFetching, which is also true on
-                every 30s background poll and was unmounting the whole calendar each time. */}
-            {isLoading ? (
-                <LottieLoader isLoading={true} fullscreen={false} />
-            ) : isError ? (
-                <div className="flex-center h-full w-full">Something went wrong loading your schedule.</div>
-            ) : isMobileOrTabScreen ? (
-                <MobileCalender events={data || []} onDateSelect={handleDateSelect} />
-            ) : (
-                <Calendar events={data || []} onDateSelect={handleDateSelect} />
-            )}
+        <>
+            <ScheduleDashboardLayout
+                role="volunteer"
+                timeZoneLabel={volunteerTimeZone}
+                onScheduleAvailability={() => setModal("my_schedule")}
+                onAddDateSlot={handleDateSelect}
+                onOpenProfile={(id) => setLearnerId(id)}
+                events={data}
+                isLoading={isLoading || !currentMonth}
+                isError={isError}
+                onRetry={() => refetch()}
+                calendar={
+                    isMobileOrTabScreen ? (
+                        <MobileCalender events={data || []} onDateSelect={handleDateSelect} />
+                    ) : (
+                        <Calendar events={data || []} onDateSelect={handleDateSelect} />
+                    )
+                }
+            />
+            <LearnerViewModal
+                isOpen={!!learnerId && modal !== "add_new_meeting"}
+                onClose={() => {
+                    setLearnerId(null);
+                    setModal(null);
+                }}
+            />
             <MyScheduleModal isOpen={isOpenSchedule} onClose={handleNavigate} />
             <AddNewMeetingModalVolunteer isOpen={isOpenAddSession} onClose={handleNavigate} />
             <FeedbackModal
@@ -134,6 +152,6 @@ export default function SchedulePage() {
                 isMobileScreen={isMobileOrTabScreen}
                 currentDate={selectedDate}
             />
-        </div>
+        </>
     );
 }

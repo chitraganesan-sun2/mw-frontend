@@ -83,8 +83,8 @@ const repeatOptions = [
 interface ScheduleSlotEditorProps extends UseScheduleSlotsResult { }
 
 // Pure presentational rendering of the day-card list, driven entirely by useScheduleSlots'
-// return value. No fetching, no modal chrome - MyScheduleModal wraps this in SideModal,
-// ScheduleAvailabilitySection renders it inline.
+// return value. No fetching, no modal chrome - MyScheduleModal / LearnerScheduleModal wrap
+// this in SideModal.
 const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
     days,
     schedule,

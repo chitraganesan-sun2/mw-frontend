@@ -18,6 +18,7 @@ import TrashIcon from "@/assets/icons/TrashIcon";
 import AddSlotIcon from "@/assets/icons/AddSlotIcon";
 import { generateTimeSlotId, extractTimezoneOffset } from "@/utils/timeFunctions";
 import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 import { Spin } from "antd";
 
 dayjs.extend(utc);
@@ -345,10 +346,13 @@ const OnetImeScheduleModal = ({
                 queryClient.invalidateQueries({
                     queryKey: ["availableDays", currentDate],
                 });
+                // Schedule dashboard's availability list (shares the editors' key prefix).
+                queryClient.invalidateQueries({ queryKey: ["volunteer_slot"] });
             })
             .catch((err) => {
+                // The backend re-validates (past time, overlap, > 1 hour) - say which.
                 showToast({
-                    message: "Error creating slots",
+                    message: getApiErrorMessage(err, "Error creating slots"),
                     type: "error",
                 });
             })
