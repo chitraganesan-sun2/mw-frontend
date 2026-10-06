@@ -167,6 +167,7 @@ export type EndpointProps = {
         getAllchatsOfLearner: (learnerId: string) => string;
         getIndividualChat: (chatId: string, type: "learner" | "volunteer") => string;
         readMessage: string;
+        unreadCount: string;
         volunteerPermission: (id: string) => string;
         learnerPermission: (id: string) => string;
     };

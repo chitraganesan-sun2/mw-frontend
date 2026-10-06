@@ -205,6 +205,7 @@ export const endpoints: EndpointProps = {
         getIndividualChat: (chatId: string, type: "learner" | "volunteer") =>
             `chat/chat/${chatId}/${type}`,
         readMessage: `chat/message/read`,
+        unreadCount: `chat/unread_count`,
         volunteerPermission: (id: string) => `volunteers/${id}/chat_permission`,
         learnerPermission: (id: string) => `learner/${id}/chat_permission`,
     },

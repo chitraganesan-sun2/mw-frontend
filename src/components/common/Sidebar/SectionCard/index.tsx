@@ -11,9 +11,12 @@ interface SectionCardProps {
     icon: React.ReactNode;
     textColor?: string;
     onClick?: () => void;
+    /** Unread count; renders nothing when 0/undefined. */
+    badge?: number;
 }
 
-const SectionCard = ({ href, text, icon, textColor, onClick }: SectionCardProps) => {
+const SectionCard = ({ href, text, icon, textColor, onClick, badge }: SectionCardProps) => {
+    const hasBadge = typeof badge === "number" && badge > 0;
     const pathname = usePathname();
     const isActive = pathname.includes(href);
     // getCookie reads document.cookie, which isn't available during SSR - reading it
@@ -34,6 +37,7 @@ const SectionCard = ({ href, text, icon, textColor, onClick }: SectionCardProps)
             <Link
                 href={finalHref}
                 onClick={onClick}
+                aria-label={hasBadge ? `${text}, ${badge} unread` : undefined}
                 className="flex items-start gap-2 lg:max-w-[150px] lg:w-full ml-[-1rem]"
             >
                 <span
@@ -51,6 +55,14 @@ const SectionCard = ({ href, text, icon, textColor, onClick }: SectionCardProps)
                 >
                     {text}
                 </p>
+                {hasBadge && (
+                    <span
+                        aria-hidden="true"
+                        className="ml-1 mt-0.5 min-w-[18px] rounded-full bg-red-600 px-1.5 text-center text-[11px] font-semibold leading-[18px] text-white animate-pulse"
+                    >
+                        {badge > 99 ? "99+" : badge}
+                    </span>
+                )}
             </Link>
         </div>
     );

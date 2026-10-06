@@ -1,6 +1,6 @@
 "use client";
 
-import NotificationIcon from "@/assets/icons/NotificationIcon";
+import { HiOutlineBell } from "react-icons/hi2";
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
@@ -67,13 +67,13 @@ const HeaderNotificationBell = () => {
         <>
             <button
                 type="button"
-                aria-label="Notifications"
+                aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
                 onClick={() => setIsOpen(true)}
                 className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white p-0 text-black transition-colors hover:bg-gray-50"
             >
-                <NotificationIcon width={18} height={18} />
+                <HiOutlineBell size={20} aria-hidden="true" />
                 {unreadCount > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 min-w-[16px] rounded-full bg-red-500 px-1 text-center text-[10px] font-semibold leading-4 text-white">
+                    <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 min-w-[16px] rounded-full bg-red-600 px-1 text-center text-[10px] font-semibold leading-4 text-white">
                         {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                 )}
@@ -82,15 +82,16 @@ const HeaderNotificationBell = () => {
             {/* Notification toast popup */}
             {showToast && (
                 <div
+                    role="status"
                     className="fixed top-5 right-5 z-[9999] flex items-center gap-3 rounded-2xl bg-white border border-gray-100 shadow-lg px-4 py-3 animate-slide-in-right"
                     style={{ minWidth: 260, maxWidth: 340 }}
                 >
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                        <NotificationIcon width={16} height={16} />
+                        <HiOutlineBell size={16} aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900">New Notification</p>
-                        <p className="text-xs text-gray-500 truncate">You have a new session request waiting.</p>
+                        <p className="text-xs text-gray-500 truncate">You have a new session update.</p>
                     </div>
                     <button
                         type="button"

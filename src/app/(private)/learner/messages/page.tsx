@@ -10,6 +10,7 @@ import MessageBubble from "@/components/messages/MessageBubble";
 import { Input } from "@/components/common/Input";
 import Button from "@/components/common/Button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { UNREAD_MESSAGES_QUERY_KEY } from "@/hooks/useUnreadMessages";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
@@ -423,6 +424,7 @@ const Messages = () => {
             message_ids: messageId,
         }).then((res: any) => {
             queryClient.invalidateQueries({ queryKey: ["chats"] });
+            queryClient.invalidateQueries({ queryKey: UNREAD_MESSAGES_QUERY_KEY });
         });
     };
 

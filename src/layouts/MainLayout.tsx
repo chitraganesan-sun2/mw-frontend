@@ -1,6 +1,7 @@
 "use client";
 
 import Sidebar from "@/components/common/Sidebar";
+import NewMessageAlert from "@/components/common/NewMessageAlert";
 import { FC, PropsWithChildren, useEffect, useState } from "react";
 import { renderHeader } from "./helper";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -47,6 +48,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
     return (
         <div className='h-[100dvh] w-screen overflow-hidden flex'>
+            {!isApprovalPending && <NewMessageAlert />}
             {!isProfile && (
                 <div className='max-lg:hidden w-1/6'>
                     <Sidebar />

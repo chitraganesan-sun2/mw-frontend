@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { clearCookies } from "@/utils/auth";
 import { unregisterTokenFromBackend } from "@/services/push-notifications";
 import { useEffect, useState } from "react";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const router = useRouter();
@@ -33,6 +34,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
         setRole(getCookie("role"));
     }, []);
     const isMobileOrTabScreen = InnerWidth() < 1024;
+    const { unreadMessages } = useUnreadMessages();
 
     // Instant Sessions - for both learners and volunteers
     const instantSessionsLink = {
@@ -78,6 +80,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
             href: "/messages",
             text: "Messages",
             icon: <MessageIcon />,
+            badge: unreadMessages,
         },
         {
             href: "/settings",
