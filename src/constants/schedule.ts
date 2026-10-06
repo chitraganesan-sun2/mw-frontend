@@ -47,14 +47,9 @@ export const LearnerFeedbackFormConstants: FormField[] = [
     // },
 ];
 
+// Shared session-form order (see components/schedule/forms/SessionFormFields): counterpart,
+// then Category/Skill and Session Title, Session Details & Expectations, Date, slots.
 export const LearnerScheduleModalConstants = [
-    {
-        name: "title_of_the_meeting",
-        label: "Session Title",
-        inputType: "text",
-        placeholder: "Enter session title",
-        required: true,
-    },
     {
         name: "select_volunteer",
         label: "Select Volunteer",
@@ -65,32 +60,24 @@ export const LearnerScheduleModalConstants = [
         options: [],
     },
     {
-        name: "select_date",
-        label: "Select Date",
-        inputType: "datepicker",
-        placeholder: "Select a date",
-        required: true,
-    },
-];
-
-export const LearnerScheduleModalDescriptionConstants = [
-    {
-        name: "description",
-        label: "Description",
-        inputType: "textarea",
-        placeholder: "Enter session description here",
-        required: true,
-    },
-];
-
-export const VolunteerScheduleModalConstants = [
-    {
         name: "title_of_the_meeting",
         label: "Session Title",
         inputType: "text",
         placeholder: "Enter session title",
         required: true,
     },
+    {
+        name: "select_date",
+        label: "Date",
+        inputType: "datepicker",
+        placeholder: "Select a date",
+        required: true,
+    },
+];
+
+// Shared session-form order (see components/schedule/forms/SessionFormFields): counterpart,
+// then Category/Skill and Session Title, Session Details & Expectations, Date, slots.
+export const VolunteerScheduleModalConstants = [
     {
         name: "select_learner",
         label: "Select Learner",
@@ -101,20 +88,18 @@ export const VolunteerScheduleModalConstants = [
         options: [],
     },
     {
+        name: "title_of_the_meeting",
+        label: "Session Title",
+        inputType: "text",
+        placeholder: "Enter session title",
+        required: true,
+    },
+    {
         name: "select_date",
-        label: "Select Date",
+        label: "Date",
         inputType: "datepicker",
         placeholder: "Select a date",
         required: true,
     },
 ];
 
-export const VolunteerScheduleModalDescriptionConstants = [
-    {
-        name: "description",
-        label: "Description",
-        inputType: "textarea",
-        placeholder: "Enter session description here",
-        required: true,
-    },
-];

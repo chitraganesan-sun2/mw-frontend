@@ -1,11 +1,11 @@
 "use client";
+import { Fragment } from "react";
 import { endpoints } from "@/api/constants";
 import { GET_API, POST_API } from "@/api/request";
 import { Input } from "@/components/common/Input";
 import SideModal from "@/components/common/Modals/SideModal";
 import {
     VolunteerScheduleModalConstants,
-    VolunteerScheduleModalDescriptionConstants,
 } from "@/constants/schedule";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -48,20 +48,30 @@ import { showToast } from "@/components/common/Toast";
 import { getCookie } from "@/utils/auth";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { joinNames } from "@/utils/joinNames";
+import {
+    CategoryField,
+    SessionDetailsField,
+    SkillField,
+    type PickedSkill,
+    type SessionCategory,
+} from "@/components/schedule/forms/SessionFormFields";
 
 // Define Zod schema for form validation
 const meetingFormSchema = z.object({
-    title_of_the_meeting: z.string().min(1, "Meeting title is required"),
-    select_learner: z.string().min(1, "Please select a learner"),
+    title_of_the_meeting: z.string().trim().min(1, "Please enter a session title."),
+    select_learner: z.string().min(1, "Please choose a learner."),
     select_date: z
         .union([z.string(), z.date(), z.null()])
         .refine((val) => val !== null && val !== "", {
-            message: "Please select a date",
+            message: "Please choose a date.",
         }),
     start_time: z.string(),
     end_time: z.string(),
-    description: z.string().min(1, "Description is required"),
-    selected_slot: z.string().min(1, "Please select a time slot"),
+    description: z.string().trim().min(1, "Please describe the session details and expectations."),
+    selected_slot: z.string().min(1, "Please choose a time slot."),
+    // One skill, picked from the volunteer's own subjects / skills (same as a learner booking).
+    academic_skills: z.array(z.string()).optional().default([]),
+    non_academic_skills: z.array(z.string()).optional().default([]),
 });
 
 // Infer TypeScript type from schema
@@ -88,9 +98,13 @@ export default function AddNewMeetingModalVolunteer({
         end_time: "",
         description: "",
         selected_slot: "",
+        academic_skills: [],
+        non_academic_skills: [],
     });
     const [availableSlots, setAvailableSlots] = useState<any[]>([]);
 
+    const [category, setCategory] = useState<SessionCategory | "">("");
+    const [skillErrors, setSkillErrors] = useState<{ category?: string; skill?: string }>({});
     const [fetchingLearners, setFetchingLearners] = useState<boolean>(false);
     const [learners, setLearners] = useState<Array<{ label: string; value: string }>>([]);
     const searchParams = useSearchParams();
@@ -104,6 +118,18 @@ export default function AddNewMeetingModalVolunteer({
     const [isLoadingAvailableDays, setIsLoadingAvailableDays] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<string>(dayjs().format("YYYY-MM"));
     const volunteerId = getCookie("volunteer_id") as string;
+
+    // The volunteer's own subjects / skills - same query key as the schedule page, so this is
+    // usually already cached.
+    const { data: ownProfile } = useQuery<any>({
+        queryKey: ["volunteer-details", volunteerId],
+        queryFn: async () => (await GET_API(endpoints.volunteer.getIndividualVolunteer(volunteerId)))?.data ?? null,
+        enabled: isOpen && Boolean(volunteerId),
+    });
+    const ownAcademic: string[] = (ownProfile?.volunteer_subjects || []).map((s: any) => s?.subject_name).filter(Boolean);
+    const ownArts: string[] = (ownProfile?.volunteer_skills || []).map((s: any) => s?.skill_name).filter(Boolean);
+    const hasSkillOptions = ownAcademic.length > 0 || ownArts.length > 0;
+    const pickedSkillName = formData.academic_skills?.[0] || formData.non_academic_skills?.[0] || "";
 
     const getLearners = async () => {
         setFetchingLearners(true);
@@ -274,10 +300,18 @@ export default function AddNewMeetingModalVolunteer({
     };
 
     const validateForm = (): boolean => {
+        const skillProblems = hasSkillOptions
+            ? {
+                  category: category ? undefined : "Please choose a category.",
+                  skill: pickedSkillName ? undefined : "Please choose a skill.",
+              }
+            : {};
+        setSkillErrors(skillProblems);
+        const skillsOk = !skillProblems.category && !skillProblems.skill;
         try {
             meetingFormSchema.parse(formData);
             setErrors({});
-            return true;
+            return skillsOk;
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const newErrors: Partial<Record<keyof FormData, string>> = {};
@@ -301,6 +335,8 @@ export default function AddNewMeetingModalVolunteer({
             session_end_time: formData.end_time,
             session_title: formData.title_of_the_meeting,
             session_description: formData.description,
+            academic_skills: formData.academic_skills || [],
+            non_academic_skills: formData.non_academic_skills || [],
         };
         return await POST_API(endpoints.session.bookVolunteerInitiatedSession, payload);
     };
@@ -317,7 +353,10 @@ export default function AddNewMeetingModalVolunteer({
                 end_time: "",
                 description: "",
                 selected_slot: "",
+                academic_skills: [],
+                non_academic_skills: [],
             });
+            setCategory("");
             setAvailableSlots([]);
             onClose();
             showToast({
@@ -416,10 +455,53 @@ export default function AddNewMeetingModalVolunteer({
 
     const isMobileScreen = InnerWidth() < 768;
 
+    const COUNTERPART_FIELD = "select_learner";
+    const skillFields = hasSkillOptions && (
+        <>
+            <CategoryField
+                value={category}
+                error={skillErrors.category}
+                available={[
+                    ...(ownAcademic.length > 0 ? (["academic"] as const) : []),
+                    ...(ownArts.length > 0 ? (["non_academic"] as const) : []),
+                ]}
+                onChange={(value) => {
+                    setCategory(value);
+                    setFormData((prev) => ({ ...prev, academic_skills: [], non_academic_skills: [] }));
+                    setSkillErrors({});
+                }}
+            />
+            <SkillField
+                category={category}
+                options={category === "academic" ? ownAcademic : ownArts}
+                value={pickedSkillName ? ({ skill_id: pickedSkillName, skill_name: pickedSkillName } as PickedSkill) : null}
+                error={skillErrors.skill}
+                onChange={(value) => {
+                    const names = value ? [value.skill_name] : [];
+                    setFormData((prev) => ({
+                        ...prev,
+                        academic_skills: category === "academic" ? names : [],
+                        non_academic_skills: category === "non_academic" ? names : [],
+                    }));
+                    setSkillErrors((e) => ({ ...e, skill: undefined }));
+                }}
+            />
+        </>
+    );
+    const detailsField = (
+        <SessionDetailsField
+            value={formData.description}
+            error={errors.description}
+            placeholder="What will you cover? Anything the learner should know or bring?"
+            onChange={(value) => handleChange("description", value)}
+        />
+    );
+
     if (!isOpen) return null;
     return (
         <SideModal
             title="Add New Session"
+            saveButtonText="Send Request"
             onClose={onClose}
             isOpen={isOpen}
             onSave={handleSubmit}
@@ -438,8 +520,8 @@ export default function AddNewMeetingModalVolunteer({
                         field.name === "select_date" ? ownUnavailableDates : undefined;
 
                     return (
+                        <Fragment key={field.name}>
                         <Input
-                            key={field.name}
                             {...getFieldProps(field)}
                             onChange={(value: any) => handleChange(field.name, value)}
                             value={formData[field.name as keyof FormData]}
@@ -472,6 +554,9 @@ export default function AddNewMeetingModalVolunteer({
                                     : undefined
                             }
                         />
+                        {field.name === COUNTERPART_FIELD && skillFields}
+                        {field.name === "title_of_the_meeting" && detailsField}
+                        </Fragment>
                     );
                 })}
                 <AvailableSlots
@@ -489,16 +574,6 @@ export default function AddNewMeetingModalVolunteer({
                     volunteerTimezone={ownTimezone}
                 />
 
-                {VolunteerScheduleModalDescriptionConstants.map((field: any) => (
-                    <Input
-                        key={field.name}
-                        {...getFieldProps(field)}
-                        onChange={(value: any) => handleChange(field.name, value)}
-                        value={formData[field.name as keyof FormData]}
-                        required={field.required}
-                        error={errors[field.name as keyof FormData]}
-                    />
-                ))}
             </div>
         </SideModal>
     );

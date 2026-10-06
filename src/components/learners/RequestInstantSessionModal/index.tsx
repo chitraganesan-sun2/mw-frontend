@@ -14,8 +14,19 @@ import CommitActionBar from "@/components/common/Input/Picker/CommitActionBar";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { Input } from "@/components/common/Input";
+import {
+    CategoryField,
+    DurationField,
+    InstantDateField,
+    LevelField,
+    SESSION_FIELD_LABELS,
+    SessionDetailsField,
+    SkillField,
+    type PickedSkill,
+    type SessionCategory,
+} from "@/components/schedule/forms/SessionFormFields";
 import { useAppStore } from "@/store/useAppStore";
+import { shortTimeZone } from "@/utils/sessionDisplay";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
@@ -53,14 +64,7 @@ interface RequestInstantSessionModalProps {
     onSuccess: () => void;
 }
 
-interface Skill {
-    skill_id: string;
-    skill_name: string;
-}
 
-const DURATIONS = [15, 30, 45, 60];
-// Matches the backend's NewInstantSessionRequestModel.session_details max_length.
-const DETAILS_MAX_LENGTH = 2000;
 
 const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     isOpen,
@@ -81,13 +85,14 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             .split(" - ")[0]
             ?.trim() ?? "";
     const learnerTz = ABBR_TO_IANA[tzAbbr] || "";
+
     const nowInTz = learnerTz ? dayjs().tz(learnerTz) : dayjs();
     const todayStr = nowInTz.format("YYYY-MM-DD");
     const tomorrowStr = nowInTz.add(1, "day").format("YYYY-MM-DD");
 
     // Form state
-    const [sessionType, setSessionType] = useState<"academic" | "non_academic" | "">("");
-    const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
+    const [category, setCategory] = useState<SessionCategory | "">("");
+    const [skill, setSkill] = useState<PickedSkill | null>(null);
     const [level, setLevel] = useState("");
     // Default the date to today (in the learner's timezone) so they don't have to open
     // the picker for the common case; tomorrow is still selectable.
@@ -95,7 +100,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     const [time, setTime] = useState<string>("");
     const [duration, setDuration] = useState<number>(30);
     const [sessionDetails, setSessionDetails] = useState<string>("");
-    const [errors, setErrors] = useState<{ details?: string; time?: string }>({});
+    const [errors, setErrors] = useState<{ category?: string; skill?: string; level?: string; details?: string; time?: string }>({});
     // Controlled picker + draft value: see CommitActionBar. The draft starts on a sensible
     // default (next 5 minutes today, 9:00 AM tomorrow) so the clock never opens on an
     // empty "-- : --" header with OK doing nothing.
@@ -110,8 +115,8 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     const timeValue = time ? makeInTz(`${date}T${time}`) : null;
 
     const resetForm = () => {
-        setSessionType("");
-        setSelectedSkills([]);
+        setCategory("");
+        setSkill(null);
         setLevel("");
         setDate(learnerTz ? dayjs().tz(learnerTz).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"));
         setTime("");
@@ -146,21 +151,15 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     };
 
     const handleSubmit = async () => {
-        if (!sessionType) {
-            showToast({ message: "Please select what you want to learn", type: "error" });
-            return;
-        }
-        if (selectedSkills.length === 0) {
-            showToast({ message: "Please select at least one skill", type: "error" });
-            return;
-        }
-        if (!level) {
-            showToast({ message: "Please select a level", type: "error" });
-            return;
-        }
-        if (!sessionDetails.trim()) {
-            setErrors((e) => ({ ...e, details: "Please describe the session details and expectations." }));
-            showToast({ message: "Please describe the session details and expectations", type: "error" });
+        const found = {
+            category: category ? undefined : "Please choose a category.",
+            skill: skill ? undefined : "Please choose a skill.",
+            level: level ? undefined : "Please choose a level.",
+            details: sessionDetails.trim() ? undefined : "Please describe the session details and expectations.",
+        };
+        if (found.category || found.skill || found.level || found.details) {
+            setErrors((e) => ({ ...e, ...found }));
+            showToast({ message: "Please complete the highlighted fields", type: "error" });
             return;
         }
         if (!date || !time) {
@@ -185,17 +184,17 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 availability_date: dayjs(date).format("YYYY-MM-DD"),
                 availability_start_time: time,
                 duration: duration,
-                session_type: sessionType,
-                skill_ids: selectedSkills.map((s) => s.skill_id),
-                grade_level: sessionType === "academic" ? level : null,
-                expertise_level: sessionType === "non_academic" ? level : null,
+                session_type: category,
+                skill_ids: [skill!.skill_id],
+                grade_level: category === "academic" ? level : null,
+                expertise_level: category === "non_academic" ? level : null,
                 session_details: sessionDetails.trim(),
             };
 
             const res = await POST_API(endpoints.session.createLearnerInstantSessionRequest, payload);
 
             if (res.status === 201 || res.status === 200) {
-                showToast({ message: "Session request created successfully! Volunteers will be notified.", type: "success" });
+                showToast({ message: "Request posted! Volunteers will be notified.", type: "success" });
                 onSuccess();
                 handleClose();
             } else {
@@ -212,10 +211,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         <CenterModal
             isOpen={isOpen}
             onClose={handleClose}
-            title="Request a Session"
+            title="Request an Instant Session"
             topContent={
                 <p className="text-sm text-gray-500 font-normal !mt-0">
-                    Let a volunteer know when you&apos;re free to learn
+                    Post what you want to learn - a volunteer can accept it.
                 </p>
             }
             width={580}
@@ -231,144 +230,58 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             )}
 
             <div className="flex flex-col gap-5">
-                {/* Session Type */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-base font-medium text-[#121212]">
-                        What do you want to learn?
-                    </label>
-                    <select
-                        className="w-full h-12 px-4 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] appearance-none"
-                        value={sessionType}
-                        onChange={(e) => {
-                            setSessionType(e.target.value as "academic" | "non_academic" | "");
-                            setSelectedSkills([]);
-                            setLevel("");
-                        }}
-                    >
-                        <option value="" disabled>
-                            Select a category
-                        </option>
-                        <option value="academic">Academic</option>
-                        <option value="non_academic">Arts &amp; Life Skills</option>
-                    </select>
-                </div>
+                <CategoryField
+                    value={category}
+                    error={errors.category}
+                    onChange={(value) => {
+                        setCategory(value);
+                        setSkill(null);
+                        setLevel("");
+                        setErrors((e) => ({ ...e, category: undefined, skill: undefined, level: undefined }));
+                    }}
+                />
+                <SkillField
+                    category={category}
+                    value={skill}
+                    error={errors.skill}
+                    onChange={(value) => {
+                        setSkill(value);
+                        setErrors((e) => ({ ...e, skill: undefined }));
+                    }}
+                />
+                <LevelField
+                    category={category}
+                    value={level}
+                    error={errors.level}
+                    onChange={(value) => {
+                        setLevel(value);
+                        setErrors((e) => ({ ...e, level: undefined }));
+                    }}
+                />
+                <SessionDetailsField
+                    value={sessionDetails}
+                    error={errors.details}
+                    placeholder="What do you want to cover? Anything the volunteer should know or prepare?"
+                    onChange={(value) => {
+                        setSessionDetails(value);
+                        if (value.trim()) setErrors((e) => ({ ...e, details: undefined }));
+                    }}
+                />
 
-                {/* Skills – LOV, filtered by category, matches the onboarding form's async-select
-                    (same endpoint/response shape) so users can add a skill that isn't listed yet. */}
-                {sessionType && (
-                    <Input
-                        name="skills"
-                        label="Which skills do you want to learn?"
-                        inputType="async-select"
-                        variant="multi"
-                        creatable
-                        allowCreate
-                        endpoint={`skills?category=${sessionType}`}
-                        responseAsLabel="skill_name"
-                        responseAsValue={["skill_id", "skill_name"]}
-                        placeholder="Don't see your option? Type it in to add."
-                        value={selectedSkills}
-                        onChange={(value: any) => setSelectedSkills(Array.isArray(value) ? value : [])}
-                        onCreate={(value: any) => setSelectedSkills((prev) => [...prev, value])}
-                    />
-                )}
-
-                {/* Level */}
-                {sessionType && (
+                <InstantDateField
+                    value={date}
+                    today={todayStr}
+                    tomorrow={tomorrowStr}
+                    onChange={(value) => {
+                        setDate(value);
+                        setTime("");
+                        setErrors((e) => ({ ...e, time: undefined }));
+                    }}
+                />
+                <div>
                     <div className="flex flex-col gap-2">
-                        <label className="text-base font-medium text-[#121212]">
-                            {sessionType === "academic" ? "Grade Level" : "Expertise Level"}
-                        </label>
-                        {sessionType === "academic" ? (
-                            <select
-                                className="w-full h-12 px-4 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] appearance-none"
-                                value={level}
-                                onChange={(e) => setLevel(e.target.value)}
-                            >
-                                <option value="" disabled>
-                                    Select your grade
-                                </option>
-                                {Array.from({ length: 12 }).map((_, i) => (
-                                    <option key={i} value={`Grade ${i + 1}`}>
-                                        Grade {i + 1}
-                                    </option>
-                                ))}
-                                <option value="College">College</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        ) : (
-                            <div className="grid grid-cols-3 gap-3">
-                                {["beginner", "intermediate", "expert"].map((exp) => (
-                                    <button
-                                        key={exp}
-                                        type="button"
-                                        onClick={() => setLevel(exp)}
-                                        className={`py-3 px-2 rounded-xl border text-center text-sm font-medium capitalize transition-all duration-150 cursor-pointer ${
-                                            level === exp
-                                                ? "border-black bg-black text-white"
-                                                : "border-gray-200 text-[#121212] bg-white hover:border-gray-400"
-                                        }`}
-                                    >
-                                        {exp}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Session details and expectations - required (volunteers decide from this). */}
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="request-session-details" className="text-base font-medium text-[#121212]">
-                        Session Details and Expectations from Volunteers <span aria-hidden="true">*</span>
-                    </label>
-                    <textarea
-                        id="request-session-details"
-                        value={sessionDetails}
-                        required
-                        aria-required="true"
-                        aria-invalid={Boolean(errors.details)}
-                        aria-describedby={errors.details ? "request-session-details-error" : "request-session-details-hint"}
-                        maxLength={DETAILS_MAX_LENGTH}
-                        onChange={(e) => {
-                            setSessionDetails(e.target.value);
-                            if (e.target.value.trim()) setErrors((er) => ({ ...er, details: undefined }));
-                        }}
-                        placeholder="Let the volunteer know what you're hoping to cover or any specific expectations"
-                        rows={3}
-                        className={`w-full px-4 py-3 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] resize-none ${errors.details ? "border-red-600" : "border-gray-200"}`}
-                    />
-                    {errors.details ? (
-                        <p id="request-session-details-error" role="alert" className="text-sm text-red-700">
-                            {errors.details}
-                        </p>
-                    ) : (
-                        <p id="request-session-details-hint" className="text-xs text-gray-500">
-                            Required · {sessionDetails.length}/{DETAILS_MAX_LENGTH}
-                        </p>
-                    )}
-                </div>
-
-                {/* Date & Time */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="request-session-date" className="text-base font-medium text-[#121212]">Date</label>
-                        <input
-                            id="request-session-date"
-                            type="date"
-                            value={date}
-                            onChange={(e) => {
-                                setDate(e.target.value);
-                                setErrors((er) => ({ ...er, time: undefined }));
-                            }}
-                            min={todayStr}
-                            max={tomorrowStr}
-                            className="w-full h-12 px-4 border border-gray-200 rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212]"
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-base font-medium text-[#121212]">
-                            Start Time{tzAbbr ? ` (${tzAbbr})` : ""}
+                        <label htmlFor="request-session-time" className="text-base font-medium text-[#121212]">
+                            {SESSION_FIELD_LABELS.startTime}{tzAbbr ? ` (${shortTimeZone(tzAbbr, date)})` : ""} <span aria-hidden="true">*</span>
                         </label>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <MobileTimePicker
@@ -424,26 +337,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                     </div>
                 </div>
 
-                {/* Duration */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-base font-medium text-[#121212]">Duration</label>
-                    <div className="grid grid-cols-4 gap-2">
-                        {DURATIONS.map((dur) => (
-                            <button
-                                key={dur}
-                                type="button"
-                                onClick={() => setDuration(dur)}
-                                className={`py-3 px-2 rounded-xl border text-center text-sm font-medium transition-all duration-150 cursor-pointer ${
-                                    duration === dur
-                                        ? "border-black bg-black text-white"
-                                        : "border-gray-200 text-[#121212] bg-white hover:border-gray-400"
-                                }`}
-                            >
-                                {dur} min
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                <DurationField value={duration} onChange={setDuration} />
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-5 border-t border-gray-100">
@@ -459,7 +353,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                         disabled={isLoading}
                         className="flex-1 py-3 rounded-2xl bg-black text-white font-medium hover:bg-gray-900 transition-colors"
                     >
-                        {isLoading ? "Submitting..." : "Submit Request"}
+                        {isLoading ? "Posting..." : "Post Request"}
                     </button>
                 </div>
             </div>
