@@ -37,6 +37,17 @@ const EventCard = ({
             bg: "bg-blue-200 border !border-blue-600 text-blue",
             dot: "bg-blue-600",
         },
+        // Availability is not a session: dashed outline, no fill, so it can't be mistaken
+        // for a pending booking (both used to fall through to the pending style).
+        available: {
+            bg: "bg-white border-dashed !border-gray-400 text-gray-700",
+            dot: "bg-transparent border border-gray-500",
+        },
+        // A volunteer's posted instant session nobody has claimed yet.
+        instant_session_open: {
+            bg: "bg-amber-50 border-amber-400 text-amber-900",
+            dot: "bg-amber-600",
+        },
     };
 
     const currentStyle = statusStyles[status as keyof typeof statusStyles] || statusStyles.pending;

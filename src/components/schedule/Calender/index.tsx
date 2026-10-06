@@ -6,7 +6,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import dayjs from "dayjs";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import MeetingPreviewModal from "../MeetingPreviewModal";
 import { AlertModal, AllEventsModal } from "../Modals";
@@ -18,6 +19,14 @@ interface CalendarProps {
     events: any;
     onDateSelect?: (date: string) => void;
 }
+
+type CalendarView = "dayGridMonth" | "timeGridWeek" | "timeGridDay";
+
+const VIEW_OPTIONS: { value: CalendarView; label: string }[] = [
+    { value: "dayGridMonth", label: "Month" },
+    { value: "timeGridWeek", label: "Week" },
+    { value: "timeGridDay", label: "Day" },
+];
 
 const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
     const [showModal, setShowModal] = useState<ModalType>(null);
@@ -40,7 +49,10 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
     const searchParams = useSearchParams();
     const currentDate = searchParams.get("current_month");
     const modalParam = searchParams.get("modal");
-    const { setEventDetails } = useAppStore();
+    const { setEventDetails, setCurrentMonth } = useAppStore();
+    const router = useRouter();
+    const [view, setView] = useState<CalendarView>("dayGridMonth");
+    const [rangeTitle, setRangeTitle] = useState("");
 
     useEffect(() => {
         if (modalParam === "feedback") {
@@ -224,9 +236,42 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
     useEffect(() => {
         if (currentDate && calendarRef.current) {
             const calendarApi = calendarRef.current.getApi();
-            calendarApi.gotoDate(dayjs(currentDate).format("YYYY-MM-DD"));
+            // Week/Day navigation below moves the URL month itself; don't snap the view
+            // back to the 1st when the shown date is already inside that month.
+            if (dayjs(calendarApi.getDate()).format("YYYY-MM") !== dayjs(currentDate).format("YYYY-MM")) {
+                calendarApi.gotoDate(dayjs(currentDate).format("YYYY-MM-DD"));
+            }
         }
     }, [currentDate]);
+
+    // Events are fetched per month (the header's month slider drives ?current_month=).
+    // Week/Day stepping that crosses into another month updates it the same way.
+    const syncMonthTo = (date: Date) => {
+        const month = dayjs(date).format("YYYY-MM");
+        if (currentDate && dayjs(currentDate).format("YYYY-MM") === month) return;
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("current_month", month);
+        setCurrentMonth(month);
+        router.push(`?${params.toString()}`);
+    };
+
+    const changeView = (next: CalendarView) => {
+        const api = calendarRef.current?.getApi();
+        if (!api) return;
+        setView(next);
+        // Week/Day open on today when it's in the month being viewed, else on its 1st.
+        const monthStart = dayjs(currentDate || undefined).startOf("month");
+        const target = dayjs().isSame(monthStart, "month") ? dayjs() : monthStart;
+        api.changeView(next, target.format("YYYY-MM-DD"));
+    };
+
+    const step = (direction: "prev" | "next") => {
+        const api = calendarRef.current?.getApi();
+        if (!api) return;
+        if (direction === "prev") api.prev();
+        else api.next();
+        syncMonthTo(api.getDate());
+    };
 
     useEffect(() => {
         setEventDetails(selectedEventForFeedback);
@@ -264,12 +309,14 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
     };
 
     const handleDateClick = (arg: any) => {
-        const clickedDate = dayjs(arg.dateStr);
+        // Week/Day views pass a datetime ("2026-10-15T10:00:00"); callers expect a date.
+        const dateStr = String(arg.dateStr).slice(0, 10);
+        const clickedDate = dayjs(dateStr);
         const currentDate = dayjs().startOf("day");
 
         if (clickedDate.isSame(currentDate) || clickedDate.isAfter(currentDate)) {
             if (onDateSelect) {
-                onDateSelect(arg.dateStr);
+                onDateSelect(dateStr);
             }
         }
     };
@@ -337,6 +384,46 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
                 }}
             />
             <div className="p-4 calendar-container">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-1">
+                        {view !== "dayGridMonth" && (
+                            <>
+                                <button
+                                    type="button"
+                                    aria-label={view === "timeGridWeek" ? "Previous week" : "Previous day"}
+                                    onClick={() => step("prev")}
+                                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100"
+                                >
+                                    <IoIosArrowBack aria-hidden="true" />
+                                </button>
+                                <button
+                                    type="button"
+                                    aria-label={view === "timeGridWeek" ? "Next week" : "Next day"}
+                                    onClick={() => step("next")}
+                                    className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100"
+                                >
+                                    <IoIosArrowForward aria-hidden="true" />
+                                </button>
+                            </>
+                        )}
+                        <span className="text-sm font-medium" aria-live="polite">
+                            {rangeTitle}
+                        </span>
+                    </div>
+                    <div role="group" aria-label="Calendar view" className="inline-flex rounded-full border border-gray-200 bg-white p-0.5 text-xs">
+                        {VIEW_OPTIONS.map((option) => (
+                            <button
+                                key={option.value}
+                                type="button"
+                                aria-pressed={view === option.value}
+                                onClick={() => changeView(option.value)}
+                                className={`rounded-full px-3 py-1 font-medium ${view === option.value ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"}`}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
                 <FullCalendar
                     key={typeof dayMaxEvents === "number" ? `n-${dayMaxEvents}` : "auto"}
                     ref={calendarRef}
@@ -357,6 +444,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
                     events={processedEvents}
                     moreLinkClassNames={["!text-primary", "hover:!bg-transparent"]}
                     moreLinkClick={handleMoreLinkClick}
+                    datesSet={(arg) => setRangeTitle(arg.view.title)}
                 />
             </div>
         </>
