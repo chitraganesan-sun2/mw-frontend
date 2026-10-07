@@ -22,7 +22,10 @@ import { useSendData } from "@/hooks/useReactQuery";
 import { useQueryState } from "nuqs";
 import InnerWidth from "@/utils/innerWidth";
 import MobileCalender from "@/components/schedule/MobileCalender";
-import dayjs from "dayjs";
+import { profileToday } from "@/utils/sessionDisplay";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 export default function LearnerSchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
@@ -83,7 +86,8 @@ export default function LearnerSchedulePage() {
     // Clicking a day on the calendar opens Add New Session for that date - the learner
     // counterpart of the volunteer's click-a-day-to-add-availability.
     const handleDateSelect = (date: string) => {
-        if (!date || dayjs(date).isBefore(dayjs(), "day")) return;
+        // "Today" in the learner's PROFILE timezone, not the browser's.
+        if (!date || date.slice(0, 10) < profileToday(learnerTimeZone)) return;
         router.push(`/learner/schedule?view=${CALENDAR_VIEW}&modal=add_new_meeting&date=${encodeURIComponent(date)}`);
     };
 
@@ -98,11 +102,12 @@ export default function LearnerSchedulePage() {
 
     const { mutate: onSave, isPending } = useSendData({
         fn: (formData: any) => handleSubmitFeedback(formData),
-        invalidateKey: ["learner-events"],
         success: () => {
             handleNavigate();
-            queryClient.invalidateQueries({ queryKey: ["learner-events", currentMonth] });
+            invalidateScheduleViews(queryClient, "learner");
         },
+        // Was silent: a rejected submission left the modal open with no explanation.
+        error: (err) => showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't submit your feedback. Please try again.") }),
     });
 
     useEffect(() => {

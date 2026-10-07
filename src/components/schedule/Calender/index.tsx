@@ -13,6 +13,8 @@ import MeetingPreviewModal from "../MeetingPreviewModal";
 import { AlertModal, AllEventsModal } from "../Modals";
 import DayCellContent from "./DayCellContent";
 import EventCard from "./EventCard";
+import { formatSessionDate } from "@/utils/sessionDisplay";
+import { useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import "./styles.css";
 
 interface CalendarProps {
@@ -52,6 +54,8 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
     const { setEventDetails, setCurrentMonth } = useAppStore();
     const router = useRouter();
     const [view, setView] = useState<CalendarView>("dayGridMonth");
+    // "Today" in the PROFILE timezone - gates which days can be clicked to add/book.
+    const profileToday = useProfileToday();
     const [rangeTitle, setRangeTitle] = useState("");
 
     useEffect(() => {
@@ -205,7 +209,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
         }
 
         // Format for display using the correct date string
-        const formattedDate = dayjs(dateStr).format("MMM DD, YYYY");
+        const formattedDate = formatSessionDate(dateStr.slice(0, 10));
 
         setCurrentEventData({
             events: dateEvents,
@@ -311,10 +315,8 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
     const handleDateClick = (arg: any) => {
         // Week/Day views pass a datetime ("2026-10-15T10:00:00"); callers expect a date.
         const dateStr = String(arg.dateStr).slice(0, 10);
-        const clickedDate = dayjs(dateStr);
-        const currentDate = dayjs().startOf("day");
-
-        if (clickedDate.isSame(currentDate) || clickedDate.isAfter(currentDate)) {
+        // YYYY-MM-DD strings compare chronologically.
+        if (dateStr >= profileToday) {
             if (onDateSelect) {
                 onDateSelect(dateStr);
             }

@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import dayjs from "dayjs";
+import type dayjs from "dayjs";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DELETE_API, GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -12,7 +12,8 @@ import {
     canJoinSession,
     formatSessionDate,
     formatSessionTime,
-    getLocalSessionBounds,
+    formatShortSessionDate,
+    getSessionInstantBounds,
     getStatusLabel,
     getStatusPillClass,
     shortTimeZone,
@@ -20,6 +21,10 @@ import {
 import { joinNames } from "@/utils/joinNames";
 import { safeHref } from "@/utils/safeHref";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
+import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+import { isAwaitingMyResponse } from "./ScheduleSessionCard";
 import OneTimeSlotEditModal, { type OneTimeSlot } from "./OneTimeSlotEditModal";
 import { SessionListSkeleton } from "./MyScheduleSection";
 import { SCHEDULE_LABELS, getVolunteerSlotGroup, type ScheduleRole } from "./scheduleCategories";
@@ -34,21 +39,32 @@ function CompactSessionRow({
     session,
     timeZoneLabel,
     onOpenProfile,
+    onRespond,
+    now,
 }: {
     session: ScheduleSession;
     timeZoneLabel?: string;
     onOpenProfile: (userId: string) => void;
+    onRespond: () => void;
+    now: dayjs.Dayjs;
 }) {
     const learnerName = joinNames(session.learner_first_name, session.learner_last_name);
-    const bounds = getLocalSessionBounds(session.volunteer_start_date, session.volunteer_start_time, session.volunteer_end_time);
+    // Absolute instants from the UTC fields - see getSessionInstantBounds.
+    const bounds = getSessionInstantBounds(session, {
+        date: session.volunteer_start_date,
+        start: session.volunteer_start_time,
+        end: session.volunteer_end_time,
+        timeZoneLabel,
+    });
     const joinHref = safeHref(session.meet_link);
-    const showJoin = Boolean(joinHref) && canJoinSession(session, bounds?.end);
+    const showJoin = Boolean(joinHref) && canJoinSession(session, bounds?.end, now);
+    const showRespond = isAwaitingMyResponse(session, "volunteer");
     return (
         <li className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm">
             <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{session.session_title || "Session"}</p>
                 <p className="text-xs text-gray-600">
-                    {bounds ? bounds.start.format("MMM D") : formatSessionDate(session.volunteer_start_date)} ·{" "}
+                    {formatShortSessionDate(session.volunteer_start_date)} ·{" "}
                     {formatSessionTime(session.volunteer_start_time)}
                     {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, session.volunteer_start_date)}` : ""}
                     {learnerName && session.learner_id && (
@@ -70,6 +86,16 @@ function CompactSessionRow({
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass(session.status)}`}>
                     {getStatusLabel(session.status)}
                 </span>
+                {showRespond && (
+                    <button
+                        type="button"
+                        onClick={onRespond}
+                        aria-label={`Respond to the session request${learnerName ? ` from ${learnerName}` : ""}`}
+                        className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer"
+                    >
+                        Respond
+                    </button>
+                )}
                 {showJoin && (
                     <a
                         href={joinHref}
@@ -134,6 +160,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
     const [editing, setEditing] = useState<OneTimeSlot | null>(null);
     const [newDate, setNewDate] = useState("");
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+    // One-time slot being removed - disables its Remove so a double click can't fire twice.
+    const [removingId, setRemovingId] = useState<string | null>(null);
+    const openApprovals = useApprovalDrawer((state) => state.open);
+    const now = useNow();
+    // "Today" in the PROFILE timezone (the browser's date can differ).
+    const today = useProfileToday(role);
 
     const weekly = useQuery({
         queryKey: weeklyKey(role),
@@ -174,10 +206,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
         [weekly.data]
     );
 
-    const refreshAvailability = () => {
-        queryClient.invalidateQueries({ queryKey: [isVolunteer ? "volunteer_slot" : "learner_slot"] });
-        queryClient.invalidateQueries({ queryKey: [isVolunteer ? "volunteer-events" : "learner-events"] });
-    };
+    const refreshAvailability = () => invalidateScheduleViews(queryClient, role);
 
     const deleteSlot = async (slot: OneTimeSlot) => {
         const ok = await confirm({
@@ -187,19 +216,21 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             danger: true,
         });
         if (!ok) return;
+        setRemovingId(slot.volunteer_slot_id);
         try {
             await DELETE_API(endpoints.volunteer_slot.oneTimeSlot(slot.date, slot.volunteer_slot_id));
             showToast({ type: "success", message: "Availability removed" });
             refreshAvailability();
         } catch (err) {
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't remove this slot.") });
+        } finally {
+            setRemovingId(null);
         }
     };
 
     const isLoading = weekly.isLoading || (isVolunteer && oneTime.isLoading);
     const hasError = weekly.isError || (isVolunteer && oneTime.isError);
     const nothingScheduled = weeklyRows.length === 0 && (oneTime.data?.length ?? 0) === 0;
-    const today = dayjs().format("YYYY-MM-DD");
 
     const renderSessionGroup = (title: string, sessions: ScheduleSession[], empty: string) => (
         <div className="flex flex-col gap-2">
@@ -217,7 +248,14 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 <>
                     <ul className="flex flex-col divide-y divide-gray-100 rounded-lg border border-gray-200">
                         {(expanded[title] ? sessions : sessions.slice(0, COLLAPSED_ROWS)).map((s) => (
-                            <CompactSessionRow key={s.session_id} session={s} timeZoneLabel={timeZoneLabel} onOpenProfile={onOpenProfile} />
+                            <CompactSessionRow
+                                key={s.session_id}
+                                session={s}
+                                timeZoneLabel={timeZoneLabel}
+                                onOpenProfile={onOpenProfile}
+                                onRespond={openApprovals}
+                                now={now}
+                            />
                         ))}
                     </ul>
                     {sessions.length > COLLAPSED_ROWS && (
@@ -322,10 +360,11 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                             <button
                                                 type="button"
                                                 onClick={() => deleteSlot(slot)}
+                                                disabled={removingId === slot.volunteer_slot_id}
                                                 aria-label={`Remove availability on ${formatSessionDate(slot.date)} at ${formatSessionTime(slot.start_time)}`}
-                                                className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
+                                                className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                                             >
-                                                Remove
+                                                {removingId === slot.volunteer_slot_id ? "Removing…" : "Remove"}
                                             </button>
                                         </>
                                     )}

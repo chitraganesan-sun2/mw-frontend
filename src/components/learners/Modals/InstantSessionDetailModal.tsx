@@ -16,6 +16,7 @@ import { getCookie } from "@/utils/auth";
 import { getStatusLabel, getStatusPillClass } from "@/utils/sessionDisplay";
 import { useQueryClient } from "@tanstack/react-query";
 import useInnerWidth from "@/hooks/useInnerWidth";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { cn } from "@/utils/merge-class";
 
 interface InstantSessionDetailModalProps {
@@ -174,9 +175,8 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                 claimSuccess = true;
                 showToast({ message: "Session claimed successfully", type: "success" });
 
-                // Invalidate queries first
-                queryClient.invalidateQueries({ queryKey: ["learner-instant-sessions"] });
-                queryClient.invalidateQueries({ queryKey: ["learner-accepted-instant-sessions"] });
+                // Invalidate every view of this session (instant lists, dashboard, calendar).
+                invalidateScheduleViews(queryClient, "learner");
 
                 // Wait for queries to refetch (loader stays visible)
                 await Promise.all([
@@ -396,10 +396,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                 onClose={handleCloseConfirmation}
                 onConfirm={handleConfirmClaim}
                 onUnclaim={() => {
-                    queryClient.invalidateQueries({ queryKey: ["learner-instant-sessions"] });
-                    queryClient.invalidateQueries({
-                        queryKey: ["learner-accepted-instant-sessions"],
-                    });
+                    invalidateScheduleViews(queryClient, "learner");
                     onClose();
                 }}
                 session={session}

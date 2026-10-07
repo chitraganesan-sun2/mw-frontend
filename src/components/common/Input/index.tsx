@@ -35,6 +35,9 @@ const DatePickerComponent: React.FC<{
     unavailableDates?: string[];
     inputClassName?: string;
     format?: string;
+    /** Earliest selectable date (YYYY-MM-DD). Pass "today" in the user's PROFILE timezone -
+     * the default is the browser's date, which differs when the two zones disagree. */
+    earliestDate?: string;
 }> = ({
     name,
     value,
@@ -48,8 +51,9 @@ const DatePickerComponent: React.FC<{
     unavailableDates,
     inputClassName,
     format = "DD-MMM-YYYY",
+    earliestDate,
 }) => {
-    const today = dayjs().startOf("day");
+    const today = earliestDate ? dayjs(earliestDate, "YYYY-MM-DD") : dayjs().startOf("day");
 
     const parseDate = (date: any) => {
         if (!date) return null;
@@ -371,6 +375,7 @@ export const Input: React.FC<InputProps> = (props) => {
                         unavailableDates={props.unavailableDates}
                         inputClassName={props.inputClassName}
                         format={props.format}
+                        earliestDate={props.earliestDate}
                     />
                 );
 
@@ -438,19 +443,28 @@ export const Input: React.FC<InputProps> = (props) => {
                         <TimeRangePicker {...props} />
                     </div>
                 );
-            case "daterange":
+            case "daterange": {
+                // earliestDate is ours, not an antd prop - keep it off the picker.
+                const { earliestDate, ...rangeProps } = props;
                 return (
                     <DateRangePicker
-                        {...props}
+                        {...rangeProps}
                         id={name}
                         format="YYYY-MM-DD"
                         placeholder={["Start Date", "End Date"]}
                         onChange={(date) => props.onChange(date)}
                         disabledDate={(current) =>
-                            Boolean(current && current.isBefore(dayjs().startOf("day"), "day"))
+                            Boolean(
+                                current &&
+                                    current.isBefore(
+                                        earliestDate ? dayjs(earliestDate, "YYYY-MM-DD") : dayjs().startOf("day"),
+                                        "day"
+                                    )
+                            )
                         }
                     />
                 );
+            }
         }
     };
 

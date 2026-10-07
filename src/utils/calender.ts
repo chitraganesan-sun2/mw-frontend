@@ -61,6 +61,14 @@ export interface CalendarEvent {
         isAvailableSlot?: boolean;
         isInstantSessionOpen?: boolean;
         initiatedBy?: "learner" | "volunteer";
+        /** UTC date/times - for "has it ended" decisions (see getSessionInstantBounds). */
+        session_date?: string;
+        session_start_time?: string;
+        session_end_time?: string;
+        /** The viewer's profile-local date/times (what the calendar displays). */
+        localDate?: string;
+        localStartTime?: string;
+        localEndTime?: string;
     };
 }
 
@@ -128,6 +136,12 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                         feedBackCollectedFromLearner: sd.feedback_collected_from_learner,
                         feedBackCollectedFromVolunteer: sd.feedback_collected_from_volunteer,
                         initiatedBy: sd.initiated_by,
+                        session_date: sd.session_date,
+                        session_start_time: sd.session_start_time,
+                        session_end_time: sd.session_end_time,
+                        localDate: sd.volunteer_start_date,
+                        localStartTime: sd.volunteer_start_time,
+                        localEndTime: sd.volunteer_end_time,
                     },
                 });
             } else if (slot.is_new_session && dayDate) {
@@ -200,6 +214,12 @@ function mapLearnerSessionsToEvents(data: any): CalendarEvent[] {
             feedBackCollectedFromLearner: item.feedback_collected_from_learner,
             feedBackCollectedFromVolunteer: item.feedback_collected_from_volunteer,
             initiatedBy: item.initiated_by,
+            session_date: item.session_date,
+            session_start_time: item.session_start_time,
+            session_end_time: item.session_end_time,
+            localDate: item.learner_start_date,
+            localStartTime: item.learner_start_time,
+            localEndTime: item.learner_end_time,
         },
     }));
 }

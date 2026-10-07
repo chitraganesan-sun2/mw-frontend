@@ -6,10 +6,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
-import dayjs from "dayjs";
 import InnerWidth from "@/utils/innerWidth";
 import { ApprovalModalProps } from "./index.type.d";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { formatSessionDate } from "@/utils/sessionDisplay";
 
 type SessionsData = {
     learner_first_name: string;
@@ -57,7 +57,9 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
         return response?.data;
     };
 
-    const { data, isFetching, isError } = useQuery({
+    // isPending (first load only), not isFetching: the skeleton used to replace the list on
+    // every background refetch (e.g. after accepting one request).
+    const { data, isPending, isError, refetch } = useQuery({
         queryKey: [isLearner ? "learner-approval-notifications" : "approval-notifications", isOpen],
         queryFn: () => getNotifications(),
         enabled: isOpen,
@@ -94,21 +96,21 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
             modalWidth={isMobileScreen ? "100%" : 400}
         >
             <div className="flex flex-col gap-4 px-5 mt-5">
-                {isFetching ? (
+                {isPending ? (
                     <div className="flex flex-col gap-4">
                         {Array.from({ length: 10 }).map((_, index) => (
                             <NotificationCardSkeleton key={index} />
                         ))}
                     </div>
-                ) : isError ? (
-                    <p>Error loading notifications</p>
+                ) : isError && !data ? (
+                    <QueryErrorNotice message="Couldn't load your notifications." onRetry={() => refetch()} />
                 ) : notificationsData.length > 0 ? (
                     notificationsData.map((notification) => (
-                        <div>
+                        <div key={notification?.date}>
                             <div className="relative inline-flex items-center justify-center w-full">
                                 <hr className="w-full h-px my-6 bg-gray-light border-0" />
                                 <span className="absolute -translate-x-1/2 left-1/2 px-3 font-semibold !text-sm !text-gray-light !bg-white">
-                                    {formatDisplayDate(notification?.date)}
+                                    {formatSessionDate(notification?.date) || notification?.date}
                                 </span>
                             </div>
                             <div className="flex flex-col gap-3">

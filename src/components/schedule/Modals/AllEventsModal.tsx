@@ -14,7 +14,9 @@ const AllEventsModal = ({ isOpen, onClose, data, onEventClick }: AllEventsModalP
             hideFooter={true}
         >
             <div className="flex flex-col gap-2 py-5 ">
-                {data.events.map((event, index) => {
+                {[...data.events]
+                    .sort((a, b) => (a?.start?.getTime?.() ?? 0) - (b?.start?.getTime?.() ?? 0))
+                    .map((event, index) => {
                     return (
                         <EventCard
                             key={event?._def?.id || index}
@@ -28,7 +30,7 @@ const AllEventsModal = ({ isOpen, onClose, data, onEventClick }: AllEventsModalP
                             onEventClick={(e) => onEventClick(e?.currentTarget, event)}
                         />
                     );
-                })}
+                    })}
             </div>
         </CenterModal>
     );

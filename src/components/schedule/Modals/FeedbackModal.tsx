@@ -47,6 +47,12 @@ const FeedbackModal = ({
     // every mount (the modal is always mounted on the schedule pages), calling the page's
     // onClose -> router.push("?current_month=<store month>") on each load, which blanked
     // current_month and dropped deep-link params like ?modal=my_availability.
+    // Start every feedback form empty - the previous session's rating/notes used to stay
+    // prefilled when the modal opened for the next session.
+    useEffect(() => {
+        if (isOpen) setFormData({});
+    }, [isOpen, eventDetails?.session_id]);
+
     useEffect(() => {
         if (!isOpen) return;
         const userId = role === "volunteer" ? eventDetails?.learner_id : eventDetails?.volunteer_id;
@@ -57,6 +63,7 @@ const FeedbackModal = ({
     }, [isOpen]);
 
     const handleSubmit = () => {
+        if (Loading) return; // in flight - ignore repeat clicks
         const submissionData = {
             ...formData,
             image: [
@@ -95,6 +102,7 @@ const FeedbackModal = ({
             title: mode === "view" ? "Edit" : "Submit",
             btnVariant: "secondary" as const,
             customClassName: "!rounded-xl hover:!bg-black hover:!text-white",
+            isPrimary: true,
         },
     };
 
@@ -115,6 +123,9 @@ const FeedbackModal = ({
                                 title={button?.title}
                                 btnVariant={button?.btnVariant}
                                 onClick={button?.onClick}
+                                // Mobile Submit had no loading/disabled state -> double submits.
+                                loading={"isPrimary" in button ? Loading : undefined}
+                                disabled={Boolean(Loading)}
                             />
                         ))}
                     </div>
@@ -144,7 +155,12 @@ const FeedbackModal = ({
             topContent={<DetailsSection data={feedBackEventDetails} />}
             width={isTabletScreen ? "80%" : "40%"}
             secondaryActionProps={buttonProps.secondary}
-            primaryActionProps={buttonProps.primary}
+            primaryActionProps={{
+                onClick: buttonProps.primary.onClick,
+                title: buttonProps.primary.title,
+                btnVariant: buttonProps.primary.btnVariant,
+                customClassName: buttonProps.primary.customClassName,
+            }}
             loading={Loading}
         >
             <div className="flex flex-col max-lg:gap-2">

@@ -8,7 +8,7 @@ import { AlertModal } from "../Modals";
 import EventCard from "../Calender/EventCard";
 import MobileMeetingPreviewModal from "./MeetingPreview";
 import { onEnterOrSpace } from "@/utils/a11y";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import { formatSessionDate } from "@/utils/sessionDisplay";
 
 interface CalendarProps {
     events: any;
@@ -23,7 +23,10 @@ const MobileCalender: React.FC<CalendarProps> = ({ events = [], onDateSelect }) 
     const { setEventDetails } = useAppStore();
 
     const groupedEvents = useMemo(() => {
-        let list = events ?? [];
+        // Entries within a day in start-time order (they came in API order, e.g. 4 PM before 2 PM).
+        const list = [...(events ?? [])].sort(
+            (a: any, b: any) => dayjs(a.start).valueOf() - dayjs(b.start).valueOf()
+        );
         return Object.values(
             list.reduce((acc: Record<string, any[]>, item: any) => {
                 (acc[item.date] ||= []).push(item);
@@ -112,8 +115,7 @@ const MobileCalender: React.FC<CalendarProps> = ({ events = [], onDateSelect }) 
                         onClick={() => handleDateClick(eventsByDate[0]?.date)}
                     >
                         <p className="font-medium text-sm mb-4">
-                            {eventsByDate[0]?.date &&
-                                formatDisplayDate(eventsByDate[0]?.date)}
+                            {eventsByDate[0]?.date && formatSessionDate(eventsByDate[0]?.date)}
                         </p>
                         <div className="space-y-2">
                             {eventsByDate.map((event: any, i: number) => (

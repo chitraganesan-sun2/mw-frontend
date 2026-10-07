@@ -23,6 +23,9 @@ import MobileCalender from "@/components/schedule/MobileCalender";
 import InnerWidth from "@/utils/innerWidth";
 import OnetImeScheduleModal from "@/components/schedule/Modals/OnetImeScheduleModal";
 import { GET_API } from "@/api/request";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 export default function SchedulePage() {
     const [isOpenSchedule, setIsOpenSchedule] = useState(false);
@@ -101,11 +104,12 @@ export default function SchedulePage() {
 
     const { mutate: onSave, isPending } = useSendData({
         fn: (formData: any) => handleSubmitFeedback(formData),
-        invalidateKey: ["volunteer-events"],
         success: () => {
             handleNavigate();
-            queryClient.invalidateQueries({ queryKey: ["volunteer-events", currentMonth] });
+            invalidateScheduleViews(queryClient, "volunteer");
         },
+        // Was silent: a rejected submission left the modal open with no explanation.
+        error: (err) => showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't submit your feedback. Please try again.") }),
     });
 
     useEffect(() => {

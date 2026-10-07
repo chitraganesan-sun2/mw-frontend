@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import dayjs from "dayjs";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
+import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
+import { useNow } from "@/hooks/schedule/useProfileTimeZone";
 import ScheduleSessionCard from "./ScheduleSessionCard";
 import {
     SCHEDULE_LABELS,
@@ -35,6 +36,10 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const [activeTab, setActiveTab] = useState<ScheduleTab>("posted");
     const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
     const tabRefs = useRef<Record<ScheduleTab, HTMLButtonElement | null>>({ posted: null, accepted: null, direct: null });
+
+    const openApprovals = useApprovalDrawer((state) => state.open);
+    // Re-evaluated every minute so Join appears/disappears without a reload.
+    const now = useNow();
 
     const upcoming = useScheduleSessions(role, "upcoming");
     const past = useScheduleSessions(role, "past", when === "past");
@@ -73,7 +78,6 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     };
 
     const sessions = byTab[activeTab];
-    const now = dayjs();
     const hiddenPast = when === "past" && (past.data?.total ?? 0) > (past.data?.items.length ?? 0);
 
     return (
@@ -142,7 +146,9 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                         {when === "past" ? "No past sessions here yet." : SCHEDULE_TAB_EMPTY[role][activeTab]}
                     </p>
                 ) : (
-                    <div className="grid gap-2 xl:grid-cols-2">
+                    // grid-cols-1 = minmax(0, 1fr): an implicit auto column grew to the cards'
+                    // content width on phones, pushing Join past the section edge.
+                    <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
                         {sessions.map((session) => (
                             <ScheduleSessionCard
                                 key={session.session_id}
@@ -150,6 +156,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                 role={role}
                                 timeZoneLabel={timeZoneLabel}
                                 onOpenProfile={onOpenProfile}
+                                onRespond={openApprovals}
                                 now={now}
                             />
                         ))}

@@ -23,14 +23,23 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import {
+    canCompleteSession,
     canJoinSession,
     formatDuration,
+    formatLevel,
     formatSessionDate,
     formatSessionTime,
-    getLocalSessionBounds,
+    shortTimeZone,
+    formatSessionWhen,
+    getSessionInstantBounds,
     getStatusLabel,
     getStatusPillClass,
+    isRedundantLevelDescription,
 } from "@/utils/sessionDisplay";
+import { safeHref } from "@/utils/safeHref";
+import { timesAgo } from "@/utils/timeFunctions";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { useNow, useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 
 // NewEventModal pulls in @mui/x-date-pickers - defer it to its own chunk.
 const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEventModal"), { ssr: false });
@@ -46,14 +55,14 @@ const START_SESSION_BTN_CLASS =
 
 const MY_SESSIONS_STATUS_FILTERS = ["", "open", "accepted", "active", "completed", "cancelled", "expired"];
 
-function getTimeAgo(dateString?: string): string {
-    if (!dateString) return "";
-    const diffMins = dayjs().diff(dayjs(dateString), "minute");
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return `${Math.floor(diffHours / 24)}d ago`;
+/** Absolute start/end of a session or open post (UTC fields; profile-local fallback). */
+function sessionBounds(session: any, timeZoneLabel?: string) {
+    return getSessionInstantBounds(session, {
+        date: session?.volunteer_start_date,
+        start: session?.volunteer_start_time,
+        end: session?.volunteer_end_time,
+        timeZoneLabel,
+    });
 }
 
 
@@ -65,7 +74,7 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
                 <span className={`${getStatusPillClass("pending")} text-xs px-2 py-1 rounded-full font-medium`}>{getStatusLabel("pending")}</span>
             </div>
             <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === "academic" ? "Academic" : "Arts & Life Skills"}</p>
-            <p className="text-sm text-gray-600 mb-2">Level: {req.grade_level || req.expertise_level || "N/A"}</p>
+            <p className="text-sm text-gray-600 mb-2">Level: {formatLevel(req.grade_level || req.expertise_level) || "N/A"}</p>
             {Array.isArray(req.skills) && req.skills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-3">
                     {req.skills.map((skill: string) => (
@@ -81,8 +90,15 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2">{req.session_details}</p>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-700">
+                {/* The volunteer's own local time (backend-converted); the raw availability_*
+                    fields are the LEARNER's local time and used to be shown unlabelled. */}
                 <span className="font-medium">
-                    {formatSessionDate(req.availability_date)} · {formatSessionTime(req.availability_start_time)}
+                    {formatSessionDate(req.volunteer_start_date ?? req.availability_date)} ·{" "}
+                    {formatSessionTime(req.volunteer_start_time ?? req.availability_start_time)}
+                    {req.volunteer_end_time ? ` – ${formatSessionTime(req.volunteer_end_time)}` : ""}
+                    {req.volunteer_timezone
+                        ? ` ${shortTimeZone(req.volunteer_timezone, req.volunteer_start_date)}`
+                        : ""}
                 </span>
                 <span className="text-gray-500">· {formatDuration(req.duration)}</span>
             </div>
@@ -106,6 +122,8 @@ function MySessionCard({
     onComplete,
     onCancel,
     onWithdraw,
+    timeZoneLabel,
+    now,
 }: {
     session: any;
     isActionLoading: boolean;
@@ -113,17 +131,27 @@ function MySessionCard({
     onComplete: (sessionId: string) => void;
     onCancel: (sessionId: string) => void;
     onWithdraw: (volunteerSlotId: string) => void;
+    timeZoneLabel?: string;
+    now: dayjs.Dayjs;
 }) {
     const statusClass = getStatusPillClass(session.status);
     const statusLabel = getStatusLabel(session.status);
     const isLive = session.status === "accepted" || session.status === "active";
     const isOpen = session.status === "open";
+    const bounds = sessionBounds(session, timeZoneLabel);
+    const joinable = canJoinSession({ status: session.status, meet_link: safeHref(session.meet_link) }, bounds?.end, now);
+    // Complete only once the scheduled end has passed (the backend rejects it before that).
+    const completable = canCompleteSession(session, bounds, now);
+    const level = session.requested_level || session.grade_level || session.expertise_level;
+    const showDescription =
+        Boolean(session.session_description) && !isRedundantLevelDescription(session.session_description, level);
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-shadow p-5">
             <div className="flex items-center justify-between mb-3">
                 <span className={`${statusClass} text-xs px-2 py-1 rounded-full font-medium`}>{statusLabel}</span>
-                <span className="text-xs text-gray-400">{getTimeAgo(session.created_at)}</span>
+                {/* created_at is naive UTC - timesAgo parses it as UTC (it used to be read as local). */}
+                <span className="text-xs text-gray-400">{timesAgo(session.created_at)}</span>
             </div>
             <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
@@ -136,12 +164,17 @@ function MySessionCard({
                     <p className="text-xs text-gray-500">{session.session_title}</p>
                 </div>
             </div>
-            {session.session_description && (
+            {showDescription && (
                 <p className="text-xs text-gray-600 mb-3 line-clamp-2">{session.session_description}</p>
             )}
             <div className="flex items-center justify-between pt-3 border-t border-gray-50 mb-3">
-                <span className="text-xs text-gray-400">
-                    {formatSessionDate(session.volunteer_start_date)} · {formatSessionTime(session.volunteer_start_time)}
+                <span className="text-xs text-gray-500">
+                    {formatSessionWhen({
+                        date: session.volunteer_start_date,
+                        start: session.volunteer_start_time,
+                        end: session.volunteer_end_time,
+                        timeZoneLabel,
+                    })}
                 </span>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -160,17 +193,19 @@ function MySessionCard({
                             disabled={isActionLoading}
                             onClick={() => onView(session.session_id)}
                         >
-                            {isLive ? "Join" : "View"}
+                            {joinable ? "Join" : "View"}
                         </button>
                         {isLive && (
                             <>
-                                <button
-                                    className="text-green-700 text-xs font-medium hover:text-green-800 disabled:opacity-50"
-                                    disabled={isActionLoading}
-                                    onClick={() => onComplete(session.session_id)}
-                                >
-                                    Complete
-                                </button>
+                                {completable && (
+                                    <button
+                                        className="text-green-700 text-xs font-medium hover:text-green-800 disabled:opacity-50"
+                                        disabled={isActionLoading}
+                                        onClick={() => onComplete(session.session_id)}
+                                    >
+                                        Complete
+                                    </button>
+                                )}
                                 <button
                                     className="text-red-600 text-xs font-medium hover:text-red-700 disabled:opacity-50"
                                     disabled={isActionLoading}
@@ -193,6 +228,10 @@ export default function VolunteerInstantSessionsPage() {
     const router = useRouter();
     const queryClient = useQueryClient();
     const [isActionLoading, setIsActionLoading] = useState(false);
+    // Which detail-modal action is in flight (loading spinner on that button, both disabled).
+    const [detailAction, setDetailAction] = useState<"complete" | "cancel" | null>(null);
+    const timeZoneLabel = useProfileTimeZone("volunteer");
+    const now = useNow();
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [sessionDetail, setSessionDetail] = useState<any>(null);
     const [isDetailLoading, setIsDetailLoading] = useState(false);
@@ -268,8 +307,7 @@ export default function VolunteerInstantSessionsPage() {
         try {
             await POST_API(endpoints.session.acceptLearnerRequest(requestId));
             showToast({ message: "Request accepted! A session has been created.", type: "success" });
-            queryClient.invalidateQueries({ queryKey: ["volunteer-learner-requests"] });
-            queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
+            invalidateScheduleViews(queryClient, "volunteer");
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Failed to accept request"), type: "error" });
         } finally {
@@ -290,16 +328,20 @@ export default function VolunteerInstantSessionsPage() {
     };
 
     const handleCompleteSession = async (sessionId: string) => {
+        if (isActionLoading) return;
+        if (!(await askConfirm({ title: "Mark as completed", description: "Mark this session as completed? This can't be undone.", confirmText: "Mark completed", cancelText: "Not yet" }))) return;
         setIsActionLoading(true);
+        setDetailAction("complete");
         try {
             await PUT_API(endpoints.session.markAsCompleted(sessionId), {});
             showToast({ message: "Session marked as completed", type: "success" });
-            queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
+            invalidateScheduleViews(queryClient, "volunteer");
             setSessionDetail(null);
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Failed to complete session"), type: "error" });
         } finally {
             setIsActionLoading(false);
+            setDetailAction(null);
         }
     };
 
@@ -309,7 +351,7 @@ export default function VolunteerInstantSessionsPage() {
         try {
             await DELETE_API(endpoints.session.withdrawInstantSession(volunteerSlotId));
             showToast({ message: "Instant session withdrawn", type: "success" });
-            queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
+            invalidateScheduleViews(queryClient, "volunteer");
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Failed to withdraw session"), type: "error" });
         } finally {
@@ -318,19 +360,25 @@ export default function VolunteerInstantSessionsPage() {
     };
 
     const handleCancelSession = async (sessionId: string) => {
+        if (isActionLoading) return;
         if (!(await askConfirm({ title: "Cancel session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel session", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
+        setDetailAction("cancel");
         try {
             await PUT_API(endpoints.session.cancelSession(sessionId), { status: "cancelled" });
             showToast({ message: "Session cancelled", type: "success" });
-            queryClient.invalidateQueries({ queryKey: ["volunteer-my-instant-sessions"] });
+            invalidateScheduleViews(queryClient, "volunteer");
             setSessionDetail(null);
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Failed to cancel session"), type: "error" });
         } finally {
             setIsActionLoading(false);
+            setDetailAction(null);
         }
     };
+
+    const detailBounds = sessionDetail ? sessionBounds(sessionDetail, timeZoneLabel) : null;
+    const detailJoinHref = safeHref(sessionDetail?.meet_link);
 
     const isLoading = isLearnerRequestsLoading || isMySessionsLoading;
 
@@ -365,10 +413,9 @@ export default function VolunteerInstantSessionsPage() {
                 onClose={() => setShowCreateForm(false)}
                 onSubmit={() => {
                     setShowCreateForm(false);
-                    refetchMySessions();
-                    // A posted session also shows on the Schedule calendar - keep that cache
-                    // in sync too, instead of leaving it stale until its own poll.
-                    queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
+                    // A posted session also shows on the Schedule calendar and dashboard - keep
+                    // those caches in sync too, instead of leaving them stale until their poll.
+                    invalidateScheduleViews(queryClient, "volunteer");
                 }}
             />
 
@@ -425,6 +472,8 @@ export default function VolunteerInstantSessionsPage() {
                                     onComplete={handleCompleteSession}
                                     onCancel={handleCancelSession}
                                     onWithdraw={handleWithdrawOpenSession}
+                                    timeZoneLabel={timeZoneLabel}
+                                    now={now}
                                 />
                             ))}
                         </div>
@@ -507,30 +556,31 @@ export default function VolunteerInstantSessionsPage() {
                             onClick={() => setSessionDetail(null)}
                         />
                         {sessionDetail &&
-                            canJoinSession(
-                                sessionDetail,
-                                getLocalSessionBounds(
-                                    sessionDetail.volunteer_start_date,
-                                    sessionDetail.volunteer_start_time,
-                                    sessionDetail.volunteer_end_time
-                                )?.end
-                            ) && (
-                            <a href={sessionDetail.meet_link} target="_blank" rel="noopener noreferrer" className="flex-1">
+                            detailJoinHref &&
+                            canJoinSession({ status: sessionDetail.status, meet_link: detailJoinHref }, detailBounds?.end, now) && (
+                            <a href={detailJoinHref} target="_blank" rel="noopener noreferrer" className="flex-1">
                                 <Button title="Join" btnVariant="secondary" customClassName="w-full" />
                             </a>
                         )}
                         {sessionDetail?.status && !["completed", "cancelled", "expired"].includes(sessionDetail.status) && (
                             <>
-                                <Button
-                                    title="Complete"
-                                    btnVariant="secondary"
-                                    customClassName="flex-1"
-                                    onClick={() => handleCompleteSession(sessionDetail.session_id)}
-                                />
+                                {/* Only once the scheduled end has passed (backend-enforced). */}
+                                {canCompleteSession(sessionDetail, detailBounds, now) && (
+                                    <Button
+                                        title="Complete"
+                                        btnVariant="secondary"
+                                        customClassName="flex-1"
+                                        loading={detailAction === "complete"}
+                                        disabled={isActionLoading}
+                                        onClick={() => handleCompleteSession(sessionDetail.session_id)}
+                                    />
+                                )}
                                 <Button
                                     title="Cancel"
                                     btnVariant="tertiary"
                                     customClassName="!bg-white !text-red-600 !border !border-red-200 flex-1"
+                                    loading={detailAction === "cancel"}
+                                    disabled={isActionLoading}
                                     onClick={() => handleCancelSession(sessionDetail.session_id)}
                                 />
                             </>
@@ -540,11 +590,18 @@ export default function VolunteerInstantSessionsPage() {
             >
                 {sessionDetail && (
                     <div className="flex flex-col gap-3 text-sm text-[#121212]">
-                        {sessionDetail.session_description && <p>{sessionDetail.session_description}</p>}
+                        {sessionDetail.session_description &&
+                            !isRedundantLevelDescription(sessionDetail.session_description, sessionDetail.requested_level) && (
+                                <p>{sessionDetail.session_description}</p>
+                            )}
                         <p>
                             <span className="font-medium">When: </span>
-                            {formatSessionDate(sessionDetail.volunteer_start_date)} ·{" "}
-                            {formatSessionTime(sessionDetail.volunteer_start_time)} – {formatSessionTime(sessionDetail.volunteer_end_time)}
+                            {formatSessionWhen({
+                                date: sessionDetail.volunteer_start_date,
+                                start: sessionDetail.volunteer_start_time,
+                                end: sessionDetail.volunteer_end_time,
+                                timeZoneLabel,
+                            })}
                         </p>
                         {sessionDetail.learner_full_name && (
                             <p>

@@ -7,12 +7,10 @@ import Button from "@/components/common/Button";
 import ConfirmationSuccessfulModal from "./ConfirmationSuccessfulModal";
 import { GET_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import { showToast } from "@/components/common/Toast";
-
-dayjs.extend(customParseFormat);
 import { useQueryClient } from "@tanstack/react-query";
+import { formatDuration, formatSessionTime, getDurationMinutes, shortTimeZone } from "@/utils/sessionDisplay";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { cn } from "@/utils/merge-class";
 
@@ -53,7 +51,6 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
     onClaimLoadingChange,
 }) => {
     const queryClient = useQueryClient();
-    const today = dayjs().format("YYYY-MM-DD");
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [successSession, setSuccessSession] = useState<any>(session);
     const [showConfirmation, setShowConfirmation] = useState(true);
@@ -83,10 +80,17 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
                         const formattedSession = {
                             id: apiData.volunteer_slot_id,
                             title: apiData.title,
-                            startTime: dayjs(apiData.start_time, "HH:mm").format("h:mm a"),
-                            endTime: dayjs(apiData.end_time, "HH:mm").format("h:mm a"),
-                            timezone: (apiData.volunteer_timezone || session.timezone)?.split(" - ")[0], // Fallback if missing
-                            duration: `${apiData.duration} Mins`,
+                            // App-standard "6:00 PM", "45 min", DST-correct zone abbreviation.
+                            startTime: formatSessionTime(apiData.start_time),
+                            endTime: formatSessionTime(apiData.end_time),
+                            timezone: apiData.volunteer_timezone
+                                ? shortTimeZone(apiData.volunteer_timezone, apiData.date)
+                                : session.timezone,
+                            duration: formatDuration(
+                                typeof apiData.duration === "number"
+                                    ? apiData.duration
+                                    : getDurationMinutes(apiData.start_time, apiData.end_time)
+                            ),
                             instructor: {
                                 name: apiData.volunteer_name,
                                 profilePicture: apiData.volunteer_image?.image_url || "/dummy-profile.webp",
@@ -136,14 +140,13 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
             if (res.status === 200 || res.status === 201) {
                 showToast({ message: "Session unclaimed successfully", type: "success" });
                 
-                // Invalidate queries first
-                queryClient.invalidateQueries({ queryKey: ["learner-instant-sessions"] });
-                queryClient.invalidateQueries({ queryKey: ["learner-accepted-instant-sessions"] });
-                
-                // Wait for queries to refetch before hiding loader
+                // Invalidate every view of this session (instant lists, dashboard, calendar).
+                invalidateScheduleViews(queryClient, "learner");
+
+                // Wait for the instant lists (today and tomorrow) to refetch before hiding the loader.
                 await Promise.all([
-                    queryClient.refetchQueries({ queryKey: ["learner-instant-sessions", today] }),
-                    queryClient.refetchQueries({ queryKey: ["learner-accepted-instant-sessions", today] }),
+                    queryClient.refetchQueries({ queryKey: ["learner-instant-sessions"] }),
+                    queryClient.refetchQueries({ queryKey: ["learner-accepted-instant-sessions"] }),
                 ]);
                 
                 onUnclaim?.();
@@ -188,7 +191,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
     const modalBodyContent = (
         <div className="flex flex-col gap-4">
             <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                Please confirm if you want to claim the "<span className="text-[#121212]">{session.title}</span>" session hosted by <span className="text-[#121212]">{session.instructor.name}</span>, scheduled from <span className="text-[#121212]">{session.startTime} to {session.endTime}</span>.
+                Please confirm if you want to claim the &ldquo;<span className="text-[#121212]">{session.title}</span>&rdquo; session hosted by <span className="text-[#121212]">{session.instructor.name}</span>, scheduled from <span className="text-[#121212]">{session.startTime} to {session.endTime}</span>.
             </p>
             <div className="bg-[#E0F2FE] rounded-lg p-4">
                 <p className="text-sm text-[#4F4F4F] leading-relaxed">

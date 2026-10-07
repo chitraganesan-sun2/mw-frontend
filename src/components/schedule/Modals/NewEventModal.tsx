@@ -28,6 +28,7 @@ import { getApiErrorMessage } from "@/utils/apiError";
 import { useQuery } from "@tanstack/react-query";
 import { useAppStore } from "@/store/useAppStore";
 import useInnerWidth from "@/hooks/useInnerWidth";
+import { shortTimeZone } from "@/utils/sessionDisplay";
 import ModalCloseIcon from "@/assets/icons/ModalCloseIcon";
 import { extractTimezoneOffset } from "@/utils/timeFunctions";
 
@@ -166,10 +167,12 @@ export default function NewEventModal({
     // Use IANA timezone name if available, otherwise raw abbreviation
     const volunteerTimezone = ianaTimezone || rawAbbreviation;
 
-    // Get the current active abbreviation (handles NST -> NDT transition)
-    const activeAbbreviation = ianaTimezone
-        ? dayjs().tz(ianaTimezone).format("z")
-        : rawAbbreviation;
+    // Abbreviation in effect on the chosen date (EST/EDT, NST/NDT) - and "IST" rather than
+    // Intl's "GMT+5:30".
+    const activeAbbreviation = shortTimeZone(
+        timezoneRaw || rawAbbreviation,
+        formData.select_date ? dayjs(formData.select_date).format("YYYY-MM-DD") : undefined
+    );
 
     // Get UTC offset from volunteerDetails or store, with fallback to extracting from timezone string
     const volunteerUtcOffsetValue =

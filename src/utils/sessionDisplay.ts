@@ -122,7 +122,40 @@ export function formatDuration(minutes?: number | null): string {
     return mins ? `${hours} hr ${mins} min` : `${hours} hr`;
 }
 
-/** Local start/end as dayjs objects (end rolls to the next day for overnight sessions). */
+/** Same calendar year as now -> "Oct 7", otherwise "Oct 7, 2027" - for compact rows. */
+export function formatShortSessionDate(date?: string | null): string {
+    if (!date) return "";
+    const d = dayjs(date, "YYYY-MM-DD", true);
+    if (!d.isValid()) return "";
+    return d.format(d.year() === dayjs().year() ? "MMM D" : "MMM D, YYYY");
+}
+
+/**
+ * The app-standard one-liner for a session's time: "October 15, 2026 · 6:00 PM – 6:45 PM EDT
+ * · 45 min". `date`/`start`/`end` are the viewer's profile-local fields; `timeZoneLabel` is the
+ * viewer's profile label (resolved to the abbreviation in effect on that date).
+ */
+export function formatSessionWhen({
+    date,
+    start,
+    end,
+    timeZoneLabel,
+}: {
+    date?: string | null;
+    start?: string | null;
+    end?: string | null;
+    timeZoneLabel?: string | null;
+}): string {
+    const range = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
+    const tz = range && timeZoneLabel ? shortTimeZone(timeZoneLabel, date) : "";
+    return [formatSessionDate(date), [range, tz].filter(Boolean).join(" "), formatDuration(getDurationMinutes(start, end))]
+        .filter(Boolean)
+        .join(" · ");
+}
+
+/** Local start/end as dayjs objects (end rolls to the next day for overnight sessions).
+ * Parsed in the BROWSER's timezone - display only. For "has it started/ended" decisions use
+ * getSessionInstantBounds, which works from the UTC fields. */
 export function getLocalSessionBounds(date?: string | null, start?: string | null, end?: string | null) {
     if (!date || !start) return null;
     const startAt = dayjs(`${date} ${start.slice(0, 5)}`, "YYYY-MM-DD HH:mm", true);
@@ -144,6 +177,45 @@ const ABBR_TO_IANA: Record<string, string> = {
     IST: "Asia/Kolkata",
 };
 
+/** IANA zone for a profile label ("EST - Eastern Standard Time (UTC-05:00)" -> America/New_York).
+ * Also accepts a bare abbreviation or an IANA name. Null when it can't be resolved. */
+export function profileTimeZoneIana(label?: string | null): string | null {
+    if (!label) return null;
+    const abbr = label.split(" - ")[0].trim();
+    if (ABBR_TO_IANA[abbr]) return ABBR_TO_IANA[abbr];
+    return /^[A-Za-z]+\/[A-Za-z_]+/.test(abbr) ? abbr : null;
+}
+
+/** "Now" in the profile's timezone (falls back to the browser's when unresolvable). */
+export function profileNow(label?: string | null): dayjs.Dayjs {
+    const iana = profileTimeZoneIana(label);
+    return iana ? dayjs().tz(iana) : dayjs();
+}
+
+/** Today's date (YYYY-MM-DD) in the profile's timezone. */
+export function profileToday(label?: string | null): string {
+    return profileNow(label).format("YYYY-MM-DD");
+}
+
+// Intl has no short name for some zones in en-US and prints an offset instead
+// ("GMT+5:30" for India, "GMT-2:30" for Newfoundland summer time).
+const OFFSET_ABBREVIATIONS: Record<string, (offsetMinutes: number) => string> = {
+    "Asia/Kolkata": () => "IST",
+    "Asia/Calcutta": () => "IST",
+    "America/St_Johns": (offset) => (offset === -150 ? "NDT" : "NST"),
+};
+
+/** Abbreviation for `iana` at the instant `at` ("EDT", "IST", "NDT"); never a "GMT+x" offset
+ * when a proper abbreviation exists. */
+export function zoneAbbreviation(iana: string, at: dayjs.Dayjs = dayjs()): string {
+    const local = at.tz(iana);
+    if (!local.isValid()) return "";
+    const z = local.format("z");
+    if (!/^(GMT|UTC)[+-]/.test(z)) return z;
+    const explicit = OFFSET_ABBREVIATIONS[iana];
+    return explicit ? explicit(local.utcOffset()) : z;
+}
+
 /**
  * Profile timezone labels look like "EST - Eastern Standard Time (UTC-05:00)". Show the
  * abbreviation in effect on `date` (EST -> EDT in summer), so every form and card agrees -
@@ -153,10 +225,110 @@ const ABBR_TO_IANA: Record<string, string> = {
 export function shortTimeZone(label?: string | null, date?: string | null): string {
     if (!label) return "";
     const abbr = label.split(" - ")[0].trim();
-    const iana = ABBR_TO_IANA[abbr];
+    const iana = profileTimeZoneIana(label);
     if (!iana) return abbr;
-    const at = date ? dayjs.tz(`${date} 12:00`, iana) : dayjs().tz(iana);
-    return at.isValid() ? at.format("z") : abbr;
+    const at = date ? dayjs.tz(`${date} 12:00`, iana) : dayjs();
+    if (!at.isValid()) return abbr;
+    const z = zoneAbbreviation(iana, at);
+    return z && !/^(GMT|UTC)[+-]/.test(z) ? z : abbr;
+}
+
+// ---------------------------------------------------------------- absolute session time
+
+/** The UTC fields the API stores on sessions (session_*) and on instant-session posts (utc_*). */
+export interface SessionInstantFields {
+    session_date?: string | null;
+    session_start_time?: string | null;
+    session_end_time?: string | null;
+    utc_start_date?: string | null;
+    utc_start_time?: string | null;
+    utc_end_date?: string | null;
+    utc_end_time?: string | null;
+}
+
+/** Profile-local fields to fall back on when a record carries no UTC fields. */
+export interface LocalTimeFallback {
+    date?: string | null;
+    start?: string | null;
+    end?: string | null;
+    /** The profile timezone the local fields are expressed in. */
+    timeZoneLabel?: string | null;
+}
+
+function parseUtc(date?: string | null, time?: string | null): dayjs.Dayjs | null {
+    if (!date || !time) return null;
+    const d = dayjs.utc(`${date} ${time.slice(0, 5)}`, "YYYY-MM-DD HH:mm", true);
+    return d.isValid() ? d : null;
+}
+
+/**
+ * Absolute start/end instants of a session, for every "has it started / ended / is it
+ * joinable" decision. Built from the UTC fields - the profile-local copies are wall-clock
+ * times in the PROFILE timezone, and parsing them in the browser's timezone (which can
+ * differ) made a session starting in 10 minutes look already ended. The end rolls past
+ * midnight when it isn't after the start. Falls back to the local fields (interpreted in the
+ * profile timezone when known) only when the record has no UTC fields.
+ */
+export function getSessionInstantBounds(
+    session?: SessionInstantFields | null,
+    fallback?: LocalTimeFallback
+): { start: dayjs.Dayjs; end: dayjs.Dayjs } | null {
+    if (session) {
+        const postStart = parseUtc(session.utc_start_date, session.utc_start_time);
+        if (postStart) {
+            let end = parseUtc(session.utc_end_date || session.utc_start_date, session.utc_end_time) ?? postStart;
+            if (!end.isAfter(postStart)) {
+                end = postStart.add(getDurationMinutes(session.utc_start_time, session.utc_end_time) ?? 0, "minute");
+            }
+            return { start: postStart, end };
+        }
+        const start = parseUtc(session.session_date, session.session_start_time);
+        if (start) {
+            return {
+                start,
+                end: start.add(getDurationMinutes(session.session_start_time, session.session_end_time) ?? 0, "minute"),
+            };
+        }
+    }
+    if (fallback?.date && fallback.start) {
+        const iana = profileTimeZoneIana(fallback.timeZoneLabel);
+        const text = `${fallback.date} ${fallback.start.slice(0, 5)}`;
+        const start = iana ? dayjs.tz(text, "YYYY-MM-DD HH:mm", iana) : dayjs(text, "YYYY-MM-DD HH:mm", true);
+        if (!start.isValid()) return null;
+        return { start, end: start.add(getDurationMinutes(fallback.start, fallback.end) ?? 0, "minute") };
+    }
+    return null;
+}
+
+/** True once the session's scheduled end has passed (unknown bounds -> false). */
+export function hasSessionEnded(
+    bounds: { end: dayjs.Dayjs } | null | undefined,
+    now: dayjs.Dayjs = dayjs()
+): boolean {
+    return Boolean(bounds && !bounds.end.isAfter(now));
+}
+
+// ---------------------------------------------------------------- levels
+
+const EXPERTISE_LABELS: Record<string, string> = {
+    beginner: "Beginner",
+    intermediate: "Intermediate",
+    expert: "Expert",
+};
+
+/** Display label for a stored level: "beginner" -> "Beginner"; grades ("Grade 7") as-is. */
+export function formatLevel(level?: string | null): string {
+    if (!level) return "";
+    const trimmed = level.trim();
+    return EXPERTISE_LABELS[trimmed.toLowerCase()] ?? trimmed;
+}
+
+/** Accepting a learner request stores "Requested level: <level>" as the description, which
+ * only repeats the level line already on the card. */
+export function isRedundantLevelDescription(description?: string | null, level?: string | null): boolean {
+    if (!description || !level) return false;
+    const match = description.trim().match(/^Requested level:\s*(.+)$/i);
+    return Boolean(match && match[1].trim().toLowerCase() === level.trim().toLowerCase());
 }
 
 // ---------------------------------------------------------------- join rule
@@ -183,4 +355,18 @@ export function canJoinSession(
     if (status !== "accepted" && status !== "active" && status !== "booked") return false;
     if (endsAt && !endsAt.isAfter(now)) return false;
     return true;
+}
+
+/**
+ * Whether to offer "Mark as completed": only for a live (accepted / in-progress / booked)
+ * session whose scheduled END has passed - the backend rejects completion before that.
+ */
+export function canCompleteSession(
+    session: { status?: string | null },
+    bounds: { end: dayjs.Dayjs } | null | undefined,
+    now: dayjs.Dayjs = dayjs()
+): boolean {
+    const status = normalizeStatus(session.status);
+    if (status !== "accepted" && status !== "active" && status !== "booked") return false;
+    return hasSessionEnded(bounds, now);
 }

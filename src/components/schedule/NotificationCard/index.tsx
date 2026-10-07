@@ -11,12 +11,11 @@ import { useSendData } from "@/hooks/useReactQuery";
 import { useState } from "react";
 import { cn } from "@/utils/merge-class";
 import { showToast } from "@/components/common/Toast";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { joinNames } from "@/utils/joinNames";
-
-dayjs.extend(customParseFormat);
+import { useAppStore } from "@/store/useAppStore";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { formatSessionDate, formatSessionTime, shortTimeZone } from "@/utils/sessionDisplay";
 
 interface NotificationCardProps {
     data: {
@@ -65,30 +64,13 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
     const queryClient = useQueryClient();
     const [loadingAccept, setLoadingAccept] = useState(false);
     const [loadingDecline, setLoadingDecline] = useState(false);
-
-    const formatTimeRange = (timeRange: string) => {
-        const [start, end] = timeRange.split(" - ");
-        const startDayjs = dayjs(start, "h:mm A");
-        const endDayjs = dayjs(end, "h:mm A");
-
-        if (startDayjs.format("A") === endDayjs.format("A")) {
-            return `${startDayjs.format("h:mm")} - ${endDayjs.format("h:mm A")}`;
-        }
-        return `${startDayjs.format("h:mm A")} - ${endDayjs.format("h:mm A")}`;
-    };
+    const { learnerTimeZone, volunteerTimeZone } = useAppStore();
+    const timeZoneLabel = isLearnerViewer ? learnerTimeZone : volunteerTimeZone;
 
     const formatTime = (start: string, end: string) => {
         if (!start || !end) return "Time not set";
-
-        const formatToAMPM = (time: string) => {
-            const [hours, minutes] = time.split(":");
-            const hoursNum = parseInt(hours);
-            const ampm = hoursNum >= 12 ? "PM" : "AM";
-            const formattedHours = hoursNum % 12 || 12;
-            return `${formattedHours}:${minutes} ${ampm}`;
-        };
-
-        return `${formatToAMPM(start)} - ${formatToAMPM(end)}`;
+        const tz = timeZoneLabel ? shortTimeZone(timeZoneLabel, displayDate) : "";
+        return `${formatSessionTime(start)} – ${formatSessionTime(end)}${tz ? ` ${tz}` : ""}`;
     };
 
     const handleNotificationStatus = async (status: string, sessionId: string) => {
@@ -105,9 +87,6 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
             } else {
                 showToast({ type: "info", message: "Session request declined" });
             }
-            queryClient.invalidateQueries({
-                queryKey: [isLearnerViewer ? "learner-events" : "volunteer-events"],
-            });
         });
     };
 
@@ -116,11 +95,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
         fn: (status: string) => handleNotificationStatus(status, data?.session_id),
         invalidateKey: [isLearnerViewer ? "learner-accepted-sessions" : "volunteer-accepted-sessions"],
         success: () => {
-            queryClient.invalidateQueries({
-                queryKey: [isLearnerViewer ? "learner-approval-notifications" : "approval-notifications"],
-            });
-            // ["events"] matched no query - the calendars are keyed per role.
-            queryClient.invalidateQueries({ queryKey: [isLearnerViewer ? "learner-events" : "volunteer-events"] });
+            // Bell list, calendar AND the Schedule dashboard (it used to stay "Pending" until
+            // its 30s poll).
+            invalidateScheduleViews(queryClient, viewerRole);
             setLoadingAccept(false);
             setLoadingDecline(false);
         },
@@ -151,7 +128,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                 </div>
                 <div className="flex flex-col gap-1">
                     <p className="text-[0.75rem] font-medium text-gray-light">Date</p>
-                    <p className="text-sm font-medium">{dayjs(displayDate).format("D-MMM-YYYY")}</p>
+                    <p className="text-sm font-medium">{formatSessionDate(displayDate)}</p>
                 </div>
                 <div className="flex flex-col gap-1">
                     <p className="text-[0.75rem] font-medium text-gray-light">Time</p>

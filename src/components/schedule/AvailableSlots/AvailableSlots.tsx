@@ -8,7 +8,7 @@ import { getCookie } from "@/utils/auth";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { useAppStore } from "@/store/useAppStore";
+import { shortTimeZone } from "@/utils/sessionDisplay";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -51,37 +51,14 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
         queryKey: queryKey,
         queryFn: async () => await getUserDetails(),
     });
-    const timezoneMapping: Record<string, string> = {
-        AKST: "America/Anchorage",
-        AKDT: "America/Anchorage",
-        AST: "America/Halifax",
-        ADT: "America/Halifax",
-        CST: "America/Chicago",
-        CDT: "America/Chicago",
-        EST: "America/New_York",
-        EDT: "America/New_York",
-        HST: "Pacific/Honolulu",
-        HDT: "Pacific/Honolulu",
-        MST: "America/Denver",
-        MDT: "America/Denver",
-        MT: "America/Denver",
-        NST: "America/St_Johns",
-        NDT: "America/St_Johns",
-        PST: "America/Los_Angeles",
-        PDT: "America/Los_Angeles",
-        PT: "America/Los_Angeles",
-        CT: "America/Chicago",
-        ET: "America/New_York",
-        IST: "Asia/Kolkata",
-    };
-
     const userProfileTimezone = isVolunteer
         ? data?.volunteer_contact_details?.timezone
         : data?.learner_personal_info?.learner_contact_details?.timezone;
 
-    // Handle full timezone strings like "MST - Mountain Standard Time (UTC-07:00)"
-    const tzKey = userProfileTimezone?.split(" - ")[0] || "";
-    const userIANA = (tzKey && timezoneMapping[tzKey]) || (userProfileTimezone && !userProfileTimezone.includes(" ") ? userProfileTimezone : dayjs.tz.guess());
+    // Slot times are in the viewer's profile timezone. `volunteerTimezone` (a profile label or
+    // an IANA name) overrides it; shortTimeZone gives the DST-correct abbreviation for the
+    // date, and "IST"/"NDT" instead of Intl's "GMT+5:30"/"GMT-2:30".
+    const tzSource = volunteerTimezone || userProfileTimezone || dayjs.tz.guess();
 
     // No filtering needed - showing all slots from API as requested.
     const displaySlots = availableSlots;
@@ -95,6 +72,8 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
             <div>
                 {slotError ? (
                     <p className="text-xs font-normal -mt-2 mb-2 text-red-500">{slotError}</p>
+                ) : errors && selectedDate ? (
+                    <p role="alert" className="text-xs font-normal -mt-2 mb-2 text-red-700">{errors}</p>
                 ) : (
                     <p className="text-xs font-normal mb-2 -mt-2 text-gray-400">
                         {fetchingSlots ? (
@@ -131,8 +110,7 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
             >
                 <div className="flex gap-3 flex-wrap">
                     {displaySlots.map((slot) => {
-                        const tz = volunteerTimezone || userIANA;
-                        const abbr = dayjs.tz(`${selectedDate} ${slot.start_time}`, tz).format("z");
+                        const abbr = shortTimeZone(tzSource, selectedDate);
 
                         return (
                             <Radio
@@ -146,7 +124,11 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
                     })}
                 </div>
             </Radio.Group>
-            {isSlotsAvailable && <p className="text-xs text-red-500 mt-1">{errors}</p>}
+            {isSlotsAvailable && errors && (
+                <p role="alert" className="text-xs text-red-700 mt-1">
+                    {errors}
+                </p>
+            )}
         </div>
     );
 };

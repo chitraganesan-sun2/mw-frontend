@@ -28,14 +28,20 @@ import { useConfirm } from "@/hooks/useConfirm";
 import {
     canJoinSession,
     formatDuration,
+    formatLevel,
     formatSessionDate,
     formatSessionTime,
+    formatSessionWhen,
     getDurationMinutes,
-    getLocalSessionBounds,
+    getSessionInstantBounds,
     getStatusLabel,
     getStatusPillClass,
     shortTimeZone,
+    type SessionInstantFields,
 } from "@/utils/sessionDisplay";
+import { safeHref } from "@/utils/safeHref";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { useProfileTimeZone, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 
 export interface Session {
     id: string;
@@ -57,6 +63,8 @@ export interface Session {
     volunteer_id?: string;
     start_time_24?: string;
     end_time_24?: string;
+    /** UTC fields of the post/session - for "has it ended" (Join) decisions. */
+    instant?: SessionInstantFields;
     instructor: {
         name: string;
         profilePicture?: string;
@@ -95,8 +103,8 @@ function mapItemToSession(item: any, date: string): Session {
         .filter(Boolean);
     // The level the volunteer is teaching at (grade or Beginner/Intermediate/Expert) - shown
     // alongside the skill, like "Level" on the learner's own request cards.
-    const level: string = item.grade_level || item.expertise_level || "";
-    if (level) tags.push(level.charAt(0).toUpperCase() + level.slice(1));
+    const level = formatLevel(item.grade_level || item.expertise_level);
+    if (level) tags.push(level);
     const isClaimed =
         item.is_accepted === true || item.status === "claimed" || item.status === "accepted";
     const startDateTime =
@@ -121,6 +129,15 @@ function mapItemToSession(item: any, date: string): Session {
         volunteer_id: item.volunteer_id,
         start_time_24: item.start_time ?? startTimeRaw,
         end_time_24: item.end_time ?? endTimeRaw,
+        instant: {
+            utc_start_date: item.utc_start_date,
+            utc_start_time: item.utc_start_time,
+            utc_end_date: item.utc_end_date,
+            utc_end_time: item.utc_end_time,
+            session_date: item.session_date,
+            session_start_time: item.session_start_time,
+            session_end_time: item.session_end_time,
+        },
         instructor: {
             name: instructorName,
             profilePicture:
@@ -142,11 +159,13 @@ function RequestedSessionCard({
     isActionLoading,
     onCancel,
     onView,
+    timeZoneLabel,
 }: {
     request: any;
     isActionLoading: boolean;
     onCancel: (requestId: string) => void;
     onView: (sessionId: string) => void;
+    timeZoneLabel?: string;
 }) {
     const statusClass = getStatusPillClass(request.status);
     const statusLabel = getStatusLabel(request.status);
@@ -164,7 +183,7 @@ function RequestedSessionCard({
                 </span>
             </div>
             <p className="text-sm text-gray-600 mb-2">
-                Level: {request.grade_level || request.expertise_level || "N/A"}
+                Level: {formatLevel(request.grade_level || request.expertise_level) || "N/A"}
             </p>
             {request.volunteer_name && (
                 <p className="text-sm text-gray-600 mb-2">
@@ -189,6 +208,7 @@ function RequestedSessionCard({
             <div className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="font-medium">
                     {formatSessionDate(request.availability_date)} · {formatSessionTime(request.availability_start_time)}
+                    {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, request.availability_date)}` : ""}
                 </span>
                 <span className="text-gray-500">· {formatDuration(request.duration)}</span>
             </div>
@@ -229,8 +249,11 @@ export default function InstantSessionsPage() {
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
 
-    const todayStr = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
-    const tomorrowStr = useMemo(() => dayjs().add(1, "day").format("YYYY-MM-DD"), []);
+    // Today/tomorrow in the learner's PROFILE timezone (not the browser's), re-evaluated every
+    // minute and on focus so an open tab rolls over at midnight.
+    const timeZoneLabel = useProfileTimeZone("learner");
+    const todayStr = useProfileToday("learner");
+    const tomorrowStr = useMemo(() => dayjs(todayStr).add(1, "day").format("YYYY-MM-DD"), [todayStr]);
     // Browsing is always "today + tomorrow" combined, no per-date navigation - users
     // shouldn't have to click forward just to see whether tomorrow has anything.
     const browseDates = useMemo(() => [todayStr, tomorrowStr], [todayStr, tomorrowStr]);
@@ -303,6 +326,9 @@ export default function InstantSessionsPage() {
     const myRequestsHasMore = Number(requestsPage) * REQUESTS_PAGE_SIZE < myRequestsTotal;
 
     const availableSessions: Session[] = useMemo(() => {
+        // The today and tomorrow fetches can both return the same post (the backend pads the
+        // date window) - keep one copy per id, or React gets duplicate keys and the card shows twice.
+        const seen = new Set<string>();
         return availableQueries
             .flatMap((q, i) => {
                 const apiData = q.data;
@@ -311,6 +337,7 @@ export default function InstantSessionsPage() {
                 return raw.map((item: any) => mapItemToSession(item, browseDates[i]));
             })
             .filter((s: Session) => s.status === "available")
+            .filter((s: Session) => !seen.has(s.id) && Boolean(seen.add(s.id)))
             .sort((a: Session, b: Session) =>
                 a.startDateTime && b.startDateTime
                     ? dayjs(a.startDateTime).valueOf() - dayjs(b.startDateTime).valueOf()
@@ -331,6 +358,8 @@ export default function InstantSessionsPage() {
                     .map((item: any) => mapItemToSession(item, date))
                     .filter((s: Session) => s.date === date);
             })
+            // Same de-duplication as the available list.
+            .filter((s: Session, index: number, all: Session[]) => all.findIndex((o) => o.id === s.id) === index)
             .sort((a: Session, b: Session) =>
                 a.startDateTime && b.startDateTime
                     ? dayjs(a.startDateTime).valueOf() - dayjs(b.startDateTime).valueOf()
@@ -358,16 +387,23 @@ export default function InstantSessionsPage() {
             setSessionDetail({
                 title: apiData?.title ?? session.title,
                 description: apiData?.description ?? session.description,
-                dateLabel: formatSessionDate(apiData?.date ?? session.date),
-                timeLabel: apiData?.start_time && apiData?.end_time
-                    ? `${formatSessionTime(apiData.start_time)} – ${formatSessionTime(apiData.end_time)}`
-                    : `${session.startTime} – ${session.endTime}`,
+                whenLabel: formatSessionWhen({
+                    date: apiData?.date ?? session.date,
+                    start: apiData?.start_time ?? session.start_time_24,
+                    end: apiData?.end_time ?? session.end_time_24,
+                    timeZoneLabel,
+                }),
                 hostName: apiData?.volunteer_name ?? session.instructor.name,
-                meetLink: apiData?.meet_link,
-                endsAt: getLocalSessionBounds(
-                    apiData?.date ?? session.date,
-                    apiData?.start_time ?? session.start_time_24,
-                    apiData?.end_time ?? session.end_time_24
+                meetLink: safeHref(apiData?.meet_link),
+                // Absolute end (UTC fields) - the local fields are in the profile timezone.
+                endsAt: getSessionInstantBounds(
+                    { ...session.instant, ...apiData },
+                    {
+                        date: apiData?.date ?? session.date,
+                        start: apiData?.start_time ?? session.start_time_24,
+                        end: apiData?.end_time ?? session.end_time_24,
+                        timeZoneLabel,
+                    }
                 )?.end,
                 status: "accepted",
                 cancelAction: "unclaim",
@@ -409,17 +445,20 @@ export default function InstantSessionsPage() {
             setSessionDetail({
                 title: apiData?.session_title,
                 description: apiData?.session_description,
-                dateLabel: formatSessionDate(apiData?.learner_start_date),
-                timeLabel: apiData?.learner_start_time && apiData?.learner_end_time
-                    ? `${formatSessionTime(apiData.learner_start_time)} – ${formatSessionTime(apiData.learner_end_time)}`
-                    : undefined,
+                whenLabel: formatSessionWhen({
+                    date: apiData?.learner_start_date,
+                    start: apiData?.learner_start_time,
+                    end: apiData?.learner_end_time,
+                    timeZoneLabel,
+                }),
                 hostName: apiData?.volunteer_full_name,
-                meetLink: apiData?.meet_link,
-                endsAt: getLocalSessionBounds(
-                    apiData?.learner_start_date,
-                    apiData?.learner_start_time,
-                    apiData?.learner_end_time
-                )?.end,
+                meetLink: safeHref(apiData?.meet_link),
+                endsAt: getSessionInstantBounds(apiData, {
+                    date: apiData?.learner_start_date,
+                    start: apiData?.learner_start_time,
+                    end: apiData?.learner_end_time,
+                    timeZoneLabel,
+                })?.end,
                 status: apiData?.status,
                 cancelAction: ["completed", "cancelled", "expired"].includes(apiData?.status) ? "none" : "cancel",
                 identifier: sessionId,
@@ -436,7 +475,7 @@ export default function InstantSessionsPage() {
         setIsActionLoading(true);
         try {
             await DELETE_API(endpoints.session.cancelLearnerRequest(requestId));
-            queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
+            invalidateScheduleViews(queryClient, "learner");
             showToast({ message: "Request cancelled successfully", type: "success" });
         } catch (e: any) {
             showToast({ message: getApiErrorMessage(e, "Failed to cancel request"), type: "error" });
@@ -446,7 +485,7 @@ export default function InstantSessionsPage() {
     };
 
     const handleCancelDetail = async () => {
-        if (!sessionDetail?.identifier || sessionDetail.cancelAction === "none") return;
+        if (isActionLoading || !sessionDetail?.identifier || sessionDetail.cancelAction === "none") return;
         if (!(await askConfirm({ title: "Cancel session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel session", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
@@ -456,9 +495,7 @@ export default function InstantSessionsPage() {
                 await PUT_API(endpoints.session.cancelSession(sessionDetail.identifier), { status: "cancelled" });
             }
             showToast({ message: "Session cancelled successfully", type: "success" });
-            queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
-            queryClient.invalidateQueries({ queryKey: ["learner-instant-sessions"] });
-            queryClient.invalidateQueries({ queryKey: ["learner-accepted-instant-sessions"] });
+            invalidateScheduleViews(queryClient, "learner");
             setSessionDetail(null);
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Failed to cancel session"), type: "error" });
@@ -536,6 +573,7 @@ export default function InstantSessionsPage() {
                                     isActionLoading={isActionLoading}
                                     onCancel={handleCancelRequest}
                                     onView={handleViewRequestedSession}
+                                    timeZoneLabel={timeZoneLabel}
                                 />
                             ))}
                         </div>
@@ -661,6 +699,8 @@ export default function InstantSessionsPage() {
                                 title="Cancel"
                                 btnVariant="tertiary"
                                 customClassName="!bg-white !text-red-600 !border !border-red-200 flex-1"
+                                loading={isActionLoading}
+                                disabled={isActionLoading}
                                 onClick={handleCancelDetail}
                             />
                         )}
@@ -672,7 +712,7 @@ export default function InstantSessionsPage() {
                         {sessionDetail.description && <p>{sessionDetail.description}</p>}
                         <p>
                             <span className="font-medium">When: </span>
-                            {sessionDetail.dateLabel} {sessionDetail.timeLabel}
+                            {sessionDetail.whenLabel}
                         </p>
                         {sessionDetail.hostName && (
                             <p>
@@ -687,9 +727,7 @@ export default function InstantSessionsPage() {
             <RequestInstantSessionModal
                 isOpen={isRequestModalOpen}
                 onClose={() => setIsRequestModalOpen(false)}
-                onSuccess={() => {
-                    queryClient.invalidateQueries({ queryKey: ["learner-my-requests"] });
-                }}
+                onSuccess={() => invalidateScheduleViews(queryClient, "learner")}
             />
         </div>
     );

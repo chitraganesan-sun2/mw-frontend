@@ -7,6 +7,7 @@ import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
 import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import { useState, useEffect, useRef } from "react";
+import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 
 const HeaderNotificationBell = () => {
     // getCookie reads document.cookie, which isn't available during SSR - reading it
@@ -20,7 +21,8 @@ const HeaderNotificationBell = () => {
         setVolunteerId(getCookie("volunteer_id"));
         setLearnerId(getCookie("learner_id"));
     }, []);
-    const [isOpen, setIsOpen] = useState(false);
+    // Shared open state: a pending card's "Respond" on the Schedule dashboard opens this drawer too.
+    const { isOpen, open: openDrawer, close: closeDrawer } = useApprovalDrawer();
     const [showToast, setShowToast] = useState(false);
     const prevCount = useRef<number>(0);
     const hasInitialized = useRef(false);
@@ -68,7 +70,7 @@ const HeaderNotificationBell = () => {
             <button
                 type="button"
                 aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
-                onClick={() => setIsOpen(true)}
+                onClick={openDrawer}
                 className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white p-0 text-black transition-colors hover:bg-gray-50"
             >
                 <HiOutlineBell size={20} aria-hidden="true" />
@@ -106,7 +108,7 @@ const HeaderNotificationBell = () => {
 
             <ApprovalModal
                 isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
+                onClose={closeDrawer}
                 role={isLearner ? "learner" : "volunteer"}
             />
         </>

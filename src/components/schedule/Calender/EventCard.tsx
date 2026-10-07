@@ -87,7 +87,7 @@ const EventCard = ({
                 <>
                     <div className="flex items-center gap-2 truncate overflow-hidden min-w-0 flex-1 event-title-section">
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 event-dot ${currentStyle.dot}`} />
-                        <span className="font-normal capitalize !text-sm truncate">{title}</span>
+                        <span className="font-normal !text-sm truncate">{title}</span>
                     </div>
                     <span className="text-xs whitespace-nowrap flex-shrink-0 event-time-section">{time || `${startTime} - ${endTime}`}</span>
                 </>

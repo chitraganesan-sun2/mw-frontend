@@ -8,6 +8,7 @@ import { TimeIcon, HostedByIcon, VerifyTickIcon } from "@/assets/icons";
 import ModalCloseIcon from "@/assets/icons/ModalCloseIcon";
 import PersonImg from "@/assets/images/Person.png";
 import useInnerWidth from "@/hooks/useInnerWidth";
+import { safeHref } from "@/utils/safeHref";
 
 interface ConfirmationSuccessfulModalProps {
     isOpen: boolean;
@@ -39,18 +40,20 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
     onJoinMeeting,
 }) => {
     const [copied, setCopied] = useState(false);
+    // Only a real http(s) Meet link - Join used to open an empty window when there was none.
+    const meetHref = safeHref(session.meetingLink);
 
     const handleCopyLink = () => {
-        if (session.meetingLink) {
-            navigator.clipboard.writeText(session.meetingLink);
+        if (meetHref) {
+            navigator.clipboard.writeText(meetHref);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         }
     };
 
     const handleJoinMeeting = () => {
-        if (session.meetingLink) {
-            window.open(session.meetingLink, "_blank");
+        if (meetHref) {
+            window.open(meetHref, "_blank", "noopener,noreferrer");
         }
     };
 
@@ -130,19 +133,23 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                             btnVariant="secondary"
                             customClassName="!w-full max-w-[207px] !h-11 !bg-[#68DBFF] !text-[#121212] hover:!bg-[#B3E5FC] !font-medium !rounded-xl"
                             onClick={handleJoinMeeting}
+                            disabled={!meetHref}
+                            aria-describedby={meetHref ? undefined : "meet-link-missing"}
                         />
                         <div className="w-full max-w-[207px] mt-0">
-                            {session.meetingLink ? (
+                            {meetHref ? (
                                 <a
-                                    href={session.meetingLink}
+                                    href={meetHref}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-[12px] text-[#000000] font-medium hover:underline break-words"
                                 >
-                                    {session.meetingLink}
+                                    {meetHref}
                                 </a>
                             ) : (
-                                <span className="text-[12px] text-[#000000] font-medium">—</span>
+                                <span id="meet-link-missing" className="text-[12px] text-[#4F4F4F] font-medium">
+                                    The Meet link isn&apos;t available yet.
+                                </span>
                             )}
                         </div>
                     </div>
@@ -151,6 +158,7 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                         btnVariant="tertiary"
                         customClassName="!w-[100px] !h-8 !bg-white !text-black !border !border-gray-300 !px-6 !mt-4 !rounded-full flex items-center justify-center flex-shrink-0"
                         onClick={handleCopyLink}
+                        disabled={!meetHref}
                     />
                 </div>
             </div>

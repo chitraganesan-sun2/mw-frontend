@@ -5,6 +5,7 @@ import { DatePicker, Radio, Input } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import UpdownIcon from "@/assets/icons/UpdownIcon";
 import cn from "classnames";
+import { useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 
 interface CustomRecurrenceModalProps {
     isOpen: boolean;
@@ -29,6 +30,8 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
     onSave,
     initialData,
 }) => {
+    // "Today" in the user's PROFILE timezone - the browser's date can differ.
+    const today = useProfileToday();
     const [repeatEvery, setRepeatEvery] = useState<number>(initialData?.repeatEvery ?? 0);
     const [startDate, setStartDate] = useState<Dayjs | null>(
         initialData?.start_date ? dayjs(initialData.start_date) : null
@@ -146,7 +149,7 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
                             placeholder="Select date"
                             className="!w-[180px] !h-10 [&_.ant-picker]:!rounded-full [&_.ant-picker]:!bg-[#F4F7FB] [&_.ant-picker]:!border [&_.ant-picker]:!border-[#E0E0E0] [&_.ant-picker-input>input]:!bg-gray-50 [&_.ant-picker-input>input]:!px-4 [&_.ant-picker-input>input]:!py-2 [&_.ant-picker-input>input]:!text-sm [&_.ant-picker-input>input]:!font-medium [&_.ant-picker-input>input]:!h-full"
                             disabledDate={(current) => {
-                                return current && current < dayjs().startOf("day");
+                                return current && current.format("YYYY-MM-DD") < today;
                             }}
                         />
                     </div>

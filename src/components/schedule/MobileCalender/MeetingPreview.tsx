@@ -7,7 +7,7 @@ import Divider from "@/components/common/Divider";
 import { useAppStore } from "@/store/useAppStore";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { MdClose } from "react-icons/md";
@@ -17,8 +17,16 @@ import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { useSendData } from "@/hooks/useReactQuery";
 import MobileSideModal from "@/components/common/Modals/MobileSideModal";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
-import { getStatusLabel, getStatusPillClass } from "@/utils/sessionDisplay";
+import { safeHref } from "@/utils/safeHref";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import {
+    canCompleteSession,
+    canJoinSession,
+    formatSessionWhen,
+    getSessionInstantBounds,
+    getStatusLabel,
+    getStatusPillClass,
+} from "@/utils/sessionDisplay";
 
 interface MobileMeetingPreviewModalProps {
     data: any;
@@ -36,9 +44,12 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     style,
 }) => {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
-    const { currentMonth } = useAppStore();
+    const { currentMonth, learnerTimeZone, volunteerTimeZone } = useAppStore();
     const role = getCookie("role");
+    const scheduleRole = role === "learner" ? "learner" : "volunteer";
+    const timeZoneLabel = scheduleRole === "learner" ? learnerTimeZone : volunteerTimeZone;
 
     const [isAnimating, setIsAnimating] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -66,16 +77,8 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     const { mutate: onSave, isPending } = useSendData({
         // @ts-ignore
         fn: (status: string) => handleNotificationStatus(status, sessionId),
-        invalidateKey: [`${role}-accepted-sessions`],
         success: () => {
-            queryClient.invalidateQueries({
-                queryKey: [role === "learner" ? "learner-approval-notifications" : "approval-notifications"],
-            });
-            if (role === "volunteer") {
-                queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
-            } else {
-                queryClient.invalidateQueries({ queryKey: ["learner-events"] });
-            }
+            invalidateScheduleViews(queryClient, scheduleRole);
             setLoadingAccept(false);
             setLoadingDecline(false);
             onClose();
@@ -107,9 +110,14 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event;
-    const startTime = dayjs(event.start).local().format(`dddd, ${DISPLAY_DATE_FORMAT}, h:mm A`);
-    const endTime = dayjs(event.end).local().format("h:mm A");
     const { title, extendedProps } = eventData;
+    // App-standard "October 15, 2026 · 6:00 PM – 6:45 PM EDT · 45 min", in the profile timezone.
+    const whenLabel = formatSessionWhen({
+        date: extendedProps?.localDate ?? dayjs(event.start).format("YYYY-MM-DD"),
+        start: extendedProps?.localStartTime ?? dayjs(event.start).format("HH:mm"),
+        end: extendedProps?.localEndTime ?? (event.end ? dayjs(event.end).format("HH:mm") : null),
+        timeZoneLabel,
+    });
     const {
         meetLink,
         learner,
@@ -123,22 +131,30 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
     // Only the recipient of a pending request can accept/decline it - not whoever initiated
     // it (legacy sessions have no initiatedBy stored, and were always learner-initiated).
     const canRespondToPending = (initiatedBy || "learner") !== role;
+    // Absolute instants (UTC fields) for Join / Complete - see getSessionInstantBounds.
+    const bounds = getSessionInstantBounds(extendedProps, {
+        date: extendedProps?.localDate,
+        start: extendedProps?.localStartTime,
+        end: extendedProps?.localEndTime,
+        timeZoneLabel,
+    });
+    const joinHref = safeHref(meetLink);
+    const showJoin = Boolean(joinHref) && canJoinSession({ status, meet_link: joinHref }, bounds?.end);
+    // Completion is only allowed once the scheduled end has passed (backend-enforced).
+    const showComplete = canCompleteSession({ status }, bounds);
 
     const handleFeedBack = () => {
-        onClose()
-        router.push(`/${role}/schedule?current_month=${currentMonth}&modal=feedback`);
+        onClose();
+        // Keep the view the user is on (the calendar is ?view=calendar).
+        const view = searchParams.get("view");
+        router.push(`/${role}/schedule?${view ? `view=${encodeURIComponent(view)}&` : ""}current_month=${currentMonth}&modal=feedback`);
     };
 
     const handleMarkAsCompleted = () => {
-        setLoadingCompleted(true)
+        setLoadingCompleted(true);
         PUT_API(endpoints.session.markAsCompleted(sessionId), {})
             .then(() => {
-                if (role === "volunteer") {
-                    queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
-                } else {
-                    queryClient.invalidateQueries({ queryKey: ["learner-events"] });
-                }
-                queryClient.invalidateQueries({ queryKey: [`${role}-accepted-sessions`] });
+                invalidateScheduleViews(queryClient, scheduleRole);
                 onClose();
             })
             // No catch before: any rejection (e.g. "hasn't started yet") left the button
@@ -194,22 +210,20 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                         <div className="flex justify-between gap-3">
                             <div className="flex flex-col gap-1">
                                 <p className="font-semibold text-xl text-black">{title}</p>
-                                <p className="text-gray-light font-medium text-sm">
-                                    {`${startTime} - ${endTime}`}
-                                </p>
+                                <p className="text-gray-light font-medium text-sm">{whenLabel}</p>
                             </div>
                         </div>
                         <Divider />
-                        {status === "accepted" && (
+                        {showJoin && (
                             <div>
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex flex-col gap-2 mb-5">
                                         <Button
-                                            onClick={() => window.open(meetLink, "_blank")}
+                                            onClick={() => window.open(joinHref, "_blank", "noopener,noreferrer")}
                                             title="Join with Google Meet"
                                             customClassName="w-fit !bg-background-secondary !text-sm rounded-xl !outline-none !border-none !text-black"
                                         />
-                                        <p className="font-medium text-xs">{meetLink?.replace("https://", "")}</p>
+                                        <p className="font-medium text-xs">{joinHref?.replace("https://", "")}</p>
                                     </div>
                                     <Button
                                         title="Copy Link"
@@ -233,10 +247,10 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                             </p>
                         </div>
                         <Divider />
-                        {status === "accepted" && (
+                        {showComplete && (
                             <div className="flex items-center justify-between gap-3">
                                 <p className="text-gray-light font-medium text-sm">Availability Status</p>
-                                {status === "accepted" ? (
+                                {showComplete ? (
                                     <Button
                                         loading={loadingCompleted}
                                         disabled={loadingCompleted}

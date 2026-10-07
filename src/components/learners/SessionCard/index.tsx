@@ -7,7 +7,15 @@ import { TimeIcon } from "@/assets/icons";
 import DummyProfileImg from "@/assets/images/dummy-profile.webp";
 import PersonImg from "@/assets/images/Person.png";
 import { onEnterOrSpace } from "@/utils/a11y";
-import { canJoinSession, formatSessionDate, getLocalSessionBounds, getStatusLabel, getStatusPillClass } from "@/utils/sessionDisplay";
+import {
+    canJoinSession,
+    formatSessionDate,
+    getSessionInstantBounds,
+    getStatusLabel,
+    getStatusPillClass,
+    type SessionInstantFields,
+} from "@/utils/sessionDisplay";
+import { safeHref } from "@/utils/safeHref";
 
 interface SessionCardProps {
     session: {
@@ -26,6 +34,8 @@ interface SessionCardProps {
         /** 24h local times, used to hide Join once the session has ended. */
         start_time_24?: string;
         end_time_24?: string;
+        /** UTC fields - the absolute end decides whether Join is still offered. */
+        instant?: SessionInstantFields;
         instructor: {
             name: string;
             profilePicture?: string;
@@ -37,11 +47,18 @@ interface SessionCardProps {
 const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
     // "claimed" is shown as "Booked" - one status vocabulary across the app (sessionDisplay).
     const status = { label: getStatusLabel(session.status), className: getStatusPillClass(session.status) };
-    const endsAt = getLocalSessionBounds(session.date, session.start_time_24, session.end_time_24)?.end;
+    // Absolute end from the UTC fields (the 24h times are profile-local wall clock, which the
+    // browser's timezone would misread).
+    const endsAt = getSessionInstantBounds(session.instant, {
+        date: session.date,
+        start: session.start_time_24,
+        end: session.end_time_24,
+    })?.end;
+    const joinHref = safeHref(session.meetLink);
     const showJoin =
         session.status === "claimed" &&
         session.claimedByMe &&
-        canJoinSession({ status: "booked", meet_link: session.meetLink }, endsAt);
+        canJoinSession({ status: "booked", meet_link: joinHref }, endsAt);
 
     return (
         <div
@@ -115,7 +132,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                 so they don't have to open the detail modal to join. */}
             {showJoin && (
                 <a
-                    href={session.meetLink}
+                    href={joinHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}

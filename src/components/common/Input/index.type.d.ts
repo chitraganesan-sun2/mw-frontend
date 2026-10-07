@@ -102,6 +102,8 @@ type DatePickerInputProps = BaseInputProps & {
     onOpenChange?: (open: boolean) => void;
     onPanelChange?: (value: any, mode: any) => void;
     format?: string;
+    /** Earliest selectable date (YYYY-MM-DD), e.g. today in the user's profile timezone. */
+    earliestDate?: string;
 };
 
 type SessionDatePickerInputProps = BaseInputProps & {
@@ -221,6 +223,8 @@ type TimeRangeInputProps = BaseInputProps & {
 type DateRangeInputProps = BaseInputProps & {
     inputType: "daterange";
     onChange: (value: any) => void;
+    /** Earliest selectable date (YYYY-MM-DD), e.g. today in the user's profile timezone. */
+    earliestDate?: string;
     fromPlaceholder?: string;
     toPlaceholder?: string;
     value: any;

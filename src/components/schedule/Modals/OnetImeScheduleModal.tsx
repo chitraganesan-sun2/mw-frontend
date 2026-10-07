@@ -19,6 +19,7 @@ import { generateTimeSlotId, extractTimezoneOffset } from "@/utils/timeFunctions
 import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { Spin } from "antd";
+import { formatSessionDate, shortTimeZone } from "@/utils/sessionDisplay";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -205,10 +206,9 @@ const OnetImeScheduleModal = ({
         return dayjs.tz(undefined, volunteerTimezone || "UTC");
     };
 
-    // Get the current active abbreviation (handles NST -> NDT transition)
-    const activeAbbreviation = ianaTimezone
-        ? dayjs().tz(ianaTimezone).format("z")
-        : rawAbbreviation;
+    // Abbreviation in effect on this date (EST/EDT, NST/NDT) - and "IST" rather than
+    // Intl's "GMT+5:30".
+    const activeAbbreviation = shortTimeZone(timezoneRaw || rawAbbreviation, currentDate || undefined);
 
     const getAvailableDaysForDate = async () => {
         if (currentDate !== "") {
@@ -452,7 +452,7 @@ const OnetImeScheduleModal = ({
 
     return (
         <SideModal
-            title={`${dayjs(currentDate, "YYYY-MM-DD").format("DD MMMM YYYY")}`}
+            title={formatSessionDate(currentDate)}
             onClose={handleClose}
             isOpen={isOpen}
             onSave={handleSubmit}

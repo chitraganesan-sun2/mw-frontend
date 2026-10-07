@@ -16,29 +16,6 @@ import { useEffect, useState } from "react";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const timezoneMapping: Record<string, string> = {
-    AKST: "America/Anchorage",
-    AKDT: "America/Anchorage",
-    AST: "America/Halifax",
-    ADT: "America/Halifax",
-    CST: "America/Chicago",
-    CDT: "America/Chicago",
-    EST: "America/New_York",
-    EDT: "America/New_York",
-    HST: "Pacific/Honolulu",
-    HDT: "Pacific/Honolulu",
-    MST: "America/Denver",
-    MDT: "America/Denver",
-    MT: "America/Denver",
-    NST: "America/St_Johns",
-    NDT: "America/St_Johns",
-    PST: "America/Los_Angeles",
-    PDT: "America/Los_Angeles",
-    PT: "America/Los_Angeles",
-    CT: "America/Chicago",
-    ET: "America/New_York",
-    IST: "Asia/Kolkata",
-};
 import AvailableSlots from "../AvailableSlots/AvailableSlots";
 import { useSearchParams } from "next/navigation";
 import { useSendData } from "@/hooks/useReactQuery";
@@ -55,6 +32,36 @@ import {
     type PickedSkill,
     type SessionCategory,
 } from "@/components/schedule/forms/SessionFormFields";
+import CounterpartSelect, { type CounterpartOption } from "@/components/schedule/forms/CounterpartSelect";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { useProfileTimeZone, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+
+const EMPTY_FORM = {
+    title_of_the_meeting: "",
+    select_volunteer: "",
+    select_date: "",
+    start_time: "",
+    end_time: "",
+    google_meet_link: "",
+    description: "",
+    selected_slot: "",
+    academic_skills: [] as string[],
+    non_academic_skills: [] as string[],
+};
+
+/** Split a volunteer's profile into the Skill options per Category. Skills carry the LOV
+ * `category`, so an academic skill (e.g. "Mathematics") offered under volunteer_skills is
+ * listed under Academic, not Arts & Life Skills. Skills without a category stay under
+ * Arts & Life Skills (the old behaviour). */
+export function skillOptionsByCategory(profile: any): { academic: string[]; nonAcademic: string[] } {
+    const skills: any[] = profile?.volunteer_skills || [];
+    const academic = [
+        ...(profile?.volunteer_subjects || []).map((s: any) => s?.subject_name),
+        ...skills.filter((s) => s?.category === "academic").map((s) => s?.skill_name),
+    ].filter(Boolean) as string[];
+    const nonAcademic = skills.filter((s) => s?.category !== "academic").map((s) => s?.skill_name).filter(Boolean) as string[];
+    return { academic: Array.from(new Set(academic)), nonAcademic: Array.from(new Set(nonAcademic)) };
+}
 
 // Define Zod schema for form validation
 const meetingFormSchema = z.object({
@@ -87,18 +94,7 @@ interface AddNewMeetingModalProps {
 }
 
 export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: AddNewMeetingModalProps) {
-    const [formData, setFormData] = useState<FormData>({
-        title_of_the_meeting: "",
-        select_volunteer: "",
-        select_date: "",
-        start_time: "",
-        end_time: "",
-        google_meet_link: "",
-        description: "",
-        selected_slot: "",
-        academic_skills: [],
-        non_academic_skills: [],
-    });
+    const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
     const [availableSlots, setAvailableSlots] = useState<any[]>([]);
     // Options for the two skill pickers, sourced from the selected volunteer's own
     // declared subjects (academic) / skills (non-academic).
@@ -112,8 +108,12 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     // One category, then exactly one skill from the volunteer's own subjects / skills.
     const [category, setCategory] = useState<SessionCategory | "">("");
     const [skillErrors, setSkillErrors] = useState<{ category?: string; skill?: string }>({});
-    const [fetchingVolunteers, setFetchingVolunteers] = useState<boolean>(false);
-    const [volunteers, setVolunteers] = useState<Array<{ label: string; value: string }>>([]);
+    // The picked volunteer (id + display name) for the searchable picker.
+    const [volunteerOption, setVolunteerOption] = useState<CounterpartOption | null>(null);
+    const queryClient = useQueryClient();
+    // Profile timezone label + "today" in it (date gates must not use the browser's date).
+    const profileTimeZone = useProfileTimeZone("learner");
+    const today = useProfileToday("learner");
     const searchParams = useSearchParams();
     const volunteerId = searchParams.get("volunteerId");
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -127,52 +127,24 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     const [currentMonth, setCurrentMonth] = useState<string>(dayjs().format("YYYY-MM"));
     const learnerId = getCookie("learner_id");
 
-    const getVolunteers = async () => {
-        setFetchingVolunteers(true);
-        const response = await GET_API(endpoints.volunteer.getAllVolunteers);
-        const volunteerOptions = response.data.items.map((volunteer: any) => ({
-            label: volunteer.volunteer_first_name + " " + volunteer.volunteer_last_name,
-            value: volunteer.volunteer_id,
-        }));
-        if (volunteerId) {
-            const volunteer = volunteerOptions.find(
-                (volunteer: any) => volunteer.value === volunteerId
-            );
-            if (volunteer) {
-                setFormData((prev) => ({ ...prev, select_volunteer: volunteer.value }));
-            }
-        }
-        setVolunteers(volunteerOptions);
-        setFetchingVolunteers(false);
-    };
-
-    const getIndividualVolunteer = async () => {
-        const { data } = await GET_API(
-            endpoints.volunteer.getIndividualVolunteer(volunteerId || "")
-        );
-        setFormData((prev) => ({ ...prev, select_volunteer: data?.volunteer_id }));
-        setVolunteers([
-            {
-                label: joinNames(data?.volunteer_first_name, data?.volunteer_last_name),
-                value: data?.volunteer_id,
-            },
-        ]);
-    };
-
-    const { data } = useQuery({
-        // Per-person key + no caching: the options are populated as a side effect of the
-        // queryFn, so a cache hit under the old constant key (["learners"]/["volunteers"])
-        // skipped it and reopening the modal for someone else within the 5-min staleTime
-        // showed an empty/previous recipient. Also the queryFn must return a value.
-        queryKey: ["meeting-modal-volunteers", volunteerId || "all"],
-        queryFn: async () => {
-            await (volunteerId ? getIndividualVolunteer() : getVolunteers());
-            return true;
-        },
-        enabled: isOpen,
-        staleTime: 0,
-        gcTime: 0,
-    });
+    // Deep link (?volunteerId=): preselect that volunteer, label included.
+    useEffect(() => {
+        if (!isOpen || !volunteerId) return;
+        let cancelled = false;
+        GET_API(endpoints.volunteer.getIndividualVolunteer(volunteerId))
+            .then(({ data }: any) => {
+                if (cancelled || !data?.volunteer_id) return;
+                setVolunteerOption({
+                    value: data.volunteer_id,
+                    label: joinNames(data?.volunteer_first_name, data?.volunteer_last_name) || "Volunteer",
+                });
+                setFormData((prev) => ({ ...prev, select_volunteer: data.volunteer_id }));
+            })
+            .catch(() => undefined);
+        return () => {
+            cancelled = true;
+        };
+    }, [isOpen, volunteerId]);
 
     const getAvailableDays = async () => {
         try {
@@ -286,16 +258,6 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         }
     };
 
-    const getFieldProps = (field: any) => {
-        if (field?.name === "select_volunteer") {
-            return {
-                ...field,
-                options: volunteers,
-                isLoading: fetchingVolunteers,
-            };
-        }
-        return field;
-    };
 
     const handleSlotSelection = (slotId: string, startTime: string, endTime: string) => {
         setFormData((prev) => ({
@@ -327,6 +289,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         try {
             meetingFormSchema.parse(formData);
             setErrors({});
+            if (!skillsOk) showToast({ message: "Please complete the highlighted fields.", type: "error" });
             return skillsOk;
         } catch (error) {
             if (error instanceof z.ZodError) {
@@ -337,9 +300,27 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     }
                 });
                 setErrors(newErrors);
+                // Submitting with no slot used to do nothing visible - say what's missing.
+                showToast({ message: error.errors[0]?.message || "Please complete the highlighted fields.", type: "error" });
             }
             return false;
         }
+    };
+
+    // Cancel / close discards the draft - reopening used to show the abandoned form.
+    const resetForm = () => {
+        setFormData(EMPTY_FORM);
+        setVolunteerOption(null);
+        setAvailableSlots([]);
+        setCategory("");
+        setSkillErrors({});
+        setErrors({});
+        setSlotError("");
+        setSelectedVolunteerId("");
+    };
+    const handleClose = () => {
+        resetForm();
+        onClose();
     };
 
     const handleSave = async () => {
@@ -360,24 +341,12 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
 
     const { mutate: onSave, isPending } = useSendData({
         fn: () => handleSave(),
-        invalidateKey: ["learner-events", "learner-accepted-sessions"],
         success: () => {
-            setFormData({
-                title_of_the_meeting: "",
-                select_volunteer: "",
-                select_date: "",
-                start_time: "",
-                end_time: "",
-                google_meet_link: "",
-                description: "",
-                selected_slot: "",
-                academic_skills: [],
-                non_academic_skills: [],
-            });
-            setAvailableSlots([]);
-            onClose();
+            invalidateScheduleViews(queryClient, "learner");
+            handleClose();
+            // It's a request the volunteer still has to accept, not a scheduled meeting.
             showToast({
-                message: "Meeting scheduled successfully",
+                message: "Session request sent",
                 type: "success",
             });
         },
@@ -385,7 +354,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
             // Previously empty: a conflict / double-booking rejection from the backend
             // left the modal open with no indication anything went wrong.
             showToast({
-                message: getApiErrorMessage(err, "Couldn't schedule the meeting. Please try again."),
+                message: getApiErrorMessage(err, "Couldn't send the session request. Please try again."),
                 type: "error",
             });
         },
@@ -399,20 +368,8 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         onSave(formData);
     };
 
-    // Slot times come back from the API already in the LEARNER's local time, so they must be
-    // labelled with the learner's own timezone - this used to use the volunteer's (and fall
-    // back to "UTC"), mislabelling every slot for a cross-timezone pair.
-    const [volunteerTimezone, setVolunteerTimezone] = useState<string>("");
-    useEffect(() => {
-        if (!learnerId) return;
-        GET_API(endpoints.learner.getIndividualLearner(learnerId))
-            .then(({ data }: any) => {
-                const tzCode = data?.learner_personal_info?.learner_contact_details?.timezone;
-                setVolunteerTimezone(timezoneMapping[tzCode] || "");
-            })
-            .catch(() => setVolunteerTimezone(""));
-    }, [learnerId]);
-
+    // Slot times come back from the API already in the LEARNER's local time, so they are
+    // labelled with the learner's own profile timezone (AvailableSlots resolves the label).
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
@@ -432,16 +389,9 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     const { data } = await GET_API(
                         endpoints.volunteer.getIndividualVolunteer(formData.select_volunteer)
                     );
-                    setVolunteerAcademicOptions(
-                        (data?.volunteer_subjects || [])
-                            .filter((s: any) => s?.subject_name)
-                            .map((s: any) => ({ label: s.subject_name, value: s.subject_name }))
-                    );
-                    setVolunteerNonAcademicOptions(
-                        (data?.volunteer_skills || [])
-                            .filter((s: any) => s?.skill_name)
-                            .map((s: any) => ({ label: s.skill_name, value: s.skill_name }))
-                    );
+                    const { academic, nonAcademic } = skillOptionsByCategory(data);
+                    setVolunteerAcademicOptions(academic.map((name) => ({ label: name, value: name })));
+                    setVolunteerNonAcademicOptions(nonAcademic.map((name) => ({ label: name, value: name })));
                 } catch (error) {
                     console.error("Error fetching volunteer details:", error);
                     setVolunteerAcademicOptions([]);
@@ -464,11 +414,10 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
 
             // Pre-fill the calendar-clicked date (also loads that volunteer's slots for it).
             const preset = initialDate ? dayjs(initialDate) : null;
-            if (preset?.isValid() && !preset.isBefore(dayjs(), "day")) {
+            if (preset?.isValid() && preset.format("YYYY-MM-DD") >= today) {
                 handleChange("select_date", preset.toDate());
             }
         } else {
-            setVolunteerTimezone("");
             setVolunteerAcademicOptions([]);
             setVolunteerNonAcademicOptions([]);
         }
@@ -565,13 +514,12 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         <SideModal
             title="Add New Session"
             saveButtonText="Send Request"
-            onClose={onClose}
+            onClose={handleClose}
             isOpen={isOpen}
             onSave={handleSubmit}
             isLoading={isPending}
-            onCancel={onClose}
+            onCancel={handleClose}
             modalWidth={isMobileScreen ? 600 : 400}
-            loading={fetchingVolunteers}
         >
             <div className="flex flex-col max-lg:gap-3 px-5 mt-7">
                 {LearnerScheduleModalConstants.map((field: any) => {
@@ -585,14 +533,35 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
 
                     if (field.name === "select_date" && selectedVolunteerId === "") return null;
 
+                    if (field.name === COUNTERPART_FIELD) {
+                        return (
+                            <Fragment key={field.name}>
+                                <CounterpartSelect
+                                    kind="volunteer"
+                                    name={field.name}
+                                    label={field.label}
+                                    placeholder="Type a volunteer's name"
+                                    value={volunteerOption}
+                                    disabled={Boolean(volunteerId)}
+                                    error={errors.select_volunteer}
+                                    onChange={(option) => {
+                                        setVolunteerOption(option);
+                                        handleChange(field.name, option?.value ?? "");
+                                    }}
+                                />
+                                {skillFields}
+                            </Fragment>
+                        );
+                    }
+
                     return (
                         <Fragment key={field.name}>
                         <Input
-                            {...getFieldProps(field)}
+                            {...field}
+                            earliestDate={field.name === "select_date" ? today : undefined}
                             onChange={(value: any) => handleChange(field.name, value)}
                             value={formData[field.name as keyof FormData]}
                             required={field.required}
-                            disabled={field.name === "select_volunteer" && volunteerId}
                             error={errors[field.name as keyof FormData]}
                             availableDays={availableDaysForField}
                             availableDates={availableDatesForField}
@@ -682,7 +651,6 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                                     : undefined
                             }
                         />
-                        {field.name === COUNTERPART_FIELD && skillFields}
                         {field.name === "title_of_the_meeting" && detailsField}
                         </Fragment>
                     );
@@ -699,7 +667,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                             ? dayjs(formData.select_date).format("YYYY-MM-DD")
                             : undefined
                     }
-                    volunteerTimezone={volunteerTimezone}
+                    volunteerTimezone={profileTimeZone}
                 />
 
             </div>

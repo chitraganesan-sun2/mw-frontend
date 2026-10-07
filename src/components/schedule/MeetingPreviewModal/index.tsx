@@ -7,7 +7,7 @@ import Divider from "@/components/common/Divider";
 import { useAppStore } from "@/store/useAppStore";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMdCheckmark } from "react-icons/io";
@@ -17,7 +17,9 @@ import { getCookie } from "@/utils/auth";
 import { showToast } from "@/components/common/Toast";
 import { useSendData } from "@/hooks/useReactQuery";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import { safeHref } from "@/utils/safeHref";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { canCompleteSession, canJoinSession, formatSessionWhen, getSessionInstantBounds } from "@/utils/sessionDisplay";
 
 interface MeetingPreviewModalProps {
     data: any;
@@ -46,9 +48,12 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const [deletingSlot, setDeletingSlot] = useState(false);
 
     const router = useRouter();
+    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
-    const { currentMonth } = useAppStore();
+    const { currentMonth, learnerTimeZone, volunteerTimeZone } = useAppStore();
     const role = getCookie("role");
+    const scheduleRole = role === "learner" ? "learner" : "volunteer";
+    const timeZoneLabel = scheduleRole === "learner" ? learnerTimeZone : volunteerTimeZone;
 
     const markNotificationAsRead = async (sessionIds: (string | undefined)[]) => {
         const validSessionIds = sessionIds.filter((id): id is string => Boolean(id));
@@ -86,16 +91,8 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const { mutate: onSave, isPending } = useSendData({
         // @ts-ignore
         fn: (status: string) => handleNotificationStatus(status, sessionId),
-        invalidateKey: [`${role}-accepted-sessions`],
         success: () => {
-            queryClient.invalidateQueries({
-                queryKey: [role === "learner" ? "learner-approval-notifications" : "approval-notifications"],
-            });
-            if (role === "volunteer") {
-                queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
-            } else {
-                queryClient.invalidateQueries({ queryKey: ["learner-events"] });
-            }
+            invalidateScheduleViews(queryClient, scheduleRole);
             setLoadingAccept(false);
             setLoadingDecline(false);
             onClose();
@@ -138,9 +135,14 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event._def;
-    const startTime = dayjs(event.start).local().format(`dddd, ${DISPLAY_DATE_FORMAT}, h:mm A`);
-    const endTime = dayjs(event.end).local().format("h:mm A");
     const { title, extendedProps } = eventData;
+    // App-standard "October 15, 2026 · 6:00 PM – 6:45 PM EDT · 45 min", in the profile timezone.
+    const whenLabel = formatSessionWhen({
+        date: extendedProps.localDate ?? dayjs(event.start).format("YYYY-MM-DD"),
+        start: extendedProps.localStartTime ?? dayjs(event.start).format("HH:mm"),
+        end: extendedProps.localEndTime ?? (event.end ? dayjs(event.end).format("HH:mm") : null),
+        timeZoneLabel,
+    });
     const {
         meetLink,
         learner,
@@ -154,22 +156,31 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     // Only the recipient of a pending request can accept/decline it - not whoever initiated
     // it (legacy sessions have no initiatedBy stored, and were always learner-initiated).
     const canRespondToPending = (initiatedBy || "learner") !== role;
+    // Join / Complete decisions use the absolute session instants (UTC fields), not the
+    // profile-local wall-clock parsed in the browser's timezone.
+    const bounds = getSessionInstantBounds(extendedProps, {
+        date: extendedProps.localDate,
+        start: extendedProps.localStartTime,
+        end: extendedProps.localEndTime,
+        timeZoneLabel,
+    });
+    const joinHref = safeHref(meetLink);
+    const showJoin = Boolean(joinHref) && canJoinSession({ status, meet_link: joinHref }, bounds?.end);
+    // Completion is only allowed once the scheduled end has passed (backend-enforced).
+    const showComplete = canCompleteSession({ status }, bounds);
 
     const handleFeedBack = () => {
         onClose();
-        router.push(`/${role}/schedule?current_month=${currentMonth}&modal=feedback`);
+        // Keep the view the user is on (the calendar is ?view=calendar).
+        const view = searchParams.get("view");
+        router.push(`/${role}/schedule?${view ? `view=${encodeURIComponent(view)}&` : ""}current_month=${currentMonth}&modal=feedback`);
     };
 
     const handleMarkAsCompleted = () => {
         setLoadingCompleted(true);
         PUT_API(endpoints.session.markAsCompleted(sessionId), {})
             .then(() => {
-                if (role === "volunteer") {
-                    queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
-                } else {
-                    queryClient.invalidateQueries({ queryKey: ["learner-events"] });
-                }
-                queryClient.invalidateQueries({ queryKey: [`${role}-accepted-sessions`] });
+                invalidateScheduleViews(queryClient, scheduleRole);
                 onClose();
             })
             // Previously no catch: any rejection (e.g. the backend's "can't complete before
@@ -197,8 +208,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             .then(() => {
                 showToast({ type: "success", message: "Slot deleted" });
                 onClose();
-                // Optionally, refresh the calendar data
-                queryClient.invalidateQueries({ queryKey: ["volunteer-events"] });
+                invalidateScheduleViews(queryClient, "volunteer");
             })
             .catch((err) => {
                 showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't delete the slot. Please try again.") });
@@ -305,9 +315,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                     <div className="flex justify-between gap-3">
                         <div className="flex flex-col gap-1">
                             <p className="font-semibold text-xl text-black">{title}</p>
-                            <p className="text-gray-light font-medium text-sm">
-                                {`${startTime} - ${endTime}`}
-                            </p>
+                            <p className="text-gray-light font-medium text-sm">{whenLabel}</p>
                         </div>
                         <Button aria-label="Close"
                             onClick={onClose}
@@ -375,9 +383,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 <div className="flex justify-between gap-3">
                     <div className="flex flex-col gap-1">
                         <p className="font-semibold text-xl text-black">{title}</p>
-                        <p className="text-gray-light font-medium text-sm">
-                            {`${startTime} - ${endTime}`}
-                        </p>
+                        <p className="text-gray-light font-medium text-sm">{whenLabel}</p>
                     </div>
                     <Button aria-label="Close"
                         onClick={onClose}
@@ -387,16 +393,18 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                     </Button>
                 </div>
                 <Divider />
-                {status === "accepted" && (
+                {/* Join only while the session can still be joined (accepted, has a valid Meet
+                    link, not yet ended) - it used to open an empty window / an ended meeting. */}
+                {showJoin && (
                     <div>
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex flex-col gap-2">
                                 <Button
-                                    onClick={() => window.open(meetLink, "_blank")}
+                                    onClick={() => window.open(joinHref, "_blank", "noopener,noreferrer")}
                                     title="Join with Google Meet"
                                     customClassName="w-fit !bg-background-secondary rounded-xl !outline-none !border-none !text-black"
                                 />
-                                <p className="font-medium text-[12px] ml-1">{meetLink}</p>
+                                <p className="font-medium text-[12px] ml-1">{joinHref}</p>
                             </div>
                             <Button
                                 title="Copy Link"
@@ -421,10 +429,10 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 </div>
                 <Divider />
                 {status === "completed" && renderFeedback()}
-                {status === "accepted" && (
+                {showComplete && (
                     <div className="flex items-center justify-between gap-3">
                         <p className="text-gray-light font-medium text-sm">Availability Status</p>
-                        {status === "accepted" ? (
+                        {showComplete ? (
                             <Button
                                 loading={loadingCompleted}
                                 disabled={loadingCompleted}
