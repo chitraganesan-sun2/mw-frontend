@@ -179,6 +179,9 @@ const FormTabsSection = forwardRef(
           ["email", "contact_number"].includes(field.id)
         : fields.includes(field.id) && volunteerAge();
 
+    // Time Zone is editable (2026-10-07) so users can move to the no-daylight-saving options
+    // (Arizona / Saskatchewan / Puerto Rico); the backend re-derives their upcoming sessions'
+    // local times when it changes. Country stays locked.
     const diableField = (field: any) =>
       (role === "learner" &&
         (((["self", "parent"].includes(enrolled_by) &&
@@ -192,7 +195,6 @@ const FormTabsSection = forwardRef(
               "contact_number",
               "zip_code",
               "country",
-              "timezone",
               "parent_first_name",
               "parent_last_name",
               "parent_contact_number",
@@ -213,7 +215,6 @@ const FormTabsSection = forwardRef(
           "contact_number",
           "zip_code",
           "country",
-          "timezone",
           "consented_from_parent",
           "volunteer_parent_name",
           "volunteer_parent_email",
