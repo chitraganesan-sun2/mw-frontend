@@ -8,7 +8,7 @@ const DetailChipCard: React.FC<DetailChipCardProps> = ({ tags, title, className 
             <p className="text-sm text-gray-light font-normal">{title}</p>
             <div className="flex flex-wrap gap-2">
                 { Array.isArray(tags) ? tags?.map((tag) => (
-                    <TagComponent text={tag} className="text-xs py-1 font-medium px-2" />
+                    <TagComponent key={tag} text={tag} className="text-xs py-1 font-medium px-2" />
                 )) : <TagComponent text={tags} className="text-xs py-1 font-medium px-2" /> }
             </div>
         </div>

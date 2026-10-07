@@ -53,7 +53,7 @@ const JoinUsPage = () => {
                         <div className="w-full max-w-none space-y-6 md:space-y-7 lg:space-y-8 italic">
                             {/* First Paragraph */}
                             <p className="text-[14px] md:text-lg lg:text-xl text-[#000000] leading-relaxed text-left">
-                                At MelodyWings, we don't just run programs — we create spaces where
+                                At MelodyWings, we don&apos;t just run programs — we create spaces where
                                 every challenged child and learner is seen, heard, and valued.
                             </p>
 
@@ -68,7 +68,7 @@ const JoinUsPage = () => {
                             <p className="text-[14px] md:text-lg lg:text-xl text-[#000000] leading-relaxed text-left">
                                 When you join MelodyWings, you help build the bridge between
                                 volunteers and learners, creating a space where every learner is
-                                supported, empowered, and encouraged to grow. Whether you're
+                                supported, empowered, and encouraged to grow. Whether you&apos;re
                                 interested in nonprofit leadership, education, technology, or social
                                 impact, MelodyWings offers hands-on experience in operations,
                                 teamwork, communication, and problem-solving—experience that goes

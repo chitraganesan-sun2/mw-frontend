@@ -350,4 +350,7 @@ const FormTabsSection = forwardRef(
   }
 );
 
+// forwardRef'd arrow has no inferred name; set one for DevTools / react/display-name.
+FormTabsSection.displayName = "FormTabsSection";
+
 export default FormTabsSection;

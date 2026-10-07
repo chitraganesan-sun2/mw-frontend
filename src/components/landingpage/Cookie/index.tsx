@@ -49,7 +49,7 @@ export default function CookieConsent() {
           <li>3. Allow trusted third-party services to track this information.</li>
         </ul>
         <p className="text-sm font-normal">
-          We honor Do Not Track signals and will not track or plant cookies if it's enabled.
+          We honor Do Not Track signals and will not track or plant cookies if it&apos;s enabled.
         </p>
         <div className="flex justify-end space-x-2">
           <Button

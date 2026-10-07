@@ -16,16 +16,16 @@ function MeetOurTeam() {
         {meetOurTeamCardData.length === 2 ? (
           <>
             <div className="col-span-1 hidden lg:block"></div>
-            {meetOurTeamCardData.map((team, index) => (
-              <div className='col-span-1 lg:col-span-2'>
-                <TeamCard key={index} {...team} />
+            {meetOurTeamCardData.map((team) => (
+              <div key={team.name} className='col-span-1 lg:col-span-2'>
+                <TeamCard {...team} />
               </div>
             ))}
             <div className="col-span-1 hidden lg:block"></div>
           </>
         ) : (
-          meetOurTeamCardData.map((team, index) => (
-            <TeamCard key={index} {...team} />
+          meetOurTeamCardData.map((team) => (
+            <TeamCard key={team.name} {...team} />
           ))
         )}
       </div>

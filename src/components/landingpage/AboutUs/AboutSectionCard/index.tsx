@@ -15,7 +15,7 @@ function AboutSectionCard() {
             The idea for MelodyWings was born from the shared experiences of a mother-daughter duo, Chitra and Nithila, during their time volunteering with His Mountain Top Ministries (<Link href="https://hismountaintopministries.com" target="_blank" className="font-semibold underline">HMM</Link>) through National Charity League Inc (NCL). {" "}
             <Link href="https://www.nationalcharityleague.org/chapter/granitebayarea" target="_blank" className="font-semibold underline">NCL, Granite Bay Area Chapter</Link> is a group of mothers and daughters who have come together in a commitment to community service for more than 35 non-profits, and HMM is one among them.
             HMM offers horse therapy for children with special needs.
-            As "sidewalkers," Chitra and Nithila walked alongside the horses, ensuring the children's safety as they participated in therapeutic activities.
+            As &quot;sidewalkers,&quot; Chitra and Nithila walked alongside the horses, ensuring the children&apos;s safety as they participated in therapeutic activities.
           </p>
         </div>
       </div>
