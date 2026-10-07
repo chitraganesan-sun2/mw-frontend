@@ -45,56 +45,33 @@ const JoinUsStep1Page = () => {
         }
     }, [country]);
 
-    const isNextEnabled =
-        !loading &&
-        !!fullName.trim() &&
-        emailRegex.test(email) &&
-        !!phoneCountryCode &&
-        phoneNumber.trim().length > 0 &&
-        !!dateOfBirth &&
-        !!country &&
-        !!state &&
-        !!compensationPreference;
-
     const selectedCountryName =
         countryOptions.find((opt) => opt.value === country?.toString())?.label || country?.toString();
 
     const selectedStateName =
         stateOptions.find((opt) => opt.value === state?.toString())?.label || state?.toString();
 
+    // Inline errors for every required field at once (the form used to stop at the first
+    // problem with a single toast and show nothing next to the fields).
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const clearError = (name: string) =>
+        setFieldErrors((prev) => (prev[name] ? { ...prev, [name]: "" } : prev));
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!fullName.trim()) {
-            showToast({ type: 'error', message: 'Please enter your full name.' });
-            return;
-        }
-        if (!emailRegex.test(email)) {
-            showToast({ type: 'error', message: 'Please enter a valid email address.' });
-            return;
-        }
-
-        if (!phoneCountryCode || phoneNumber.trim().length === 0) {
-            showToast({ type: 'error', message: 'Please enter your phone number.' });
-            return;
-        }
-
-        if (!dateOfBirth) {
-            showToast({ type: 'error', message: 'Please select your date of birth.' });
-            return;
-        }
-
-        if (!country) {
-            showToast({ type: 'error', message: 'Please select your country.' });
-            return;
-        }
-
-        if (!state) {
-            showToast({ type: 'error', message: 'Please select your state.' });
-            return;
-        }
-
-        if (!compensationPreference) {
-            showToast({ type: 'error', message: 'Please confirm compensation preference.' });
+        const errs: Record<string, string> = {};
+        if (!fullName.trim()) errs.full_name = "Please enter your full name.";
+        if (!emailRegex.test(email)) errs.email = "Please enter a valid email address.";
+        if (!phoneCountryCode || phoneNumber.trim().length === 0) errs.phone_number = "Please enter your phone number.";
+        if (!dateOfBirth) errs.date_of_birth = "Please select your date of birth.";
+        if (!country) errs.country = "Please select your country.";
+        if (!state) errs.state = "Please select your state.";
+        if (!compensationPreference) errs.compensation = "Please confirm compensation preference.";
+        setFieldErrors(errs);
+        const first = Object.keys(errs)[0];
+        if (first) {
+            showToast({ type: "error", message: errs[first] });
+            document.querySelector<HTMLElement>(`[name="${first}"], #${first}`)?.focus?.();
             return;
         }
 
@@ -198,7 +175,8 @@ const JoinUsStep1Page = () => {
                                     label="Full Name"
                                     required
                                     value={fullName}
-                                    onChange={(v) => setFullName(typeof v === 'string' ? v : v?.[0] ?? '')}
+                                    error={fieldErrors.full_name}
+                                    onChange={(v) => { clearError("full_name"); setFullName(typeof v === 'string' ? v : v?.[0] ?? ''); }}
                                     placeholder="Eg. John Doe"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
@@ -211,7 +189,8 @@ const JoinUsStep1Page = () => {
                                     label="Email Address"
                                     required
                                     value={email}
-                                    onChange={(v: any) => setEmail(typeof v === 'string' ? v : v?.[0] ?? '')}
+                                    error={fieldErrors.email}
+                                    onChange={(v: any) => { clearError("email"); setEmail(typeof v === 'string' ? v : v?.[0] ?? ''); }}
                                     placeholder="Enter Email Address"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
@@ -236,7 +215,8 @@ const JoinUsStep1Page = () => {
                                             inputType="text"
                                             name="phone_number"
                                             value={phoneNumber}
-                                            onChange={(v) => setPhoneNumber((typeof v === 'string' ? v : v?.[0] ?? '').replace(/\D/g, ''))}
+                                            error={fieldErrors.phone_number}
+                                            onChange={(v) => { clearError("phone_number"); setPhoneNumber((typeof v === 'string' ? v : v?.[0] ?? '').replace(/\D/g, '')); }}
                                             placeholder="Enter Phone number"
                                             rootClassName="w-full flex-1 min-w-0 !mb-0"
                                             inputClassName="w-full !rounded-xl border-gray-200"
@@ -251,8 +231,9 @@ const JoinUsStep1Page = () => {
                                     label="Date of Birth"
                                     required
                                     value={dateOfBirth}
+                                    error={fieldErrors.date_of_birth}
                                     birthDatePicker={{ minAge: 13, maxAge: 100 }}
-                                    onChange={(v) => setDateOfBirth(typeof v === 'string' ? v : '')}
+                                    onChange={(v) => { clearError("date_of_birth"); setDateOfBirth(typeof v === 'string' ? v : ''); }}
                                     placeholder="Select Date of Birth"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
@@ -268,7 +249,9 @@ const JoinUsStep1Page = () => {
                                     disabled={countriesLoading}
                                     isLoading={countriesLoading}
                                     value={country}
+                                    error={fieldErrors.country}
                                     onChange={(v) => {
+                                        clearError("country");
                                         setCountry(v ?? '');
                                         setState(''); // reset state when country changes
                                     }}
@@ -288,7 +271,8 @@ const JoinUsStep1Page = () => {
                                     disabled={!country || statesLoading}
                                     isLoading={statesLoading}
                                     value={state}
-                                    onChange={(v) => setState(v ?? '')}
+                                    error={fieldErrors.state}
+                                    onChange={(v) => { clearError("state"); setState(v ?? ''); }}
                                     placeholder={statesLoading ? "Loading states..." : "Select State"}
                                     options={stateOptions}
                                     rootClassName="w-full"
@@ -374,11 +358,12 @@ const JoinUsStep1Page = () => {
                                     inputType="radio"
                                     name="compensation_preference"
                                     value={compensationPreference}
-                                    onChange={(value) =>
+                                    onChange={(value) => {
+                                        clearError("compensation");
                                         setCompensationPreference(
                                             value as '' | 'unpaid_ok' | 'paid_only'
-                                        )
-                                    }
+                                        );
+                                    }}
                                     options={[
                                         {
                                             value: 'unpaid_ok',
@@ -392,6 +377,11 @@ const JoinUsStep1Page = () => {
                                     inputClassName="mt-1"
                                     radioButtonClassName="w-full md:w-auto"
                                 />
+                                {fieldErrors.compensation && (
+                                    <p role="alert" className="text-xs text-red-700 first-letter:uppercase font-medium">
+                                        {fieldErrors.compensation}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Navigation buttons */}
@@ -407,7 +397,9 @@ const JoinUsStep1Page = () => {
                                     htmlType="submit"
                                     title={loading ? "Loading..." : "Next Step"}
                                     loading={loading}
-                                    disabled={!isNextEnabled}
+                                    // Always clickable (only blocked while sending): a button that stays
+                                    // disabled tells the user nothing - clicking now flags every missing field.
+                                    disabled={loading}
                                     btnVariant="secondary"
                                     customClassName="!px-6 !w-full md:!w-auto !rounded-[10px] !py-2 !h-10 md:!h-11 disabled:opacity-50"
                                 />

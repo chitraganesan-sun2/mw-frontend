@@ -486,7 +486,7 @@ const Donate = () => {
 
             <section className={`${PAGE_GUTTER_CLASS} pt-10 md:pt-12`}>
                 {/* Desktop/tablet */}
-                <div className="hidden sm:grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(4,285px)] lg:justify-center gap-4 md:gap-6">
+                <div className="hidden sm:grid w-full grid-cols-1 sm:grid-cols-2 xl:grid-cols-[repeat(4,285px)] xl:justify-center gap-4 md:gap-6">
                     {donateCardData.map((item, index) => (
                         <DonateCard key={index} {...item} />
                     ))}

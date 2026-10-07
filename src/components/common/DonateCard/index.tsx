@@ -9,7 +9,7 @@ interface DonateCardProps {
 
 const DonateCard = ({ title, subtitle, image }: DonateCardProps) => {
     return (
-        <div className="relative w-full lg:w-[285px] h-[200px] sm:h-[220px] lg:h-[265px] rounded-3xl overflow-hidden shadow-sm">
+        <div className="relative w-full xl:w-[285px] h-[200px] sm:h-[220px] lg:h-[265px] rounded-3xl overflow-hidden shadow-sm">
             <div className="absolute inset-0 w-full h-full">
                 <Image
                     src={image}
