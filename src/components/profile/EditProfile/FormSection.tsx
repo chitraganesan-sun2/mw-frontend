@@ -278,6 +278,15 @@ const FormTabsSection = forwardRef(
                           <div className="flex flex-col gap-2 md:gap-1">
                             {field.fields.map((childField: any) => {
                               const isChildDisabled = diableField(childField) || childField?.disabled;
+                              // Same rule as onboarding's FormTabs: a child's own parent (e.g.
+                              // volunteer_contact_details for email/country/timezone) is layered
+                              // on the card's, not dropped - dropping it bound the field to a
+                              // top-level key, so the saved time zone showed blank here.
+                              const childParent = childField.parent
+                                ? parent
+                                  ? `${parent}.${childField.parent}`
+                                  : childField.parent
+                                : parent;
                               return (
                                 <FormField
                                   key={childField.id}
@@ -289,7 +298,7 @@ const FormTabsSection = forwardRef(
                                   }}
                                   control={control}
                                   errors={errors}
-                                  parent={parent}
+                                  parent={childParent}
                                   setValue={setValue}
                                   clearErrors={clearErrors}
                                 />
@@ -314,7 +323,13 @@ const FormTabsSection = forwardRef(
                         errors={errors}
                         setValue={setValue}
                         clearErrors={clearErrors}
-                        parent={field.parent ? `${section?.parent}.${field.parent}` : section?.parent}
+                        parent={
+                          field.parent
+                            ? section?.parent
+                              ? `${section.parent}.${field.parent}`
+                              : field.parent
+                            : section?.parent
+                        }
                       />
                     );
                   })}
