@@ -107,7 +107,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
                 router.push(`/${role}/profile`);
                 break;
             case "match_found":
-                router.push(`/${role}/matches`);
+                router.push(role === "volunteer" ? "/volunteer/learners?tab=matches" : "/learner/volunteer?tab=matches");
                 break;
             default:
                 if (notification.post_id) {

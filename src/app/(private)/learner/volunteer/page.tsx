@@ -11,6 +11,8 @@ import { endpoints } from "@/api/constants";
 import { useComponentStore } from "@/store/useComponenetStore";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import { useQueryState } from "nuqs";
+import MatchesTabs from "@/components/matches/MatchesTabs";
+import LearnerMatchesPanel from "@/components/matches/LearnerMatchesPanel";
 import VolunteerFilterModal from "@/components/learners/Modals/VolunteerFilter";
 import { RiFilter3Line } from "react-icons/ri";
 import LottieLoader from "@/components/common/Loader/Lottie";
@@ -63,6 +65,9 @@ export default function LearnersPage() {
     const [end_time] = useQueryState("end_time");
     const [volunteerId, setVolunteerId] = useQueryState("volunteerId");
     const [modalQuery, setModalQuery] = useQueryState("modal");
+    // "My Matches" lives here as a tab (?tab=matches) instead of its own sidebar page.
+    const [tab, setTab] = useQueryState("tab");
+    const isMatchesTab = tab === "matches";
 
     const isMobileScreen = InnerWidth() < 768;
 
@@ -99,7 +104,7 @@ export default function LearnersPage() {
             const response: any = await GET_API(endpoint);
             return response.data;
         },
-        enabled: true,
+        enabled: !isMatchesTab,
     });
 
     const appliedFiltersCount = useMemo(() => {
@@ -160,6 +165,7 @@ export default function LearnersPage() {
             searchPlaceholder: "Find your tutor",
             actionButtonPlacement: "right",
             title: "Volunteers",
+            hideSearch: isMatchesTab,
             titleIcon: getHeaderIcon(pathname),
             actionButtons: [
                 {
@@ -169,7 +175,7 @@ export default function LearnersPage() {
                     buttonOnClick: () => router.push("/learner/my-volunteers"),
                     buttonClassName:
                         "!bg-black !text-white hover:!bg-black hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",
-                    buttonPlacement: "right",
+                    buttonPlacement: "right" as const,
                     showButton: true,
                 },
                 {
@@ -178,12 +184,14 @@ export default function LearnersPage() {
                     buttonIcon: <RiFilter3Line className="text-lg" />,
                     buttonClassName:
                         "!bg-black !text-white hover:!bg-black hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",
-                    buttonPlacement: "right",
-                    showButton: true,
+                    buttonPlacement: "right" as const,
+                    showButton: !isMatchesTab,
                 },
-            ],
+            // The header renders every action button; drop the ones hidden for this tab
+            // (Filters means nothing on My Matches).
+            ].filter((button) => button.showButton),
         });
-    }, [pathname, setHeaderOptions, appliedFiltersCount]);
+    }, [pathname, setHeaderOptions, appliedFiltersCount, isMatchesTab]);
 
     return (
         <div className="h-full animate-fadeIn">
@@ -194,7 +202,14 @@ export default function LearnersPage() {
                 isOpen={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}
             />
-            {isLoading ? (
+            <MatchesTabs
+                active={isMatchesTab ? "matches" : "all"}
+                allLabel="All Volunteers"
+                onChange={(t) => setTab(t === "matches" ? "matches" : null)}
+            />
+            {isMatchesTab ? (
+                <LearnerMatchesPanel />
+            ) : isLoading ? (
                 <LottieLoader isLoading={true} />
             ) : isError ? (
                 <div className="flex-center h-full w-full">Something went wrong</div>

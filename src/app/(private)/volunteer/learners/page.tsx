@@ -14,6 +14,8 @@ import InnerWidth from "@/utils/innerWidth";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQueryState } from "nuqs";
+import MatchesTabs from "@/components/matches/MatchesTabs";
+import VolunteerMatchesPanel from "@/components/matches/VolunteerMatchesPanel";
 import { useEffect, useMemo, useState } from "react";
 import { RiFilter3Line } from "react-icons/ri";
 import { useDebounce } from "use-debounce";
@@ -66,6 +68,9 @@ export default function LearnersPage() {
     const [expected_goals] = useQueryState("expected_goals");
     const [learnerId, setLearnerId] = useQueryState("learnerId");
     const [modalQuery, setModalQuery] = useQueryState("modal");
+    // "My Matches" lives here as a tab (?tab=matches) instead of its own sidebar page.
+    const [tab, setTab] = useQueryState("tab");
+    const isMatchesTab = tab === "matches";
 
     const isMobileScreen = InnerWidth() < 768;
 
@@ -110,7 +115,7 @@ export default function LearnersPage() {
             const response: any = await GET_API(endpoint);
             return response.data;
         },
-        enabled: true,
+        enabled: !isMatchesTab,
     });
 
     const appliedFiltersCount = useMemo(() => {
@@ -194,6 +199,7 @@ export default function LearnersPage() {
             searchPlaceholder: "Find your learner",
             actionButtonPlacement: "right",
             title: "Learners",
+            hideSearch: isMatchesTab,
             titleIcon: getHeaderIcon(pathname),
 
             actionButtons: [
@@ -203,7 +209,7 @@ export default function LearnersPage() {
                         : "Learners I have worked with",
                     buttonOnClick: () => router.push("/volunteer/my-learners"),
                     buttonClassName: learnersActionButtonClassName,
-                    buttonPlacement: "right",
+                    buttonPlacement: "right" as const,
                     showButton: true,
                 },
                 {
@@ -211,12 +217,14 @@ export default function LearnersPage() {
                     buttonOnClick: () => setIsFilterOpen(true),
                     buttonIcon: <RiFilter3Line className="text-lg" />,
                     buttonClassName: learnersActionButtonClassName,
-                    buttonPlacement: "right",
-                    showButton: true,
+                    buttonPlacement: "right" as const,
+                    showButton: !isMatchesTab,
                 },
-            ],
+            // The header renders every action button; drop the ones hidden for this tab
+            // (Filters means nothing on My Matches).
+            ].filter((button) => button.showButton),
         });
-    }, [pathname, setHeaderOptions, appliedFiltersCount, isMobileScreen]);
+    }, [pathname, setHeaderOptions, appliedFiltersCount, isMobileScreen, isMatchesTab]);
 
     return (
         <div className="h-full animate-fadeIn">
@@ -227,7 +235,14 @@ export default function LearnersPage() {
                 isOpen={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}
             />
-            {isLoading ? (
+            <MatchesTabs
+                active={isMatchesTab ? "matches" : "all"}
+                allLabel="All Learners"
+                onChange={(t) => setTab(t === "matches" ? "matches" : null)}
+            />
+            {isMatchesTab ? (
+                <VolunteerMatchesPanel />
+            ) : isLoading ? (
                 <LottieLoader isLoading={true} />
             ) : isError ? (
                 <div className="flex-center h-full w-full">Something went wrong</div>

@@ -2,7 +2,6 @@ import Divider from "@/components/common/Divider";
 import Logo from "@/components/common/Logo";
 import Avatar from "./Avatar";
 import SectionCard from "./SectionCard";
-import { HiOutlineSparkles } from "react-icons/hi2";
 import {
     CalendarIcon,
     CommunityIcon,
@@ -63,15 +62,6 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                   icon: <VolunteerIcon />,
               };
 
-    // The match dashboard ("Find My Volunteer" / "Find My Learner"). It used to live at the
-    // bare /learner and /volunteer paths, which the route guard redirects to the schedule,
-    // so it was unreachable from anywhere (incl. the match_found push).
-    const matchesLink = {
-        href: "/matches",
-        text: "My Matches",
-        icon: <HiOutlineSparkles />,
-    };
-
     const remainingLinks: any[] = [
         {
             href: "/resources",
@@ -98,8 +88,8 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
 
     // Combine all links in the desired order
     // For both roles: My Schedule (the landing dashboard), Instant Sessions, Role-based link,
-    // My Matches, Resources, Community, Messages, Settings
-    const linksData = [...baseLinksData, instantSessionsLink, roleBasedLink, matchesLink, ...remainingLinks];
+    // Resources, Community, Messages, Settings
+    const linksData = [...baseLinksData, instantSessionsLink, roleBasedLink, ...remainingLinks];
 
     const handleSignOut = () => signOut();
 
