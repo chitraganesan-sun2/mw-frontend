@@ -114,8 +114,11 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
         );
     };
 
-    const onError = () => {
-        showToast({ message: "Please, fill all the required fields!", type: "error" });
+    // Say what is actually wrong (e.g. "Please upload at least one picture or a video.")
+    // instead of one generic message - the specific text was only shown far down the form.
+    const onError = (errs?: Record<string, { message?: string } | undefined>) => {
+        const first = errs ? Object.values(errs).find((e) => e?.message)?.message : undefined;
+        showToast({ message: first || "Please, fill all the required fields!", type: "error" });
     };
 
     const { width } = useWindowSize();

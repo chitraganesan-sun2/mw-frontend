@@ -66,7 +66,10 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
     const [activeTab] = useQueryState("tab");
     const [searchQuery, setSearchQuery] = useQueryState("query");
 
-    const [comment, setComment] = useState<string>("");
+    // One draft PER POST. A single shared string meant typing in one post's inline comment box
+    // (desktop) filled every post's box, and "Post" on the wrong one sent that text.
+    const [drafts, setDrafts] = useState<Record<string, string>>({});
+    const setDraft = (postId: string, value: string) => setDrafts((prev) => ({ ...prev, [postId]: value }));
     const [isCommentLoading, setIsCommentLoading] = useState<boolean>(false);
     const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
 
@@ -186,10 +189,12 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
 
     // Handle Comment
     const handleComment = async (postId: string, parentId?: string) => {
+        const text = (drafts[postId] ?? "").trim();
+        if (!text) return;
         setIsCommentLoading(true);
 
         let payload = {
-            comment_text: comment,
+            comment_text: text,
             created_by: role,
             post_id: postId,
             parent_id: "",
@@ -203,7 +208,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
         })
             .then(() => {
                 queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab, debouncedSearchQuery] });
-                setComment("");
+                setDraft(postId, "");
             })
             // toast.promise re-rejects on failure, so the reset must not live in .then -
             // otherwise a failed post left the comment button stuck in its loading state.
@@ -496,8 +501,8 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                     <div className="hidden md:block mt-4">
                                         <CommentInput
                                             name="comment"
-                                            value={comment || ""}
-                                            onChange={(e) => setComment(e.target.value)}
+                                            value={drafts[post.post_id] || ""}
+                                            onChange={(e) => setDraft(post.post_id, e.target.value)}
                                             disabled={isCommentLoading}
                                             inputClassName=""
                                             onPost={() => handleComment(post.post_id)}
@@ -535,8 +540,8 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                         {activeCommentPostId && (
                             <MobileCommentPanel
                                 postId={activeCommentPostId}
-                                comment={comment}
-                                setComment={setComment}
+                                comment={drafts[activeCommentPostId] ?? ""}
+                                setComment={(value: string) => setDraft(activeCommentPostId, value)}
                                 onClose={() => setActiveCommentPostId(null)}
                                 handleComment={handleComment}
                             />
