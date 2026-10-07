@@ -1,8 +1,5 @@
 import academicStrengths from "@/data/academicStrengths.json";
-import academicChallenges from "@/data/academicChallenges.json";
-import behavioralConcerns from "@/data/behavioralConcerns.json";
 import techniquesThatWork from "@/data/techniquesThatWork.json";
-import parentGoals from "@/data/parentGoals.json";
 
 // No Country filter: GET /volunteer/list always restricts to the learner's own country and
 // ignores a client-supplied `country`, so picking another country silently did nothing.
@@ -67,16 +64,6 @@ export const LearnerFilterModalConstants = [
         responseAsValue: "development_disability_name",
     },
     {
-        name: "areas_of_support_needed",
-        label: "Areas of Support Needed",
-        inputType: "async-select",
-        variant: "multi",
-        placeholder: "Select Areas of Support",
-        endpoint: "areas_of_support",
-        responseAsLabel: "area_of_support_name",
-        responseAsValue: "area_of_support_name",
-    },
-    {
         id: "academic_strengths",
         name: "academic_strengths",
         label: "Academic Strengths",
@@ -84,26 +71,6 @@ export const LearnerFilterModalConstants = [
         variant: "multi",
         placeholder: "Select Academic Strengths",
         options: academicStrengths,
-        showSearch: true,
-    },
-    {
-        id: "academic_challenges",
-        name: "academic_challenges",
-        label: "Academic Challenges",
-        inputType: "select-creatable",
-        variant: "multi",
-        placeholder: "Select Academic Challenges",
-        options: academicChallenges,
-        showSearch: true,
-    },
-    {
-        id: "behavioral_concerns",
-        name: "behavioral_concerns",
-        label: "Behavioral Concerns",
-        inputType: "select-creatable",
-        variant: "multi",
-        placeholder: "Select Behavioral Concerns",
-        options: behavioralConcerns,
         showSearch: true,
     },
     {
@@ -124,14 +91,5 @@ export const LearnerFilterModalConstants = [
         responseAsLabel: "skill_name",
         responseAsValue: "skill_id",
         placeholder: "Select Skills to Learn",
-    },
-    {
-        name: "expected_goals",
-        label: "Parent/Guardian's Goals for the Learner",
-        inputType: "select-creatable",
-        variant: "multi",
-        placeholder: "Select Parent Goals",
-        options: parentGoals,
-        showSearch: true,
     },
 ];

@@ -59,13 +59,9 @@ export default function LearnersPage() {
     const [searchQuery, setSearchQuery] = useQueryState("query");
     const [learner_primary_language] = useQueryState("learner_primary_language");
     const [type_of_developmental_disability] = useQueryState("type_of_developmental_disability");
-    const [areas_of_support_needed] = useQueryState("areas_of_support_needed");
     const [academic_strengths] = useQueryState("academic_strengths");
-    const [academic_challenges] = useQueryState("academic_challenges");
-    const [behavioral_concerns] = useQueryState("behavioral_concerns");
     const [techniques_to_calm] = useQueryState("techniques_to_calm");
     const [skill_ids] = useQueryState("skill_ids");
-    const [expected_goals] = useQueryState("expected_goals");
     const [learnerId, setLearnerId] = useQueryState("learnerId");
     const [modalQuery, setModalQuery] = useQueryState("modal");
     // "My Matches" lives here as a tab (?tab=matches) instead of its own sidebar page.
@@ -83,13 +79,9 @@ export default function LearnersPage() {
             size,
             learner_primary_language,
             type_of_developmental_disability,
-            areas_of_support_needed,
             academic_strengths,
-            academic_challenges,
-            behavioral_concerns,
             techniques_to_calm,
             skill_ids,
-            expected_goals,
         ],
         queryFn: async () => {
             const params: Record<string, string> = {
@@ -103,13 +95,9 @@ export default function LearnersPage() {
                 params.learner_primary_language = learner_primary_language;
             if (type_of_developmental_disability)
                 params.type_of_developmental_disability = type_of_developmental_disability;
-            if (areas_of_support_needed) params.areas_of_support_needed = areas_of_support_needed;
             if (academic_strengths) params.academic_strengths = academic_strengths;
-            if (academic_challenges) params.academic_challenges = academic_challenges;
-            if (behavioral_concerns) params.behavioral_concerns = behavioral_concerns;
             if (techniques_to_calm) params.techniques_to_calm = techniques_to_calm;
             if (skill_ids) params.skill_ids = skill_ids;
-            if (expected_goals) params.expected_goals = expected_goals;
 
             const endpoint = `${endpoints.learner.getAllLearners}?${new URLSearchParams(params)}`;
             const response: any = await GET_API(endpoint);
@@ -122,25 +110,17 @@ export default function LearnersPage() {
         const filters = [
             learner_primary_language,
             type_of_developmental_disability,
-            areas_of_support_needed,
             academic_strengths,
-            academic_challenges,
-            behavioral_concerns,
             techniques_to_calm,
             skill_ids,
-            expected_goals,
         ];
         return filters.filter((filter) => filter).length;
     }, [
         learner_primary_language,
         type_of_developmental_disability,
-        areas_of_support_needed,
         academic_strengths,
-        academic_challenges,
-        behavioral_concerns,
         techniques_to_calm,
         skill_ids,
-        expected_goals,
     ]);
 
     useEffect(() => {

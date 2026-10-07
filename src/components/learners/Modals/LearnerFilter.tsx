@@ -8,16 +8,15 @@ import { LearnerFilterModalConstants } from "@/constants/modals";
 import { useQueryState } from "nuqs";
 import InnerWidth from "@/utils/innerWidth";
 
+// Filters only for fields today's onboarding still collects. Areas of Support, Academic
+// Challenges, Behavioral Concerns and Parent Goals only matched pre-2026-08 profiles and were
+// removed (user decision, 2026-10-07).
 const meetingFormSchema = z.object({
     learner_primary_language: z.any().optional(),
     type_of_developmental_disability: z.any().optional(),
-    areas_of_support_needed: z.any().optional(),
     academic_strengths: z.any().optional(),
-    academic_challenges: z.any().optional(),
-    behavioral_concerns: z.any().optional(),
     techniques_to_calm: z.any().optional(),
     skill_ids: z.any().optional(),
-    expected_goals: z.any().optional(),
 });
 
 type FilterData = z.infer<typeof meetingFormSchema>;
@@ -37,13 +36,9 @@ export default function LearnerFilterModal({
     const [type_of_developmental_disability, setDevelopmentalDisability] = useQueryState(
         "type_of_developmental_disability"
     );
-    const [areas_of_support_needed, setAreasOfSupport] = useQueryState("areas_of_support_needed");
     const [academic_strengths, setAcademicStrengths] = useQueryState("academic_strengths");
-    const [academic_challenges, setAcademicChallenges] = useQueryState("academic_challenges");
-    const [behavioral_concerns, setBehavioralConcerns] = useQueryState("behavioral_concerns");
     const [techniques_to_calm, setTechniquesThatWork] = useQueryState("techniques_to_calm");
     const [skill_ids, setSkillsExpertiseToLearn] = useQueryState("skill_ids");
-    const [expected_goals, setParentGoals] = useQueryState("expected_goals");
 
     const [filterData, setFilterData] = useState<FilterData>({});
 
@@ -54,24 +49,16 @@ export default function LearnerFilterModal({
             // Multi-select like the rest: a plain string here made the picker drop the
             // applied value(s) when the modal was reopened.
             type_of_developmental_disability: type_of_developmental_disability?.split(",") || [],
-            areas_of_support_needed: areas_of_support_needed?.split(",") || [],
             academic_strengths: academic_strengths?.split(",") || [],
-            academic_challenges: academic_challenges?.split(",") || [],
-            behavioral_concerns: behavioral_concerns?.split(",") || [],
             techniques_to_calm: techniques_to_calm?.split(",") || [],
             skill_ids: skill_ids?.split(",") || [],
-            expected_goals: expected_goals?.split(",") || [],
         });
     }, [
         learner_primary_language,
         type_of_developmental_disability,
-        areas_of_support_needed,
         academic_strengths,
-        academic_challenges,
-        behavioral_concerns,
         techniques_to_calm,
         skill_ids,
-        expected_goals,
     ]);
 
     const handleChange = (name: keyof FilterData, value: any) => {
@@ -92,32 +79,14 @@ export default function LearnerFilterModal({
                 ? filterData.type_of_developmental_disability.join(",")
                 : null
         );
-        setAreasOfSupport(
-            filterData?.areas_of_support_needed?.length
-                ? filterData.areas_of_support_needed.join(",")
-                : null
-        );
         setAcademicStrengths(
             filterData?.academic_strengths?.length ? filterData.academic_strengths.join(",") : null
-        );
-        setAcademicChallenges(
-            filterData?.academic_challenges?.length
-                ? filterData.academic_challenges.join(",")
-                : null
-        );
-        setBehavioralConcerns(
-            filterData?.behavioral_concerns?.length
-                ? filterData.behavioral_concerns.join(",")
-                : null
         );
         setTechniquesThatWork(
             filterData?.techniques_to_calm?.length ? filterData.techniques_to_calm.join(",") : null
         );
         setSkillsExpertiseToLearn(
             filterData?.skill_ids?.length ? filterData.skill_ids.join(",") : null
-        );
-        setParentGoals(
-            filterData?.expected_goals?.length ? filterData.expected_goals.join(",") : null
         );
 
         onClose();
@@ -127,13 +96,9 @@ export default function LearnerFilterModal({
         setFilterData({});
         setLanguages(null);
         setDevelopmentalDisability(null);
-        setAreasOfSupport(null);
         setAcademicStrengths(null);
-        setAcademicChallenges(null);
-        setBehavioralConcerns(null);
         setTechniquesThatWork(null);
         setSkillsExpertiseToLearn(null);
-        setParentGoals(null);
         onClose();
     };
 
