@@ -95,9 +95,10 @@ export const extractTimezoneOffset = (timezoneLabel: string): string | null => {
  * datetime.utcnow().isoformat() -> "2026-09-28T09:51:48"). `new Date(x)` parses such a
  * string as LOCAL time, shifting it by the viewer's UTC offset (5h30 for IST).
  */
-// App-wide display date format ("28 Sep 2026"), matching the admin console. Screens used
-// ~8 variants (28-Sep-2026, Sep 28, 28th Sep, 28/09/2026, Monday, September 28, ...).
-export const DISPLAY_DATE_FORMAT = "DD MMM YYYY";
+// App-wide display date format: the session standard "October 7, 2026" (same as
+// utils/sessionDisplay SESSION_DATE_FORMAT). Screens used ~8 variants (28-Sep-2026, Sep 28,
+// 28th Sep, 28/09/2026, ...). Display only - nothing parses with it.
+export const DISPLAY_DATE_FORMAT = "MMMM D, YYYY";
 export const formatDisplayDate = (value?: string | number | Date | null, inputFormat?: string): string => {
     if (!value) return "-";
     const d = inputFormat ? dayjs(value as string, inputFormat) : dayjs(value);

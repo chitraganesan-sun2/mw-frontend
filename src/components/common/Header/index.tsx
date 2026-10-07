@@ -107,6 +107,7 @@ const CommonHeader: React.FC = () => {
                                     (titleIconClick ? (
                                         <Button
                                             icon={titleIcon}
+                                            aria-label="Go back"
                                             rootClassName="flex items-center justify-center !w-10 !h-10 rounded-full hover:bg-gray-100 cursor-pointer border-stroke mr-2"
                                             onClick={titleIconClick}
                                         />

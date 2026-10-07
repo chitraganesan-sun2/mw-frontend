@@ -9,7 +9,7 @@ import { GET_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "@/components/common/Toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDuration, formatSessionTime, getDurationMinutes, shortTimeZone } from "@/utils/sessionDisplay";
+import { formatDuration, formatSessionDate, formatSessionTime, getDurationMinutes, shortTimeZone } from "@/utils/sessionDisplay";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { cn } from "@/utils/merge-class";
@@ -28,6 +28,8 @@ interface ClaimConfirmationModalProps {
         status: "available" | "claimed";
         tags: string[];
         description: string;
+        /** YYYY-MM-DD, in the host's calendar. */
+        date?: string;
         startTime: string;
         endTime: string;
         timezone: string;
@@ -191,7 +193,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
     const modalBodyContent = (
         <div className="flex flex-col gap-4">
             <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                Please confirm if you want to claim the &ldquo;<span className="text-[#121212]">{session.title}</span>&rdquo; session hosted by <span className="text-[#121212]">{session.instructor.name}</span>, scheduled from <span className="text-[#121212]">{session.startTime} to {session.endTime}</span>.
+                Please confirm if you want to claim the &ldquo;<span className="text-[#121212]">{session.title}</span>&rdquo; session hosted by <span className="text-[#121212]">{session.instructor.name}</span>, scheduled <span className="text-[#121212]">{session.date ? `${formatSessionDate(session.date)}, ` : ""}from {session.startTime} to {session.endTime}{session.timezone ? ` ${session.timezone}` : ""}</span>.
             </p>
             <div className="bg-[#E0F2FE] rounded-lg p-4">
                 <p className="text-sm text-[#4F4F4F] leading-relaxed">

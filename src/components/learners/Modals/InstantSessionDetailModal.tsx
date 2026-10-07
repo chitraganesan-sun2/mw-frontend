@@ -258,21 +258,22 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                             <TagComponent
                                 key={index}
                                 text={label}
-                                tagClassName="!bg-[#E0F2FE] !border-none !text-black !px-3 !py-1 !text-sm"
+                                tagClassName="!bg-gray-100 !border-none !text-black !px-3 !py-1 !text-sm"
                             />
                         );
                     })}
                 </div>
             )}
             <p className="text-sm text-black leading-relaxed">{session.description}</p>
-            <div className="flex items-center justify-between py-1">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1">
                 <div className="flex items-center gap-2">
                     <div className="flex items-center justify-center pb-1! w-5 h-5 text-gray-600 flex-shrink-0">
                         <TimeIcon className="w-5 h-5" />
                     </div>
-                    <span className="text-base font-medium text-[#4F4F4F]">Duration</span>
+                    {/* The value is the time range + length, so "Time" (it was labelled "Duration"). */}
+                    <span className="text-base font-medium text-[#4F4F4F]">Time</span>
                 </div>
-                <span className="text-base font-medium text-[#121212]">
+                <span className="text-base font-medium text-[#121212] text-right">
                     {session.startTime} - {session.endTime} {session.timezone} ({session.duration})
                 </span>
             </div>
