@@ -101,7 +101,7 @@ function CompactSessionRow({
                         href={joinHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white hover:opacity-90"
+                        className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold"
                     >
                         Join
                     </a>

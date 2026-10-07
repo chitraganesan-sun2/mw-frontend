@@ -486,3 +486,17 @@ html {
 .animate-slide-in-right {
     animation: slideInRight 0.3s ease-out forwards;
 }
+
+/* Filled primary action (buttons, Join, Respond, selected chips) - the landing
+   "Enroll as Learner" / "Become a Volunteer" look: the role's light tint, black text
+   and a darker 3D edge on the right/bottom. Text accents keep --primary-color. */
+.btn-primary-fill {
+    background-color: var(--background-secondary-color) !important;
+    color: var(--black-color, #000) !important;
+    border-style: solid !important;
+    border-width: 0 2px 2px 0 !important;
+    border-color: var(--primary-edge-color) !important;
+}
+.btn-primary-fill:hover:not(:disabled) {
+    filter: brightness(0.96);
+}

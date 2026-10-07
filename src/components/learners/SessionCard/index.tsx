@@ -136,7 +136,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                    className="mt-3 inline-flex items-center justify-center rounded-xl btn-primary-fill px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
                 >
                     Join
                 </a>

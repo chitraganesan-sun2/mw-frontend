@@ -49,7 +49,7 @@ dayjs.extend(customParseFormat);
 
 // Same style as the learner page's "+ Request a Session" (theme primary = volunteer orange).
 const START_SESSION_BTN_CLASS =
-    "bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity";
+    "btn-primary-fill px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity";
 
 
 
@@ -104,7 +104,7 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
             </div>
             <div className="mt-4 flex justify-end">
                 <button
-                    className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="btn-primary-fill px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     disabled={isActionLoading}
                     onClick={() => onAccept(req.request_id)}
                 >

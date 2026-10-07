@@ -551,7 +551,7 @@ export default function InstantSessionsPage() {
                     </h2>
                     <button
                         onClick={() => setIsRequestModalOpen(true)}
-                        className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+                        className="btn-primary-fill px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
                     >
                         + Request a Session
                     </button>
@@ -607,7 +607,7 @@ export default function InstantSessionsPage() {
                         </p>
                         <button
                             onClick={() => setIsRequestModalOpen(true)}
-                            className="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+                            className="btn-primary-fill px-6 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
                         >
                             Request a Session
                         </button>

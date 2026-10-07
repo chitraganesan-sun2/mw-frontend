@@ -29,7 +29,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
                             value={option.value}
                             className={`max-md:hidden flex items-center justify-center w-12 h-12 rounded-full
                             ${value === option.value
-                                    ? "bg-primary text-white border-primary"
+                                    ? "btn-primary-fill"
                                     : "bg-background-input text-gray hover:border-primary"
                                 } transition-colors ${radioButtonClassName}`}
                         >

@@ -119,7 +119,7 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                         <Button
                             onClick={handleScheduleMeeting}
                             title="Schedule a session"
-                            className="!rounded-xl !text-sm !w-full !text-black !bg-primary !border-primary !border"
+                            className="!rounded-xl !text-sm !w-full btn-primary-fill"
                         />
                     </div>
                 )}

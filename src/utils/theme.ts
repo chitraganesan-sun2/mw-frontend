@@ -9,13 +9,18 @@ export const VolunteerTheme = {
     // text and UI components) and 3.1:1 on the volunteer background below.
     primary: "#E35D0B",
     background: "#FFE9D4",
+    // Filled buttons/pills use the landing "Become a Volunteer" look (user choice): this
+    // light tint + black text + a darker 3D edge.
     backgroundSecondary: "#FFAC71",
+    edge: "#B54708",
 };
 
 export const LearnerTheme = {
     primary: "#09BAEE",
     background: "#DFF5FF",
+    // Same pattern as the landing "Enroll as Learner" button.
     backgroundSecondary: "#68DBFF",
+    edge: "#009BCC",
 };
 
 export const getTheme = () => {

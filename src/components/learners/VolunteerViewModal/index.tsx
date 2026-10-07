@@ -61,7 +61,7 @@ const ProfileHeader = ({
             <Button
                 onClick={onScheduleMeeting}
                 title="Schedule a session"
-                className="text-sm !text-black !bg-primary !border-primary !border"
+                className="text-sm btn-primary-fill"
             />
             <button
                 type="button"

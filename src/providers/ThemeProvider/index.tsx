@@ -82,6 +82,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
             "--background-secondary-color",
             theme.backgroundSecondary
         );
+        document.documentElement.style.setProperty("--primary-edge-color", theme.edge);
     };
 
     // Watch for cookie changes
