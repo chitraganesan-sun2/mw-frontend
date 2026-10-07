@@ -27,6 +27,7 @@ import {
     minuteRangesOverlap,
     shortTimeZone,
     slotMinuteRange,
+    profileTimeZoneIana,
 } from "@/utils/sessionDisplay";
 
 dayjs.extend(utc);
@@ -52,29 +53,6 @@ interface TimePickerComponentProps {
     isEndPicker?: boolean;
 }
 
-const timezoneMapping: Record<string, string> = {
-    AKST: "America/Anchorage",
-    AKDT: "America/Anchorage",
-    AST: "America/Halifax",
-    ADT: "America/Halifax",
-    CST: "America/Chicago",
-    CDT: "America/Chicago",
-    EST: "America/New_York",
-    EDT: "America/New_York",
-    HST: "Pacific/Honolulu",
-    HDT: "Pacific/Honolulu",
-    MST: "America/Denver",
-    MDT: "America/Denver",
-    MT: "America/Denver",
-    NST: "America/St_Johns",
-    NDT: "America/St_Johns",
-    PST: "America/Los_Angeles",
-    PDT: "America/Los_Angeles",
-    PT: "America/Los_Angeles",
-    CT: "America/Chicago",
-    ET: "America/New_York",
-    IST: "Asia/Kolkata",
-};
 
 interface Slot {
     start_time: string;
@@ -209,7 +187,8 @@ const OnetImeScheduleModal = ({
         ? (timezoneRaw.split(" - ")[0]?.trim() ?? "")
         : "";
 
-    const ianaTimezone = timezoneMapping[rawAbbreviation] || null;
+    // Full-label aware (Arizona / Saskatchewan / Puerto Rico have no daylight saving).
+    const ianaTimezone = profileTimeZoneIana(timezoneRaw);
 
     // Use IANA timezone name if available, otherwise raw abbreviation
     const volunteerTimezone = ianaTimezone || rawAbbreviation;

@@ -19,8 +19,16 @@
                 "value": "MST - Mountain Standard Time (UTC-07:00)"
             },
             {
+                "label": "MST - Mountain Standard Time, Arizona - no daylight saving (UTC-07:00)",
+                "value": "MST - Mountain Standard Time, Arizona - no daylight saving (UTC-07:00)"
+            },
+            {
                 "label": "CST - Central Standard Time (UTC-06:00)",
                 "value": "CST - Central Standard Time (UTC-06:00)"
+            },
+            {
+                "label": "CST - Central Standard Time, Saskatchewan - no daylight saving (UTC-06:00)",
+                "value": "CST - Central Standard Time, Saskatchewan - no daylight saving (UTC-06:00)"
             },
             {
                 "label": "EST - Eastern Standard Time (UTC-05:00)",
@@ -29,6 +37,10 @@
             {
                 "label": "AST - Atlantic Standard Time (UTC-04:00)",
                 "value": "AST - Atlantic Standard Time (UTC-04:00)"
+            },
+            {
+                "label": "AST - Atlantic Standard Time, Puerto Rico - no daylight saving (UTC-04:00)",
+                "value": "AST - Atlantic Standard Time, Puerto Rico - no daylight saving (UTC-04:00)"
             },
             {
                 "label": "NST - Newfoundland Standard Time (UTC-03:30)",

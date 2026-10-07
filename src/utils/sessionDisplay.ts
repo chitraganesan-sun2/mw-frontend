@@ -216,6 +216,15 @@ const ABBR_TO_IANA: Record<string, string> = {
     IST: "Asia/Kolkata",
 };
 
+// Exact picker labels whose abbreviation alone is ambiguous: no-daylight-saving areas share
+// MST/CST/AST with zones that DO observe it. Checked before the abbreviation map. Keep in
+// sync with src/data/selectiveTimeZones.json and the backend's utils/timezones.py.
+const LABEL_TO_IANA: Record<string, string> = {
+    "MST - Mountain Standard Time, Arizona - no daylight saving (UTC-07:00)": "America/Phoenix",
+    "CST - Central Standard Time, Saskatchewan - no daylight saving (UTC-06:00)": "America/Regina",
+    "AST - Atlantic Standard Time, Puerto Rico - no daylight saving (UTC-04:00)": "America/Puerto_Rico",
+};
+
 const IANA_NAME = /^[A-Za-z]+\/[A-Za-z_]+/;
 
 /** IANA zone for a profile label ("EST - Eastern Standard Time (UTC-05:00)" -> America/New_York).
@@ -225,6 +234,7 @@ const IANA_NAME = /^[A-Za-z]+\/[A-Za-z_]+/;
 export function profileTimeZoneIana(label?: string | null, iana?: string | null): string | null {
     if (iana && IANA_NAME.test(iana.trim())) return iana.trim();
     if (!label) return null;
+    if (LABEL_TO_IANA[label.trim()]) return LABEL_TO_IANA[label.trim()];
     const abbr = label.split(" - ")[0].trim();
     if (ABBR_TO_IANA[abbr]) return ABBR_TO_IANA[abbr];
     return IANA_NAME.test(abbr) ? abbr : null;

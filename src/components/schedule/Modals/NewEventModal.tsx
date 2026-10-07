@@ -28,7 +28,7 @@ import { getApiErrorMessage } from "@/utils/apiError";
 import { useQuery } from "@tanstack/react-query";
 import { useAppStore } from "@/store/useAppStore";
 import useInnerWidth from "@/hooks/useInnerWidth";
-import { minuteRangesOverlap, shortTimeZone, slotMinuteRange } from "@/utils/sessionDisplay";
+import { minuteRangesOverlap, profileTimeZoneIana, shortTimeZone, slotMinuteRange } from "@/utils/sessionDisplay";
 import ModalCloseIcon from "@/assets/icons/ModalCloseIcon";
 import { extractTimezoneOffset } from "@/utils/timeFunctions";
 
@@ -90,29 +90,6 @@ interface InstantSessionPayload {
     expertise_level: string | null;
 }
 
-const timezoneMapping: Record<string, string> = {
-    AKST: "America/Anchorage",
-    AKDT: "America/Anchorage",
-    AST: "America/Halifax",
-    ADT: "America/Halifax",
-    CST: "America/Chicago",
-    CDT: "America/Chicago",
-    EST: "America/New_York",
-    EDT: "America/New_York",
-    HST: "Pacific/Honolulu",
-    HDT: "Pacific/Honolulu",
-    MST: "America/Denver",
-    MDT: "America/Denver",
-    MT: "America/Denver",
-    NST: "America/St_Johns",
-    NDT: "America/St_Johns",
-    PST: "America/Los_Angeles",
-    PDT: "America/Los_Angeles",
-    PT: "America/Los_Angeles",
-    CT: "America/Chicago",
-    ET: "America/New_York",
-    IST: "Asia/Kolkata",
-};
 
 export default function NewEventModal({
     isOpen,
@@ -162,7 +139,8 @@ export default function NewEventModal({
         ? (timezoneRaw.split(" - ")[0]?.trim() ?? "")
         : "";
 
-    const ianaTimezone = timezoneMapping[rawAbbreviation] || null;
+    // Full-label aware (Arizona / Saskatchewan / Puerto Rico have no daylight saving).
+    const ianaTimezone = profileTimeZoneIana(timezoneRaw);
 
     // Use IANA timezone name if available, otherwise raw abbreviation
     const volunteerTimezone = ianaTimezone || rawAbbreviation;

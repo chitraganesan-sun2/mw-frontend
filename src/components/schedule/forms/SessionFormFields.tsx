@@ -43,6 +43,9 @@ export const CATEGORY_OPTIONS: { value: SessionCategory; label: string }[] = [
 ];
 
 export const GRADE_OPTIONS = [
+    // Learners can be 5 (the minimum age), so the list starts before Grade 1.
+    "Pre-K",
+    "Kindergarten",
     ...Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`),
     "College",
     "Other",

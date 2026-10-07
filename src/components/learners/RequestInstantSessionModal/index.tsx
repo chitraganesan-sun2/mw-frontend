@@ -26,37 +26,12 @@ import {
     type SessionCategory,
 } from "@/components/schedule/forms/SessionFormFields";
 import { useAppStore } from "@/store/useAppStore";
-import { shortTimeZone } from "@/utils/sessionDisplay";
+import { profileTimeZoneIana, shortTimeZone } from "@/utils/sessionDisplay";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// Onboarding stores the timezone as "ABBR - Full Name (UTC±HH:MM)"; map the abbr to an
-// IANA zone so dayjs can do DST-correct math. Mirrors schedule/Modals/NewEventModal.
-const ABBR_TO_IANA: Record<string, string> = {
-    AKST: "America/Anchorage",
-    AKDT: "America/Anchorage",
-    AST: "America/Halifax",
-    ADT: "America/Halifax",
-    CST: "America/Chicago",
-    CDT: "America/Chicago",
-    CT: "America/Chicago",
-    EST: "America/New_York",
-    EDT: "America/New_York",
-    ET: "America/New_York",
-    HST: "Pacific/Honolulu",
-    HDT: "Pacific/Honolulu",
-    MST: "America/Denver",
-    MDT: "America/Denver",
-    MT: "America/Denver",
-    NST: "America/St_Johns",
-    NDT: "America/St_Johns",
-    PST: "America/Los_Angeles",
-    PDT: "America/Los_Angeles",
-    PT: "America/Los_Angeles",
-    IST: "Asia/Kolkata",
-};
 
 interface RequestInstantSessionModalProps {
     isOpen: boolean;
@@ -80,11 +55,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     // Onboarding stores "ABBR - Full Name (UTC±HH:MM)". Keep the abbr as-is for the label
     // (it's exactly what the learner picked - "IST", "PST", ...) and map it to an IANA
     // zone for DST-correct date math.
-    const tzAbbr =
-        ((learnerDetails?.learner_personal_info?.learner_contact_details?.timezone as string) ?? "")
-            .split(" - ")[0]
-            ?.trim() ?? "";
-    const learnerTz = ABBR_TO_IANA[tzAbbr] || "";
+    const tzLabel = (learnerDetails?.learner_personal_info?.learner_contact_details?.timezone as string) ?? "";
+    const tzAbbr = tzLabel.split(" - ")[0]?.trim() ?? "";
+    // Full-label aware (Arizona / Saskatchewan / Puerto Rico have no daylight saving).
+    const learnerTz = profileTimeZoneIana(tzLabel) || "";
 
     const nowInTz = learnerTz ? dayjs().tz(learnerTz) : dayjs();
     const todayStr = nowInTz.format("YYYY-MM-DD");
@@ -281,7 +255,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 <div>
                     <div className="flex flex-col gap-2">
                         <label htmlFor="request-session-time" className="text-base font-medium text-[#121212]">
-                            {SESSION_FIELD_LABELS.startTime}{tzAbbr ? ` (${shortTimeZone(tzAbbr, date)})` : ""} <span aria-hidden="true">*</span>
+                            {SESSION_FIELD_LABELS.startTime}{tzAbbr ? ` (${shortTimeZone(tzLabel, date)})` : ""} <span aria-hidden="true">*</span>
                         </label>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <MobileTimePicker
