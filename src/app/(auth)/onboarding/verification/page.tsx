@@ -94,7 +94,7 @@ export default function VerificationPage() {
     const verificationTheme =
         role === "learner"
             ? { iconBgColor: "#DFF5FF", iconAccentColor: "#09BAEE" }
-            : { iconBgColor: "#FFF0E6", iconAccentColor: "#FF6C00" };
+            : { iconBgColor: "#FFF0E6", iconAccentColor: "#E35D0B" };
 
     return (
         <div className="flex min-h-[60dvh] bg-background-input items-center justify-center flex-col gap-5 md:px-10">

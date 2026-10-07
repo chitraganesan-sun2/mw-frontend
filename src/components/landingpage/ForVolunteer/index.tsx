@@ -16,7 +16,7 @@ const ForVolunteer = () => {
                 title="For Volunteers"
                 subTitle="You’ll find more than a volunteer role—you’ll find a purpose that uplifts"
                 description="Have a passion for teach and helping others? Join our community where your efforts can make a world of difference!"
-                titleColor="!text-[#FF6C00]"
+                titleColor="!text-volunteer"
             />
 
             <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">

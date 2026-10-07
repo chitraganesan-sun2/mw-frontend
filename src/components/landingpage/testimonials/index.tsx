@@ -22,7 +22,7 @@ const TestimonialMarqueeCard = ({ testimonial }: { testimonial: TestimonialData 
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                 testimonial.category === "Learners" 
                     ? "bg-blue-50 text-blue-600" 
-                    : "bg-orange-50 text-orange-600"
+                    : "bg-volunteer-light text-volunteer"
             }`}>
                 {testimonial.category}
             </span>

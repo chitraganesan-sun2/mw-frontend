@@ -417,7 +417,8 @@ html {
     .ant-picker-time-panel-column
     > li.ant-picker-time-panel-cell-selected
     .ant-picker-time-panel-cell-inner {
-    background: #ffac71;
+    /* Role-aware (was orange for learners too). */
+    background: var(--background-secondary-color);
     color: var(--gray-color);
 }
 
@@ -464,8 +465,8 @@ html {
 }
 
 .text-gradient {
-    color: #ffa766;
-    background-image: linear-gradient(90deg, #ffa766 24%, #66dbff 64%);
+    color: #e35d0b;
+    background-image: linear-gradient(90deg, #e35d0b 24%, #66dbff 64%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

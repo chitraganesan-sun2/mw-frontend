@@ -363,7 +363,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                             <button
                                                 type="button"
                                                 onClick={() => onClick(post.post_id)}
-                                                className="cursor-pointer text-primary font-medium text-[#ffac71] bg-transparent border-0 p-0 inline"
+                                                className="cursor-pointer text-primary font-medium bg-transparent border-0 p-0 inline"
                                             >
                                                 See More
                                             </button>

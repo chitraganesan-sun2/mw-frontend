@@ -215,7 +215,7 @@ const TabButtons = ({
                             </p>
                             <div
                                 className={`!h-[4px] !w-full mt-1 rounded-t-xl ${
-                                    activeTab === tab ? "bg-[#FF9053]" : ""
+                                    activeTab === tab ? "bg-primary" : ""
                                 }`}
                             ></div>
                         </button>

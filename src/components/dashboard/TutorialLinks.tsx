@@ -23,7 +23,7 @@ const DEMO_CATEGORIES = ["learner_demo", "volunteer_demo"];
 const categoryIcons: Record<string, React.ReactNode> = {
     video: <FiVideo className="text-blue-600" size={18} aria-hidden="true" />,
     doc: <FiFileText className="text-green-700" size={18} aria-hidden="true" />,
-    guide: <FiBookOpen className="text-orange-700" size={18} aria-hidden="true" />,
+    guide: <FiBookOpen className="text-volunteer" size={18} aria-hidden="true" />,
 };
 
 /**

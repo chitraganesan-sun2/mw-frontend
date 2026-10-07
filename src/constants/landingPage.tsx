@@ -31,16 +31,16 @@ const handleInnerWidth = () => {
 };
 
 export const gradientInnerTextStyle = {
-    color: "#ffa766",
-    backgroundImage: "linear-gradient(90deg, #ffa766 30%, #66dbff 54%)",
+    color: "#E35D0B",
+    backgroundImage: "linear-gradient(90deg, #E35D0B 30%, #66dbff 54%)",
     backgroundClip: "text",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
 } as const;
 
 export const gradientTextStyle = {
-    color: "#ffa766",
-    backgroundImage: "linear-gradient(90deg, #009BCC 30%, #FF6C00 60%)",
+    color: "#E35D0B",
+    backgroundImage: "linear-gradient(90deg, #009BCC 30%, #E35D0B 60%)",
     backgroundClip: "text",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",

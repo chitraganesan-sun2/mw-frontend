@@ -11,6 +11,13 @@ const config: Config = {
         extend: {
             colors: {
                 primary: "var(--primary-color)",
+                // Fixed volunteer brand orange for places with no signed-in role (landing,
+                // onboarding). Keep in sync with VolunteerTheme in src/utils/theme.ts.
+                volunteer: {
+                    DEFAULT: "#E35D0B",
+                    dark: "#B54708",
+                    light: "#FFF0E6",
+                },
                 background: {
                     DEFAULT: "var(--background-color)",
                     input: "var(--input-background)",

@@ -2,7 +2,7 @@
 
 import Button from "@/components/common/Button";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { cn } from "@/utils/merge-class";
 import { CardSkeleton } from "../Card";
 import { useQueryState } from "nuqs";
@@ -101,7 +101,7 @@ const SectionWrapper = ({
                                 </span>
                             ) : (
                                 Array.isArray(data) &&
-                                data.map((item, index) => <>{renderItem(item, index)}</>)
+                                data.map((item, index) => <Fragment key={item?.resource_id ?? item?.category_id ?? index}>{renderItem(item, index)}</Fragment>)
                             )}
                         </>
                     )}
