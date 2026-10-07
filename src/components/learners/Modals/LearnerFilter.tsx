@@ -51,7 +51,9 @@ export default function LearnerFilterModal({
     useEffect(() => {
         setFilterData({
             learner_primary_language: learner_primary_language?.split(",") || [],
-            type_of_developmental_disability: type_of_developmental_disability || null,
+            // Multi-select like the rest: a plain string here made the picker drop the
+            // applied value(s) when the modal was reopened.
+            type_of_developmental_disability: type_of_developmental_disability?.split(",") || [],
             areas_of_support_needed: areas_of_support_needed?.split(",") || [],
             academic_strengths: academic_strengths?.split(",") || [],
             academic_challenges: academic_challenges?.split(",") || [],
@@ -85,7 +87,11 @@ export default function LearnerFilterModal({
                 ? filterData.learner_primary_language.join(",")
                 : null
         );
-        setDevelopmentalDisability(filterData?.type_of_developmental_disability || null);
+        setDevelopmentalDisability(
+            filterData?.type_of_developmental_disability?.length
+                ? filterData.type_of_developmental_disability.join(",")
+                : null
+        );
         setAreasOfSupport(
             filterData?.areas_of_support_needed?.length
                 ? filterData.areas_of_support_needed.join(",")

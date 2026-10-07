@@ -1,66 +1,24 @@
 [
-    {
-        "label": "Difficulty in Social Interaction",
-        "value": "difficulty_in_social_interaction"
-    },
+    { "label": "Aggressive Behaviors or Tantrums", "value": "aggressive_behaviors_or_tantrums" },
+    { "label": "Challenges in Emotional Regulation", "value": "challenges_in_emotional_regulation" },
     { "label": "Delayed Communication Skills", "value": "delayed_communication_skills" },
-    { "label": "Repetitive Behaviors", "value": "repetitive_behaviors" },
-    {
-        "label": "Difficulty in Adapting to Changes",
-        "value": "difficulty_in_adapting_to_changes"
-    },
-    {
-        "label": "Sensory Sensitivities (e.g., to Sound, Touch, or Light)",
-        "value": "sensory_sensitivities"
-    },
-    { "label": "Short Attention Span", "value": "short_attention_span" },
-    { "label": "Impulsivity", "value": "impulsivity" },
-    {
-        "label": "Difficulty in Understanding Social Cues",
-        "value": "difficulty_in_understanding_social_cues"
-    },
-    {
-        "label": "Aggressive Behaviors or Tantrums",
-        "value": "aggressive_behaviors_or_tantrums"
-    },
-    {
-        "label": "Self-Stimulatory Behaviors (e.g., Hand Flapping, Rocking)",
-        "value": "self_stimulatory_behaviors"
-    },
-    {
-        "label": "Difficulty in Maintaining Eye Contact",
-        "value": "difficulty_in_maintaining_eye_contact"
-    },
-    {
-        "label": "Fixation on Specific Objects or Topics",
-        "value": "fixation_on_specific_objects_or_topics"
-    },
-    {
-        "label": "Difficulty in Following Instructions",
-        "value": "difficulty_in_following_instructions"
-    },
-    {
-        "label": "Challenges in Emotional Regulation",
-        "value": "challenges_in_emotional_regulation"
-    },
+    { "label": "Difficulty in Adapting to Changes", "value": "difficulty_in_adapting_to_changes" },
+    { "label": "Difficulty in Following Instructions", "value": "difficulty_in_following_instructions" },
+    { "label": "Difficulty in Forming Peer Relationships", "value": "difficulty_in_forming_peer_relationships" },
+    { "label": "Difficulty in Maintaining Eye Contact", "value": "difficulty_in_maintaining_eye_contact" },
+    { "label": "Difficulty in Social Interaction", "value": "difficulty_in_social_interaction" },
+    { "label": "Difficulty in Understanding Social Cues", "value": "difficulty_in_understanding_social_cues" },
+    { "label": "Easily Overwhelmed in Group Settings", "value": "easily_overwhelmed_in_group_settings" },
+    { "label": "Excessive Dependence on Routines or Rituals", "value": "excessive_dependence_on_routines_or_rituals" },
+    { "label": "Fixation on Specific Objects or Topics", "value": "fixation_on_specific_objects_or_topics" },
     { "label": "High Levels of Anxiety or Fear", "value": "high_levels_of_anxiety_or_fear" },
-    {
-        "label": "Oppositional or Defiant Behaviors",
-        "value": "oppositional_or_defiant_behaviors"
-    },
-    {
-        "label": "Excessive Dependence on Routines or Rituals",
-        "value": "excessive_dependence_on_routines_or_rituals"
-    },
-    {
-        "label": "Easily Overwhelmed in Group Settings",
-        "value": "easily_overwhelmed_in_group_settings"
-    },
-    {
-        "label": "Difficulty in Forming Peer Relationships",
-        "value": "difficulty_in_forming_peer_relationships"
-    },
     { "label": "Hyperactivity or Hypoactivity", "value": "hyperactivity_or_hypoactivity" },
-    { "label": "Others", "value": "others" },
+    { "label": "Impulsivity", "value": "impulsivity" },
+    { "label": "Oppositional or Defiant Behaviors", "value": "oppositional_or_defiant_behaviors" },
+    { "label": "Repetitive Behaviors", "value": "repetitive_behaviors" },
+    { "label": "Self-Stimulatory Behaviors (e.g., Hand Flapping, Rocking)", "value": "self_stimulatory_behaviors" },
+    { "label": "Sensory Sensitivities (e.g., to Sound, Touch, or Light)", "value": "sensory_sensitivities" },
+    { "label": "Short Attention Span", "value": "short_attention_span" },
+    { "label": "Other", "value": "others" },
     { "label": "N/A", "value": "N/A" }
 ]

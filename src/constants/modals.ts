@@ -1,23 +1,12 @@
-import nationalities from "@/data/nationalities.json";
-import developmentalDisabilities from "@/data/developmentalDisabilities.json";
-import areasOfSupport from "@/data/areasOfSupport.json";
 import academicStrengths from "@/data/academicStrengths.json";
 import academicChallenges from "@/data/academicChallenges.json";
 import behavioralConcerns from "@/data/behavioralConcerns.json";
 import techniquesThatWork from "@/data/techniquesThatWork.json";
-import skillsExpertise from "@/data/skills_expertise.json";
 import parentGoals from "@/data/parentGoals.json";
 
+// No Country filter: GET /volunteer/list always restricts to the learner's own country and
+// ignores a client-supplied `country`, so picking another country silently did nothing.
 export const VolunteerFilterModalConstants = [
-    {
-        id: "country",
-        name: "country",
-        label: "Select Country of Residence",
-        inputType: "select",
-        placeholder: "Select Country of Residence",
-        options: nationalities,
-        showSearch: true,
-    },
     {
         name: "languages_known",
         label: "Languages Known",
@@ -59,7 +48,7 @@ export const VolunteerFilterModalConstants = [
 export const LearnerFilterModalConstants = [
     {
         name: "learner_primary_language",
-        label: "Languages Known",
+        label: "Primary Language",
         inputType: "async-select",
         variant: "multi",
         placeholder: "Select Language",
@@ -119,10 +108,10 @@ export const LearnerFilterModalConstants = [
     },
     {
         name: "techniques_to_calm",
-        label: "Techniques That Work",
+        label: "Behavior Support Strategies",
         inputType: "select-creatable",
         variant: "multi",
-        placeholder: "Select Techniques",
+        placeholder: "Select Strategies",
         options: techniquesThatWork,
         showSearch: true,
     },

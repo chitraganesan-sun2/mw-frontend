@@ -1,8 +1,13 @@
 [
-    { "label": "Math", "value": "math" },
-    { "label": "Science", "value": "science" },
-    { "label": "History", "value": "history" },
+    { "label": "Biology", "value": "biology" },
+    { "label": "Chemistry", "value": "chemistry" },
+    { "label": "Computer Science", "value": "computer_science" },
     { "label": "English", "value": "english" },
-    { "label": "Others", "value": "others" },
+    { "label": "History", "value": "history" },
+    { "label": "Math", "value": "math" },
+    { "label": "Physics", "value": "physics" },
+    { "label": "Science", "value": "science" },
+    { "label": "Social Studies", "value": "social_studies" },
+    { "label": "Other", "value": "others" },
     { "label": "N/A", "value": "N/A" }
 ]

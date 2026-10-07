@@ -34,6 +34,8 @@ function toOptions(kind: "volunteer" | "learner", items: any[]): CounterpartOpti
                     ? [...(item?.volunteer_subjects || []), ...(item?.volunteer_skills || [])]
                     : item?.skills || []
             )
+                // Skip the onboarding "None" chip (id "__none__") - not a topic.
+                .filter((s: any) => (s?.subject_id ?? s?.skill_id) !== "__none__")
                 .map((s: any) => s?.subject_name ?? s?.skill_name)
                 .filter(Boolean);
             return value ? { value: String(value), name: name || "Unnamed", topics } : null;

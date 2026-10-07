@@ -25,6 +25,8 @@ import { showToast } from "@/components/common/Toast";
 import { getCookie } from "@/utils/auth";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { joinNames } from "@/utils/joinNames";
+import { compareOptionLabels } from "@/utils/optionOrder";
+import { NONE_SKILL_OPTION, NONE_SUBJECT_OPTION } from "@/constants/volunteer";
 import {
     CategoryField,
     SessionDetailsField,
@@ -54,13 +56,19 @@ const EMPTY_FORM = {
  * listed under Academic, not Arts & Life Skills. Skills without a category stay under
  * Arts & Life Skills (the old behaviour). */
 export function skillOptionsByCategory(profile: any): { academic: string[]; nonAcademic: string[] } {
-    const skills: any[] = profile?.volunteer_skills || [];
+    // The onboarding "None" chip ("I don't teach this category", id "__none__") is stored on
+    // the profile like a real pick - it is not a skill to book, and must not make a category
+    // look available.
+    const isReal = (id: unknown) => id !== NONE_SUBJECT_OPTION.value.subject_id && id !== NONE_SKILL_OPTION.value.skill_id;
+    const skills: any[] = (profile?.volunteer_skills || []).filter((s: any) => isReal(s?.skill_id));
+    const subjects: any[] = (profile?.volunteer_subjects || []).filter((s: any) => isReal(s?.subject_id));
     const academic = [
-        ...(profile?.volunteer_subjects || []).map((s: any) => s?.subject_name),
+        ...subjects.map((s: any) => s?.subject_name),
         ...skills.filter((s) => s?.category === "academic").map((s) => s?.skill_name),
     ].filter(Boolean) as string[];
     const nonAcademic = skills.filter((s) => s?.category !== "academic").map((s) => s?.skill_name).filter(Boolean) as string[];
-    return { academic: Array.from(new Set(academic)), nonAcademic: Array.from(new Set(nonAcademic)) };
+    const unique = (names: string[]) => Array.from(new Set(names)).sort(compareOptionLabels);
+    return { academic: unique(academic), nonAcademic: unique(nonAcademic) };
 }
 
 // Define Zod schema for form validation

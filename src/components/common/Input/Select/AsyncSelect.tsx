@@ -10,6 +10,19 @@ import { cn } from "@/utils/merge-class";
 import { StylesConfig } from "react-select";
 import { usePathname } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import { SERVER_ORDERED_LOV_ENDPOINTS, sortByLabel } from "@/utils/optionOrder";
+
+// A stored value that isn't in the fetched list - a typed-in entry still pending admin
+// review, or one this list no longer offers. Show it from the stored value itself instead
+// of returning null: a dropped value vanished from the field and was then silently removed
+// from the profile on the next change/save.
+const storedValueAsOption = (val: any, responseAsValue: AsyncSelectProps["responseAsValue"], responseAsLabel: string) => {
+    if (Array.isArray(responseAsValue)) {
+        return val?.[responseAsLabel] ? { value: val, label: val[responseAsLabel] } : null;
+    }
+    // Only when the stored value IS the label (e.g. language_name); an id can't be shown.
+    return responseAsValue === responseAsLabel && typeof val === "string" && val ? { value: val, label: val } : null;
+};
 
 const AsyncSelect = ({
     variant,
@@ -138,7 +151,7 @@ const AsyncSelect = ({
                                 : val === noneOption.value;
                             if (isNone) return { value: noneOption.value, label: noneOption.label };
                         }
-                        return null;
+                        return storedValueAsOption(val, responseAsValue, responseAsLabel);
                     }
 
                     return {
@@ -161,7 +174,7 @@ const AsyncSelect = ({
             return d[responseAsValue] === props.value;
         });
 
-        if (!matchingItem) return null;
+        if (!matchingItem) return storedValueAsOption(props.value, responseAsValue, responseAsLabel);
 
         if (!responseAsValue)
             return {
@@ -176,10 +189,16 @@ const AsyncSelect = ({
     }, [data, props.value, responseAsValue, responseAsLabel, variant, noneOption]);
 
     const options = useMemo(() => {
-        const fetched = convertToOptions(data, responseAsValue, responseAsLabel, isLoading);
+        const converted = convertToOptions(data, responseAsValue, responseAsLabel, isLoading);
+        // Lookup lists come back in insertion order for most endpoints (subjects, categories)
+        // and with "None" mid-list for others - sort A-Z with Other/None/N/A last, except the
+        // lists whose server order is the intended one.
+        const fetched = SERVER_ORDERED_LOV_ENDPOINTS.has(String(endpoint).split("?")[0])
+            ? converted
+            : sortByLabel(converted, (option) => option.label);
         if (!noneOption) return fetched;
         return [{ label: noneOption.label, value: noneOption.value }, ...fetched];
-    }, [data, responseAsValue, responseAsLabel, isLoading, noneOption]);
+    }, [data, responseAsValue, responseAsLabel, isLoading, noneOption, endpoint]);
 
     const filteredOptions = useMemo(() => {
         if (variant === "multi" && Array.isArray(getValue) && getValue?.length > 0) {

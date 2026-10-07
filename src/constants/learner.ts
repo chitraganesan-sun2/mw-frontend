@@ -1,5 +1,8 @@
 import nationalities from "@/data/nationalities.json";
 import timezones from "@/data/selectiveTimeZones.json";
+// Shared with the Learner Filter (constants/modals.ts) so both list the same options in the same order.
+import academicStrengths from "@/data/academicStrengths.json";
+import behaviorSupportStrategies from "@/data/techniquesThatWork.json";
 
 export const LEARNER_MIN_AGE = 5;
 
@@ -32,7 +35,7 @@ const ParentGuardianFields: FormField[] = [
         creatable: true,
         variant: "single",
         showSearch: true,
-        placeholder: "Select relationship",
+        placeholder: "Select a relationship",
         gridCols: 1,
         options: [
             { label: "Aunt/Uncle", value: "aunt_uncle" },
@@ -120,7 +123,7 @@ const LearnerPersonalFields: FormField[] = [
         options: [
             { label: "Male", value: "male" },
             { label: "Female", value: "female" },
-            { label: "Prefer not to reveal", value: "not_specified" },
+            { label: "Prefer not to say", value: "not_specified" },
         ],
         gridCols: 1,
         required: true,
@@ -129,7 +132,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "learner_preferred_pronoun",
         label: "Preferred Pronoun",
         inputType: "select",
-        placeholder: "Select Pronoun",
+        placeholder: "Select a pronoun",
         options: [
             { label: "He/Him", value: "he_him" },
             { label: "She/Her", value: "she_her" },
@@ -185,7 +188,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "country",
         label: "Country of Residence",
         inputType: "select",
-        placeholder: "Select Country of Residence",
+        placeholder: "Select a country",
         options: nationalities,
         showSearch: true,
         gridCols: 1,
@@ -196,7 +199,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "timezone",
         label: "Time Zone",
         inputType: "select",
-        placeholder: "Search or select time zone",
+        placeholder: "Select a time zone",
         showSearch: true,
         options: timezones,
         gridCols: 1,
@@ -274,25 +277,7 @@ const DisabilityInfoFields: FormField[] = [
         variant: "multi",
         placeholder: "Don't see your option? Type it in to add.",
         gridCols: 1,
-        options: [
-            { label: "Clear Instructions", value: "clear_instructions" },
-            { label: "Deep Breathing", value: "deep_breathing" },
-            { label: "Express Through Art", value: "express_through_art" },
-            { label: "Give Comfort Item", value: "give_comfort_item" },
-            { label: "Keep Consistent Routine", value: "keep_consistent_routine" },
-            { label: "Offer Fidget Toys", value: "offer_fidget_toys" },
-            { label: "Physical Activity", value: "physical_activity" },
-            { label: "Play Calming Music", value: "play_calming_music" },
-            { label: "Practice Grounding", value: "practice_grounding" },
-            { label: "Provide a Quiet Space", value: "provide_a_quiet_space" },
-            { label: "Reduce Stimuli", value: "reduce_stimuli" },
-            { label: "Simple Mindfulness", value: "simple_mindfulness" },
-            { label: "Use Calm Voice", value: "use_calm_voice" },
-            { label: "Use Deep Pressure", value: "use_deep_pressure" },
-            { label: "Use Visual Aids", value: "use_visual_aids" },
-            { label: "Others", value: "others" },
-            { label: "N/A", value: "N/A" },
-        ],
+        options: behaviorSupportStrategies,
     },
     {
         id: "description",
@@ -349,19 +334,7 @@ const EducationAndHobbiesFields: FormField[] = [
         placeholder: "Don't see your option? Type it in to add.",
         gridCols: 1,
         disabled: false,
-        options: [
-            { label: "English", value: "english" },
-            { label: "History", value: "history" },
-            { label: "Math", value: "math" },
-            { label: "Science", value: "science" },
-            { label: "Computer Science", value: "computer_science" },
-            { label: "Social Studies", value: "social_studies" },
-            { label: "Chemistry", value: "chemistry" },
-            { label: "Physics", value: "physics" },
-            { label: "Biology", value: "biology" },
-            { label: "Others", value: "others" },
-            { label: "N/A", value: "N/A" },
-        ],
+        options: academicStrengths,
     },
     {
         id: "extracurricular_activities",

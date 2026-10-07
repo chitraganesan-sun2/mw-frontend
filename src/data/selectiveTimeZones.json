@@ -3,12 +3,20 @@
         "label": "North America",
         "options": [
             {
+                "label": "HST - Hawaii-Aleutian Standard Time (UTC-10:00)",
+                "value": "HST - Hawaii-Aleutian Standard Time (UTC-10:00)"
+            },
+            {
                 "label": "AKST - Alaska Standard Time (UTC-09:00)",
                 "value": "AKST - Alaska Standard Time (UTC-09:00)"
             },
             {
-                "label": "AST - Atlantic Standard Time (UTC-04:00)",
-                "value": "AST - Atlantic Standard Time (UTC-04:00)"
+                "label": "PST - Pacific Standard Time (UTC-08:00)",
+                "value": "PST - Pacific Standard Time (UTC-08:00)"
+            },
+            {
+                "label": "MST - Mountain Standard Time (UTC-07:00)",
+                "value": "MST - Mountain Standard Time (UTC-07:00)"
             },
             {
                 "label": "CST - Central Standard Time (UTC-06:00)",
@@ -19,21 +27,12 @@
                 "value": "EST - Eastern Standard Time (UTC-05:00)"
             },
             {
-                "label": "HST - Hawaii-Aleutian Standard Time (UTC-10:00)",
-                "value": "HST - Hawaii-Aleutian Standard Time (UTC-10:00)"
-            },
-
-            {
-                "label": "MST - Mountain Standard Time (UTC-07:00)",
-                "value": "MST - Mountain Standard Time (UTC-07:00)"
+                "label": "AST - Atlantic Standard Time (UTC-04:00)",
+                "value": "AST - Atlantic Standard Time (UTC-04:00)"
             },
             {
                 "label": "NST - Newfoundland Standard Time (UTC-03:30)",
                 "value": "NST - Newfoundland Standard Time (UTC-03:30)"
-            },
-            {
-                "label": "PST - Pacific Standard Time (UTC-08:00)",
-                "value": "PST - Pacific Standard Time (UTC-08:00)"
             }
         ]
     },
