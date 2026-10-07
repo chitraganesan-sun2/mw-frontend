@@ -2,16 +2,9 @@
 import React from "react";
 import Image from "next/image";
 import { safeImageSrc } from "@/utils/safeHref";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useAppStore } from "@/store/useAppStore";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import { formatProfileTimestamp } from "@/utils/sessionDisplay";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(advancedFormat);
 interface MessageBubbleProps {
     message: string;
     timestamp: string;
@@ -31,18 +24,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     // Only render avatars next/image can load - a bad URL would throw and crash the chat.
     const userImage = safeImageSrc(rawUserImage);
 
-    const timezoneMapping: Record<string, string> = {
-        AKST: "America/Anchorage",
-        AST: "America/Halifax",
-        CST: "America/Chicago",
-        EST: "America/New_York",
-        HST: "Pacific/Honolulu",
-        MST: "America/Denver",
-        NST: "America/St_Johns",
-        PST: "America/Los_Angeles",
-        IST: "Asia/Kolkata",
-    };
-
     const timezoneRaw =
         (volunteerDetails as { volunteer_contact_details?: { timezone?: string } })
             ?.volunteer_contact_details?.timezone ||
@@ -51,14 +32,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         })?.learner_personal_info?.learner_contact_details?.timezone ||
         "";
 
-    const rawAbbreviation = timezoneRaw.includes(" - ")
-        ? (timezoneRaw.split(" - ")[0]?.trim() ?? "")
-        : timezoneRaw.trim();
-
-    const ianaTimezone = timezoneMapping[rawAbbreviation];
-    const formattedMessageTime = ianaTimezone
-        ? dayjs(date).tz(ianaTimezone)
-        : dayjs(date);
+    // App date style ("October 6, 2026 · 11:51 AM") in the profile timezone. The chat API
+    // sends created_at with an offset; a naive (optimistic/socket) value is read as UTC.
+    const formattedMessageTime = formatProfileTimestamp(date, timezoneRaw, { withZone: false });
 
     return (
         <div
@@ -95,12 +71,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                                 : "text-[#4F4F4F] md:text-gray-500"
                         }`}
                     >
-                        <span className="md:hidden">{formattedMessageTime.format(DISPLAY_DATE_FORMAT)}</span>
-                        <span className="md:hidden font-black">•</span>
-                        <span className="md:hidden">{formattedMessageTime.format("h:mm a")}</span>
-                        <span className="hidden md:inline">
-                            {formattedMessageTime.format("Do MMM • h:mm a")}
-                        </span>
+                        <span>{formattedMessageTime}</span>
                     </div>
                 </div>
                 {isOwnMessage && userImage && (

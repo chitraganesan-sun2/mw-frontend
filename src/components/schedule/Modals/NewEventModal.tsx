@@ -28,7 +28,7 @@ import { getApiErrorMessage } from "@/utils/apiError";
 import { useQuery } from "@tanstack/react-query";
 import { useAppStore } from "@/store/useAppStore";
 import useInnerWidth from "@/hooks/useInnerWidth";
-import { shortTimeZone } from "@/utils/sessionDisplay";
+import { minuteRangesOverlap, shortTimeZone, slotMinuteRange } from "@/utils/sessionDisplay";
 import ModalCloseIcon from "@/assets/icons/ModalCloseIcon";
 import { extractTimezoneOffset } from "@/utils/timeFunctions";
 
@@ -305,6 +305,8 @@ export default function NewEventModal({
         const isTimeSlotBooked = (timeStr: string): boolean => {
             if (!slotsData || !Array.isArray(slotsData)) return false;
             return slotsData.some((slot: any) => {
+                // An overnight slot occupies [start, midnight) on this date.
+                if (slot.end_time <= slot.start_time) return timeStr >= slot.start_time;
                 return timeStr >= slot.start_time && timeStr < slot.end_time;
             });
         };
@@ -344,20 +346,17 @@ export default function NewEventModal({
         setFormData((prev) => ({ ...prev, description: value }));
     };
 
-    // Helper function to check if time slots overlap
+    // Helper function to check if time slots overlap. Wrap-aware: an end at/before the start
+    // runs past midnight (11:30 PM + 60 min ends 00:30), which a plain HH:mm compare missed.
+    // `dayShift` places slot 2 on a neighbouring day (-1 / +1).
     const areSlotsOverlapping = (
         start1: string,
         end1: string,
         start2: string,
-        end2: string
-    ): boolean => {
-        const start1Minutes = dayjs(start1, "HH:mm");
-        const end1Minutes = dayjs(end1, "HH:mm");
-        const start2Minutes = dayjs(start2, "HH:mm");
-        const end2Minutes = dayjs(end2, "HH:mm");
-
-        return start1Minutes.isBefore(end2Minutes) && end1Minutes.isAfter(start2Minutes);
-    };
+        end2: string,
+        dayShift = 0
+    ): boolean =>
+        minuteRangesOverlap(slotMinuteRange(start1, end1), slotMinuteRange(start2, end2), dayShift * 24 * 60);
 
     // Helper function to calculate end time from start time and duration
     const calculateEndTime = (startTime: string, durationMinutes: number): string => {
@@ -441,13 +440,13 @@ export default function NewEventModal({
                 const durationMinutes = Number(formData.duration) || 0;
                 const s = formData.start_time;
                 const e = calculateEndTime(s, durationMinutes);
-                const overlapsOpen = myOpen.some(
-                    (os) =>
-                        os?.volunteer_start_date === dateStr &&
-                        os?.volunteer_start_time &&
-                        os?.volunteer_end_time &&
-                        areSlotsOverlapping(s, e, os.volunteer_start_time, os.volunteer_end_time)
-                );
+                const overlapsOpen = myOpen.some((os) => {
+                    if (!os?.volunteer_start_date || !os.volunteer_start_time || !os.volunteer_end_time) return false;
+                    // Same day, or an adjacent day whose session can wrap across midnight into ours.
+                    const dayShift = dayjs(os.volunteer_start_date).diff(dayjs(dateStr), "day");
+                    if (Math.abs(dayShift) > 1) return false;
+                    return areSlotsOverlapping(s, e, os.volunteer_start_time, os.volunteer_end_time, dayShift);
+                });
                 if (overlapsOpen) {
                     showToast({
                         message: "You've already opened an instant session that overlaps this time",

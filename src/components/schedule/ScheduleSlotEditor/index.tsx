@@ -11,6 +11,7 @@ import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import type { TimeSlot, UseScheduleSlotsResult } from "@/hooks/schedule/useScheduleSlots";
 import { getSlotId } from "@/hooks/schedule/useScheduleSlots";
+import { formatTimeRange, isOvernightRange } from "@/utils/sessionDisplay";
 
 interface TimePickerComponentProps {
     day: string;
@@ -184,6 +185,12 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                                 <TrashIcon />
                                                             </span>
                                                         </div>
+                                                        {/* An end before the start is an overnight slot - say so instead of swapping. */}
+                                                        {isOvernightRange(slot.start_time, slot.end_time) && (
+                                                            <p className="text-xs text-gray-600">
+                                                                {formatTimeRange(slot.start_time, slot.end_time)}
+                                                            </p>
+                                                        )}
                                                         {errors[day]?.map(
                                                             (error, errorIndex) =>
                                                                 error.includes(`Time slot ${slotIndex + 1}`) && (

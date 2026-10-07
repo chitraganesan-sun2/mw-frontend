@@ -113,6 +113,39 @@ export function getDurationMinutes(start?: string | null, end?: string | null): 
     return diff;
 }
 
+function hhmmToMinutes(time: string): number {
+    const [h, m] = time.slice(0, 5).split(":").map(Number);
+    return h * 60 + m;
+}
+
+/** True when a slot's end is before its start, i.e. it runs past midnight. */
+export function isOvernightRange(start?: string | null, end?: string | null): boolean {
+    if (!start || !end) return false;
+    return hhmmToMinutes(end) < hhmmToMinutes(start);
+}
+
+/**
+ * A slot as [startMinutes, endMinutes) on its start day. An end at/before the start crosses
+ * midnight, so it's pushed past 1440 - "23:30"-"00:30" is [1410, 1470), not a reversed range.
+ */
+export function slotMinuteRange(start: string, end: string): [number, number] {
+    const s = hhmmToMinutes(start);
+    let e = hhmmToMinutes(end);
+    if (e <= s) e += 24 * 60;
+    return [s, e];
+}
+
+/** Half-open overlap of two slotMinuteRange()s; `shift` offsets b (1440 = b is on the next day). */
+export function minuteRangesOverlap(a: [number, number], b: [number, number], shift = 0): boolean {
+    return a[0] < b[1] + shift && b[0] + shift < a[1];
+}
+
+/** "11:30 PM – 12:30 AM (next day)" for an overnight slot, "6:00 PM – 6:45 PM" otherwise. */
+export function formatTimeRange(start?: string | null, end?: string | null): string {
+    const range = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
+    return isOvernightRange(start, end) ? `${range} (next day)` : range;
+}
+
 /** 45 -> "45 min", 60 -> "1 hr", 90 -> "1 hr 30 min". */
 export function formatDuration(minutes?: number | null): string {
     if (!minutes || minutes <= 0) return "";
@@ -177,24 +210,29 @@ const ABBR_TO_IANA: Record<string, string> = {
     IST: "Asia/Kolkata",
 };
 
+const IANA_NAME = /^[A-Za-z]+\/[A-Za-z_]+/;
+
 /** IANA zone for a profile label ("EST - Eastern Standard Time (UTC-05:00)" -> America/New_York).
- * Also accepts a bare abbreviation or an IANA name. Null when it can't be resolved. */
-export function profileTimeZoneIana(label?: string | null): string | null {
+ * Also accepts a bare abbreviation or an IANA name. Null when it can't be resolved.
+ * `iana`, when given (a stored IANA zone, e.g. "America/Phoenix"), wins over the label: the
+ * abbreviation map can't tell Arizona from Denver or Puerto Rico from Halifax. */
+export function profileTimeZoneIana(label?: string | null, iana?: string | null): string | null {
+    if (iana && IANA_NAME.test(iana.trim())) return iana.trim();
     if (!label) return null;
     const abbr = label.split(" - ")[0].trim();
     if (ABBR_TO_IANA[abbr]) return ABBR_TO_IANA[abbr];
-    return /^[A-Za-z]+\/[A-Za-z_]+/.test(abbr) ? abbr : null;
+    return IANA_NAME.test(abbr) ? abbr : null;
 }
 
 /** "Now" in the profile's timezone (falls back to the browser's when unresolvable). */
-export function profileNow(label?: string | null): dayjs.Dayjs {
-    const iana = profileTimeZoneIana(label);
-    return iana ? dayjs().tz(iana) : dayjs();
+export function profileNow(label?: string | null, iana?: string | null): dayjs.Dayjs {
+    const zone = profileTimeZoneIana(label, iana);
+    return zone ? dayjs().tz(zone) : dayjs();
 }
 
 /** Today's date (YYYY-MM-DD) in the profile's timezone. */
-export function profileToday(label?: string | null): string {
-    return profileNow(label).format("YYYY-MM-DD");
+export function profileToday(label?: string | null, iana?: string | null): string {
+    return profileNow(label, iana).format("YYYY-MM-DD");
 }
 
 // Intl has no short name for some zones in en-US and prints an offset instead
@@ -221,16 +259,38 @@ export function zoneAbbreviation(iana: string, at: dayjs.Dayjs = dayjs()): strin
  * abbreviation in effect on `date` (EST -> EDT in summer), so every form and card agrees -
  * cards used to print the stored "EST" while the forms showed "EDT" for the same user.
  * `date` (YYYY-MM-DD) defaults to today; pass the session's date for a session.
+ * `iana` (optional stored IANA zone) is preferred over the label's abbreviation mapping.
  */
-export function shortTimeZone(label?: string | null, date?: string | null): string {
-    if (!label) return "";
-    const abbr = label.split(" - ")[0].trim();
-    const iana = profileTimeZoneIana(label);
-    if (!iana) return abbr;
-    const at = date ? dayjs.tz(`${date} 12:00`, iana) : dayjs();
+export function shortTimeZone(label?: string | null, date?: string | null, iana?: string | null): string {
+    if (!label && !iana) return "";
+    const abbr = label ? label.split(" - ")[0].trim() : "";
+    const zone = profileTimeZoneIana(label, iana);
+    if (!zone) return abbr;
+    const at = date ? dayjs.tz(`${date} 12:00`, zone) : dayjs();
     if (!at.isValid()) return abbr;
-    const z = zoneAbbreviation(iana, at);
+    const z = zoneAbbreviation(zone, at);
     return z && !/^(GMT|UTC)[+-]/.test(z) ? z : abbr;
+}
+
+/**
+ * An absolute instant (e.g. a record's created_at) in the app style, in the PROFILE timezone:
+ * "October 7, 2026 · 9:44 AM EDT". A naive ISO string (no Z/offset - how the backend's
+ * datetime.utcnow().isoformat() arrives) is read as UTC; one with an offset keeps it. Falls
+ * back to the browser's timezone (no abbreviation) when the profile zone is unknown.
+ */
+export function formatProfileTimestamp(
+    value?: string | null,
+    timeZoneLabel?: string | null,
+    { iana, withZone = true }: { iana?: string | null; withZone?: boolean } = {}
+): string {
+    if (!value) return "";
+    const instant = dayjs.utc(value);
+    if (!instant.isValid()) return "";
+    const zone = profileTimeZoneIana(timeZoneLabel, iana);
+    const local = zone ? instant.tz(zone) : instant.local();
+    const text = local.format(`${SESSION_DATE_FORMAT} · h:mm A`);
+    const abbr = withZone && zone ? zoneAbbreviation(zone, instant) : "";
+    return abbr ? `${text} ${abbr}` : text;
 }
 
 // ---------------------------------------------------------------- absolute session time

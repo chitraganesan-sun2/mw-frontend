@@ -8,7 +8,8 @@ import LearnerCard from "@/components/learners/LearnerCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useRef } from "react";
-import { formatUtcTimestamp } from "@/utils/timeFunctions";
+import { formatProfileTimestamp } from "@/utils/sessionDisplay";
+import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 import { joinNames } from "@/utils/joinNames";
 
 interface MatchRecord {
@@ -28,6 +29,8 @@ interface MatchRecord {
  */
 export default function VolunteerMatchesPanel() {
     const queryClient = useQueryClient();
+    // History dates in the PROFILE timezone (with its abbreviation), not the browser's.
+    const timeZoneLabel = useProfileTimeZone("volunteer");
     const [, setLearnerId] = useQueryState("learnerId");
 
     const { data: historyData, isLoading: isHistoryLoading } = useQuery({
@@ -149,7 +152,7 @@ export default function VolunteerMatchesPanel() {
                     <div className="bg-white rounded-xl divide-y divide-stroke">
                         {matches.map((m) => (
                             <div key={m.match_id} className="flex items-center justify-between p-4 text-sm">
-                                <span>{formatUtcTimestamp(m.created_at)}</span>
+                                <span>{formatProfileTimestamp(m.created_at, timeZoneLabel)}</span>
                                 <span className={m.status === "notified" ? "text-success" : "text-gray-light"}>
                                     {m.status === "notified" ? "Matched" : "No match found"}
                                 </span>

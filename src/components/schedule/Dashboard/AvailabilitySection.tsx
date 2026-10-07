@@ -13,6 +13,7 @@ import {
     formatSessionDate,
     formatSessionTime,
     formatShortSessionDate,
+    formatTimeRange,
     getSessionInstantBounds,
     getStatusLabel,
     getStatusPillClass,
@@ -211,7 +212,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
     const deleteSlot = async (slot: OneTimeSlot) => {
         const ok = await confirm({
             title: "Remove this availability?",
-            description: `${formatSessionDate(slot.date)}, ${formatSessionTime(slot.start_time)} – ${formatSessionTime(slot.end_time)} will no longer be offered to learners.`,
+            description: `${formatSessionDate(slot.date)}, ${formatTimeRange(slot.start_time, slot.end_time)} will no longer be offered to learners.`,
             confirmText: "Remove",
             danger: true,
         });
@@ -325,7 +326,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                 <span>
                                     <span className="font-medium">Every {day}</span>
                                     <span className="text-gray-700">
-                                        {" "}· {formatSessionTime(slot.start_time)} – {formatSessionTime(slot.end_time)}
+                                        {" "}· {formatTimeRange(slot.start_time, slot.end_time)}
                                         {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel)}` : ""}
                                     </span>
                                 </span>
@@ -339,7 +340,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                 <span>
                                     <span className="font-medium">{formatSessionDate(slot.date)}</span>
                                     <span className="text-gray-700">
-                                        {" "}· {formatSessionTime(slot.start_time)} – {formatSessionTime(slot.end_time)}
+                                        {" "}· {formatTimeRange(slot.start_time, slot.end_time)}
                                         {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, slot.date)}` : ""}
                                     </span>
                                 </span>

@@ -5,7 +5,7 @@ import Button from "@/components/common/Button";
 import { PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { formatSessionDate, getDurationMinutes } from "@/utils/sessionDisplay";
+import { formatSessionDate, formatTimeRange, getDurationMinutes, isOvernightRange } from "@/utils/sessionDisplay";
 
 export interface OneTimeSlot {
     date: string;
@@ -27,7 +27,8 @@ const MAX_SLOT_MINUTES = 60;
  * overlap with other availability and the volunteer's local "now". */
 export function validateSlotTimes(start: string, end: string): string | null {
     if (!start || !end) return "Please choose both a start and an end time.";
-    if (end <= start) return "End time must be after the start time.";
+    if (end === start) return "Start and end time cannot be the same.";
+    // An end before the start crosses midnight (11:30 PM - 12:30 AM); getDurationMinutes wraps.
     const minutes = getDurationMinutes(start, end) ?? 0;
     if (minutes > MAX_SLOT_MINUTES) return "A slot cannot be longer than one hour.";
     return null;
@@ -119,6 +120,9 @@ const OneTimeSlotEditModal: React.FC<Props> = ({ slot, onClose, onSaved }) => {
                     />
                 </label>
             </div>
+            {isOvernightRange(start, end) && (
+                <p className="mt-2 text-xs text-gray-600">{formatTimeRange(start, end)}</p>
+            )}
             {error && (
                 <p role="alert" className="mt-3 text-sm text-red-700">
                     {error}

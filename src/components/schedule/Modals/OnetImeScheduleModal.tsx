@@ -19,7 +19,15 @@ import { generateTimeSlotId, extractTimezoneOffset } from "@/utils/timeFunctions
 import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { Spin } from "antd";
-import { formatSessionDate, shortTimeZone } from "@/utils/sessionDisplay";
+import {
+    formatSessionDate,
+    formatSessionTime,
+    formatTimeRange,
+    isOvernightRange,
+    minuteRangesOverlap,
+    shortTimeZone,
+    slotMinuteRange,
+} from "@/utils/sessionDisplay";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -40,6 +48,8 @@ interface TimePickerComponentProps {
     volunteerTimezone: string;
     currentDate: string;
     existingSlots: Slot[];
+    /** End picker: an end earlier than "now" on today is an overnight end (next day), not past. */
+    isEndPicker?: boolean;
 }
 
 const timezoneMapping: Record<string, string> = {
@@ -84,6 +94,7 @@ const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
     volunteerTimezone,
     currentDate,
     existingSlots,
+    isEndPicker,
 }) => {
     const getNowInVolunteerTimezone = () => dayjs.tz(undefined, volunteerTimezone || "UTC");
 
@@ -126,7 +137,7 @@ const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
                     const isToday = currentDate === nowInTz.format("YYYY-MM-DD");
 
                     // Keep blocking past times for current day.
-                    if (isToday && timeValue.isBefore(nowInTz, "minute")) {
+                    if (!isEndPicker && isToday && timeValue.isBefore(nowInTz, "minute")) {
                         return true;
                     }
 
@@ -136,6 +147,8 @@ const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
                         const timeStr = timeValue.format("HH:mm");
                         return existingSlots.some((slot) => {
                             if (!slot.start_time || !slot.end_time) return false;
+                            // An overnight slot occupies [start, midnight) on this date.
+                            if (isOvernightRange(slot.start_time, slot.end_time)) return timeStr >= slot.start_time;
                             return timeStr >= slot.start_time && timeStr < slot.end_time;
                         });
                     }
@@ -277,11 +290,10 @@ const OnetImeScheduleModal = ({
             return;
         }
 
-        // Enforce max slot duration of 60 minutes.
+        // Enforce max slot duration of 60 minutes (an end before the start crosses midnight).
         const hasMoreThanOneHourSlot = finalSlots.some((slot) => {
-            const start = dayjs(slot.start_time, "HH:mm");
-            const end = dayjs(slot.end_time, "HH:mm");
-            return end.diff(start, "minute") > 60;
+            const [start, end] = slotMinuteRange(slot.start_time, slot.end_time);
+            return end - start > 60;
         });
         if (hasMoreThanOneHourSlot) {
             showToast({
@@ -354,11 +366,11 @@ const OnetImeScheduleModal = ({
     ) {
         if (!slotA.start_time || !slotA.end_time || !slotB.start_time || !slotB.end_time)
             return false;
-        const startA = dayjs(slotA.start_time, "HH:mm");
-        const endA = dayjs(slotA.end_time, "HH:mm");
-        const startB = dayjs(slotB.start_time, "HH:mm");
-        const endB = dayjs(slotB.end_time, "HH:mm");
-        return startA.isBefore(endB) && endA.isAfter(startB);
+        // Wrap-aware: an overnight slot runs to end + 24h on this date.
+        return minuteRangesOverlap(
+            slotMinuteRange(slotA.start_time, slotA.end_time),
+            slotMinuteRange(slotB.start_time, slotB.end_time)
+        );
     }
 
     // Pulled out so it can be re-run whenever `existingSlots` itself changes (e.g. its
@@ -383,14 +395,7 @@ const OnetImeScheduleModal = ({
             });
 
             // 2. Check for overlaps with EXISTING slots
-            const hasExistingOverlap = existingSlotsToCheck.some((existingSlot) => {
-                if (!existingSlot.start_time || !existingSlot.end_time) return false;
-                const eStart = dayjs(existingSlot.start_time, "HH:mm");
-                const eEnd = dayjs(existingSlot.end_time, "HH:mm");
-                const nStart = dayjs(slotA.start_time, "HH:mm");
-                const nEnd = dayjs(slotA.end_time, "HH:mm");
-                return nStart.isBefore(eEnd) && nEnd.isAfter(eStart);
-            });
+            const hasExistingOverlap = existingSlotsToCheck.some((existingSlot) => areSlotsOverlapping(slotA, existingSlot));
 
             if (hasExistingOverlap) {
                 if (!newInvalidSlots.includes(idxA)) newInvalidSlots.push(idxA);
@@ -400,10 +405,9 @@ const OnetImeScheduleModal = ({
                 if (!newInvalidSlots.includes(idxA)) newInvalidSlots.push(idxA);
             }
 
-            // 4. Check for durations more than one hour
-            const slotStart = dayjs(slotA.start_time, "HH:mm");
-            const slotEnd = dayjs(slotA.end_time, "HH:mm");
-            if (slotEnd.diff(slotStart, "minute") > 60) {
+            // 4. Check for durations more than one hour (overnight-aware)
+            const [slotStart, slotEnd] = slotMinuteRange(slotA.start_time, slotA.end_time);
+            if (slotEnd - slotStart > 60) {
                 if (!newInvalidSlots.includes(idxA)) newInvalidSlots.push(idxA);
             }
         });
@@ -425,14 +429,8 @@ const OnetImeScheduleModal = ({
         const updatedSlots = slots.map((slot) => ({ ...slot }));
         updatedSlots[index][type] = value || "";
 
-        // Swap logic: if both times are set and start_time > end_time, swap them
-        const start = updatedSlots[index].start_time;
-        const end = updatedSlots[index].end_time;
-        if (start && end && dayjs(start, "HH:mm").isAfter(dayjs(end, "HH:mm"))) {
-            // Swap
-            updatedSlots[index].start_time = end;
-            updatedSlots[index].end_time = start;
-        }
+        // No start/end swap: an end before the start is an overnight slot (11:30 PM - 12:30 AM),
+        // which the swap used to turn into 00:30-23:30 and then reject as > 1 hour.
 
         setInvalidSlots(computeInvalidSlots(updatedSlots, existingSlots));
         setSlots(updatedSlots);
@@ -511,7 +509,8 @@ const OnetImeScheduleModal = ({
                                         </span>
                                         <span className="text-sm text-gray-500">to</span>
                                         <span className="rounded-lg bg-[#E0E0E0] px-3 w-full py-2 text-sm font-medium text-[#121212]">
-                                            {dayjs(slot.end_time, "HH:mm").format("h:mm A")}
+                                            {formatSessionTime(slot.end_time)}
+                                            {isOvernightRange(slot.start_time, slot.end_time) ? " (next day)" : ""}
                                         </span>
                                     </div>
                                     {/* Desktop: title + time range */}
@@ -522,8 +521,7 @@ const OnetImeScheduleModal = ({
                                         </span>
                                     </div>
                                     <span className="hidden md:inline text-sm text-gray-500 font-medium">
-                                        {dayjs(slot.start_time, "HH:mm").format("h:mm A")} -{" "}
-                                        {dayjs(slot.end_time, "HH:mm").format("h:mm A")}
+                                        {formatTimeRange(slot.start_time, slot.end_time)}
                                     </span>
                                 </div>
                             ))}
@@ -532,7 +530,8 @@ const OnetImeScheduleModal = ({
                     <div>
                         <p className="font-medium mt-4">Create New Slots</p>
                         {slots.map((slot, idx) => (
-                            <div key={idx} className="flex items-center gap-2 mt-2">
+                            <React.Fragment key={idx}>
+                            <div className="flex items-center gap-2 mt-2">
                                 <TimePickerComponent
                                     value={slot.start_time}
                                     onChange={(val) => handleTimeChange(idx, "start_time", val)}
@@ -551,6 +550,7 @@ const OnetImeScheduleModal = ({
                                     volunteerTimezone={volunteerTimezone}
                                     currentDate={currentDate}
                                     existingSlots={existingSlots}
+                                    isEndPicker
                                 />
                                 <button
                                     type="button"
@@ -570,6 +570,10 @@ const OnetImeScheduleModal = ({
                                     </button>
                                 )}
                             </div>
+                            {isOvernightRange(slot.start_time, slot.end_time) && (
+                                <p className="text-xs text-gray-600 mt-1">{formatTimeRange(slot.start_time, slot.end_time)}</p>
+                            )}
+                            </React.Fragment>
                         ))}
                     </div>
                 </div>

@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSendData } from "@/hooks/useReactQuery";
 import { convertToUTC, generateTimeSlotId } from "@/utils/timeFunctions";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { minuteRangesOverlap, slotMinuteRange } from "@/utils/sessionDisplay";
 
 export type ScheduleRole = "volunteer" | "learner";
 
@@ -63,11 +64,6 @@ function emptySchedule(): DaySchedule {
     return {
         Sunday: [], Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [],
     };
-}
-
-function convertTimeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(":").map(Number);
-    return hours * 60 + minutes;
 }
 
 interface UseScheduleSlotsOptions {
@@ -188,11 +184,12 @@ export function useScheduleSlots({
                     dayErrors.push(`${slotLabel}: Please select start time`);
                 }
                 if (slot.start_time && slot.end_time) {
+                    // An end before the start crosses midnight (23:30-00:30 = 60 min); the
+                    // backend allows overnight slots up to the same one-hour cap.
+                    const [startMin, endMin] = slotMinuteRange(slot.start_time, slot.end_time);
                     if (slot.start_time === slot.end_time) {
                         dayErrors.push(`${slotLabel}: Start and end time cannot be the same`);
-                    } else if (
-                        convertTimeToMinutes(slot.end_time) - convertTimeToMinutes(slot.start_time) > 60
-                    ) {
+                    } else if (endMin - startMin > 60) {
                         dayErrors.push(`${slotLabel}: Slot duration cannot exceed one hour`);
                     } else if (isTimeOverlapping(day, slot.start_time, slot.end_time, index)) {
                         dayErrors.push(`${slotLabel} overlaps with another slot`);
@@ -228,21 +225,29 @@ export function useScheduleSlots({
     const isTimeOverlapping = (day: string, newFrom: string, newTo: string, currentIndex: number): boolean => {
         if (!newFrom || !newTo) return false;
 
-        const newFromMinutes = convertTimeToMinutes(newFrom);
-        const newToMinutes = convertTimeToMinutes(newTo);
+        // Wrap-aware: an overnight slot is [start, end + 24h) on its day, so it can also collide
+        // with the next day's early slots (and the previous day's overnight slot with ours).
+        const range = slotMinuteRange(newFrom, newTo);
+        const dayIndex = DAYS.indexOf(day);
+        const neighbours: [string, number][] = [
+            [DAYS[(dayIndex + 6) % 7], -24 * 60],
+            [DAYS[(dayIndex + 1) % 7], 24 * 60],
+        ];
 
-        return schedule[day].some((slot, index) => {
+        const sameDay = schedule[day].some((slot, index) => {
             if (index === currentIndex || !slot.start_time || !slot.end_time) return false;
-
-            const existingFromMinutes = convertTimeToMinutes(slot.start_time);
-            const existingToMinutes = convertTimeToMinutes(slot.end_time);
-
-            return (
-                (newFromMinutes >= existingFromMinutes && newFromMinutes < existingToMinutes) ||
-                (newToMinutes > existingFromMinutes && newToMinutes <= existingToMinutes) ||
-                (newFromMinutes <= existingFromMinutes && newToMinutes >= existingToMinutes)
-            );
+            return minuteRangesOverlap(range, slotMinuteRange(slot.start_time, slot.end_time));
         });
+        return (
+            sameDay ||
+            neighbours.some(([otherDay, shift]) =>
+                (schedule[otherDay] || []).some(
+                    (slot) =>
+                        Boolean(slot.start_time && slot.end_time) &&
+                        minuteRangesOverlap(range, slotMinuteRange(slot.start_time, slot.end_time), shift)
+                )
+            )
+        );
     };
 
     const handleTimeChange = (
@@ -256,15 +261,8 @@ export function useScheduleSlots({
             [type]: value ? dayjs(value, "HH:mm").format("HH:mm") : "",
         };
 
-        if (
-            updatedSlot.start_time &&
-            updatedSlot.end_time &&
-            dayjs(updatedSlot.start_time, "HH:mm").isAfter(dayjs(updatedSlot.end_time, "HH:mm"))
-        ) {
-            const temp = updatedSlot.start_time;
-            updatedSlot.start_time = updatedSlot.end_time;
-            updatedSlot.end_time = temp;
-        }
+        // No start/end swap: an end before the start is an overnight slot (11:30 PM - 12:30 AM),
+        // which the swap used to turn into a 23-hour 00:30-23:30 slot that failed validation.
 
         setSchedule((prev) => ({
             ...prev,
