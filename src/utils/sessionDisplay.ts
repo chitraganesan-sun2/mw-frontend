@@ -141,9 +141,11 @@ export function minuteRangesOverlap(a: [number, number], b: [number, number], sh
 }
 
 /** "11:30 PM – 12:30 AM (next day)" for an overnight slot, "6:00 PM – 6:45 PM" otherwise. */
-export function formatTimeRange(start?: string | null, end?: string | null): string {
+/** "11:30 PM – 12:30 AM EDT (next day)" - the zone (optional) goes before the overnight note. */
+export function formatTimeRange(start?: string | null, end?: string | null, zone?: string | null): string {
     const range = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
-    return isOvernightRange(start, end) ? `${range} (next day)` : range;
+    const withZone = zone ? `${range} ${zone}` : range;
+    return isOvernightRange(start, end) ? `${withZone} (next day)` : withZone;
 }
 
 /** 45 -> "45 min", 60 -> "1 hr", 90 -> "1 hr 30 min". */

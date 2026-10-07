@@ -326,8 +326,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                 <span>
                                     <span className="font-medium">Every {day}</span>
                                     <span className="text-gray-700">
-                                        {" "}· {formatTimeRange(slot.start_time, slot.end_time)}
-                                        {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel)}` : ""}
+                                        {" "}·{" "}
+                                        {formatTimeRange(
+                                            slot.start_time,
+                                            slot.end_time,
+                                            timeZoneLabel ? shortTimeZone(timeZoneLabel) : null
+                                        )}
                                     </span>
                                 </span>
                                 <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
@@ -340,8 +344,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                 <span>
                                     <span className="font-medium">{formatSessionDate(slot.date)}</span>
                                     <span className="text-gray-700">
-                                        {" "}· {formatTimeRange(slot.start_time, slot.end_time)}
-                                        {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, slot.date)}` : ""}
+                                        {" "}·{" "}
+                                        {formatTimeRange(
+                                            slot.start_time,
+                                            slot.end_time,
+                                            timeZoneLabel ? shortTimeZone(timeZoneLabel, slot.date) : null
+                                        )}
                                     </span>
                                 </span>
                                 <span className="flex items-center gap-2">
