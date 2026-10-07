@@ -6,7 +6,7 @@ import { SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunt
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useEffect, useRef } from "react";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import { formatDisplayDate, DISPLAY_DATE_FORMAT, isAgeUnder18 } from "@/utils/timeFunctions";
 
 dayjs.extend(customParseFormat);
 
@@ -72,6 +72,9 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
             stopVideo();
         };
     }, []);
+    // Guardian details only apply to a minor volunteer; an adult would otherwise see
+    // "Consented from Guardian: No" (the string "No" is truthy, so the row never filtered out).
+    const showGuardian = !!data?.volunteer_birth_date && isAgeUnder18(data.volunteer_birth_date);
     const details = [
         { label: "First Name", value: data?.volunteer_first_name },
         { label: "Last Name", value: data?.volunteer_last_name },
@@ -100,10 +103,10 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         { label: "Work Experience", value: data?.volunteer_work_experience },
         { label: "Favorite Free Time Activities", value: data?.volunteer_favorite_activities },
         { label: "Description", value: data?.volunteer_description },
-        { label: "Consented from Guardian", value: data?.consented_from_parent ? "Yes" : "No" },
-        { label: "Guardian Name", value: data?.volunteer_parent_name },
-        { label: "Guardian Email", value: data?.volunteer_parent_email },
-        { label: "Guardian Phone", value: data?.volunteer_parent_contact_number?.number },
+        { label: "Consented from Guardian", value: showGuardian ? (data?.consented_from_parent ? "Yes" : "No") : "" },
+        { label: "Guardian Name", value: showGuardian ? data?.volunteer_parent_name : "" },
+        { label: "Guardian Email", value: showGuardian ? data?.volunteer_parent_email : "" },
+        { label: "Guardian Phone", value: showGuardian ? data?.volunteer_parent_contact_number?.number : "" },
     ].filter(detail => detail.value && Object.keys(detail.value).length);
     
     const renderAboutMeVideo = () => {

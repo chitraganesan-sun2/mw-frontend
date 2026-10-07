@@ -36,7 +36,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
     const handleSubmit = async () => {
         let message = "";
 
-        if (!reportType) message = "Please, select the report";
+        if (!reportType) message = "Please select a reason for your report.";
         if (reportType === "others" && !reportDescription) message = "Please, fill the report details";
         if (!postId) message = "Post ID is missing";
 

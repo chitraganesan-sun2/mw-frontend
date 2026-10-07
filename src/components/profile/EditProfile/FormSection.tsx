@@ -25,6 +25,8 @@ type FormTabsSectionProps = {
   isLoading: boolean;
   clearErrors: UseFormClearErrors<any>;
   onFormSubmitted?: () => void;
+  // The profile as last saved - a locked field that has no saved value is left editable.
+  savedData?: any;
 };
 
 // ✅ using forwardRef so parent can call resetTabs
@@ -43,6 +45,7 @@ const FormTabsSection = forwardRef(
       isLoading,
       clearErrors,
       onFormSubmitted,
+      savedData,
     }: FormTabsSectionProps,
     ref
   ) => {
@@ -71,10 +74,27 @@ const FormTabsSection = forwardRef(
     };
 
     const validateCurrentSection = async () => {
-      const { fields, parent } = formData[activeTab];
-      const currentFields = fields.map((field) =>
-        parent ? `${parent}.${field.parent || field.id}` : field.parent || field.id
-      );
+      const { fields, parent, type } = formData[activeTab];
+      // Card sections nest their real leaf fields one level down (each entry is a card wrapper
+      // with its own `fields`, and a null `parent`/no `id` of its own). Mapping the wrappers
+      // directly produced `undefined` names, which crashed @hookform/resolvers inside trigger()
+      // - so "Next" silently did nothing on every volunteer card tab. Same fix as onboarding's
+      // FormTabs: validate the leaf paths, layering each leaf's own parent on the card's.
+      const currentFields: string[] =
+        type === "card"
+          ? fields.flatMap((card: any) => {
+              const cardParent = card.parent ? (parent ? `${parent}.${card.parent}` : card.parent) : parent;
+              return (card.fields || []).map((leaf: any) =>
+                leaf.parent
+                  ? cardParent
+                    ? `${cardParent}.${leaf.parent}.${leaf.id}`
+                    : `${leaf.parent}.${leaf.id}`
+                  : cardParent
+                  ? `${cardParent}.${leaf.id}`
+                  : leaf.id
+              );
+            })
+          : fields.map((field: any) => (parent ? `${parent}.${field.parent || field.id}` : field.parent || field.id));
 
       const isValidSection = await trigger(currentFields);
 
@@ -182,7 +202,7 @@ const FormTabsSection = forwardRef(
     // Time Zone is editable (2026-10-07) so users can move to the no-daylight-saving options
     // (Arizona / Saskatchewan / Puerto Rico); the backend re-derives their upcoming sessions'
     // local times when it changes. Country stays locked.
-    const diableField = (field: any) =>
+    const isLockedField = (field: any) =>
       (role === "learner" &&
         (((["self", "parent"].includes(enrolled_by) &&
             [
@@ -233,6 +253,19 @@ const FormTabsSection = forwardRef(
           "invloved_in_complaints",
         ].includes(field.id));
 
+    // A field is locked only once it holds a saved value. Older accounts can have these blank
+    // (the profile card even lists them under "Missing"); locking them while validation still
+    // requires them left Edit Profile impossible to save. Judged from the SAVED data, not the
+    // live form, so a field never locks while the user is typing into it.
+    const savedValueAt = (path: string) =>
+      path.split(".").reduce((acc: any, key) => (acc == null ? acc : acc[key]), savedData);
+    const hasSavedValue = (path: string) => {
+      const value = savedValueAt(path);
+      return Array.isArray(value) ? value.length > 0 : value !== undefined && value !== null && String(value).trim() !== "";
+    };
+    const diableField = (field: any, parent?: string) =>
+      isLockedField(field) && (!savedData || hasSavedValue(parent ? `${parent}.${field.id}` : field.id));
+
     return (
       <form onSubmit={onSubmit} className="w-full">
         <div ref={tabButtonsRef} className="mx-auto pb-2">
@@ -278,7 +311,7 @@ const FormTabsSection = forwardRef(
                           <h3 className="text-xl font-medium mb-2">{field.title}</h3>
                           <div className="flex flex-col gap-2 md:gap-1">
                             {field.fields.map((childField: any) => {
-                              const isChildDisabled = diableField(childField) || childField?.disabled;
+                              const isChildDisabled = diableField(childField, childField.parent ? (parent ? `${parent}.${childField.parent}` : childField.parent) : parent) || childField?.disabled;
                               // Same rule as onboarding's FormTabs: a child's own parent (e.g.
                               // volunteer_contact_details for email/country/timezone) is layered
                               // on the card's, not dropped - dropping it bound the field to a
@@ -310,7 +343,8 @@ const FormTabsSection = forwardRef(
                       );
                     }
 
-                    const isFieldDisabled = diableField(field) || field?.disabled;
+                    const flatParent = field.parent ? (section?.parent ? `${section.parent}.${field.parent}` : field.parent) : section?.parent;
+                    const isFieldDisabled = diableField(field, flatParent) || field?.disabled;
                     return (
                       <FormField
                         key={field.id}
@@ -343,7 +377,7 @@ const FormTabsSection = forwardRef(
                       onClick={onSubmit}
                       loading={isLoading}
                       disabled={isLoading}
-                      title="Submit Application"
+                      title="Save Changes"
                       size="large"
                       customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto hover:!bg-background-secondary !text-sm !bg-background-secondary !text-black !rounded-lg !shadow-2xl !font-normal"
                     />

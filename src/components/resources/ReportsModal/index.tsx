@@ -35,7 +35,7 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
     const handleSubmit = async () => {
         let message = "";
 
-        if (!reportType) message = "Please, select the report";
+        if (!reportType) message = "Please select a reason for your report.";
         if (reportType === "others" && !reportDescription) message = "Description is required";
         if (!resourceId) message = "Resource ID is missing";
 
@@ -102,8 +102,7 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
             primaryActionProps={buttonProps.primary}
         >
             <p className="text-base mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua.
+                Help us keep MelodyWings resources accurate and safe. Please select a reason for reporting this resource.
             </p>
             <div>
                 <Radio.Group

@@ -130,7 +130,7 @@ export default function LearnersPage() {
                 profileImage: learner?.profile_picture?.image_url,
                 name: joinNames(learner?.learner_personal_info?.learner_first_name, learner?.learner_personal_info?.learner_last_name),
                 location: learner?.learner_personal_info?.learner_contact_details?.country,
-                learnerHrs: learner?.total_classes_attended?.toString(),
+                learnerHrs: (learner?.total_attended_hours ?? 0).toString(),
                 studentConnected: learner?.students_connected?.toString(),
                 subjects: learner?.learner_subjects?.map((subject: any) => subject?.subject_name),
                 languages: learner?.learner_personal_info?.learner_primary_language,

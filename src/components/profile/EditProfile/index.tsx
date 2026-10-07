@@ -84,8 +84,22 @@ const EditProfileModal = ({
     }
   };
 
-  const onError = () => {
-    showToast({ message: "Please enter all details.", type: "error" });
+  // Name the first thing that failed (e.g. a missing profile picture has no inline error of
+  // its own), instead of only a generic "enter all details".
+  const firstErrorMessage = (node: any): string | null => {
+    if (!node || typeof node !== "object") return null;
+    if (typeof node.message === "string" && node.message) return node.message;
+    for (const key of Object.keys(node)) {
+      if (key === "ref") continue;
+      const found = firstErrorMessage(node[key]);
+      if (found) return found;
+    }
+    return null;
+  };
+
+  const onError = (formErrors?: any) => {
+    const detail = firstErrorMessage(formErrors);
+    showToast({ message: detail ? `Please enter all details: ${detail}` : "Please enter all details.", type: "error" });
   };
 
   // ✅ handle cancel or close
@@ -163,6 +177,7 @@ const EditProfileModal = ({
         clearErrors={clearErrors}
         onSubmit={handleSubmit(onSubmit, onError)}
         isLoading={isSubmitting}
+        savedData={data}
       />
     </CenterModal>
     <ConfirmModal
