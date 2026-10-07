@@ -335,7 +335,8 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                                 <Button
                                     onClick={() => setConfirmingDelete(false)}
                                     disabled={deletingSlot}
-                                    customClassName="w-fit bg-white !text-black border border-stroke hover:bg-white text-sm rounded-full !py-1.5 !px-4"
+                                    btnVariant="outline"
+                                    customClassName="w-fit text-sm rounded-full !py-1.5 !px-4"
                                 >
                                     Cancel
                                 </Button>
@@ -350,6 +351,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                         ) : (
                             <Button
                                 onClick={() => setConfirmingDelete(true)}
+                                btnVariant="tertiary"
                                 customClassName="w-fit bg-white !text-[#DC2626] border border-[#DC2626] hover:bg-white hover:!text-[#DC2626] hover:border hover:border-[#DC2626] text-base rounded-full !py-2 !px-8"
                             >
                                 Delete
@@ -402,13 +404,15 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                                 <Button
                                     onClick={() => window.open(joinHref, "_blank", "noopener,noreferrer")}
                                     title="Join with Google Meet"
-                                    customClassName="w-fit !bg-background-secondary rounded-xl !outline-none !border-none !text-black"
+                                    btnVariant="primary"
+                                    customClassName="w-fit rounded-xl !outline-none"
                                 />
                                 <p className="font-medium text-[12px] ml-1">{joinHref}</p>
                             </div>
                             <Button
                                 title="Copy Link"
-                                customClassName="w-fit !bg-white hover:!bg-white !text-black text-sm rounded-full !py-0 !px-5"
+                                btnVariant="outline"
+                                customClassName="w-fit text-sm rounded-full !py-0 !px-5"
                                 onClick={handleLinkCopy}
                             />
                         </div>
@@ -438,6 +442,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                                 disabled={loadingCompleted}
                                 onClick={() => handleMarkAsCompleted()}
                                 title="Mark as completed"
+                                btnVariant="tertiary"
                                 customClassName="w-fit bg-white !text-[#DC2626] border border-[#DC2626] hover:bg-white hover:!text-[#DC2626] hover:border hover:border-[#DC2626] text-sm rounded-full !py-0 !px-5"
                             />
                         ) : (

@@ -108,14 +108,15 @@ const EditProfileModal = ({
     secondary: {
       onClick: handleClose,
       title: "Cancel",
-      btnVariant: "secondary",
-      customClassName: cn("!bg-transparent !text-black !rounded-xl sm:w-auto w-[72px]"),
+      btnVariant: "outline",
+      customClassName: cn("!rounded-xl sm:w-auto w-[72px]"),
       disabled: isSubmitting,
     },
     primary: {
       onClick: handleSubmit(onSubmit, onError),
       title: isSubmitting ? "Saving" : "Save",
-      customClassName: cn("!rounded-xl hover:!bg-black hover:!text-white sm:w-auto w-[72px]"),
+      btnVariant: "primary",
+      customClassName: cn("!rounded-xl sm:w-auto w-[72px]"),
       disabled: isSubmitting,
     },
   };

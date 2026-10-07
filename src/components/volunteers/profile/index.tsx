@@ -61,9 +61,9 @@ const VolunteerProfileBio = ({ data }: any) => {
 
             {/* Stats Overview */}
             <div className="flex items-center gap-4 px-5">
-                <div className="flex items-center gap-2 bg-blue-50 rounded-lg px-3 py-2">
-                    <span className="text-lg font-bold text-blue-700">{data?.students_connected || 0}</span>
-                    <span className="text-xs text-blue-600">Learners</span>
+                <div className="flex items-center gap-2 bg-learner-light rounded-lg px-3 py-2">
+                    <span className="text-lg font-bold text-learner-dark">{data?.students_connected || 0}</span>
+                    <span className="text-xs text-gray-700">Learners</span>
                 </div>
                 <div className="flex items-center gap-2 bg-green-50 rounded-lg px-3 py-2">
                     <span className="text-lg font-bold text-green-700">{data?.total_volunteered_hours || 0}</span>

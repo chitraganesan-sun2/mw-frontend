@@ -221,13 +221,15 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                                         <Button
                                             onClick={() => window.open(joinHref, "_blank", "noopener,noreferrer")}
                                             title="Join with Google Meet"
-                                            customClassName="w-fit !bg-background-secondary !text-sm rounded-xl !outline-none !border-none !text-black"
+                                            btnVariant="primary"
+                                            customClassName="w-fit !text-sm rounded-xl !outline-none"
                                         />
                                         <p className="font-medium text-xs">{joinHref?.replace("https://", "")}</p>
                                     </div>
                                     <Button
                                         title="Copy Link"
-                                        customClassName="w-fit !bg-white hover:!bg-white !text-black text-sm rounded-full !py-0 !px-2"
+                                        btnVariant="outline"
+                                        customClassName="w-fit text-sm rounded-full !py-0 !px-2"
                                         onClick={handleLinkCopy}
                                     />
                                 </div>
@@ -256,6 +258,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                                         disabled={loadingCompleted}
                                         onClick={() => handleMarkAsCompleted()}
                                         title="Mark as completed"
+                                        btnVariant="tertiary"
                                         customClassName="w-fit bg-white !text-[#DC2626] border border-[#DC2626] hover:bg-white hover:!text-[#DC2626] hover:border hover:border-[#DC2626] text-sm rounded-full !py-0 !px-5"
                                     />
                                 ) : (

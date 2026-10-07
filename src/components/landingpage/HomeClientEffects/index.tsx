@@ -11,7 +11,16 @@ export default function HomeClientEffects() {
     const [, setParamMode] = useQueryState("signup_as");
 
     useEffect(() => {
+        // Clearing signup_as rewrites the URL and drops any #hash, so read the section
+        // anchor (header "For Learners" / "For Volunteers" from another page) first and
+        // scroll to it once the page has laid out.
+        const anchor = window.location.hash.slice(1);
         setParamMode(null);
+        if (anchor) {
+            window.setTimeout(() => {
+                document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 150);
+        }
 
         let sr: any;
         const setupScrollReveal = async () => {

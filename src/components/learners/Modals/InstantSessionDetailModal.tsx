@@ -228,18 +228,15 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
         <div className="w-full flex gap-3 pb-2">
             <Button
                 title="Close"
-                btnVariant="tertiary"
-                customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
+                btnVariant="outline"
+                customClassName="flex-1"
                 onClick={onClose}
             />
             <div className="relative flex-1 min-w-0">
                 <Button
                     title="Claim Now"
-                    btnVariant="secondary"
-                    customClassName={`w-full ${isClaimDisabled
-                        ? "!bg-[#1E1E1E] !cursor-not-allowed !text-white"
-                        : ""
-                        }`}
+                    btnVariant="primary"
+                    customClassName={`w-full ${isClaimDisabled ? "!cursor-not-allowed" : ""}`}
                     onClick={handleClaim}
                     disabled={isClaimDisabled}
                 />

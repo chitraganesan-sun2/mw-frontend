@@ -2,6 +2,7 @@
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import TagComponent from "@/components/common/Tag";
+import { roleTagClass } from "@/components/common/Tag/roleTagClass";
 import { useAppStore } from "@/store/useAppStore";
 import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
@@ -84,7 +85,7 @@ const Avatar = () => {
                 )}
             </div>
             <p className="font-medium text-center">{userName}</p>
-            <TagComponent text={role || ""} />
+            <TagComponent text={role || ""} tagClassName={roleTagClass(role)} />
             <p className="text-xs text-gray-light  text-center">
                 {isVolunteer
                     ? data?.volunteer_contact_details?.timezone

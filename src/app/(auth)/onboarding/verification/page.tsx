@@ -69,7 +69,7 @@ export default function VerificationPage() {
     if (isLoading || !role) {
         return (
             <div className="flex h-[60dvh] bg-background-input items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
             </div>
         );
     }
@@ -93,8 +93,8 @@ export default function VerificationPage() {
                 : VolunteerThankyouCardConstants;
     const verificationTheme =
         role === "learner"
-            ? { iconBgColor: "#DFF5FF", iconAccentColor: "#09BAEE" }
-            : { iconBgColor: "#FFF0E6", iconAccentColor: "#E35D0B" };
+            ? { iconBgColor: "#DFF5FF", iconAccentColor: "#09BAEE" } // learner entity blue
+            : { iconBgColor: "#FFF0E6", iconAccentColor: "#E35D0B" }; // volunteer entity orange
 
     return (
         <div className="flex min-h-[60dvh] bg-background-input items-center justify-center flex-col gap-5 md:px-10">

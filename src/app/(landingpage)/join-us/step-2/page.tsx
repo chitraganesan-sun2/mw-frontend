@@ -217,8 +217,8 @@ const JoinUsStep2Page = () => {
                             <div className="mt-8 flex w-full  gap-3 md:flex-row md:justify-between md:items-center">
                                 <Button
                                     title="Previous"
-                                    btnVariant="tertiary"
-                                    customClassName="!px-6 !py-2 !w-full md:!w-auto !rounded-[10px] !h-10 md:!h-11 border border-gray-300 !text-gray-700"
+                                    btnVariant="outline"
+                                    customClassName="!px-6 !py-2 !w-full md:!w-auto !rounded-[10px] !h-10 md:!h-11"
                                     onClick={() => router.push("/join-us/step-1")}
                                 />
                                 <Button

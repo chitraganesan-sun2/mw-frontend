@@ -1,7 +1,6 @@
 import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
 
-import { cn } from "@/utils/merge-class";
 import { useEffect, useState } from "react";
 
 import { reportResource } from "@/api/resources";
@@ -19,7 +18,7 @@ const options = [
     { label: "Inappropriate Content", value: "inappropriate_content" },
     { label: "Spam or Advertising", value: "spam_or_advertising" },
     { label: "Misinformation", value: "misinformation" },
-    { label: "Others", value: "others" },
+    { label: "Other", value: "others" },
 ];
 
 const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModalProps) => {
@@ -73,13 +72,14 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
         secondary: {
             onClick: onClose,
             title: "Cancel",
-            btnVariant: "secondary",
-            customClassName: cn("!bg-transparent !text-black", "!rounded-xl"),
+            btnVariant: "outline",
+            customClassName: "!rounded-xl",
         },
         primary: {
             onClick: handleSubmit,
             title: isSubmitting ? "Submiting Report" : "Submit Report",
-            customClassName: "!rounded-xl hover:!bg-black hover:!text-white",
+            btnVariant: "primary",
+            customClassName: "!rounded-xl",
             disabled: isSubmitting,
         },
     };

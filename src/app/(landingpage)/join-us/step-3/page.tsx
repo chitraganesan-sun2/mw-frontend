@@ -280,19 +280,19 @@ const JoinUsStep3Page = () => {
                             <div className="space-y-4 md:space-y-5">
                                 <div className="space-y-2">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">Why are you interested in this opportunity with MelodyWings?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border" placeholder="Describe here" value={qMelodyWings} onChange={(e) => setQMelodyWings(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qMelodyWings} onChange={(e) => setQMelodyWings(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">Why are you interested in the role you selected?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border" placeholder="Describe here" value={qRole} onChange={(e) => setQRole(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qRole} onChange={(e) => setQRole(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">What relevant experience do you have for this role?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border" placeholder="Clubs, volunteer work, internships, school projects, etc." value={qExp} onChange={(e) => setQExp(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Clubs, volunteer work, internships, school projects, etc." value={qExp} onChange={(e) => setQExp(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">What skills would you bring to this role?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border" placeholder="Describe here" value={qSkills} onChange={(e) => setQSkills(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qSkills} onChange={(e) => setQSkills(e.target.value)} />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full min-w-0">
@@ -304,7 +304,7 @@ const JoinUsStep3Page = () => {
                                         <input
                                             type="text"
                                             required
-                                            className="w-full min-w-0 rounded-xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border"
+                                            className="w-full min-w-0 rounded-xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border"
                                             placeholder="Enter here"
                                             value={hoursAvailable}
                                             onChange={(e) => setHoursAvailable(e.target.value)}
@@ -316,7 +316,7 @@ const JoinUsStep3Page = () => {
                                         </label>
                                         <input
                                             type="text"
-                                            className="w-full min-w-0 rounded-xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border"
+                                            className="w-full min-w-0 rounded-xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border"
                                             placeholder="Enter here"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
@@ -328,14 +328,14 @@ const JoinUsStep3Page = () => {
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">
                                         Have you previously volunteered or worked with children or neurodivergent learners? If yes, please describe.
                                     </label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border" placeholder="Describe here" value={qChildren} onChange={(e) => setQChildren(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qChildren} onChange={(e) => setQChildren(e.target.value)} />
                                 </div>
 
                                 <div className="space-y-2 w-full min-w-0">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">
                                         Is there anything else you would like us to know about you?
                                     </label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border" placeholder="Describe here" value={qAdditional} onChange={(e) => setQAdditional(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qAdditional} onChange={(e) => setQAdditional(e.target.value)} />
                                 </div>
                             </div>
                         </section>
@@ -369,7 +369,7 @@ const JoinUsStep3Page = () => {
                                     <textarea
                                         rows={3}
                                         disabled={!requiresCrimDetails}
-                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border ${!requiresCrimDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresCrimDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         placeholder="Describe here"
                                         value={crimDetails}
                                         onChange={(e) => setCrimDetails(e.target.value)}
@@ -388,7 +388,7 @@ const JoinUsStep3Page = () => {
                                     <textarea
                                         rows={3}
                                         disabled={!requiresSexDetails}
-                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border ${!requiresSexDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresSexDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         placeholder="Describe here"
                                         value={sexDetails}
                                         onChange={(e) => setSexDetails(e.target.value)}
@@ -417,7 +417,7 @@ const JoinUsStep3Page = () => {
                                     <textarea
                                         rows={3}
                                         disabled={!requiresDiscDetails}
-                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border ${!requiresDiscDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresDiscDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         placeholder="Describe here"
                                         value={discDetails}
                                         onChange={(e) => setDiscDetails(e.target.value)}
@@ -436,7 +436,7 @@ const JoinUsStep3Page = () => {
                                     <textarea
                                         rows={3}
                                         disabled={!requiresHealthDetails}
-                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border ${!requiresHealthDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresHealthDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         placeholder="Describe here"
                                         value={healthDetails}
                                         onChange={(e) => setHealthDetails(e.target.value)}
@@ -463,7 +463,7 @@ const JoinUsStep3Page = () => {
                                     <textarea
                                         rows={3}
                                         disabled={!requiresConsentDetails}
-                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border ${!requiresConsentDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresConsentDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         placeholder="Describe here"
                                         value={consentDetails}
                                         onChange={(e) => setConsentDetails(e.target.value)}
@@ -482,7 +482,7 @@ const JoinUsStep3Page = () => {
                                     <textarea
                                         rows={3}
                                         disabled={!requiresPrevVolDetails}
-                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-primary box-border ${!requiresPrevVolDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresPrevVolDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
                                         placeholder="Mention here"
                                         value={prevVolDetails}
                                         onChange={(e) => setPrevVolDetails(e.target.value)}
@@ -518,7 +518,7 @@ const JoinUsStep3Page = () => {
                         </section>
 
                         <div className="mt-4 flex justify-between items-center">
-                            <Button type="button" title="Previous" btnVariant="tertiary" customClassName="!px-6 !py-2 !h-10 md:!h-11 border !rounded-[10px] border-gray-300 !text-gray-700 disabled:opacity-50" onClick={() => router.push('/join-us/step-2')} disabled={loading} />
+                            <Button type="button" title="Previous" btnVariant="outline" customClassName="!px-6 !py-2 !h-10 md:!h-11 !rounded-[10px] disabled:opacity-50" onClick={() => router.push('/join-us/step-2')} disabled={loading} />
                             <Button htmlType="submit" title={loading ? "Submitting..." : "Submit Application"} loading={loading} disabled={!isNextEnabled} btnVariant="secondary" customClassName="!px-6 !py-2 !rounded-[10px] !h-10 md:!h-11 disabled:opacity-50" />
                         </div>
                     </form>

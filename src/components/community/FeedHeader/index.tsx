@@ -17,7 +17,7 @@ const FeedHeader = ({ title, mode, onClose, onSave, isSubmitting = false, rootCl
             <button
                 onClick={onClose}
                 disabled={isSubmitting}
-                className={`flex items-center justify-center gap-2 bg-[#F4F7FB] border border-[#E0E0E0] rounded-xl text-[14px] px-4 py-2 w-[72px] ${cancelBtnClassName}`}
+                className={`btn-secondary-outline flex items-center justify-center gap-2 rounded-xl text-[14px] px-4 py-2 w-[72px] ${cancelBtnClassName}`}
             >
                 Cancel
             </button>
@@ -25,7 +25,7 @@ const FeedHeader = ({ title, mode, onClose, onSave, isSubmitting = false, rootCl
             <button
                 onClick={onSave}
                 disabled={isSubmitting}
-                className={`flex items-center justify-center gap-2 bg-[#1E1E1E] border border-black text-white text-[14px] rounded-xl px-4 py-2 w-[72px] ${saveBtnClassName}`}
+                className={`btn-primary-fill flex items-center justify-center gap-2 text-[14px] rounded-xl px-4 py-2 w-[72px] ${saveBtnClassName}`}
             >
                 {isSubmitting ? (mode === "edit" ? "Saving" : "Adding") : (mode === "edit" ? "Save" : "Add")}
             </button>

@@ -52,18 +52,22 @@ const STATUS_LABELS: Record<SessionStatus, string> = {
 };
 
 // Pill colours. Cancelled/declined use a muted rose, not the error red, and pending uses
-// amber - neither should read as an error indicator.
+// amber - neither should read as an error indicator. No status uses blue or orange: those
+// mean Learner and Volunteer across the app.
+// Important (!) so they also win over a Tag's own background (TagComponent defaults to
+// the viewer's theme tint); written out literally because Tailwind only generates class
+// names it can see in source.
 const STATUS_PILL_CLASSES: Record<SessionStatus, string> = {
-    posted: "bg-amber-100 text-amber-900",
-    available: "bg-green-100 text-green-800",
-    booked: "bg-sky-100 text-sky-800",
-    pending: "bg-yellow-100 text-yellow-900",
-    accepted: "bg-blue-100 text-blue-800",
-    active: "bg-green-100 text-green-800",
-    completed: "bg-gray-100 text-gray-800",
-    cancelled: "bg-rose-50 text-rose-800",
-    expired: "bg-gray-100 text-gray-600",
-    rejected: "bg-rose-50 text-rose-800",
+    posted: "!bg-amber-100 !text-amber-900",
+    available: "!bg-green-100 !text-green-800",
+    booked: "!bg-emerald-100 !text-emerald-800",
+    pending: "!bg-yellow-100 !text-yellow-900",
+    accepted: "!bg-emerald-100 !text-emerald-800",
+    active: "!bg-teal-100 !text-teal-800",
+    completed: "!bg-gray-100 !text-gray-800",
+    cancelled: "!bg-rose-50 !text-rose-800",
+    expired: "!bg-gray-100 !text-gray-600",
+    rejected: "!bg-rose-50 !text-rose-800",
 };
 
 export function normalizeStatus(status?: string | null): SessionStatus | null {

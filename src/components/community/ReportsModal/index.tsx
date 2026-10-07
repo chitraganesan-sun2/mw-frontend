@@ -19,7 +19,7 @@ const options = [
     { label: "Inappropriate Content", value: "inappropriate_content" },
     { label: "Spam or Advertising", value: "spam_or_advertising" },
     { label: "Misinformation", value: "misinformation" },
-    { label: "Others", value: "others" },
+    { label: "Other", value: "others" },
 ];
 
 const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalProps) => {
@@ -70,14 +70,14 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
         secondary: {
             onClick: onClose,
             title: "Cancel",
-            btnVariant: "tertiary",
+            btnVariant: "outline",
             customClassName: "!rounded-xl",
             disabled: isSubmitting,
         },
         primary: {
             onClick: handleSubmit,
             title: isSubmitting ? "Submiting Report" : "Submit Report",
-            btnVariant: "secondary",
+            btnVariant: "primary",
             customClassName: "!rounded-xl",
             disabled: isSubmitting,
         },

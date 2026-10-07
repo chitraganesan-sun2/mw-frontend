@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import Image from "next/image";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import TagComponent from "@/components/common/Tag";
+import { roleTagClass } from "@/components/common/Tag/roleTagClass";
 import { HeartLikeIcon, UnlikeHeartIcon } from "@/assets/icons";
 import { DELETE_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -84,7 +85,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
                                 <TagComponent
                                     text={comment.created_by}
                                     className="w-fit text-[12px] capitalize !m-0"
-                                    tagClassName={`!border-none ${comment?.created_by === "volunteer" ? "!bg-[#FFE9D4]" : "!bg-[#DFF5FF]"}`}
+                                    tagClassName={roleTagClass(comment?.created_by)}
                                 />
                                 <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
                                 <p className="font-semibold text-black text-sm">

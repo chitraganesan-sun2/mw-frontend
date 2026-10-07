@@ -6,7 +6,7 @@ const ITEMS: { key: string; label: string; swatch: string; roles: ScheduleRole[]
     { key: "posted", label: "Posted instant session", swatch: "bg-amber-50 border border-amber-400", roles: ["volunteer"] },
     { key: "pending", label: "Pending", swatch: "bg-[#F4F7FB] border border-[#E0E0E0]", roles: ["volunteer", "learner"] },
     { key: "accepted", label: "Accepted", swatch: "bg-[#DCFCE7] border border-[#86EFAC]", roles: ["volunteer", "learner"] },
-    { key: "completed", label: "Completed", swatch: "bg-blue-200 border border-blue-600", roles: ["volunteer", "learner"] },
+    { key: "completed", label: "Completed", swatch: "bg-slate-200 border border-slate-500", roles: ["volunteer", "learner"] },
     // Learners still see their own declined requests; the volunteer calendar no longer
     // draws declined/cancelled sessions (the slot shows as Available again).
     { key: "rejected", label: "Declined", swatch: "bg-[#FEE2E2] border border-[#FCA5A5]", roles: ["learner"] },

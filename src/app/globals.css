@@ -112,7 +112,8 @@ html {
     .ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-disabled):before,
 :where(.css-dev-only-do-not-override-wz1edx).ant-picker-dropdown
     .ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-disabled):before {
-    background-color: #d5f1ff !important;
+    /* Viewer's role tint (was hardcoded learner blue for volunteers too). */
+    background-color: var(--background-color, #d5f1ff) !important;
 }
 
 :where(.css-dev-only-do-not-override-wz1edx).ant-picker-dropdown
@@ -125,7 +126,7 @@ html {
     .ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-disabled)
     .ant-picker-cell-inner {
     color: white !important;
-    background-color: #08547a !important;
+    background-color: var(--primary-edge-color, #08547a) !important;
 }
 
 /* Customize Mui Time Picker Style */
@@ -487,16 +488,68 @@ html {
     animation: slideInRight 0.3s ease-out forwards;
 }
 
-/* Filled primary action (buttons, Join, Respond, selected chips) - the landing
-   "Enroll as Learner" / "Become a Volunteer" look: the role's light tint, black text
-   and a darker 3D edge on the right/bottom. Text accents keep --primary-color. */
-.btn-primary-fill {
-    background-color: var(--background-secondary-color) !important;
-    color: var(--black-color, #000) !important;
-    border-style: solid !important;
-    border-width: 0 2px 2px 0 !important;
-    border-color: var(--primary-edge-color) !important;
-}
-.btn-primary-fill:hover:not(:disabled) {
-    filter: brightness(0.96);
+/* Button colour system - Blue = Learner, Orange = Volunteer, Black = login / common.
+   Kept in the components layer so a caller's `!`-utility override (customClassName) still
+   wins: outside a layer these !important rules came after the utilities and silently beat
+   every `!bg-*`/`!text-*` override (e.g. a "Cancel" painted the same tint as "Save"). */
+@layer components {
+    /* Filled primary action of the SIGNED-IN viewer's role (Save, Join, Respond, selected
+       chips) - the landing "Enroll as Learner" / "Become a Volunteer" look: the role's light
+       tint, black text and a darker 3D edge on the right/bottom. Text accents keep
+       --primary-color. Not for logged-out / role-neutral pages - use .btn-common there. */
+    .btn-primary-fill {
+        background-color: var(--background-secondary-color) !important;
+        color: var(--black-color, #000) !important;
+        border-style: solid !important;
+        border-width: 0 2px 2px 0 !important;
+        border-color: var(--primary-edge-color) !important;
+    }
+    .btn-primary-fill:hover:not(:disabled) {
+        filter: brightness(0.96);
+    }
+
+    /* Role-neutral / common action (Log In, Sign in with Google, Sign out, Donate, Join us,
+       onboarding Next/Submit): solid black. */
+    .btn-common {
+        background-color: var(--black-color, #121212) !important;
+        color: var(--white-color, #fff) !important;
+        border: 1px solid var(--black-color, #121212) !important;
+    }
+    .btn-common:hover:not(:disabled) {
+        background-color: #000 !important;
+        color: var(--white-color, #fff) !important;
+    }
+
+    /* Secondary action next to a primary one (Cancel, Close, Previous, Back): white with a
+       black border so it never reads as the primary. */
+    .btn-secondary-outline {
+        background-color: var(--white-color, #fff) !important;
+        color: var(--black-color, #121212) !important;
+        border: 1px solid var(--black-color, #121212) !important;
+    }
+    .btn-secondary-outline:hover:not(:disabled) {
+        background-color: #f5f5f5 !important;
+        color: var(--black-color, #121212) !important;
+    }
+
+    /* Fixed ENTITY fills - same look as .btn-primary-fill but always learner blue /
+       volunteer orange, whoever is viewing (landing CTAs, role choice). */
+    .btn-learner-fill {
+        background-color: #68dbff !important;
+        color: var(--black-color, #000) !important;
+        border-style: solid !important;
+        border-width: 0 2px 2px 0 !important;
+        border-color: #009bcc !important;
+    }
+    .btn-volunteer-fill {
+        background-color: #ffac71 !important;
+        color: var(--black-color, #000) !important;
+        border-style: solid !important;
+        border-width: 0 2px 2px 0 !important;
+        border-color: #b54708 !important;
+    }
+    .btn-learner-fill:hover:not(:disabled),
+    .btn-volunteer-fill:hover:not(:disabled) {
+        filter: brightness(0.96);
+    }
 }

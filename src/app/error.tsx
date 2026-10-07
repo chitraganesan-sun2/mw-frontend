@@ -29,9 +29,9 @@ export default function GlobalError({
                 </p>
             </div>
             <div className="flex gap-3">
-                <Button title="Try Again" btnVariant="primary" onClick={() => reset()} />
+                <Button title="Try Again" btnVariant="secondary" onClick={() => reset()} />
                 <Link href="/">
-                    <Button title="Back to Home" btnVariant="secondary" />
+                    <Button title="Back to Home" btnVariant="outline" />
                 </Link>
             </div>
         </div>

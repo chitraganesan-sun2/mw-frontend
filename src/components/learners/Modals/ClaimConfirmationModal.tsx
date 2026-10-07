@@ -175,13 +175,13 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
         <div className="w-full flex gap-3 pb-2">
             <Button
                 title="Cancel"
-                btnVariant="tertiary"
-                customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
+                btnVariant="outline"
+                customClassName="flex-1"
                 onClick={onClose}
             />
             <Button
                 title={isClaiming ? "Claiming..." : "Yes Confirm"}
-                btnVariant="secondary"
+                btnVariant="primary"
                 customClassName="flex-1"
                 onClick={handleConfirm}
                 disabled={isClaiming}

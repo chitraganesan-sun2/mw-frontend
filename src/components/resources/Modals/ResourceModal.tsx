@@ -225,11 +225,9 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
         secondary: {
             onClick: onClose,
             title: "Cancel",
-            btnVariant: "secondary",
+            btnVariant: mode === "view" ? "error" : "outline",
             customClassName: cn(
-                mode === "view"
-                    ? "!text-error !bg-error-light !border-none"
-                    : "!bg-transparent !text-black",
+                mode === "view" && "!text-error !bg-error-light !border-none",
                 "!rounded-xl",
                 "sm:w-auto w-[72px]"
             ),
@@ -237,10 +235,8 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
         primary: {
             onClick: handleSubmit(onSubmit, onError),
             title: isSubmitting ? (isEditMode ? "Saving" : "Adding") : isEditMode ? "Save" : "Add",
-            customClassName: cn(
-                "!rounded-xl hover:!bg-black hover:!text-white",
-                "sm:w-auto w-[72px]"
-            ),
+            btnVariant: "primary",
+            customClassName: cn("!rounded-xl", "sm:w-auto w-[72px]"),
             disabled: isSubmitting,
         },
     };

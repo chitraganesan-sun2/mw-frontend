@@ -39,7 +39,7 @@ export default function DonationHistoryPage() {
                     <h1 className="text-2xl font-bold text-gray-900">Your Donation History</h1>
                     <Link
                         href="/donate"
-                        className="text-sm font-medium text-primary hover:underline whitespace-nowrap"
+                        className="text-sm font-medium text-black underline-offset-2 hover:underline whitespace-nowrap"
                     >
                         Donate again
                     </Link>

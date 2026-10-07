@@ -14,16 +14,20 @@ const AlertModal = ({ isOpen, onClose, onProceed, onCancel, value, onChange }: A
             onClose={onClose}
             width='40%'
             customClassName="!rounded-3xl"
+            // CenterModal renders secondaryActionProps first; here that slot holds the
+            // action ("Proceed") and the primary slot holds "Cancel", so the variants are
+            // set explicitly: Cancel = black outline, Proceed = the viewer's role fill.
             secondaryActionProps={{
                 onClick: onProceed,
                 title: "Proceed",
-                customClassName: "!rounded-xl hover:!bg-black hover:!text-white",
+                btnVariant: "primary",
+                customClassName: "!rounded-xl",
             }}
             primaryActionProps={{
                 onClick: onCancel,
                 title: "Cancel",
-                btnVariant: "secondary",
-                customClassName: "!bg-transparent !text-black !rounded-xl",
+                btnVariant: "outline",
+                customClassName: "!rounded-xl",
             }}
         >
             <Input

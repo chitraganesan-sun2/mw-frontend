@@ -4,6 +4,7 @@ import ViewModal from "@/components/common/Modals/ViewModal";
 import Image from "next/image";
 import VideoPlayer from "@/components/common/VideoPlayer";
 import TagComponent from "@/components/common/Tag";
+import { roleTagClass } from "@/components/common/Tag/roleTagClass";
 import Divider from "@/components/common/Divider";
 import CommentCard from "@/components/community/CommentCard";
 import { DeleteIcon, EditIcon, FeedModalCloseIcon } from "@/assets/icons";
@@ -428,6 +429,7 @@ const FeedViewModal = ({
                                             <TagComponent
                                                 text={post?.created_by}
                                                 className="w-fit capitalize !m-0"
+                                                tagClassName={roleTagClass(post?.created_by)}
                                             />
                                             <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
                                             <p className="font-medium md:font-semibold text-black">

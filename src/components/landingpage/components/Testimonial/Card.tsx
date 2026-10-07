@@ -10,7 +10,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: TestimonialData }) => {
                 <div className="flex justify-center">
                     <TagComponent
                         className={`${testimonial.category === "Learners"
-                            ? "!bg-[#F0FAFF] !text-[#009BCC]"
+                            ? "!bg-learner-light !text-learner-dark"
                             : "!text-volunteer !bg-volunteer-light"
                             } py-1 !text-sm px-4 border-none`}
                         text={testimonial.category}

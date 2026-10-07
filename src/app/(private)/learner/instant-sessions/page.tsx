@@ -22,6 +22,8 @@ import { showToast } from "@/components/common/Toast";
 import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
+import ProfileNameLink from "@/components/common/ProfileNameLink";
+import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -68,6 +70,7 @@ export interface Session {
     instructor: {
         name: string;
         profilePicture?: string;
+        id?: string;
     };
 }
 
@@ -139,6 +142,7 @@ function mapItemToSession(item: any, date: string): Session {
             session_end_time: item.session_end_time,
         },
         instructor: {
+            id: item.volunteer_id,
             name: instructorName,
             profilePicture:
                 item.volunteer_image?.image_url ??
@@ -188,7 +192,7 @@ function RequestedSessionCard({
             {request.volunteer_name && (
                 <p className="text-sm text-gray-600 mb-2">
                     Volunteer:{" "}
-                    <span className="font-medium text-[#121212]">{request.volunteer_name}</span>
+                    <ProfileNameLink role="volunteer" id={request.accepted_by} name={request.volunteer_name} />
                 </p>
             )}
             {Array.isArray(request.skills) && request.skills.length > 0 && (
@@ -197,7 +201,7 @@ function RequestedSessionCard({
                         <TagComponent
                             key={skill}
                             text={skill}
-                            tagClassName="!bg-blue-50 !border-none !text-blue-700 !px-2 !py-0.5 !text-[10px] capitalize"
+                            tagClassName="!bg-gray-100 !border-none !text-gray-700 !px-2 !py-0.5 !text-[10px] capitalize"
                         />
                     ))}
                 </div>
@@ -259,6 +263,8 @@ export default function InstantSessionsPage() {
     const browseDates = useMemo(() => [todayStr, tomorrowStr], [todayStr, tomorrowStr]);
 
     const [query] = useQueryState("query");
+    // Volunteer names on cards open the volunteer's profile (?volunteerId=).
+    const [profileVolunteerId, setProfileVolunteerId] = useQueryState("volunteerId");
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
     // Deep link from the "new instant session" notification email:
@@ -528,6 +534,7 @@ export default function InstantSessionsPage() {
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
             {confirmModal}
+            <VolunteerViewModal isOpen={!!profileVolunteerId} onClose={() => setProfileVolunteerId(null)} />
             {(isPageLoading || isActionLoading || isDetailLoading) && (
                 <div className="fixed top-4 right-4 z-20 bg-white rounded-full shadow-md p-2">
                     <Spin size="small" />
@@ -545,13 +552,14 @@ export default function InstantSessionsPage() {
 
             {/* My Requested Sessions (the learner-request-for-any-volunteer flow) - shown first */}
             <div className="mb-10">
-                <div className="flex justify-between items-center mb-4">
+                {/* Same header row as the volunteer page: title left, action right, wraps on phones. */}
+                <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
                         My Requested Instant Sessions
                     </h2>
                     <button
                         onClick={() => setIsRequestModalOpen(true)}
-                        className="btn-primary-fill px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+                        className="btn-primary-fill h-10 inline-flex items-center px-5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity ml-auto shrink-0 whitespace-nowrap"
                     >
                         + Request a Session
                     </button>
@@ -679,8 +687,8 @@ export default function InstantSessionsPage() {
                     <div className="w-full flex gap-3">
                         <Button
                             title="Close"
-                            btnVariant="tertiary"
-                            customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
+                            btnVariant="outline"
+                            customClassName="flex-1"
                             onClick={() => setSessionDetail(null)}
                         />
                         {sessionDetail &&
@@ -691,7 +699,7 @@ export default function InstantSessionsPage() {
                                 rel="noopener noreferrer"
                                 className="flex-1"
                             >
-                                <Button title="Join" btnVariant="secondary" customClassName="w-full" />
+                                <Button title="Join" btnVariant="primary" customClassName="w-full" />
                             </a>
                         )}
                         {sessionDetail?.cancelAction && sessionDetail.cancelAction !== "none" && (

@@ -81,13 +81,14 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
             primaryActionProps={{
                 onClick: handleSave,
                 title: "Save",
-                customClassName: "!bg-black !text-white !rounded-xl w-[100px] h-[40px]",
+                btnVariant: "primary",
+                customClassName: "!rounded-xl w-[100px] h-[40px]",
             }}
             secondaryActionProps={{
                 onClick: onClose,
                 title: "Cancel",
-                btnVariant: "secondary",
-                customClassName: "!bg-white !text-black !border !border-gray-300 !rounded-xl w-[100px] h-[40px]",
+                btnVariant: "outline",
+                customClassName: "!rounded-xl w-[100px] h-[40px]",
             }}
         >
             <div className="flex flex-col gap-6 max-md:px-2 max-md:py-6 md:px-6 md:py-6">

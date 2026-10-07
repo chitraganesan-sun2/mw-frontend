@@ -89,19 +89,14 @@ const FeedbackModal = ({
         secondary: {
             onClick: onClose,
             title: mode === "view" ? "Delete" : "Cancel",
-            btnVariant: "tertiary" as const,
-            customClassName: cn(
-                mode === "view"
-                    ? "!text-error !bg-error-light !border-none"
-                    : "!bg-transparent !text-black",
-                "!rounded-xl"
-            ),
+            btnVariant: mode === "view" ? ("error" as const) : ("outline" as const),
+            customClassName: cn(mode === "view" && "!text-error !bg-error-light !border-none", "!rounded-xl"),
         },
         primary: {
             onClick: handleSubmit,
             title: mode === "view" ? "Edit" : "Submit",
-            btnVariant: "secondary" as const,
-            customClassName: "!rounded-xl hover:!bg-black hover:!text-white",
+            btnVariant: "primary" as const,
+            customClassName: "!rounded-xl",
             isPrimary: true,
         },
     };

@@ -17,6 +17,8 @@ import TagComponent from "@/components/common/Tag";
 import { showToast } from "@/components/common/Toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import ProfileNameLink from "@/components/common/ProfileNameLink";
+import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -50,6 +52,9 @@ dayjs.extend(customParseFormat);
 // Same style as the learner page's "+ Request a Session" (theme primary = volunteer orange).
 const START_SESSION_BTN_CLASS =
     "btn-primary-fill px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity";
+// Section-header controls (title + action button + filter) share one fixed height so the
+// button and the status dropdown line up on one row.
+const SECTION_CONTROL_HEIGHT = "h-10";
 
 
 
@@ -70,7 +75,9 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
     return (
         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg">{req.learner_name}</h3>
+                <h3 className="font-semibold text-lg">
+                    <ProfileNameLink role="learner" id={req.learner_id} name={req.learner_name} />
+                </h3>
                 <span className={`${getStatusPillClass("pending")} text-xs px-2 py-1 rounded-full font-medium`}>{getStatusLabel("pending")}</span>
             </div>
             <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === "academic" ? "Academic" : "Arts & Life Skills"}</p>
@@ -81,7 +88,7 @@ function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isAc
                         <TagComponent
                             key={skill}
                             text={skill}
-                            tagClassName="!bg-blue-50 !border-none !text-blue-700 !px-2 !py-0.5 !text-[10px] capitalize"
+                            tagClassName="!bg-gray-100 !border-none !text-gray-700 !px-2 !py-0.5 !text-[10px] capitalize"
                         />
                     ))}
                 </div>
@@ -159,7 +166,11 @@ function MySessionCard({
                 </div>
                 <div>
                     <h4 className="font-semibold text-gray-900 text-sm">
-                        {session.learner_name || (isOpen ? "Waiting for a learner to claim" : "Learner")}
+                        {session.learner_name && !isOpen ? (
+                            <ProfileNameLink role="learner" id={session.learner_id} name={session.learner_name} />
+                        ) : (
+                            session.learner_name || (isOpen ? "Waiting for a learner to claim" : "Learner")
+                        )}
                     </h4>
                     <p className="text-xs text-gray-500">{session.session_title}</p>
                 </div>
@@ -238,6 +249,8 @@ export default function VolunteerInstantSessionsPage() {
     const role = getCookie("role") || "volunteer";
 
     const [query] = useQueryState("query");
+    // Learner names on cards open the learner's profile (?learnerId=).
+    const [profileLearnerId, setProfileLearnerId] = useQueryState("learnerId");
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
     const [sessionsPage, setSessionsPage] = useQueryState("sessions_page", { defaultValue: "1" });
@@ -393,6 +406,7 @@ export default function VolunteerInstantSessionsPage() {
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
             {confirmModal}
+            <LearnerViewModal isOpen={!!profileLearnerId} onClose={() => setProfileLearnerId(null)} />
             {(isLearnerRequestsFetching || isMySessionsFetching || isActionLoading) && (
                 <div className="fixed top-4 right-4 z-20 bg-white rounded-full shadow-md p-2">
                     <Spin size="small" />
@@ -421,30 +435,36 @@ export default function VolunteerInstantSessionsPage() {
 
             {/* My Posted Instant Sessions (sessions this volunteer started or accepted) - shown first */}
             <div className="mb-10">
-                <div className="flex justify-between items-center gap-3 mb-4">
+                {/* Title left; "+ Start a New Session" and the status filter side by side on
+                    the right. On narrow phones the pair wraps under the title as one row and
+                    the dropdown shrinks rather than dropping to a third line / overflowing. */}
+                <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
                         My Posted Instant Sessions
                     </h2>
-                    <button onClick={() => setShowCreateForm(true)} className={`${START_SESSION_BTN_CLASS} shrink-0`}>
-                        + Start a New Session
-                    </button>
-                </div>
-
-                <div className="flex justify-end mb-4">
-                    <select
-                        className="h-9 px-3 border border-gray-200 rounded-lg text-sm bg-white"
-                        value={sessionsStatus || ""}
-                        onChange={(e) => {
-                            setSessionsStatus(e.target.value || null);
-                            setSessionsPage("1");
-                        }}
-                    >
-                        {MY_SESSIONS_STATUS_FILTERS.map((s) => (
-                            <option key={s} value={s}>
-                                {s ? getStatusLabel(s) : "All statuses"}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="flex items-center justify-end gap-3 ml-auto min-w-0 max-w-full">
+                        <button
+                            onClick={() => setShowCreateForm(true)}
+                            className={`${START_SESSION_BTN_CLASS} ${SECTION_CONTROL_HEIGHT} !py-0 max-sm:!px-4 inline-flex items-center shrink-0 whitespace-nowrap`}
+                        >
+                            + Start a New Session
+                        </button>
+                        <select
+                            aria-label="Filter by status"
+                            className={`${SECTION_CONTROL_HEIGHT} min-w-0 flex-1 sm:flex-none px-3 border border-gray-200 rounded-xl text-sm bg-white`}
+                            value={sessionsStatus || ""}
+                            onChange={(e) => {
+                                setSessionsStatus(e.target.value || null);
+                                setSessionsPage("1");
+                            }}
+                        >
+                            {MY_SESSIONS_STATUS_FILTERS.map((s) => (
+                                <option key={s} value={s}>
+                                    {s ? getStatusLabel(s) : "All statuses"}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 {isMySessionsError && !mySessionsData ? (
@@ -551,15 +571,15 @@ export default function VolunteerInstantSessionsPage() {
                     <div className="w-full flex gap-3">
                         <Button
                             title="Close"
-                            btnVariant="tertiary"
-                            customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
+                            btnVariant="outline"
+                            customClassName="flex-1"
                             onClick={() => setSessionDetail(null)}
                         />
                         {sessionDetail &&
                             detailJoinHref &&
                             canJoinSession({ status: sessionDetail.status, meet_link: detailJoinHref }, detailBounds?.end, now) && (
                             <a href={detailJoinHref} target="_blank" rel="noopener noreferrer" className="flex-1">
-                                <Button title="Join" btnVariant="secondary" customClassName="w-full" />
+                                <Button title="Join" btnVariant="primary" customClassName="w-full" />
                             </a>
                         )}
                         {sessionDetail?.status && !["completed", "cancelled", "expired"].includes(sessionDetail.status) && (
@@ -568,7 +588,7 @@ export default function VolunteerInstantSessionsPage() {
                                 {canCompleteSession(sessionDetail, detailBounds, now) && (
                                     <Button
                                         title="Complete"
-                                        btnVariant="secondary"
+                                        btnVariant="primary"
                                         customClassName="flex-1"
                                         loading={detailAction === "complete"}
                                         disabled={isActionLoading}
@@ -606,7 +626,11 @@ export default function VolunteerInstantSessionsPage() {
                         {sessionDetail.learner_full_name && (
                             <p>
                                 <span className="font-medium">Learner: </span>
-                                {sessionDetail.learner_full_name}
+                                <ProfileNameLink
+                                    role="learner"
+                                    id={sessionDetail.learner_id}
+                                    name={sessionDetail.learner_full_name}
+                                />
                             </p>
                         )}
                     </div>

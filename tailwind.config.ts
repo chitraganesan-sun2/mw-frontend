@@ -6,17 +6,37 @@ const config: Config = {
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/app/**/**/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/layouts/**/*.{js,ts,jsx,tsx,mdx}",
+        // Class names also live in helpers/constants (status pill colours in
+        // utils/sessionDisplay.ts, calendar styles in utils/calender.ts, ...). Unscanned,
+        // any class used ONLY there was never generated - e.g. the "Pending" pill had no
+        // background at all.
+        "./src/utils/**/*.{js,ts,jsx,tsx}",
+        "./src/hooks/**/*.{js,ts,jsx,tsx}",
+        "./src/constants/**/*.{js,ts,jsx,tsx}",
+        "./src/providers/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
         extend: {
             colors: {
                 primary: "var(--primary-color)",
-                // Fixed volunteer brand orange for places with no signed-in role (landing,
-                // onboarding). Keep in sync with VolunteerTheme in src/utils/theme.ts.
+                // Fixed ENTITY colours (Blue = Learner, Orange = Volunteer), independent of the
+                // signed-in role: use these for anything that identifies a learner or a
+                // volunteer (role tags, "For Learners" sections, learner/volunteer counts).
+                // `primary` / `background*` stay the VIEWER's role theme. Keep in sync with
+                // VolunteerTheme / LearnerTheme in src/utils/theme.ts.
+                //   DEFAULT = text accent, dark = 3D edge / readable text, light = tint
+                //   background, fill = filled-button tint (black text on it).
                 volunteer: {
                     DEFAULT: "#E35D0B",
                     dark: "#B54708",
                     light: "#FFF0E6",
+                    fill: "#FFAC71",
+                },
+                learner: {
+                    DEFAULT: "#09BAEE",
+                    dark: "#009BCC",
+                    light: "#DFF5FF",
+                    fill: "#68DBFF",
                 },
                 background: {
                     DEFAULT: "var(--background-color)",

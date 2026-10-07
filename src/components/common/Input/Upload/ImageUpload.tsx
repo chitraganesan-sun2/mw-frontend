@@ -61,7 +61,7 @@ const ImageUpload: React.FC<BaseUploaderProps> = ({ ...props }) => {
                                     size="small"
                                     title="Remove"
                                     btnVariant="secondary"
-                                    customClassName="transition-background max-w-full mx-2 group-hover:flex hidden rounded-full !focus:bg-gray !hover:bg-gray bg-gray  z-50 p-0 !text-xs"
+                                    customClassName="transition-background max-w-full mx-2 group-hover:flex hidden rounded-full !focus:bg-gray !hover:bg-gray !bg-gray  z-50 p-0 !text-xs"
                                     onClick={() => handleRemove(index, props.fileType)}
                                 />
                                 <div className="absolute bg-opacity-40 bg-black inset-0 text-white opacity-0 group-hover:opacity-40  rounded-lg transition-all duration-300 flex items-center justify-center"></div>

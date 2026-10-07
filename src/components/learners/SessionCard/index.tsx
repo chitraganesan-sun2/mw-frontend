@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import ProfileNameLink from "@/components/common/ProfileNameLink";
 import Image from "next/image";
 import TagComponent from "@/components/common/Tag";
 import { TimeIcon } from "@/assets/icons";
@@ -39,6 +40,8 @@ interface SessionCardProps {
         instructor: {
             name: string;
             profilePicture?: string;
+            /** volunteer_id - makes the name open the volunteer's profile. */
+            id?: string;
         };
     };
     onClick: () => void;
@@ -87,7 +90,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                             <TagComponent
                                 key={index}
                                 text={label}
-                                tagClassName="!bg-[#E0F2FE] !border-none !text-black !px-3 !py-1 !text-sm"
+                                tagClassName="!bg-gray-100 !border-none !text-black !px-3 !py-1 !text-sm"
                             />
                         );
                     })}
@@ -105,7 +108,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                         <TimeIcon />
                         </div>
                     
-                    <span className="text-[16px] font-medium text-black whitespace-nowrap">
+                    {/* Wraps on narrow screens - whitespace-nowrap pushed "… 2:30 PM EDT" past the card edge. */}
+                    <span className="min-w-0 text-[16px] font-medium text-black break-words">
                         {session.date && `${formatSessionDate(session.date)} · `}
                         {session.startTime} – {session.endTime} {session.timezone}
                         {session.duration && ` · ${session.duration}`}
@@ -124,7 +128,15 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
                             className="object-cover"
                         />
                     </div>
-                    <span className="text-base font-medium text-[#121212]">{session.instructor.name}</span>
+                    {/* The card is clickable (opens the session); the name opens the volunteer. */}
+                    <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                        <ProfileNameLink
+                            role="volunteer"
+                            id={session.instructor.id}
+                            name={session.instructor.name}
+                            className="text-base"
+                        />
+                    </span>
                 </div>
             </div>
 

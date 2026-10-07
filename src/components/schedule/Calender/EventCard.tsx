@@ -33,9 +33,10 @@ const EventCard = ({
             bg: "bg-[#FEE2E2] border-[#FCA5A5] text-[#B91C1C]",
             dot: "bg-[#B91C1C]",
         },
+        // Slate, not blue - blue means Learner across the app.
         completed: {
-            bg: "bg-blue-200 border !border-blue-600 text-blue",
-            dot: "bg-blue-600",
+            bg: "bg-slate-200 border !border-slate-500 text-slate-700",
+            dot: "bg-slate-600",
         },
         // Availability is not a session: dashed outline, no fill, so it can't be mistaken
         // for a pending booking (both used to fall through to the pending style).

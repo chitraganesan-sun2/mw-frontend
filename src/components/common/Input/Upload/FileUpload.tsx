@@ -81,7 +81,7 @@ const FileUpload = ({ ...props }: FileUploadProps) => {
                 <div className="w-full">
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                         <div
-                            className="bg-blue-600 h-1.5 rounded-full transition-all duration-300 ease-out"
+                            className="bg-primary h-1.5 rounded-full transition-all duration-300 ease-out"
                             style={{ width: `${uploadProgress}%` }}
                         />
                     </div>

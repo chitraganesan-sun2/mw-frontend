@@ -739,13 +739,15 @@ export default function NewEventModal({
                         <Button
                             title="Cancel"
                             onClick={handleCancel}
-                            customClassName="flex-1 !bg-white !text-black !font-medium !rounded-2xl !border !border-gray-200 hover:!bg-gray-50 !py-3"
+                            btnVariant="outline"
+                            customClassName="flex-1 !font-medium !rounded-2xl !py-3"
                         />
                         <Button
                             title={isSubmitting ? "Posting..." : "Post Session"}
                             onClick={handleSubmit}
                             disabled={isSubmitting}
-                            customClassName="flex-1 !bg-black !text-white !font-medium !rounded-2xl !py-3"
+                            btnVariant="primary"
+                            customClassName="flex-1 !font-medium !rounded-2xl !py-3"
                         />
                     </div>
                 </div>
@@ -753,13 +755,15 @@ export default function NewEventModal({
                     <Button
                         title="Cancel"
                         onClick={handleCancel}
-                        customClassName="flex-1 !bg-white !text-black !font-medium !rounded-2xl !border !border-gray-200 !py-3"
+                        btnVariant="outline"
+                        customClassName="flex-1 !font-medium !rounded-2xl !py-3"
                     />
                     <Button
                         title={isSubmitting ? "Posting..." : "Post Session"}
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        customClassName="flex-1 !bg-black !text-white !font-medium !rounded-2xl !py-3"
+                        btnVariant="primary"
+                        customClassName="flex-1 !font-medium !rounded-2xl !py-3"
                     />
                 </div>
             </CenterModal>

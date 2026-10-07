@@ -11,6 +11,7 @@ import Divider from "@/components/common/Divider";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import ViewModal from "@/components/common/Modals/ViewModal";
 import TagComponent from "@/components/common/Tag";
+import { roleTagClass } from "@/components/common/Tag/roleTagClass";
 import OverViewCard from "@/components/learners/LearnerOverViewCard";
 import DetailCard from "@/components/profile/Bio/DetailCard";
 import DetailChipCard from "@/components/profile/Bio/DetailChipCard";
@@ -136,7 +137,7 @@ const ProfileInfo = ({
                 </p>
                 <TagComponent
                     text="Volunteer"
-                    tagClassName="!bg-[#FFE9D4] !border-none px-2 max-md:hidden"
+                    tagClassName={`${roleTagClass("volunteer")} px-2 max-md:hidden`}
                 />
                 <p className="text-xs font-medium text-gray-800">
                     {volunteerData?.volunteer_contact_details?.timezone}
@@ -218,7 +219,7 @@ const TabButtons = ({
                         onClick={() => handleTabChange(tab)}
                         className={`font-medium text-center w-[50%] rounded-full py-2.5 px-5 appearance-none ${
                             activeTab === tab
-                                ? "bg-[#dff5ff] border-primary border-2"
+                                ? "bg-background border-primary border-2"
                                 : "border-2 border-transparent"
                         } transition-all duration-200 cursor-pointer`}
                     >

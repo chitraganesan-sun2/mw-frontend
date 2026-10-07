@@ -130,8 +130,8 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                     <div className="flex flex-col gap-1 min-w-0">
                         <Button
                             title="Join with Google Meet"
-                            btnVariant="secondary"
-                            customClassName="!w-full max-w-[207px] !h-11 !bg-[#68DBFF] !text-[#121212] hover:!bg-[#B3E5FC] !font-medium !rounded-xl"
+                            btnVariant="primary"
+                            customClassName="!w-full max-w-[207px] !h-11 !font-medium !rounded-xl"
                             onClick={handleJoinMeeting}
                             disabled={!meetHref}
                             aria-describedby={meetHref ? undefined : "meet-link-missing"}
@@ -155,8 +155,8 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                     </div>
                     <Button
                         title={copied ? "Copied!" : "Copy Link"}
-                        btnVariant="tertiary"
-                        customClassName="!w-[100px] !h-8 !bg-white !text-black !border !border-gray-300 !px-6 !mt-4 !rounded-full flex items-center justify-center flex-shrink-0"
+                        btnVariant="outline"
+                        customClassName="!w-[100px] !h-8 !px-6 !mt-4 !rounded-full flex items-center justify-center flex-shrink-0"
                         onClick={handleCopyLink}
                         disabled={!meetHref}
                     />

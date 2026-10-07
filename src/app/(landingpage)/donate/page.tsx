@@ -453,7 +453,7 @@ const Donate = () => {
                 for (const m of mapped) if (!unique.has(m.value)) unique.set(m.value, m);
                 const options = Array.from(unique.values());
                 if (!options.some((o) => o.value === "other" || o.value === "others")) {
-                    options.push({ label: "Others", value: "others" });
+                    options.push({ label: "Other", value: "other" });
                 }
                 setHearAboutOptions(options);
             })

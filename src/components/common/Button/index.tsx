@@ -11,15 +11,21 @@ const Button: React.FC<ButtonProps> = ({
     const baseStyles =
         "rounded-2xl px-4 py-4 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 active:scale-95";
 
+    // Colour system: Blue = Learner, Orange = Volunteer, Black = login / common actions.
+    //   primary   - the signed-in viewer's role action (themed tint fill)
+    //   secondary - role-neutral / common action (solid black)
+    //   outline   - the secondary action beside a primary one (Cancel, Close, Previous)
+    //   learner / volunteer - fixed entity colours, whoever is viewing
     const variantStyles = {
         primary: "btn-primary-fill",
-        secondary: "bg-black text-white hover:bg-black hover:text-white focus:bg-black focus:text-white",
+        secondary: "btn-common",
+        outline: "btn-secondary-outline",
         tertiary: "bg-white text-black",
         error: "bg-error-light text-error hover:bg-error focus:bg-error-light",
         success: "bg-success-light text-success hover:bg-success focus:bg-success-light",
         link: "text-primary border-none shadow-none hover:underline !bg-transparent hover:!bg-transparent hover:!text-primary text-sm font-normal",
-        learner: "!bg-[#68DBFF] hover:!bg-[#68DBFF] border-0 border-r-2 border-b-2 border-[#009BCC] hover:!border-[#009BCC] !text-sm !text-black !rounded-[10px] shadow-sm !py-4 !px-3",
-        volunteer: "!bg-[#FFAC71] hover:!bg-[#FFAC71] border-0 border-r-2 border-b-2 border-volunteer-dark hover:!border-volunteer-dark !text-sm !text-black !rounded-[10px] shadow-sm !py-4 !px-3",
+        learner: "btn-learner-fill !text-sm !rounded-[10px] shadow-sm !py-4 !px-3",
+        volunteer: "btn-volunteer-fill !text-sm !rounded-[10px] shadow-sm !py-4 !px-3",
     };
 
     return (

@@ -5,7 +5,6 @@ import { POST_API, PUT_API } from "@/api/request";
 import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { CommunityFormConstants } from "@/constants/community";
-import { cn } from "@/utils/merge-class";
 import { useEffect, useState } from "react";
 import { getCookie } from "@/utils/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -153,8 +152,8 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
                 onClick: onClose,
                 disabled: isSubmitting,
                 title: "Cancel",
-                btnVariant: "secondary",
-                customClassName: cn("bg-transparent !text-black", "!rounded-xl"),
+                btnVariant: "outline",
+                customClassName: "!rounded-xl",
             }}
             primaryActionProps={{
                 onClick: handleSubmit(onSubmit, onError),
@@ -166,7 +165,8 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
                     : isEditMode
                     ? "Save"
                     : "Create",
-                customClassName: "!rounded-xl hover:!bg-black hover:!text-white",
+                btnVariant: "primary",
+                customClassName: "!rounded-xl",
             }}
         >
             {isFetching ? (

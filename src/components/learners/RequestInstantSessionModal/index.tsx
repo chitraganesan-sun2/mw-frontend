@@ -344,14 +344,14 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                     <button
                         onClick={handleClose}
                         disabled={isLoading}
-                        className="flex-1 py-3 rounded-2xl border border-gray-200 font-medium text-black hover:bg-gray-50 transition-colors"
+                        className="btn-secondary-outline flex-1 py-3 rounded-2xl font-medium transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
                         disabled={isLoading}
-                        className="flex-1 py-3 rounded-2xl bg-black text-white font-medium hover:bg-gray-900 transition-colors"
+                        className="btn-primary-fill flex-1 py-3 rounded-2xl font-medium transition-colors disabled:opacity-50"
                     >
                         {isLoading ? "Posting..." : "Post Request"}
                     </button>

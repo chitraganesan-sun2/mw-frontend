@@ -135,16 +135,11 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                 </div>
             </div>
             <div className="w-full flex flex-col gap-3 mt-4">
-                <button onClick={handleSignOut} className="flex gap-1 mt-2">
-                    <span className={`text-[1.25rem] transition-all duration-300 "text-black"`}>
+                <button onClick={handleSignOut} className="flex gap-1 mt-2 text-black">
+                    <span className="text-[1.25rem] transition-all duration-300 text-black">
                         <SignOutIcon />
                     </span>
-                    <p
-                        style={{ color: "#B91C1C" }}
-                        className={`!text-[#B91C1C] transition-all duration-300 font-medium`}
-                    >
-                        Sign Out
-                    </p>
+                    <p className="!text-black transition-all duration-300 font-medium">Sign Out</p>
                 </button>
             </div>
         </div>

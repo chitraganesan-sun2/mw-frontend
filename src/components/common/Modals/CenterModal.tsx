@@ -50,14 +50,15 @@ const CenterModal: React.FC<CenterModalProps> = ({
         primaryActionProps: {
             title: primaryActionProps?.title,
             shape: primaryActionProps?.shape ?? "round",
-            btnVariant: primaryActionProps?.btnVariant ?? "secondary",
+            // In-app primary action = the viewer's role fill; Cancel/Close = black outline.
+            btnVariant: primaryActionProps?.btnVariant ?? "primary",
             size: primaryActionProps?.size ?? "small",
             ...primaryActionProps,
         },
         secondaryActionProps: {
             title: secondaryActionProps?.title,
             shape: secondaryActionProps?.shape ?? "round",
-            btnVariant: secondaryActionProps?.btnVariant ?? "secondary",
+            btnVariant: secondaryActionProps?.btnVariant ?? "outline",
             size: secondaryActionProps?.size ?? "small",
             ...secondaryActionProps,
         },

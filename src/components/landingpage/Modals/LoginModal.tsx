@@ -112,6 +112,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                     <div className='mt-3 flex flex-col gap-5 divide-y'>
                         <Button
                             title='Sign In With Google'
+                            btnVariant="secondary"
                             className='!bg-black w-full !px-3 !py-2 text-white hover:!bg-black hover:!text-white text-sm !rounded-xl'
                             icon={<FcGoogle className='text-xl' />}
                             loading={isLoginLoading}

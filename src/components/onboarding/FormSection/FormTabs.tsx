@@ -609,7 +609,8 @@ const FormTabs = ({
                                             disabled={isLoading}
                                             title="Submit Application"
                                             size="large"
-                                            customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto hover:!bg-background-secondary !text-sm !bg-background-secondary !text-black !rounded-lg !shadow-2xl !font-normal"
+                                            btnVariant="secondary"
+                                            customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto !text-sm !rounded-lg !shadow-2xl !font-normal"
                                         />
                                     </>
                                 ) : (
@@ -619,7 +620,8 @@ const FormTabs = ({
                                         onClick={() => handleNavigation(activeTab + 1, "next")}
                                         title="Next"
                                         size="large"
-                                        customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto hover:!bg-background-secondary !text-sm !bg-background-secondary !text-black !rounded-lg !shadow-2xl !font-medium"
+                                        btnVariant="secondary"
+                                        customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto !text-sm !rounded-lg !shadow-2xl !font-medium"
                                     />
                                 )}
                             </div>

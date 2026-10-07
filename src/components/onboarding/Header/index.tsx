@@ -21,7 +21,7 @@ const Header = (props: Props) => {
                 <button
                     type='button'
                     onClick={signOut}
-                    className='flex items-center gap-1 cursor-pointer appearance-none border-0 bg-transparent p-0 font-medium text-[#B91C1C]'
+                    className='flex items-center gap-1 cursor-pointer appearance-none border-0 bg-transparent p-0 font-medium text-black'
                 >
                     <SignOutIcon />
                     Sign Out

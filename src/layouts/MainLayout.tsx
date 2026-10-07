@@ -75,6 +75,8 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                             <ThankyouCardBase
                                 title={pendingContent.title}
                                 description={pendingContent.description}
+                                iconBgColor={role === "learner" ? "#DFF5FF" : "#FFF0E6"}
+                                iconAccentColor={role === "learner" ? "#09BAEE" : "#E35D0B"}
                             />
                         </div>
                     ) : (

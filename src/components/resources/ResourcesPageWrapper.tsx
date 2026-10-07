@@ -24,6 +24,7 @@ import TopicCard, { TopicCardSkeleton } from "@/components/resources/TopicCard";
 import CategorySection from "@/components/resources/CategorySection";
 import { useDebounce } from "use-debounce";
 import TutorialLinks from "@/components/dashboard/TutorialLinks";
+import { sortByLabel } from "@/utils/optionOrder";
 
 interface ResourcesPageWrapperProps {
     variant: 'learner' | 'volunteer';
@@ -80,7 +81,10 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
         queryKey: ["resource-categories"],
         queryFn: async () => {
             const categories = await GET_API(endpoints.resources.getCategories);
-            return categories?.data;
+            // The API returns topics in insertion order - list them A-Z.
+            return Array.isArray(categories?.data)
+                ? sortByLabel(categories.data, (topic: any) => topic?.category_name)
+                : categories?.data;
         },
     });
 
@@ -142,9 +146,9 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
         });
     }, [category, pathname, setHeaderOptions, ResourceCategories, topicSingleTitle]);
 
-    const activeTabStyle = variant === 'learner'
-        ? "bg-[#DFF5FF] text-black border border-[#09BAEE]"
-        : "bg-[#FFE9D4] text-black border border-primary";
+    // Viewer's own role theme (variant === the signed-in role, so the CSS-var theme is
+    // already that role's colours); was hardcoded hex for learners only.
+    const activeTabStyle = "bg-background text-black border border-primary";
 
     return (
         <div className="w-full pt-4 lg:pt-8 flex flex-col gap-2 p-4 animate-fadeIn">

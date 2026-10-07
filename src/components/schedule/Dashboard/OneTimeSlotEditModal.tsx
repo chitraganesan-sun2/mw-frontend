@@ -79,13 +79,8 @@ const OneTimeSlotEditModal: React.FC<Props> = ({ slot, onClose, onSaved }) => {
             footerClassName="!px-6 !py-4 !border-0"
             footerComponent={
                 <div className="w-full flex gap-3">
-                    <Button
-                        title="Cancel"
-                        customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
-                        onClick={onClose}
-                        disabled={saving}
-                    />
-                    <Button title="Save" customClassName="!bg-black !text-white flex-1" onClick={save} loading={saving} />
+                    <Button title="Cancel" btnVariant="outline" customClassName="flex-1" onClick={onClose} disabled={saving} />
+                    <Button title="Save" btnVariant="primary" customClassName="flex-1" onClick={save} loading={saving} />
                 </div>
             }
         >

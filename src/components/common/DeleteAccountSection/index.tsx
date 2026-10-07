@@ -111,7 +111,7 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
                                 setIsModalOpen(false);
                                 setConfirmText("");
                             }}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                            className="btn-secondary-outline px-4 py-2 text-sm font-medium rounded-lg transition-colors"
                         >
                             Cancel
                         </button>

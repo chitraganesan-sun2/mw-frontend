@@ -30,8 +30,8 @@ const ConfirmModal = ({
         <div className="w-full flex gap-3 pb-2">
             <Button
                 title={cancelText}
-                btnVariant="secondary"
-                customClassName="!bg-white !text-black !border !border-gray-300 flex-1"
+                btnVariant="outline"
+                customClassName="flex-1"
                 onClick={onCancel}
                 disabled={isLoading}
             />

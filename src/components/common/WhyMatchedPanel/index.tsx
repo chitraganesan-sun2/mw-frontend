@@ -22,7 +22,7 @@ const WhyMatchedPanel = ({
 
     return (
         <div className={`px-5 ${className}`}>
-            <div className="bg-[#FFF6EC] border border-[#FFE9D4] rounded-xl p-4 flex flex-col gap-2">
+            <div className="bg-background border border-stroke rounded-xl p-4 flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                     <HiSparkles className="text-primary shrink-0" size={16} />
                     <p className="text-sm font-semibold text-black">Why you matched</p>

@@ -5,6 +5,7 @@ import Button from "@/components/common/Button";
 import VideoPlayer from "@/components/common/VideoPlayer";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import TagComponent from "@/components/common/Tag";
+import { roleTagClass } from "@/components/common/Tag/roleTagClass";
 import { HeartLikeIcon, UnlikeHeartIcon } from "@/assets/icons";
 import CommentIcon from "@/assets/icons/CommentIcon";
 import { endpoints } from "@/api/constants";
@@ -301,6 +302,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                             <TagComponent
                                                                 text={post?.created_by}
                                                                 className="w-fit text-xs md:text-sm"
+                                                                tagClassName={roleTagClass(post?.created_by)}
                                                             />
                                                             <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
                                                         </div>

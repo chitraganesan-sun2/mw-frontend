@@ -71,22 +71,23 @@ const SideModal: React.FC<SideModalProps> = ({
                         <div className="mt-auto">
                             <Divider />
                             <div className="flex items-center justify-end gap-4 px-5 pt-4">
+                                {/* Cancel / Clear = black outline; Save = the viewer's role fill.
+                                    These used to pass !bg-white / !bg-black, which the fill
+                                    class silently beat, so both rendered as the same tint. */}
                                 <Button
                                     onClick={onCancel}
                                     title={cancelButtonText}
                                     disabled={isLoading}
-                                    className="w-fit px-4 py-2 !text-sm !text-black !bg-white !border !border-stroke-light rounded-xl"
+                                    btnVariant="outline"
+                                    customClassName="w-fit px-4 py-2 !text-sm rounded-xl"
                                 />
                                 <Button
                                     loading={isLoading}
                                     disabled={isDisabled}
                                     onClick={onSave}
                                     title={saveButtonText}
-                                    className={`w-fit !text-sm px-4 py-2 !bg-black !text-white rounded-xl ${
-                                        isDisabled
-                                            ? "!bg-opacity-50 !bg-gray-light !cursor-not-allowed"
-                                            : ""
-                                    }`}
+                                    btnVariant="primary"
+                                    customClassName="w-fit !text-sm px-4 py-2 rounded-xl"
                                 />
                             </div>
                         </div>

@@ -184,13 +184,13 @@ export default function VolunteerFilterModal({
                         <div className="flex justify-end mt-4 gap-3">
                             <button
                                 onClick={() => setIsDateModalOpen(false)}
-                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                className="btn-secondary-outline px-4 py-2 rounded-xl text-sm font-medium"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={() => setIsDateModalOpen(false)}
-                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                className="btn-primary-fill px-4 py-2 rounded-xl text-sm font-medium"
                             >
                                 Apply
                             </button>

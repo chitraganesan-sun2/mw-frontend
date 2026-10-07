@@ -65,6 +65,7 @@ function describeWhen(session: PublicSession): string {
 // about (timestamp + subject), not the full detail the in-app session card shows.
 const SessionPill = ({ session }: { session: PublicSession }) => {
 
+    // Both CTAs open the LEARNER sign-up, so they carry the learner colour (blue = Learner).
     return (
         <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-2 text-sm text-gray-700 flex-shrink-0">
@@ -126,7 +127,7 @@ const InstantSessions = () => {
                         <button
                             type="button"
                             onClick={openLearnerSignUp}
-                            className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors text-sm border-0 cursor-pointer"
+                            className="btn-learner-fill px-8 py-3 rounded-full font-medium transition-colors text-sm cursor-pointer"
                         >
                             Sign up to get notified
                         </button>
@@ -157,7 +158,7 @@ const InstantSessions = () => {
                     <button
                         type="button"
                         onClick={openLearnerSignUp}
-                        className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors text-sm border-0 cursor-pointer"
+                        className="btn-learner-fill px-8 py-3 rounded-full font-medium transition-colors text-sm cursor-pointer"
                     >
                         Sign up to join a session
                     </button>

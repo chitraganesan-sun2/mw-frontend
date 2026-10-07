@@ -58,17 +58,30 @@ const Header = () => {
         setIsSideNavBarOpen(!isSideNavBarOpen);
     };
 
-    const links = [
-        // { title: "Donate", link: "/donate" },
+    // Learner / Volunteer entries jump to their home-page sections and carry the role
+    // colour (blue = Learner, orange = Volunteer) everywhere they appear.
+    const links: { title: string; link: string; className?: string }[] = [
+        { title: "For Learners", link: "/#for-learners", className: "text-learner-dark" },
+        { title: "For Volunteers", link: "/#for-volunteers", className: "text-volunteer-dark" },
         { title: "Donate", link: "/donate" },
         { title: "About Us", link: "/about-us" },
         // { title: "Blogs", link: "/blogs" },
         // { title: "Team Up", link: "/" },
     ];
 
+    // "/#for-learners" style links: on the home page scroll straight to the section
+    // (a plain hash navigation there is undone by the page's own URL cleanup); from any
+    // other page navigate home and HomeClientEffects scrolls on arrival.
+    const scrollToHomeSection = (link: string): boolean => {
+        const [path, anchor] = link.split("#");
+        if (!anchor || (path || "/") !== "/" || pathname !== "/") return false;
+        document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return true;
+    };
+
     const handleLinkClick = (link: string) => {
         handleSideNavBar();
-        router.push(link);
+        if (!scrollToHomeSection(link)) router.push(link);
     };
 
     const hideNavigation = ["/privacy-policy", "/terms-and-conditions"].includes(pathname);
@@ -97,7 +110,10 @@ const Header = () => {
                                     <Link
                                         href={link.link}
                                         key={index}
-                                        className="underline font-medium hover:text-gray-600 transition-all duration-300 focus:outline-none focus-visible:outline-none active:outline-none"
+                                        onClick={(e) => {
+                                            if (scrollToHomeSection(link.link)) e.preventDefault();
+                                        }}
+                                        className={`underline font-medium hover:text-gray-600 transition-all duration-300 focus:outline-none focus-visible:outline-none active:outline-none ${link.className ?? ""}`}
                                         style={noTapHighlight}
                                     >
                                         {link.title}
@@ -115,6 +131,7 @@ const Header = () => {
                                 ) : (
                                     <Button
                                         title="Log In"
+                                        btnVariant="secondary"
                                         className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg"
                                         onClick={handleLoginModal}
                                     />
@@ -166,7 +183,7 @@ const Header = () => {
                                     type="button"
                                     onClick={() => handleLinkClick(link.link)}
                                     key={index}
-                                    className="underline font-medium hover:text-gray-600 transition-all duration-300 text-base appearance-none border-0 bg-transparent p-0 leading-none focus:outline-none focus-visible:outline-none active:outline-none"
+                                    className={`underline font-medium hover:text-gray-600 transition-all duration-300 text-base appearance-none border-0 bg-transparent p-0 leading-none focus:outline-none focus-visible:outline-none active:outline-none ${link.className ?? ""}`}
                                     style={noTapHighlight}
                                 >
                                     {link.title}
@@ -183,6 +200,7 @@ const Header = () => {
                                 ) : (
                                     <Button
                                         title="Log In"
+                                        btnVariant="secondary"
                                         className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg min-w-[150px]"
                                         onClick={handleLoginModal}
                                     />

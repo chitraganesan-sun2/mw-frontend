@@ -48,6 +48,7 @@ const GoogleSignUpButton = ({
         loading={loading}
         disabled={disabled}
         title="Sign Up With Google"
+        btnVariant="secondary"
         className="!bg-black w-full !px-3 !py-2 !text-white hover:!bg-black hover:!text-white text-sm !rounded-xl"
         icon={<FcGoogle className="text-xl" />}
         onClick={onClick}
