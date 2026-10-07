@@ -304,8 +304,9 @@ const CommonHeader: React.FC = () => {
                     className={`absolute z-100 w-full h-full bg-white flex-center gap-2 px-5 transform transition-all duration-500 ${isSearchInputOpen ? "top-0 right-0 visible" : "top-0 -right-full invisible"
                         }`}
                     aria-hidden={!isSearchInputOpen}
-                    // React 18 has no typed `inert` prop; an empty-string attribute enables it.
-                    {...(isSearchInputOpen ? {} : ({ inert: "" } as Record<string, string>))}
+                    // The app router runs React 19, which treats `inert` as a boolean (an empty
+                    // string is read as false); the @types are still React 18, hence the cast.
+                    {...(isSearchInputOpen ? {} : ({ inert: true } as Record<string, boolean>))}
                 >
                     <Input
                         value={searchQuery ?? ""}
