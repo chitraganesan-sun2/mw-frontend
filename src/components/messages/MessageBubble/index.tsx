@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { safeImageSrc } from "@/utils/safeHref";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -24,9 +25,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     timestamp,
     date,
     isOwnMessage,
-    userImage,
+    userImage: rawUserImage,
 }) => {
     const { volunteerDetails, learnerDetails } = useAppStore();
+    // Only render avatars next/image can load - a bad URL would throw and crash the chat.
+    const userImage = safeImageSrc(rawUserImage);
 
     const timezoneMapping: Record<string, string> = {
         AKST: "America/Anchorage",

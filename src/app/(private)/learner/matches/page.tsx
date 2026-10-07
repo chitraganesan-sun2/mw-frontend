@@ -101,7 +101,7 @@ export default function LearnerDashboardPage() {
 
     useEffect(() => {
         setHeaderOptions({
-            title: "My Dashboard",
+            title: "My Matches",
             titleIcon: getHeaderIcon(pathname),
             hideSearch: true,
             actionButtons: [

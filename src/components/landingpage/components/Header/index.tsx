@@ -13,6 +13,8 @@ import SignUpAsModal from "../../Modals/SignUpAsModal";
 import { useQueryState } from "nuqs";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GOOGLE_WEB_CLIENT_ID } from "@/definitions";
+import { getCookie, isAuthenticated } from "@/utils/auth";
+import { getDefaultRouteForRole, type Role } from "@/utils/routeGuard";
 
 const Header = () => {
     const router = useRouter();
@@ -23,9 +25,16 @@ const Header = () => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
     const [isSideNavBarOpen, setIsSideNavBarOpen] = useState<boolean>(false);
     const [mounted, setMounted] = useState(false);
+    // Signed-in users can land here (/donate, /donate/success, /donate/history) - offer
+    // a way back into the app instead of "Log In". Read after mount: cookies aren't
+    // available during SSR.
+    const [appHref, setAppHref] = useState<string | null>(null);
 
     useEffect(() => {
         setMounted(true);
+        if (isAuthenticated()) {
+            setAppHref(getDefaultRouteForRole(getCookie("role") as Role));
+        }
     }, []);
 
     // Close the drawer on any route change, not just clicks routed through
@@ -96,11 +105,20 @@ const Header = () => {
                                 ))}
                             </nav>
                             <div className="relative">
-                                <Button
-                                    title="Log In"
-                                    className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg"
-                                    onClick={handleLoginModal}
-                                />
+                                {appHref ? (
+                                    <Link
+                                        href={appHref}
+                                        className="inline-flex items-center bg-black px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg"
+                                    >
+                                        Back to app
+                                    </Link>
+                                ) : (
+                                    <Button
+                                        title="Log In"
+                                        className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg"
+                                        onClick={handleLoginModal}
+                                    />
+                                )}
                             </div>
                         </div>
                         <button
@@ -155,11 +173,20 @@ const Header = () => {
                                 </button>
                             ))}
                             <div className="relative w-full flex-center">
-                                <Button
-                                    title="Log In"
-                                    className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg min-w-[150px]"
-                                    onClick={handleLoginModal}
-                                />
+                                {appHref ? (
+                                    <Link
+                                        href={appHref}
+                                        className="inline-flex items-center justify-center bg-black px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg min-w-[150px]"
+                                    >
+                                        Back to app
+                                    </Link>
+                                ) : (
+                                    <Button
+                                        title="Log In"
+                                        className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg min-w-[150px]"
+                                        onClick={handleLoginModal}
+                                    />
+                                )}
                             </div>
                         </div>
                     </SideNavBar>

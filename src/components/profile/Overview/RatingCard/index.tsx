@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { safeImageSrc } from "@/utils/safeHref";
 import React from "react";
+import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import { IoStarSharp } from "react-icons/io5";
 import dayjs from "dayjs";
 import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
@@ -12,7 +14,7 @@ const RatingCard: React.FC<RatingCardProps> = ({ profileImg, name, rating, day, 
             <div className="flex gap-1 md:w-[800px]">
                 <div className="w-[40px] h-[40px] relative flex-shrink-0">
                     <Image
-                        src={profileImg}
+                        src={safeImageSrc(profileImg) || DummyProfileImg}
                         alt="profile picture"
                         fill
                         className="rounded-full object-cover"

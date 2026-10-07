@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import TagComponent from "@/components/common/Tag";
@@ -8,16 +8,24 @@ import { endpoints } from "@/api/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { timesAgo } from "@/utils/timeFunctions";
+import { safeImageSrc } from "@/utils/safeHref";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) => {
     const queryClient = useQueryClient();
     const [isLiked, setIsLiked] = useState(comment?.is_liked || false);
     const [likesCount, setLikesCount] = useState(comment?.total_likes || 0);
+    // Ignore clicks while a like/unlike is in flight so a double-click can't send
+    // like+unlike out of order and desync the counter.
+    const isLikePending = useRef(false);
 
     // If no comment data is provided, return null or a placeholder
     if (!comment) return null;
 
     const handleCommentLikes = async () => {
+        if (isLikePending.current) return;
+        isLikePending.current = true;
         const newLikeStatus = !isLiked;
         setIsLiked(newLikeStatus);
         setLikesCount((prev) => (newLikeStatus ? prev + 1 : prev - 1));
@@ -33,6 +41,9 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
             // Revert on error
             setIsLiked(!newLikeStatus);
             setLikesCount((prev) => (!newLikeStatus ? prev + 1 : prev - 1));
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update like. Please try again.") });
+        } finally {
+            isLikePending.current = false;
         }
     };
 
@@ -57,7 +68,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
                 <div className="flex gap-1">
                     <div className="w-[32px] h-[32px] relative flex-shrink-0">
                         <Image
-                            src={comment.author.profile_picture.image_url || DummyProfileImg}
+                            src={safeImageSrc(comment.author?.profile_picture?.image_url) || DummyProfileImg}
                             alt="profile picture"
                             fill
                             className="rounded-full object-cover"

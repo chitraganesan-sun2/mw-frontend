@@ -13,9 +13,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { endpoints } from "@/api/constants";
 import { GET_API, DELETE_API } from "@/api/request";
 import CommentInput from "../CommentInput";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { POST_API } from "@/api/request";
-import { callbackToast } from "@/components/common/Toast";
+import { callbackToast, showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { safeImageSrc } from "@/utils/safeHref";
+import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import { getCookie } from "@/utils/auth";
 import { IoIosClose } from "react-icons/io";
 import LottieLoader from "@/components/common/Loader/Lottie";
@@ -123,6 +126,14 @@ const FeedViewModal = ({
     const [isCommentFocused, setIsCommentFocused] = useState(false);
     const [replyTo, setReplyTo] = useState({ name: "", id: "" });
 
+    // The modal stays mounted between posts, so a draft comment / "Replying to" target
+    // from post A must not carry over to post B (it would post B's comment with A's
+    // parent_comment_id). Reset whenever the viewed post changes or the modal closes.
+    useEffect(() => {
+        setComment("");
+        setReplyTo({ name: "", id: "" });
+    }, [id, isOpen]);
+
     const getIndividualPost = async () => {
         const response = await GET_API(endpoints.post.getSinglePost(id as string));
         return response.data;
@@ -146,6 +157,12 @@ const FeedViewModal = ({
     });
 
     const post = data as PostData;
+    // Only URLs next/image can render - a bad one in API data would otherwise throw and
+    // take the page down. Unsafe images are skipped.
+    const safeImages = (post?.images ?? []).flatMap((image) => {
+        const src = safeImageSrc(image?.image_url);
+        return src ? [{ image_id: image.image_id, src }] : [];
+    });
 
     const handleCloseModal = () => {
         onClose();
@@ -169,34 +186,53 @@ const FeedViewModal = ({
 
     const confirmDeletePost = () => {
         if (!deleteTargetId) return;
+        const deletedId = deleteTargetId;
         callbackToast({
-            apiCall: DELETE_API(endpoints.post.deletePost(deleteTargetId)),
+            apiCall: DELETE_API(endpoints.post.deletePost(deletedId)),
             loadingMsg: "Deleting Post",
             errorMsg: "Post not Deleted",
             successMsg: "Post Deleted",
-        }).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["get-posts", "manage_your_posts"] });
-        });
+        })
+            .then(() => {
+                // The post is gone - don't leave the modal open on it.
+                handleCloseModal();
+                queryClient.removeQueries({ queryKey: ["get-single-post", deletedId] });
+                queryClient.removeQueries({ queryKey: ["get-post-comments", deletedId] });
+                queryClient.invalidateQueries({ queryKey: ["get-posts"] });
+            })
+            // toast.promise re-rejects on failure; the error toast is already shown.
+            .catch(() => {});
         setDeleteTargetId(null);
     };
 
-    const handleSavePost = (postId: string, currentSaveStatus: boolean) => {
-        if (currentSaveStatus) {
-            DELETE_API(endpoints.post.unsave(postId));
-        } else {
-            POST_API(endpoints.post.save(postId));
+    const isSavePending = useRef(false);
+
+    const handleSavePost = async (postId: string, currentSaveStatus: boolean) => {
+        if (isSavePending.current) return;
+        isSavePending.current = true;
+        const setSaved = (saved: boolean) =>
+            queryClient.setQueryData(["get-single-post", postId], (oldData: any) =>
+                oldData ? { ...oldData, is_saved: saved } : oldData
+            );
+
+        setSaved(!currentSaveStatus);
+        try {
+            if (currentSaveStatus) {
+                await DELETE_API(endpoints.post.unsave(postId));
+            } else {
+                await POST_API(endpoints.post.save(postId));
+            }
+        } catch (err) {
+            setSaved(currentSaveStatus);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update saved posts. Please try again.") });
+        } finally {
+            isSavePending.current = false;
+            // A precise setQueryData needs the exact live search-query segment the feed list is
+            // cached under (["get-posts", activeTab, debouncedSearchQuery]), which this modal
+            // doesn't have - invalidate by prefix instead so the list refetches with the
+            // correct saved state regardless of search.
+            queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab] });
         }
-
-        // A precise setQueryData needs the exact live search-query segment the feed list is
-        // cached under (["get-posts", activeTab, debouncedSearchQuery]), which this modal
-        // doesn't have - invalidate by prefix instead, same pattern already used for delete
-        // above, so the list refetches with the correct saved state regardless of search.
-        queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab] });
-
-        queryClient.setQueryData(["get-single-post", id], (oldData: any) => ({
-            ...oldData,
-            is_saved: !currentSaveStatus,
-        }));
     };
 
     const handleComment = async (postId: string) => {
@@ -239,7 +275,8 @@ const FeedViewModal = ({
             onClose={handleCloseModal}
             width={isMobile ? "100dvw" : isTablet ? "95dvw" : 1200}
             height={isMobile ? "100dvh" : isTablet ? "95dvh" : "720px"}
-            showCloseIcon={isError}
+            isLoading={isLoading}
+            isError={isError}
         >
             {isLoading ? (
                 <div className="h-full w-full max-md:!h-[100dvh] min-h-[80vh] flex-center">
@@ -250,12 +287,12 @@ const FeedViewModal = ({
             ) : (
                 <div className="h-full lg:h-[720px] flex max-lg:!flex-col">
                     <div className="lg:w-[55%] relative bg-gray-300 w-full h-[300px] md:h-[400px] lg:h-[720px] max-md:!max-h-[40%] overflow-hidden">
-                        {post?.images?.length > 0 ? (
+                        {safeImages.length > 0 ? (
                             <Slider className="flex gap-20" {...sliderSettings}>
-                                {post?.images?.map((image) => (
-                                    <div key={image?.image_id} className="relative w-full h-[300px] md:h-[400px] lg:h-[720px]">
+                                {safeImages.map((image) => (
+                                    <div key={image.image_id} className="relative w-full h-[300px] md:h-[400px] lg:h-[720px]">
                                         <Image
-                                            src={image?.image_url}
+                                            src={image.src}
                                             alt="feed image"
                                             fill
                                             className="object-contain"
@@ -263,7 +300,7 @@ const FeedViewModal = ({
                                     </div>
                                 ))}
                             </Slider>
-                        ) : post?.video?.video_url ? (
+                        ) : !post?.images?.length && post?.video?.video_url ? (
                             <div className="relative w-full h-[300px] md:h-[400px] lg:h-[720px]">
                                 <VideoPlayer src={post.video.video_url} className="w-full h-full" />
                             </div>
@@ -376,7 +413,7 @@ const FeedViewModal = ({
                                 <div className="flex gap-3">
                                     <div className="w-[40px] h-[40px] relative flex-shrink-0">
                                         <Image
-                                            src={post?.author?.profile_picture?.image_url}
+                                            src={safeImageSrc(post?.author?.profile_picture?.image_url) || DummyProfileImg}
                                             alt="profile picture"
                                             fill
                                             className="rounded-full object-cover"

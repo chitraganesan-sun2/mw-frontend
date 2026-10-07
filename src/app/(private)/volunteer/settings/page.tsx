@@ -110,7 +110,9 @@ const Settings = () => {
         setIsLoading(true);
         GET_API(endpoints.volunteer.getIndividualVolunteer(volunteerId as string))
             .then((res: any) => {
-                setIsEnabled(res.data.chat_permission);
+                // The backend treats a missing chat_permission as allowed (`is not False`),
+                // so only an explicit false means messages are blocked.
+                setIsEnabled(res.data?.chat_permission !== false);
                 const apiPref = res.data?.instant_session_email_preference;
                 if (apiPref && API_TO_UI_PREFERENCE[apiPref] !== undefined) {
                     setSessionMatchPreference(API_TO_UI_PREFERENCE[apiPref]);
@@ -130,7 +132,7 @@ const Settings = () => {
                 <p className="md:text-2xl text-[16px] font-medium">Message Permission Settings</p>
                 <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
-                        <p className="md:text-base text-[14px] font-medium">
+                        <p id="chat-permission-label" className="md:text-base text-[14px] font-medium">
                             Allow messages from learners to reach you.
                         </p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
@@ -138,6 +140,7 @@ const Settings = () => {
                         </p>
                     </div>
                     <Switch
+                        aria-labelledby="chat-permission-label"
                         checked={isEnabled}
                         loading={isLoading}
                         onChange={(value) => {
@@ -151,12 +154,13 @@ const Settings = () => {
 
                 <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
-                        <p className="md:text-base text-[14px] font-medium">Push notifications</p>
+                        <p id="push-notifications-label" className="md:text-base text-[14px] font-medium">Push notifications</p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
                             Get push notifications on your device for sessions, messages, and matches.
                         </p>
                     </div>
                     <Switch
+                        aria-labelledby="push-notifications-label"
                         checked={pushEnabled}
                         loading={isPushLoading}
                         onChange={(value) => handlePushPreferenceChange(value)}
@@ -166,14 +170,17 @@ const Settings = () => {
 
                 <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
-                        <p className="md:text-base text-[14px] font-medium">
+                        {/* A real <label htmlFor> - AntD Select drops aria-label before it
+                            reaches the combobox input, but forwards id. */}
+                        <label htmlFor="instant-session-email-preference" className="md:text-base text-[14px] font-medium">
                             Instant Session Email Notification Preferences
-                        </p>
+                        </label>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
                             Manage email notifications for instant session requests posted by learners.
                         </p>
                     </div>
                     <Select
+                        id="instant-session-email-preference"
                         value={sessionMatchPreference}
                         onChange={(value) => handleEmailPreferenceChange(value)}
                         virtual={false}

@@ -11,6 +11,13 @@ interface ViewModalProps {
     className?: string;
     borderRadius?: string;
     showCloseIcon?: boolean;
+    /**
+     * While the content is loading or failed, callers' own close buttons (which live
+     * inside the loaded content) aren't rendered - show the modal's close icon then so
+     * there's always a way out (on mobile the modal is full-screen with no mask to tap).
+     */
+    isLoading?: boolean;
+    isError?: boolean;
 }
 
 const ViewModal: React.FC<ViewModalProps> = ({
@@ -23,6 +30,8 @@ const ViewModal: React.FC<ViewModalProps> = ({
     className = "",
     borderRadius,
     showCloseIcon = false,
+    isLoading = false,
+    isError = false,
 }) => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
@@ -63,7 +72,7 @@ const ViewModal: React.FC<ViewModalProps> = ({
             )}
             centered
             open={modalOpen}
-            closeIcon={showCloseIcon}
+            closeIcon={showCloseIcon || isLoading || isError}
             onCancel={onClose}
             footer={null}
             width={width}

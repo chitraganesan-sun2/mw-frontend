@@ -2,6 +2,7 @@ import Divider from "@/components/common/Divider";
 import Logo from "@/components/common/Logo";
 import Avatar from "./Avatar";
 import SectionCard from "./SectionCard";
+import { HiOutlineSparkles } from "react-icons/hi2";
 import {
     CalendarIcon,
     CommunityIcon,
@@ -18,14 +19,11 @@ import { getCookie } from "@/utils/auth";
 import Link from "next/link";
 import InnerWidth from "@/utils/innerWidth";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { clearCookies } from "@/utils/auth";
-import { unregisterTokenFromBackend } from "@/services/push-notifications";
+import { signOut } from "@/utils/signOut";
 import { useEffect, useState } from "react";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
-    const router = useRouter();
     // getCookie reads document.cookie, which isn't available during SSR - reading it
     // directly in render made the server's nav-item set differ from the client's role,
     // triggering a full hydration-mismatch remount of the whole sidebar on every page.
@@ -65,6 +63,15 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                   icon: <VolunteerIcon />,
               };
 
+    // The match dashboard ("Find My Volunteer" / "Find My Learner"). It used to live at the
+    // bare /learner and /volunteer paths, which the route guard redirects to the schedule,
+    // so it was unreachable from anywhere (incl. the match_found push).
+    const matchesLink = {
+        href: "/matches",
+        text: "My Matches",
+        icon: <HiOutlineSparkles />,
+    };
+
     const remainingLinks: any[] = [
         {
             href: "/resources",
@@ -91,22 +98,10 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
 
     // Combine all links in the desired order
     // For both roles: My Schedule (the landing dashboard), Instant Sessions, Role-based link,
-    // Resources, Community, Messages, Settings
-    const linksData = [...baseLinksData, instantSessionsLink, roleBasedLink, ...remainingLinks];
+    // My Matches, Resources, Community, Messages, Settings
+    const linksData = [...baseLinksData, instantSessionsLink, roleBasedLink, matchesLink, ...remainingLinks];
 
-    const handleSignOut = () => {
-        // Fire-and-forget, and before clearCookies() - it needs the still-valid
-        // auth cookie to identify which device's token to remove.
-        unregisterTokenFromBackend();
-        clearCookies();
-
-        if (typeof window !== "undefined") {
-            window.location.href = "/";
-        } else {
-            router.replace("/");
-            router.refresh();
-        }
-    };
+    const handleSignOut = () => signOut();
 
     return (
         <div className="bg-white w-full h-full lg:h-screen flex flex-col items-center justify-between p-4 md:p-6 overflow-y-auto">
@@ -135,9 +130,18 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     <Divider className="max-md:!w-full" />
                 </div>
                 <div className="flex flex-col items-center gap-6 md:gap-5 lg:gap-[2.2rem] w-full mt-[1rem] md:mt-[2rem]">
-                    {linksData.map((link) => (
-                        <SectionCard key={link.href} {...link} />
-                    ))}
+                    {/* Every link is role-prefixed - until the role cookie has been read
+                        (after mount) render placeholders instead of hrefs like "/schedule"
+                        that 404 if clicked. */}
+                    {role
+                        ? linksData.map((link) => <SectionCard key={link.href} role={role} {...link} />)
+                        : linksData.map((link) => (
+                              <div
+                                  key={link.href}
+                                  aria-hidden="true"
+                                  className="h-6 w-full lg:max-w-[150px] rounded bg-gray-100 animate-pulse"
+                              />
+                          ))}
                 </div>
             </div>
             <div className="w-full flex flex-col gap-3 mt-4">

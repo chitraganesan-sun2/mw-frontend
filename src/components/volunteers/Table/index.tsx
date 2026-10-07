@@ -14,13 +14,11 @@ interface Props {
     data: Volunteer[];
     isLoading?: boolean;
     handleMessageVolunteer: (volunteerId: string) => void;
-    handleUploadTestimonial: (volunteerId: string) => void;
 }
 
 interface VolunteersTableProps {
     data: TableVolunteer[];
     handleMessageVolunteer: (id: string) => void;
-    handleUploadTestimonial: (id: string) => void;
     loading?: boolean;
     pagination?: any;
     onChange?: (pagination: any) => void;
@@ -30,7 +28,6 @@ interface VolunteersTableProps {
 const VolunteersTable: React.FC<VolunteersTableProps> = ({
     data,
     handleMessageVolunteer,
-    handleUploadTestimonial,
     loading,
     pagination,
     onChange,
@@ -65,11 +62,6 @@ const VolunteersTable: React.FC<VolunteersTableProps> = ({
                             !record.chatPermission ? "!text-gray-400" : "!text-primary"
                         }`}
                     />
-                    {/* <Button
-                        onClick={() => handleUploadTestimonial(record.id)}
-                        btnVariant="link"
-                        title="Upload Testimonial"
-                    /> */}
                 </div>
             ),
             className: "px-6 py-4",

@@ -10,6 +10,9 @@ import { useRouter } from "next/navigation";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { formatRatingSummary } from "@/utils/formatRating";
+import { safeImageSrc } from "@/utils/safeHref";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 const LearnerCard: React.FC<LearnerCardProps> = ({
     onSeeMoreClick,
@@ -30,9 +33,13 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
     const router = useRouter();    
 
     const handleChatClick = async () => {
-        GET_API(endpoints.chat.createChatForLearner(learnerId)).then((res: any) => {
-            router.push(`/volunteer/messages?chatId=${res.data.chat_id}&learnerId=${learnerId}`);
-        });
+        GET_API(endpoints.chat.createChatForLearner(learnerId))
+            .then((res: any) => {
+                router.push(`/volunteer/messages?chatId=${res.data.chat_id}&learnerId=${learnerId}`);
+            })
+            .catch((err: any) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't open the chat. Please try again.") });
+            });
     };
 
     const handleScheduleMeeting = () => {
@@ -61,7 +68,7 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
                         (and for undefined/null), so the fallback branch below never ran and
                         every learner without a photo rendered <Image src="" .../>. */}
                     <Image
-                        src={profileImage || DummyProfileImg}
+                        src={safeImageSrc(profileImage) || DummyProfileImg}
                         alt={`${name}'s avatar`}
                         fill
                         className="w-full h-full object-cover rounded-full"

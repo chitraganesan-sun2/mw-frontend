@@ -10,6 +10,7 @@ import {
 import CommonHeader from "@/components/common/Header";
 import { CalenderHeader } from "@/components/schedule";
 import { IoIosArrowBack } from "react-icons/io";
+import { HiOutlineSparkles } from "react-icons/hi2";
 
 export const getHeaderTitle = (pathname: string) => {
     const path = pathname.split("/")?.[2];
@@ -33,6 +34,8 @@ export const getHeaderIcon = (pathname: string) => {
             return <SettingIcon />;
         case "instant-sessions":
             return <InstantSessionIcon />;
+        case "matches":
+            return <HiOutlineSparkles />;
         default:
             return null;
     }

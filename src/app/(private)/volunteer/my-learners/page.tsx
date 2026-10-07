@@ -2,7 +2,6 @@
 
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
-import { TestmonialModal } from "@/components/learners/Modals";
 import LearnersTable from "@/components/learners/Table";
 import { getHeaderIcon } from "@/layouts/helper";
 import { useComponentStore } from "@/store/useComponenetStore";
@@ -19,6 +18,9 @@ import Button from "@/components/common/Button";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useDebounce } from "use-debounce";
 import { useRouter } from "next/navigation";
+import { safeImageSrc } from "@/utils/safeHref";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 interface PaginationParams {
     page: number;
@@ -46,7 +48,7 @@ const LearnerCard = ({ learner, handleMessage }: { learner: any; handleMessage: 
             <div className="flex items-center gap-2">
                 <div className="w-[40px] h-[40px] rounded-full relative">
                     <Image
-                        src={profile_picture?.image_url ? profile_picture?.image_url : DummyProfile}
+                        src={safeImageSrc(profile_picture?.image_url) || DummyProfile}
                         alt="avatar"
                         fill
                         className="w-full h-full object-cover rounded-full"
@@ -62,12 +64,6 @@ const LearnerCard = ({ learner, handleMessage }: { learner: any; handleMessage: 
                     <CardChips label="Classes Taken" value={classesTaken || "-"} />
                 </div>
                 <div className="w-full border-t pt-3 mt-3 flex justify-between gap-2">
-                    {/* <Button
-                        title="Upload Testimonial"
-                        customClassName="!px-2 !py-1 !h-auto !rounded-2xl !text-sm"
-                        btnVariant="tertiary"
-                        onClick={handleTestimonial}
-                    /> */}
                     <Button
                         title="Message Learner"
                         customClassName={`!px-2 !py-1 !h-auto !rounded-2xl !text-sm ${
@@ -136,28 +132,14 @@ export default function LearnersPage() {
         });
     };
 
-    const [learnerId, setLearnerId] = useQueryState("id", {
-        shallow: true,
-    });
-    const [mode, setMode] = useQueryState("mode", {
-        shallow: true,
-    });
-
     const handleMessageLearner = (learnerId: string) => {
-        GET_API(endpoints.chat.createChatForLearner(learnerId)).then((res: any) => {
-            router.push(`/volunteer/messages?chatId=${res.data.chat_id}&learnerId=${learnerId}`);
-        });
-        // setMode("message");
-    };
-
-    const handleUploadTestimonial = (learnerId: string) => {
-        setLearnerId(learnerId);
-        setMode("testimonial");
-    };
-
-    const handleClose = () => {
-        setLearnerId(null);
-        setMode(null);
+        GET_API(endpoints.chat.createChatForLearner(learnerId))
+            .then((res: any) => {
+                router.push(`/volunteer/messages?chatId=${res.data.chat_id}&learnerId=${learnerId}`);
+            })
+            .catch((err: any) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't open the chat. Please try again.") });
+            });
     };
 
     useEffect(() => {
@@ -172,11 +154,6 @@ export default function LearnersPage() {
 
     return (
         <div className="w-full h-full py-6 px-4 md:p-6 animate-fadeIn">
-            <TestmonialModal
-                isOpen={mode === "testimonial"}
-                mode={"create"}
-                onClose={handleClose}
-            />
             {isMobileScreen ? (
                 (isLoading || isFetching) && learnerData.length === 0 ? (
                     <LottieLoader isLoading={true} />
@@ -195,7 +172,6 @@ export default function LearnersPage() {
                 <LearnersTable
                     data={learnerData}
                     handleMessageLearner={handleMessageLearner}
-                    handleUploadTestimonial={handleUploadTestimonial}
                     loading={isLoading || isFetching}
                     pagination={{
                         current: pagination.page,

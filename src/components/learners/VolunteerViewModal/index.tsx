@@ -28,6 +28,9 @@ import { useEffect, useRef, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 import { joinNames } from "@/utils/joinNames";
+import { safeImageSrc } from "@/utils/safeHref";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 const ProfileHeader = ({
     text,
@@ -121,7 +124,7 @@ const ProfileInfo = ({
         <div className="flex items-center gap-3">
             <div className="relative w-[80px] h-[80px] rounded-full shrink-0">
                 <Image
-                    src={volunteerData?.profile_picture?.image_url || DummyProfileImg}
+                    src={safeImageSrc(volunteerData?.profile_picture?.image_url) || DummyProfileImg}
                     alt="avatar"
                     fill
                     className="object-cover rounded-full w-full h-full"
@@ -526,7 +529,7 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
 
     if (isError) {
         return (
-            <ViewModal modalOpen={isOpen} onClose={handleClose} width={855}>
+            <ViewModal modalOpen={isOpen} onClose={handleClose} width={855} isError>
                 <div className="p-5">Error loading volunteer data</div>
             </ViewModal>
         );
@@ -538,11 +541,15 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
 
     const handleStartChat = () => {
         if (!volunteerId) return;
-        GET_API(endpoints.chat.createChatForVolunteer(volunteerId)).then((res: any) => {
-            router.push(
-                `/learner/messages?chatId=${res?.data?.chat_id}&volunteerId=${volunteerId}`
-            );
-        });
+        GET_API(endpoints.chat.createChatForVolunteer(volunteerId))
+            .then((res: any) => {
+                router.push(
+                    `/learner/messages?chatId=${res?.data?.chat_id}&volunteerId=${volunteerId}`
+                );
+            })
+            .catch((err: any) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't start chat. Please try again.") });
+            });
     };
     const rating = volunteerFeedback?.overall_rating;
     const totalReviews = volunteerFeedback?.feedbacks?.length;
@@ -552,6 +559,7 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
             modalOpen={isOpen}
             onClose={handleClose}
             width={855}
+            isLoading={isLoading}
             height={isMobileScreen ? "100dvh" : ""}
             borderRadius={isMobileScreen ? "0px" : "12px"}
             className="max-md:!w-full max-md:!max-w-full max-md:!m-0"

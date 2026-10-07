@@ -10,11 +10,13 @@ import CommentIcon from "@/assets/icons/CommentIcon";
 import { endpoints } from "@/api/constants";
 import { DELETE_API, GET_API, POST_API } from "@/api/request";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CommentInput from "../CommentInput";
 import { getCookie } from "@/utils/auth";
-import { callbackToast } from "@/components/common/Toast";
+import { callbackToast, showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { safeImageSrc } from "@/utils/safeHref";
 import MobileCommentPanel from "../MobileCommentPanel";
 import SortDropdown from "../SortDropdown";
 import { DeleteIcon, EditIcon } from "@/assets/icons";
@@ -115,58 +117,69 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
 
     const posts = data?.pages.flatMap((page) => page.items) ?? [];
 
-    // Handle Like & DisLike
-    const handleLikeAction = (postId: string, currentLikeStatus: boolean) => {
-        queryClient.setQueryData(["get-posts", activeTab, debouncedSearchQuery], (oldData: any) => {
-            return {
-                ...oldData,
-                pages: oldData?.pages.map((page: any) => ({
-                    ...page,
-                    items: page.items.map((post: PostData) =>
-                        post.post_id === postId
-                            ? {
-                                  ...post,
-                                  is_liked: !currentLikeStatus,
-                                  total_likes: currentLikeStatus
-                                      ? post.total_likes - 1
-                                      : post.total_likes + 1,
-                              }
-                            : post
-                    ),
-                })),
-            };
-        });
+    // Post ids with a like / save request in flight - extra clicks are ignored so a
+    // double-click can't fire like+unlike out of order and desync the counter.
+    const pendingLikes = useRef<Set<string>>(new Set());
+    const pendingSaves = useRef<Set<string>>(new Set());
+    const postsQueryKey = ["get-posts", activeTab, debouncedSearchQuery];
 
-        if (!currentLikeStatus) {
-            POST_API(endpoints.post.like(postId));
-        } else {
-            DELETE_API(endpoints.post.unlike(postId));
-        }
-    };
-
-    // Handle Save
-    const handleSave = (postId: string, currentSaveStatus: boolean) => {
-        queryClient.setQueryData(["get-posts", activeTab, debouncedSearchQuery], (oldData: any) => {
+    const patchPost = (postId: string, patch: (post: PostData) => PostData) => {
+        queryClient.setQueryData(postsQueryKey, (oldData: any) => {
+            if (!oldData) return oldData;
             return {
                 ...oldData,
                 pages: oldData.pages.map((page: any) => ({
                     ...page,
                     items: page.items.map((post: PostData) =>
-                        post.post_id === postId
-                            ? {
-                                  ...post,
-                                  is_saved: !currentSaveStatus,
-                              }
-                            : post
+                        post.post_id === postId ? patch(post) : post
                     ),
                 })),
             };
         });
+    };
 
-        if (currentSaveStatus) {
-            DELETE_API(endpoints.post.unsave(postId));
-        } else {
-            POST_API(endpoints.post.save(postId));
+    const setLiked = (postId: string, liked: boolean) =>
+        patchPost(postId, (post) =>
+            post.is_liked === liked
+                ? post
+                : { ...post, is_liked: liked, total_likes: post.total_likes + (liked ? 1 : -1) }
+        );
+
+    // Handle Like & DisLike (optimistic, rolled back on failure)
+    const handleLikeAction = async (postId: string, currentLikeStatus: boolean) => {
+        if (pendingLikes.current.has(postId)) return;
+        pendingLikes.current.add(postId);
+        setLiked(postId, !currentLikeStatus);
+        try {
+            if (!currentLikeStatus) {
+                await POST_API(endpoints.post.like(postId));
+            } else {
+                await DELETE_API(endpoints.post.unlike(postId));
+            }
+        } catch (err) {
+            setLiked(postId, currentLikeStatus);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update like. Please try again.") });
+        } finally {
+            pendingLikes.current.delete(postId);
+        }
+    };
+
+    // Handle Save (optimistic, rolled back on failure)
+    const handleSave = async (postId: string, currentSaveStatus: boolean) => {
+        if (pendingSaves.current.has(postId)) return;
+        pendingSaves.current.add(postId);
+        patchPost(postId, (post) => ({ ...post, is_saved: !currentSaveStatus }));
+        try {
+            if (currentSaveStatus) {
+                await DELETE_API(endpoints.post.unsave(postId));
+            } else {
+                await POST_API(endpoints.post.save(postId));
+            }
+        } catch (err) {
+            patchPost(postId, (post) => ({ ...post, is_saved: currentSaveStatus }));
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update saved posts. Please try again.") });
+        } finally {
+            pendingSaves.current.delete(postId);
         }
     };
 
@@ -253,8 +266,9 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
             ) : (
                 <div className="flex flex-col gap-3 h-full divide-y divide-gray-200">
                     {posts.map((post) => {
-                        const postImage = post?.images[0]?.image_url;
-                        const validImageUrl = postImage && postImage.startsWith("http") ? postImage : "";
+                        // A bad URL in API data must not reach next/image - it throws and
+                        // takes the whole Community page down. Unsafe images are skipped.
+                        const validImageUrl = safeImageSrc(post?.images?.[0]?.image_url);
 
                         return(
                         <div key={post.post_id} className="block w-full relative py-2">
@@ -264,7 +278,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                     <div className="w-[40px] h-[40px] md:w-[40px] md:h-[40px] relative flex-shrink-0 flex items-center justify-center">
                                         <Image
                                             src={
-                                                post.author.profile_picture?.image_url ||
+                                                safeImageSrc(post.author?.profile_picture?.image_url) ||
                                                 DummyProfileImg
                                             }
                                             alt="profile picture"
@@ -357,7 +371,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                     </p>
                                 </div>
 
-                                {post.images.length > 0 && (
+                                {post.images.length > 0 && validImageUrl && (
                                     <div className="relative mt-2 md:mt-3 w-full h-full bg-gray-300 sm:rounded-xl min-h-[260px] max-h-[350px] sm:min-h-[300px] md:min-h-[360px] md:max-h-[420px] 2xl:min-h-[400px] 2xl:max-h-[450px]">
                                         <Image
                                             src={validImageUrl}

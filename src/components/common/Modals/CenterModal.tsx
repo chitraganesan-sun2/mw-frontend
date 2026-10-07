@@ -64,12 +64,13 @@ const CenterModal: React.FC<CenterModalProps> = ({
     };
 
     const buttons = [
-        <Button key={1} {...defaultButtonStyles.secondaryActionProps} disabled={loading} />,
+        <Button key={1} {...defaultButtonStyles.secondaryActionProps} disabled={loading || secondaryActionProps?.disabled} />,
         <Button
             key={2}
             {...defaultButtonStyles.primaryActionProps}
             loading={loading}
-            disabled={loading}
+            // Don't clobber the caller's own disabled (e.g. "form incomplete").
+            disabled={loading || primaryActionProps?.disabled}
         />,
     ];
 

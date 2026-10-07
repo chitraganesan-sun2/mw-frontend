@@ -13,6 +13,7 @@ import { VolunteerContactDetails, ProfileDetails as VolunteerProfileDetails } fr
 import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import Image from "next/image";
+import { safeImageSrc } from "@/utils/safeHref";
 import { useState, useRef, useEffect } from "react";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 
@@ -39,7 +40,7 @@ const ProfileInfo = ({
         <div className="flex items-center gap-3">
             <div className="relative w-[80px] h-[80px] md:w-[100px] md:h-[100px] rounded-full shrink-0">
                 <Image
-                    src={bioData?.profile_picture || DummyProfileImg}
+                    src={safeImageSrc(bioData?.profile_picture) || DummyProfileImg}
                     alt="avatar"
                     fill
                     className="object-cover rounded-full w-full h-full"

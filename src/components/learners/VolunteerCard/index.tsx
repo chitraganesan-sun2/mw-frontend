@@ -10,6 +10,9 @@ import { useRouter } from "next/navigation";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { formatRatingSummary } from "@/utils/formatRating";
+import { safeImageSrc } from "@/utils/safeHref";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 const VolunteerCard: React.FC<VolunteerCardProps> = ({
     onSeeMoreClick,
@@ -28,9 +31,13 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
     const router = useRouter();
 
     const handleChatClick = async () => {
-        GET_API(endpoints.chat.createChatForVolunteer(volunteerId)).then((res: any) => {
-            router.push(`/learner/messages?chatId=${res.data.chat_id}&volunteerId=${volunteerId}`);
-        });
+        GET_API(endpoints.chat.createChatForVolunteer(volunteerId))
+            .then((res: any) => {
+                router.push(`/learner/messages?chatId=${res.data.chat_id}&volunteerId=${volunteerId}`);
+            })
+            .catch((err: any) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't open the chat. Please try again.") });
+            });
     };
 
     const handleScheduleMeeting = () => {
@@ -48,7 +55,7 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                     className="w-[36px] h-[36px] rounded-full relative cursor-pointer appearance-none border-0 bg-transparent p-0 shrink-0"
                 >
                     <Image
-                        src={profileImage || DummyProfileImg}
+                        src={safeImageSrc(profileImage) || DummyProfileImg}
                         alt="avatar"
                         fill
                         className="w-full h-full object-cover rounded-full"

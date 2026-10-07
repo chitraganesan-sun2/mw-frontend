@@ -4,11 +4,17 @@ import Nomessage from "@/assets/images/Nomessage.png";
 import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/utils/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const NoMessage = () => {
     const router = useRouter();
-    const role = getCookie("role");
+    // Read after mount - getCookie in render differs between SSR and client.
+    const [role, setRole] = useState<string | undefined>(undefined);
+    useEffect(() => {
+        setRole(getCookie("role"));
+    }, []);
     const [isNavigating, setIsNavigating] = useState(false);
+    // Copy names the *other* side of the platform.
+    const counterparts = role === "volunteer" ? "learners" : "volunteers";
 
     const handleGoToSettings = () => {
         if (role === "volunteer") {
@@ -33,7 +39,7 @@ const NoMessage = () => {
             </div>
             <p className="md:text-2xl text-[24px] font-medium">No Messages Yet</p>
             <p className="md:text-base text-[14px] text-center">
-                Looks like you haven't initiated a conversation with <br /> any of our volunteers.
+                Looks like you haven&apos;t initiated a conversation with <br /> any of our {counterparts}.
             </p>
             <Button
                 onClick={handleStartConversation}
@@ -44,7 +50,10 @@ const NoMessage = () => {
                 Start Conversation
             </Button>
             <p className="flex flex-col md:flex-row md:text-base text-[12px] text-center">
-                Let volunteers reach out and help - turn on messages.{"  "}
+                {role === "volunteer"
+                    ? "Let learners reach out to you - turn on messages."
+                    : "Let volunteers reach out and help - turn on messages."}
+                {"  "}
                 <button
                     type="button"
                     className="mt-1 md:mt-0 md:text-base underline md:underline-none text-[16px] font-medium hover:underline cursor-pointer appearance-none border-0 bg-transparent p-0"

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { usePathname } from "next/navigation";
-import { getLocalStorage } from "@/utils/localStorage";
-import { getCookie } from "@/utils/auth";
 interface SectionCardProps {
     href: string;
+    /** Signed-in role. The Sidebar only renders cards once it is known, so links are
+     *  never emitted as "/schedule" (404) before the role cookie has been read. */
+    role: string;
     text: string;
     icon: React.ReactNode;
     textColor?: string;
@@ -15,22 +16,14 @@ interface SectionCardProps {
     badge?: number;
 }
 
-const SectionCard = ({ href, text, icon, textColor, onClick, badge }: SectionCardProps) => {
+const SectionCard = ({ href, role, text, icon, textColor, onClick, badge }: SectionCardProps) => {
     const hasBadge = typeof badge === "number" && badge > 0;
     const pathname = usePathname();
     const isActive = pathname.includes(href);
-    // getCookie reads document.cookie, which isn't available during SSR - reading it
-    // directly in render made the server's href differ from the client's, triggering
-    // a hydration mismatch on every page (see Sidebar/index.tsx for the same fix).
-    const [role, setRole] = useState<string | undefined>(undefined);
-    useEffect(() => {
-        setRole(getCookie("role"));
-    }, []);
-
     // Normalize: strip any leading slash from href so we never produce
     // a double slash like "/learner//community" (which 404s in static export).
     const cleanHref = href.replace(/^\/+/, "");
-    const finalHref = role ? `/${role}/${cleanHref}` : `/${cleanHref}`;
+    const finalHref = `/${role}/${cleanHref}`;
 
     return (
         <div className="w-full flex items-center justify-center">

@@ -21,21 +21,6 @@ export const SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS = [
 export const NONE_SUBJECT_OPTION = { label: "None", value: { subject_id: "__none__", subject_name: "None" } };
 export const NONE_SKILL_OPTION = { label: "None", value: { skill_id: "__none__", skill_name: "None" } };
 
-export const TestimonialFormConstants: FormField[] = [
-    {
-        name: "comments",
-        label: "Your Comments",
-        inputType: "textarea",
-        placeholder: "Enter comments here",
-    },
-    {
-        name: "uploadPictures",
-        label: "Do you want to upload any pictures to share in the community/forum?",
-        inputType: "upload",
-        maxFiles: 3,
-    },
-];
-
 //* Volunteer Onboarding Form Fields
 
 // "Volunteer Info" tab - renamed from the old "Profile Details" tab, now split into three

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getNotifications, markNotificationsAsRead } from "@/api/community";
 import NotificationProfileImg from "@/assets/images/NotificationProfileImg.png";
 import PostImg from "@/assets/images/PostImg.png";
@@ -10,6 +10,7 @@ import ErrorMsg from "@/components/common/Messages/ErrorMsg";
 import { timesAgo } from "@/utils/timeFunctions";
 import { useQueryState } from "nuqs";
 import { getCookie } from "@/utils/auth";
+import { safeImageSrc } from "@/utils/safeHref";
 
 const POST_NOTIFICATION_TYPES = ["like", "comment", "liked_on_your_comment", "replied_to_your_comment"];
 
@@ -45,6 +46,7 @@ interface NotificationPage {
 
 const NotificationCard: React.FC<{ notification: Notification }> = ({ notification }) => {
     const router = useRouter();
+    const queryClient = useQueryClient();
     const [_, setPostId] = useQueryState("id");
     const [mode, setMode] = useQueryState("mode");
     const role = getCookie("role");
@@ -65,7 +67,30 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
         }
     };
 
+    const markAsRead = () => {
+        if (notification.read) return;
+        markNotificationsAsRead([notification.notification_id])
+            .then(() => {
+                queryClient.setQueryData(["notifications"], (old: any) =>
+                    old
+                        ? {
+                              ...old,
+                              pages: old.pages.map((page: NotificationPage) => ({
+                                  ...page,
+                                  items: page.items.map((n) =>
+                                      n.notification_id === notification.notification_id ? { ...n, read: true } : n
+                                  ),
+                              })),
+                          }
+                        : old
+                );
+            })
+            // Best-effort: failing to mark read must not block the navigation below.
+            .catch(() => {});
+    };
+
     const handleClick = () => {
+        markAsRead();
         switch (notification.notification_type) {
             case "new_message":
                 router.push(`/${role}/messages${notification.reference_id ? `?chatId=${notification.reference_id}` : ""}`);
@@ -76,6 +101,13 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
             case "session_cancelled":
             case "session_reminder":
                 router.push(`/${role}/schedule`);
+                break;
+            case "onboarding_approved":
+            case "onboarding_rejected":
+                router.push(`/${role}/profile`);
+                break;
+            case "match_found":
+                router.push(`/${role}/matches`);
                 break;
             default:
                 if (notification.post_id) {
@@ -94,7 +126,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
             <div className="flex items-center gap-2 sm:gap-3 flex-1">
                 <div className="w-[40px] h-[40px] sm:w-[48px] sm:h-[48px] relative flex-shrink-0">
                     <Image
-                        src={notification?.author?.profile_picture?.image_url || NotificationProfileImg}
+                        src={safeImageSrc(notification?.author?.profile_picture?.image_url) || NotificationProfileImg}
                         alt="Profile"
                         fill
                         className="rounded-full object-cover"
@@ -116,7 +148,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
             </div>
             {isPostNotification && (
                 <div className="w-[40px] h-[40px] md:w-[50px] md:h-[50px] relative flex-shrink-0">
-                    <Image src={notification?.post_image || PostImg} alt="Post preview" fill className="rounded-md object-cover" />
+                    <Image src={safeImageSrc(notification?.post_image) || PostImg} alt="Post preview" fill className="rounded-md object-cover" />
                 </div>
             )}
         </button>

@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { safeImageSrc } from "@/utils/safeHref";
 import React from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getCookie } from "@/utils/auth";
@@ -61,7 +62,7 @@ const MessageCard = ({
             }`}
         >
             <div className="relative w-11 h-11 rounded-full overflow-hidden">
-                <Image src={image || DummyProfileImg} alt={name} fill className="object-cover" />
+                <Image src={safeImageSrc(image) || DummyProfileImg} alt={name} fill className="object-cover" />
             </div>
             <div className="min-w-0 flex-1 flex flex-col gap-1">
                 <div className="flex items-center gap-2 justify-between">

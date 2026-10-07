@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import Image from "next/image";
+import { safeImageSrc } from "@/utils/safeHref";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -73,11 +74,13 @@ const Avatar = () => {
         enabled: !!role,
     });
 
-    return (
-        <Link href={`/${role}/profile`} className="flex flex-col items-center gap-2 p-2">
+    const avatarSrc = safeImageSrc(userImage);
+
+    const content = (
+        <>
             <div className="relative w-[80px] h-[80px] rounded-full bg-gray-100">
-                {userImage && (
-                    <Image src={userImage} alt="avatar" fill className="object-cover rounded-full" />
+                {avatarSrc && (
+                    <Image src={avatarSrc} alt="avatar" fill className="object-cover rounded-full" />
                 )}
             </div>
             <p className="font-medium text-center">{userName}</p>
@@ -87,7 +90,17 @@ const Avatar = () => {
                     ? data?.volunteer_contact_details?.timezone
                     : data?.learner_personal_info?.learner_contact_details?.timezone}
             </p>
+        </>
+    );
+
+    // Until the role cookie is read (after mount) the profile href would be
+    // "/undefined/profile" - render the same block without a link until then.
+    return role ? (
+        <Link href={`/${role}/profile`} className="flex flex-col items-center gap-2 p-2">
+            {content}
         </Link>
+    ) : (
+        <div className="flex flex-col items-center gap-2 p-2">{content}</div>
     );
 };
 

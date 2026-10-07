@@ -5,6 +5,7 @@ import TagComponent from "@/components/common/Tag";
 import FlagIcon from "@/assets/icons/FlagIcon";
 import TrendArrow from "@/assets/icons/TrendArrow";
 import { MobileFlagIcon } from "@/assets/icons";
+import { safeImageSrc } from "@/utils/safeHref";
 type CardProps = {
     className?: string;
     imgClassName?: string;
@@ -15,7 +16,7 @@ type CardProps = {
 
 const Card = ({ className, imgClassName, resource, onClick, handleReportClick }: CardProps) => {
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-    const resourceImage = resource?.resource_image?.image_url;
+    const resourceImage = safeImageSrc(resource?.resource_image?.image_url);
 
     return (
         <div
@@ -28,15 +29,14 @@ const Card = ({ className, imgClassName, resource, onClick, handleReportClick }:
                         {resource?.total_likes} {resource?.total_likes > 1 ? "likes" : "like"}
                     </span>
                 </span>
-                {resourceImage &&
-                    (resourceImage?.startsWith("http") || resourceImage?.startsWith("https")) && (
-                        <Image
-                            src={resourceImage}
-                            alt="background"
-                            fill
-                            className={`object-cover rounded-t-xl ${imgClassName}`}
-                        />
-                    )}
+                {resourceImage && (
+                    <Image
+                        src={resourceImage}
+                        alt="background"
+                        fill
+                        className={`object-cover rounded-t-xl ${imgClassName}`}
+                    />
+                )}
             </div>
             <div className="flex flex-col p-3 gap-4 flex-grow">
                 <div className="flex justify-between items-center gap-2">

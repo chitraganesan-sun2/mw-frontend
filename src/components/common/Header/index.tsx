@@ -103,18 +103,22 @@ const CommonHeader: React.FC = () => {
                             <>
                                 {titleIcon &&
                                     (showTitleButton || !isMobileOrTabScreen) &&
-                                    (!pathname?.includes("/instant-sessions") || isMobileOrTabScreen) && (
+                                    (!pathname?.includes("/instant-sessions") || isMobileOrTabScreen) &&
+                                    (titleIconClick ? (
                                         <Button
                                             icon={titleIcon}
-                                            rootClassName={cn(
-                                                "flex items-center justify-center !w-10 !h-10 rounded-full hover:bg-gray-100",
-                                                titleIconClick
-                                                    ? "cursor-pointer border-stroke mr-2"
-                                                    : "!border-none"
-                                            )}
+                                            rootClassName="flex items-center justify-center !w-10 !h-10 rounded-full hover:bg-gray-100 cursor-pointer border-stroke mr-2"
                                             onClick={titleIconClick}
                                         />
-                                    )}
+                                    ) : (
+                                        // Decorative only - no action, so not a button.
+                                        <span
+                                            aria-hidden="true"
+                                            className="flex items-center justify-center w-10 h-10 rounded-full"
+                                        >
+                                            {titleIcon}
+                                        </span>
+                                    ))}
                                 <h3 className="md:text-lg text-[20px] font-medium">
                                     {formatString(
                                         (!pathname?.includes("/instant-sessions") || isMobileOrTabScreen)
@@ -198,8 +202,9 @@ const CommonHeader: React.FC = () => {
                             </div>
                         ))}
                     {!isMobileOrTabScreen &&
-                        actionButtons?.map((button: ActionButtons) => (
+                        actionButtons?.map((button: ActionButtons, index: number) => (
                             <Button
+                                key={`${button?.buttonTitle ?? "action"}-${index}`}
                                 title={button?.buttonTitle}
                                 onClick={button?.buttonOnClick}
                                 rootClassName={button?.buttonClassName}
@@ -292,8 +297,15 @@ const CommonHeader: React.FC = () => {
             )}
             {isMobileOrTabScreen && (
                 <div
-                    className={`absolute z-100 w-full h-full bg-white flex-center gap-2 px-5 transform transition-all duration-500 ${isSearchInputOpen ? "top-0 right-0" : "top-0 -right-full"
+                    // Closed, the panel sits off-screen (-right-full). It must be out of the
+                    // tab order / a11y tree too: focusing its input scrolled the layout root
+                    // sideways. `invisible` still lets the slide-out animation play
+                    // (visibility flips at the end of the transition).
+                    className={`absolute z-100 w-full h-full bg-white flex-center gap-2 px-5 transform transition-all duration-500 ${isSearchInputOpen ? "top-0 right-0 visible" : "top-0 -right-full invisible"
                         }`}
+                    aria-hidden={!isSearchInputOpen}
+                    // React 18 has no typed `inert` prop; an empty-string attribute enables it.
+                    {...(isSearchInputOpen ? {} : ({ inert: "" } as Record<string, string>))}
                 >
                     <Input
                         value={searchQuery ?? ""}

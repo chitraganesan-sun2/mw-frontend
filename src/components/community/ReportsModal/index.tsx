@@ -60,9 +60,9 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
             errorMsg: "Report Not Submitted!",
         }).then(() => {
             onClose();
-        }).catch(() => {
-            showToast({ type: "error", message: "Something went wrong!" });
-        });
+        // toast.promise already showed the (backend-specific) error; a second generic
+        // toast here used to dismiss and replace it.
+        }).catch(() => {});
         setIsSubmitting(false);
     };
 
@@ -85,7 +85,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
 
     return (
         <CenterModal
-            title={"Why do you want to report this resource?"}
+            title={"Why do you want to report this post?"}
             zIndex={2000}
             isOpen={isOpen}
             onClose={onClose}
@@ -96,7 +96,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
             primaryActionProps={buttonProps.primary}
         >
             <p className="text-base mb-4">
-                Help us maintain a safe and respectful community. Please select a reason for reporting this resource.
+                Help us maintain a safe and respectful community. Please select a reason for reporting this post.
             </p>
             <div>
                 <Radio.Group

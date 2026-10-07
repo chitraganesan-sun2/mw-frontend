@@ -14,13 +14,11 @@ interface Props {
     data: Learner[];
     isLoading?: boolean;
     handleMessageLearner: (learnerId: string) => void;
-    handleUploadTestimonial: (learnerId: string) => void;
 }
 
 interface LearnersTableProps {
     data: TableLearner[];
     handleMessageLearner: (id: string) => void;
-    handleUploadTestimonial: (id: string) => void;
     loading?: boolean;
     pagination?: any;
     onChange?: (pagination: any) => void;
@@ -30,7 +28,6 @@ interface LearnersTableProps {
 const LearnersTable: React.FC<LearnersTableProps> = ({
     data,
     handleMessageLearner,
-    handleUploadTestimonial,
     loading,
     pagination,
     onChange,
@@ -65,11 +62,6 @@ const LearnersTable: React.FC<LearnersTableProps> = ({
                             !record.chat_permission ? "!text-gray-400" : "!text-primary"
                         }`}
                     />
-                    {/* <Button
-                        onClick={() => handleUploadTestimonial(record.id)}
-                        btnVariant="link"
-                        title="Upload Testimonial"
-                    /> */}
                 </div>
             ),
             className: "px-6 py-4",

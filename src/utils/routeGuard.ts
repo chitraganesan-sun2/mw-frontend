@@ -78,7 +78,15 @@ function isKnownGatedRoute(pathname: string): boolean {
     );
 }
 
-export const ALWAYS_ACCESSIBLE_ROUTES = ["/donate", "/donate/history", "/privacy-policy", "/terms-and-conditions"];
+// "/donate/success" is where Stripe returns a donor after checkout - a verified user
+// must land there too, not get bounced to their schedule with no confirmation.
+export const ALWAYS_ACCESSIBLE_ROUTES = [
+    "/donate",
+    "/donate/success",
+    "/donate/history",
+    "/privacy-policy",
+    "/terms-and-conditions",
+];
 
 export const PROTECTED_ROUTES = ["/learner", "/volunteer"];
 

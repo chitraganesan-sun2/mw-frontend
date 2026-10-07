@@ -15,10 +15,12 @@ import { MdEdit } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 import { deleteResource, dislikeResource, getSingleResource, likeResource } from "@/api/resources";
 import { showToast } from "@/components/common/Toast";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { HeartLikeIcon, UnlikeHeartIcon } from "@/assets/icons";
 import LottieLoader from "@/components/common/Loader/Lottie";
-import { safeHref } from "@/utils/safeHref";
+import { safeHref, safeImageSrc } from "@/utils/safeHref";
+import { getApiErrorMessage } from "@/utils/apiError";
+import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 type DetailModalProps = {
@@ -41,6 +43,8 @@ const DetailModal = ({
     const [mode, setMode] = useQueryState("mode");
 
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const isLikePending = useRef(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likedCount, setLikedCount] = useState(0);
 
@@ -59,12 +63,28 @@ const DetailModal = ({
         enabled: Boolean(resourceId),
     });
 
+    // Optimistic like/unlike: extra clicks are ignored while a request is in flight, and
+    // the heart + counts (here and in the list behind the modal) are reverted on failure.
     const handleLikeDislike = async (status: boolean) => {
-        if (!resourceId) return;
+        if (!resourceId || isLikePending.current) return;
+        isLikePending.current = true;
         setIsLiked(status);
         setLikedCount((prev) => prev + (status ? 1 : -1));
         handleUserLikeAction(resourceId, status);
-        status ? await likeResource(resourceId) : await dislikeResource(resourceId);
+        try {
+            if (status) {
+                await likeResource(resourceId);
+            } else {
+                await dislikeResource(resourceId);
+            }
+        } catch (err) {
+            setIsLiked(!status);
+            setLikedCount((prev) => prev + (status ? -1 : 1));
+            handleUserLikeAction(resourceId, !status);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update like. Please try again.") });
+        } finally {
+            isLikePending.current = false;
+        }
     };
 
     const handleEdit = () => setMode("edit");
@@ -72,16 +92,24 @@ const DetailModal = ({
     const handleDelete = async () => {
         if (!resourceId) return;
         setIsDeleting(true);
-        const res = await deleteResource(resourceId);
-        if (res === 200) {
-            showToast({ message: "Resource Deleted" });
-            triggerReload();
-        } else {
-            showToast({ message: "Resource not deleted", type: "error" });
+        try {
+            const res = await deleteResource(resourceId);
+            if (res === 200) {
+                showToast({ message: "Resource Deleted" });
+                setIsDeleteConfirmOpen(false);
+                triggerReload();
+                onClose();
+            } else {
+                showToast({ message: "Resource not deleted", type: "error" });
+            }
+        } catch (err) {
+            showToast({ message: getApiErrorMessage(err, "Resource not deleted"), type: "error" });
+        } finally {
+            setIsDeleting(false);
         }
-        onClose();
-        setIsDeleting(false);
     };
+
+    const resourceImageSrc = safeImageSrc(resource?.resource_image?.image_url);
 
     const renderSkills = () =>
         resource?.resource_skills?.map((item: any, index: number) => (
@@ -115,6 +143,7 @@ const DetailModal = ({
         <ViewModal
             modalOpen={isOpen}
             onClose={onClose}
+            isLoading={isFetching}
             width={isMobile ? "100%" : 800}
             height="100%"
             className={isMobile ? "!p-0 !m-0 !h-screen !max-h-none !w-screen !max-w-none" : ""}
@@ -129,12 +158,16 @@ const DetailModal = ({
                         className={`relative bg-[#F4F7FB] ${isMobile ? "h-[250px] sm:h-[280px]" : "h-[300px]"} rounded-t-xl ${isMobile ? "!rounded-none" : ""
                             }`}
                     >
-                        <Image
-                            src={resource?.resource_image?.image_url || "/placeholder.png"}
-                            fill
-                            className="object-contain min-w-[60%]"
-                            alt="Resource"
-                        />
+                        {/* Skipped when the URL isn't one next/image can render (bad data would
+                            otherwise throw and take the page down). */}
+                        {resourceImageSrc && (
+                            <Image
+                                src={resourceImageSrc}
+                                fill
+                                className="object-contain min-w-[60%]"
+                                alt="Resource"
+                            />
+                        )}
                         <button
                             type="button"
                             aria-label="Close"
@@ -146,7 +179,7 @@ const DetailModal = ({
                         <div className="flex items-center gap-4 w-fit absolute top-4 right-4">
                             {isMyResource ? (
                                 <Button
-                                    onClick={handleDelete}
+                                    onClick={() => setIsDeleteConfirmOpen(true)}
                                     loading={isDeleting}
                                     customClassName="rounded-full !px-4 !gap-1 !text-sm hover:!text-error hover:!bg-error-light !h-[35px] hover:!border-none !border-none"
                                     btnVariant="error"
@@ -264,6 +297,16 @@ const DetailModal = ({
                     </div>
                 </div>
             )}
+            <ConfirmModal
+                isOpen={isDeleteConfirmOpen}
+                title="Delete resource"
+                description="Are you sure you want to delete this resource? This cannot be undone."
+                confirmText="Delete"
+                danger
+                isLoading={isDeleting}
+                onConfirm={handleDelete}
+                onCancel={() => setIsDeleteConfirmOpen(false)}
+            />
         </ViewModal>
     );
 };

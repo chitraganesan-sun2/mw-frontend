@@ -101,7 +101,7 @@ export default function VolunteerDashboardPage() {
 
     useEffect(() => {
         setHeaderOptions({
-            title: "My Dashboard",
+            title: "My Matches",
             titleIcon: getHeaderIcon(pathname),
             hideSearch: true,
             actionButtons: [

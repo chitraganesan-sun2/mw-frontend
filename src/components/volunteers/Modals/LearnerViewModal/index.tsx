@@ -23,6 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { safeImageSrc } from "@/utils/safeHref";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 import { joinNames } from "@/utils/joinNames";
@@ -132,7 +133,7 @@ const ProfileInfo = ({
         <div className="flex items-center gap-3">
             <div className="relative w-[64px] h-[64px] rounded-full shrink-0">
                 <Image
-                    src={learnerData?.profile_picture?.image_url || DummyProfileImg}
+                    src={safeImageSrc(learnerData?.profile_picture?.image_url) || DummyProfileImg}
                     alt="avatar"
                     fill
                     className="object-cover rounded-full w-full h-full"
@@ -654,7 +655,7 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
 
     if (isError) {
         return (
-            <ViewModal modalOpen={isOpen} onClose={onClose} width={855}>
+            <ViewModal modalOpen={isOpen} onClose={onClose} width={855} isError>
                 <div className="p-5">Error loading learner data</div>
             </ViewModal>
         );
@@ -668,6 +669,7 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
             modalOpen={isOpen}
             onClose={onClose}
             width={855}
+            isLoading={isLoading}
             height={isMobileScreen ? "100dvh" : ""}
             borderRadius={isMobileScreen ? "0px" : "12px"}
             className="max-md:!w-full max-md:!max-w-full max-md:!m-0"
