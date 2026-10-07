@@ -3,10 +3,11 @@
 import { getCookie } from "@/utils/auth";
 
 export const VolunteerTheme = {
-    // Was #FE5B11 - bright enough to read as the error red (#ef4444) and only 3.1:1 with
-    // white text. #B54708 is darker and further from red's hue, and passes WCAG AA with
-    // white text (5.4:1) and on the volunteer background below (4.6:1).
-    primary: "#B54708",
+    // History: #FE5B11 (read as the error red #ef4444, 3.1:1 with white) -> #B54708 (5.4:1,
+    // but too dark/brown per user feedback) -> #E35D0B: a clearly orange middle ground,
+    // still distinct from the error red, 3.6:1 with white text (WCAG AA for large/bold
+    // text and UI components) and 3.1:1 on the volunteer background below.
+    primary: "#E35D0B",
     background: "#FFE9D4",
     backgroundSecondary: "#FFAC71",
 };
