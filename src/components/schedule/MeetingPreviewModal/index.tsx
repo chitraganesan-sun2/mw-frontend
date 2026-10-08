@@ -22,6 +22,7 @@ import { useSendData } from "@/hooks/useReactQuery";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { safeHref } from "@/utils/safeHref";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
+import { useIsReschedulePending, useStartReschedule } from "@/hooks/schedule/useStartReschedule";
 import { canCompleteSession, joinState, formatSessionWhen, getSessionInstantBounds } from "@/utils/sessionDisplay";
 
 interface MeetingPreviewModalProps {
@@ -137,6 +138,10 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
 
     // Ticks so Join appears 3 minutes before the start without a reload (a hook: it must sit before the early return).
     const now = useNow();
+    // Reschedule (hooks above the early return): the calendar's events don't say whether a
+    // request is already waiting, so that comes from the My Sessions query cache.
+    const startReschedule = useStartReschedule(scheduleRole);
+    const reschedulePending = useIsReschedulePending(scheduleRole, event?._def?.extendedProps?.sessionId);
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event._def;
@@ -174,6 +179,16 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
     const showJoin = joinStatus === "open";
     // Completion is only allowed once the scheduled end has passed (backend-enforced).
     const showComplete = canCompleteSession({ status }, bounds);
+    // An accepted session that hasn't started can be moved - one request at a time.
+    const canReschedule = status === "accepted" && !reschedulePending && Boolean(bounds && bounds.start.isAfter(now));
+    const handleReschedule = () => {
+        onClose();
+        // Stay on the calendar view: closing the form returns to it.
+        startReschedule(
+            { session_id: sessionId, volunteer_id: extendedProps.volunteerId, learner_id: learner?.id },
+            searchParams.get("view")
+        );
+    };
 
     const handleFeedBack = () => {
         onClose();
@@ -465,6 +480,20 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                                 {learner ? `${learner.firstName} completed the meeting` : "Meeting completed"}
                             </p>
                         )}
+                    </div>
+                )}
+                {status === "accepted" && reschedulePending && (
+                    <p className="text-xs font-medium text-amber-700">Reschedule requested – waiting for an answer</p>
+                )}
+                {canReschedule && (
+                    <div className="flex items-center justify-between gap-3">
+                        <p className="text-gray-light font-medium text-sm">Need a different time?</p>
+                        <Button
+                            title="Reschedule"
+                            btnVariant="outline"
+                            customClassName="w-fit text-sm rounded-full !py-0 !px-5"
+                            onClick={handleReschedule}
+                        />
                     </div>
                 )}
                 {status === "pending" && canRespondToPending && (

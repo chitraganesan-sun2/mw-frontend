@@ -27,6 +27,7 @@ import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleView
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import { isAwaitingMyResponse } from "./ScheduleSessionCard";
+import { useStartReschedule } from "@/hooks/schedule/useStartReschedule";
 import OneTimeSlotEditModal, { type OneTimeSlot } from "./OneTimeSlotEditModal";
 import { SessionListSkeleton } from "./MyScheduleSection";
 import { SCHEDULE_LABELS, getVolunteerSlotGroup, type ScheduleRole } from "./scheduleCategories";
@@ -42,12 +43,14 @@ function CompactSessionRow({
     timeZoneLabel,
     onOpenProfile,
     onRespond,
+    onReschedule,
     now,
 }: {
     session: ScheduleSession;
     timeZoneLabel?: string;
     onOpenProfile: (userId: string) => void;
     onRespond: () => void;
+    onReschedule: (session: ScheduleSession) => void;
     now: dayjs.Dayjs;
 }) {
     const learnerName = joinNames(session.learner_first_name, session.learner_last_name);
@@ -61,6 +64,9 @@ function CompactSessionRow({
     const joinHref = safeHref(session.meet_link);
     const joinStatus = joinHref ? joinState(session, bounds, now) : "none";
     const showRespond = isAwaitingMyResponse(session, "volunteer");
+    // An accepted session that hasn't started can be moved - one request at a time.
+    const canReschedule =
+        session.status === "accepted" && !session.reschedule_pending && Boolean(bounds && bounds.start.isAfter(now));
     return (
         <li className={`flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm ${showRespond ? "border-l-4 border-l-amber-400 bg-amber-50/40" : ""}`}>
             <div className="min-w-0 flex-1">
@@ -96,6 +102,16 @@ function CompactSessionRow({
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass(session.status)}`}>
                     {getStatusLabel(session.status)}
                 </span>
+                {canReschedule && (
+                    <button
+                        type="button"
+                        onClick={() => onReschedule(session)}
+                        aria-label={`Ask to reschedule ${session.session_title || "this session"}`}
+                        className="text-xs font-medium text-gray-600 underline-offset-2 hover:underline hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
+                    >
+                        Reschedule
+                    </button>
+                )}
                 {showRespond && (
                     <button
                         type="button"
@@ -164,6 +180,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
     // One-time slot being removed - disables its Remove so a double click can't fire twice.
     const [removingId, setRemovingId] = useState<string | null>(null);
     const openApprovals = useApprovalDrawer((state) => state.open);
+    const startReschedule = useStartReschedule(role);
     const now = useNow();
     // "Today" in the PROFILE timezone (the browser's date can differ).
     const today = useProfileToday(role);
@@ -253,6 +270,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                                 timeZoneLabel={timeZoneLabel}
                                 onOpenProfile={onOpenProfile}
                                 onRespond={openApprovals}
+                                onReschedule={(s) => startReschedule(s)}
                                 now={now}
                             />
                         ))}
