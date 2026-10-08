@@ -23,6 +23,7 @@ import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
+import WhenLine from "@/components/common/WhenLine";
 import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
@@ -176,67 +177,75 @@ function RequestedSessionCard({
     const canCancelPending = request.status === "pending";
     const canView = Boolean(request.session_id) && request.status !== "pending";
 
+    const when = `${formatSessionDate(request.availability_date)} · ${formatSessionTime(request.availability_start_time)}${
+        timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, request.availability_date)}` : ""
+    } · ${formatDuration(request.duration)}`;
+    const subjects = [
+        Array.isArray(request.skills) ? request.skills.join(", ") : "",
+        formatLevel(request.grade_level || request.expertise_level),
+    ]
+        .filter(Boolean)
+        .join(" · ");
+    const actionClass = "text-xs font-semibold bg-transparent border-0 p-0 cursor-pointer disabled:opacity-50";
+
     return (
-        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-            <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg">
-                    {request.session_type === "academic" ? "Academic Session" : "Arts & Life Skills Session"}
-                </h3>
-                <span className={`${statusClass} text-xs px-2 py-1 rounded-full font-medium`}>
-                    {statusLabel}
-                </span>
+        <article className="min-w-0 rounded-lg border border-gray-200 bg-white p-3 flex flex-col gap-1.5">
+            <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">
+                        {request.session_type === "academic" ? "Academic Session" : "Arts & Life Skills Session"}
+                    </h3>
+                    {request.volunteer_name && (
+                        <p className="text-sm text-gray-700 break-words">
+                            <span className="text-gray-500">Volunteer: </span>
+                            <ProfileNameLink
+                                role="volunteer"
+                                id={request.accepted_by}
+                                name={request.volunteer_name}
+                                className="font-semibold"
+                            />
+                        </p>
+                    )}
+                </div>
+                <span className={`${statusClass} shrink-0 rounded-full px-2 py-0.5 text-xs font-medium`}>{statusLabel}</span>
             </div>
-            <p className="text-sm text-gray-600 mb-2">
-                Level: {formatLevel(request.grade_level || request.expertise_level) || "N/A"}
-            </p>
-            {request.volunteer_name && (
-                <p className="text-sm text-gray-600 mb-2">
-                    Volunteer:{" "}
-                    <ProfileNameLink role="volunteer" id={request.accepted_by} name={request.volunteer_name} />
-                </p>
+            <WhenLine text={when} />
+            {subjects && <p className="text-xs text-gray-600 break-words">{subjects}</p>}
+            {request.session_details && (
+                <p className="text-xs text-gray-600 line-clamp-2 break-words">{request.session_details}</p>
             )}
-            {Array.isArray(request.skills) && request.skills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                    {request.skills.map((skill: string) => (
-                        <TagComponent
-                            key={skill}
-                            text={skill}
-                            tagClassName="!bg-gray-100 !border-none !text-gray-700 !px-2 !py-0.5 !text-[10px] capitalize"
-                        />
-                    ))}
+            {(canView || canCancelPending) && (
+                <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pt-0.5">
+                    {canCancelPending && (
+                        <button
+                            className={`${actionClass} text-red-600 hover:text-red-700`}
+                            disabled={isActionLoading}
+                            onClick={() => onCancel(request.request_id)}
+                        >
+                            Cancel Request
+                        </button>
+                    )}
+                    {canView &&
+                        (request.status === "accepted" || request.status === "active" ? (
+                            <button
+                                className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90 disabled:opacity-50"
+                                disabled={isActionLoading}
+                                onClick={() => onView(request.session_id)}
+                            >
+                                View / Join
+                            </button>
+                        ) : (
+                            <button
+                                className={`${actionClass} text-gray-700 underline underline-offset-2 hover:text-gray-900`}
+                                disabled={isActionLoading}
+                                onClick={() => onView(request.session_id)}
+                            >
+                                View
+                            </button>
+                        ))}
                 </div>
             )}
-            {request.session_details && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{request.session_details}</p>
-            )}
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-                <span className="font-medium">
-                    {formatSessionDate(request.availability_date)} · {formatSessionTime(request.availability_start_time)}
-                    {timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, request.availability_date)}` : ""}
-                </span>
-                <span className="text-gray-500">· {formatDuration(request.duration)}</span>
-            </div>
-            <div className="mt-4 flex justify-end gap-3">
-                {canView && (
-                    <button
-                        className="text-primary text-sm font-medium hover:opacity-80 transition-opacity disabled:opacity-50"
-                        disabled={isActionLoading}
-                        onClick={() => onView(request.session_id)}
-                    >
-                        {request.status === "accepted" || request.status === "active" ? "View / Join" : "View"}
-                    </button>
-                )}
-                {canCancelPending && (
-                    <button
-                        className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors disabled:opacity-50"
-                        disabled={isActionLoading}
-                        onClick={() => onCancel(request.request_id)}
-                    >
-                        Cancel Request
-                    </button>
-                )}
-            </div>
-        </div>
+        </article>
     );
 }
 
@@ -573,7 +582,7 @@ export default function InstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load your requests." onRetry={() => refetchMyRequests()} />
                 ) : myRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                             {myRequests.map((req) => (
                                 <RequestedSessionCard
                                     key={req.request_id}
@@ -630,7 +639,7 @@ export default function InstantSessionsPage() {
                 </h2>
 
                 {availableSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-4">
                         {availableSessions.map((session) => (
                             <SessionCard
                                 key={session.id}
@@ -642,7 +651,7 @@ export default function InstantSessionsPage() {
                 )}
 
                 {claimedSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         {claimedSessions.map((session) => (
                             <SessionCard
                                 key={session.id}

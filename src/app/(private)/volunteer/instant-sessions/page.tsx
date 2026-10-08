@@ -18,6 +18,7 @@ import { showToast } from "@/components/common/Toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
+import WhenLine from "@/components/common/WhenLine";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
@@ -72,53 +73,49 @@ function sessionBounds(session: any, timeZoneLabel?: string) {
 
 
 function LearnerRequestCard({ req, isActionLoading, onAccept }: { req: any; isActionLoading: boolean; onAccept: (id: string) => void }) {
+    // The volunteer's own local time (backend-converted); the raw availability_* fields are
+    // the LEARNER's local time and used to be shown unlabelled.
+    const when = `${formatSessionDate(req.volunteer_start_date ?? req.availability_date)} · ${formatSessionTime(
+        req.volunteer_start_time ?? req.availability_start_time
+    )}${req.volunteer_end_time ? ` – ${formatSessionTime(req.volunteer_end_time)}` : ""}${
+        req.volunteer_timezone ? ` ${shortTimeZone(req.volunteer_timezone, req.volunteer_start_date)}` : ""
+    } · ${formatDuration(req.duration)}`;
+    const subjects = [
+        Array.isArray(req.skills) ? req.skills.join(", ") : "",
+        formatLevel(req.grade_level || req.expertise_level),
+    ]
+        .filter(Boolean)
+        .join(" · ");
+
     return (
-        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-            <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg">
-                    <ProfileNameLink role="learner" id={req.learner_id} name={req.learner_name} />
-                </h3>
-                <span className={`${getStatusPillClass("pending")} text-xs px-2 py-1 rounded-full font-medium`}>{getStatusLabel("pending")}</span>
-            </div>
-            <p className="text-sm text-gray-600 mb-2">Type: {req.session_type === "academic" ? "Academic" : "Arts & Life Skills"}</p>
-            <p className="text-sm text-gray-600 mb-2">Level: {formatLevel(req.grade_level || req.expertise_level) || "N/A"}</p>
-            {Array.isArray(req.skills) && req.skills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                    {req.skills.map((skill: string) => (
-                        <TagComponent
-                            key={skill}
-                            text={skill}
-                            tagClassName="!bg-gray-100 !border-none !text-gray-700 !px-2 !py-0.5 !text-[10px] capitalize"
-                        />
-                    ))}
+        <article className="min-w-0 rounded-lg border border-gray-200 bg-white p-3 flex flex-col gap-1.5">
+            <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">
+                        {req.session_type === "academic" ? "Academic Session" : "Arts & Life Skills Session"}
+                    </h3>
+                    <p className="text-sm text-gray-700 break-words">
+                        <span className="text-gray-500">Learner: </span>
+                        <ProfileNameLink role="learner" id={req.learner_id} name={req.learner_name} className="font-semibold" />
+                    </p>
                 </div>
-            )}
-            {req.session_details && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{req.session_details}</p>
-            )}
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-                {/* The volunteer's own local time (backend-converted); the raw availability_*
-                    fields are the LEARNER's local time and used to be shown unlabelled. */}
-                <span className="font-medium">
-                    {formatSessionDate(req.volunteer_start_date ?? req.availability_date)} ·{" "}
-                    {formatSessionTime(req.volunteer_start_time ?? req.availability_start_time)}
-                    {req.volunteer_end_time ? ` – ${formatSessionTime(req.volunteer_end_time)}` : ""}
-                    {req.volunteer_timezone
-                        ? ` ${shortTimeZone(req.volunteer_timezone, req.volunteer_start_date)}`
-                        : ""}
+                <span className={`${getStatusPillClass("pending")} shrink-0 rounded-full px-2 py-0.5 text-xs font-medium`}>
+                    {getStatusLabel("pending")}
                 </span>
-                <span className="text-gray-500">· {formatDuration(req.duration)}</span>
             </div>
-            <div className="mt-4 flex justify-end">
+            <WhenLine text={when} />
+            {subjects && <p className="text-xs text-gray-600 break-words">{subjects}</p>}
+            {req.session_details && <p className="text-xs text-gray-600 line-clamp-2 break-words">{req.session_details}</p>}
+            <div className="flex items-center justify-end pt-0.5">
                 <button
-                    className="btn-primary-fill px-4 py-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
                     disabled={isActionLoading}
                     onClick={() => onAccept(req.request_id)}
                 >
                     Accept Request
                 </button>
             </div>
-        </div>
+        </article>
     );
 }
 
@@ -153,83 +150,95 @@ function MySessionCard({
     const showDescription =
         Boolean(session.session_description) && !isRedundantLevelDescription(session.session_description, level);
 
+    const when = formatSessionWhen({
+        date: session.volunteer_start_date,
+        start: session.volunteer_start_time,
+        end: session.volunteer_end_time,
+        timeZoneLabel,
+    });
+    const actionClass = "text-xs font-semibold bg-transparent border-0 p-0 cursor-pointer disabled:opacity-50";
+
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-shadow p-5">
-            <div className="flex items-center justify-between mb-3">
-                <span className={`${statusClass} text-xs px-2 py-1 rounded-full font-medium`}>{statusLabel}</span>
-                {/* created_at is naive UTC - timesAgo parses it as UTC (it used to be read as local). */}
-                <span className="text-xs text-gray-400">{timesAgo(session.created_at)}</span>
-            </div>
-            <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">
-                    {isOpen ? "?" : session.learner_name?.charAt(0)?.toUpperCase() || "L"}
-                </div>
-                <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">
-                        {session.learner_name && !isOpen ? (
-                            <ProfileNameLink role="learner" id={session.learner_id} name={session.learner_name} />
+        <article
+            aria-label={session.session_title || "Instant session"}
+            className="min-w-0 rounded-lg border border-gray-200 bg-white p-3 flex flex-col gap-1.5 hover:shadow-sm transition-shadow"
+        >
+            <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                    <h4 className="text-sm font-semibold text-gray-900 truncate">{session.session_title || "Instant session"}</h4>
+                    <p className="text-sm text-gray-700 break-words">
+                        <span className="text-gray-500">Learner: </span>
+                        {isOpen ? (
+                            <span className="italic text-gray-500">Waiting for a learner to claim</span>
+                        ) : session.learner_name ? (
+                            <ProfileNameLink role="learner" id={session.learner_id} name={session.learner_name} className="font-semibold" />
                         ) : (
-                            session.learner_name || (isOpen ? "Waiting for a learner to claim" : "Learner")
+                            <span className="font-semibold text-gray-900">Learner</span>
                         )}
-                    </h4>
-                    <p className="text-xs text-gray-500">{session.session_title}</p>
+                    </p>
+                </div>
+                <span className={`${statusClass} shrink-0 rounded-full px-2 py-0.5 text-xs font-medium`}>{statusLabel}</span>
+            </div>
+            <WhenLine text={when} />
+            {showDescription && (
+                <p className="text-xs text-gray-600 line-clamp-2 break-words">{session.session_description}</p>
+            )}
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pt-0.5">
+                {/* created_at is naive UTC - timesAgo parses it as UTC (it used to be read as local). */}
+                <span className="text-[11px] text-gray-400">Posted {timesAgo(session.created_at)}</span>
+                <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+                    {isOpen ? (
+                        <button
+                            className={`${actionClass} text-red-600 hover:text-red-700`}
+                            disabled={isActionLoading}
+                            onClick={() => onWithdraw(session.session_id)}
+                        >
+                            Withdraw
+                        </button>
+                    ) : (
+                        <>
+                            {isLive && (
+                                <>
+                                    {completable && (
+                                        <button
+                                            className={`${actionClass} text-green-700 hover:text-green-800`}
+                                            disabled={isActionLoading}
+                                            onClick={() => onComplete(session.session_id)}
+                                        >
+                                            Complete
+                                        </button>
+                                    )}
+                                    <button
+                                        className={`${actionClass} text-red-600 hover:text-red-700`}
+                                        disabled={isActionLoading}
+                                        onClick={() => onCancel(session.session_id)}
+                                    >
+                                        Cancel
+                                    </button>
+                                </>
+                            )}
+                            {joinable ? (
+                                <button
+                                    className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90 disabled:opacity-50"
+                                    disabled={isActionLoading}
+                                    onClick={() => onView(session.session_id)}
+                                >
+                                    Join
+                                </button>
+                            ) : (
+                                <button
+                                    className={`${actionClass} text-gray-700 underline underline-offset-2 hover:text-gray-900`}
+                                    disabled={isActionLoading}
+                                    onClick={() => onView(session.session_id)}
+                                >
+                                    View
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
-            {showDescription && (
-                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{session.session_description}</p>
-            )}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-50 mb-3">
-                <span className="text-xs text-gray-500">
-                    {formatSessionWhen({
-                        date: session.volunteer_start_date,
-                        start: session.volunteer_start_time,
-                        end: session.volunteer_end_time,
-                        timeZoneLabel,
-                    })}
-                </span>
-            </div>
-            <div className="flex flex-wrap justify-end gap-2">
-                {isOpen ? (
-                    <button
-                        className="text-red-600 text-xs font-medium hover:text-red-700 disabled:opacity-50"
-                        disabled={isActionLoading}
-                        onClick={() => onWithdraw(session.session_id)}
-                    >
-                        Withdraw
-                    </button>
-                ) : (
-                    <>
-                        <button
-                            className="text-primary text-xs font-medium hover:opacity-80 disabled:opacity-50"
-                            disabled={isActionLoading}
-                            onClick={() => onView(session.session_id)}
-                        >
-                            {joinable ? "Join" : "View"}
-                        </button>
-                        {isLive && (
-                            <>
-                                {completable && (
-                                    <button
-                                        className="text-green-700 text-xs font-medium hover:text-green-800 disabled:opacity-50"
-                                        disabled={isActionLoading}
-                                        onClick={() => onComplete(session.session_id)}
-                                    >
-                                        Complete
-                                    </button>
-                                )}
-                                <button
-                                    className="text-red-600 text-xs font-medium hover:text-red-700 disabled:opacity-50"
-                                    disabled={isActionLoading}
-                                    onClick={() => onCancel(session.session_id)}
-                                >
-                                    Cancel
-                                </button>
-                            </>
-                        )}
-                    </>
-                )}
-            </div>
-        </div>
+        </article>
     );
 }
 
@@ -482,7 +491,7 @@ export default function VolunteerInstantSessionsPage() {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                             {mySessions.map((session) => (
                                 <MySessionCard
                                     key={session.session_id}
@@ -528,7 +537,7 @@ export default function VolunteerInstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />
                 ) : learnerRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                             {learnerRequests.map((req) => (
                                 <LearnerRequestCard
                                     key={req.request_id}
