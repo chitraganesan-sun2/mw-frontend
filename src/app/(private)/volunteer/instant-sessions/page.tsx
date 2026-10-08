@@ -421,7 +421,7 @@ export default function VolunteerInstantSessionsPage() {
                 <p className="text-sm text-gray-500 max-w-2xl">
                     Instant Sessions are sessions available <strong>today or tomorrow.</strong> You
                     can post an Instant Session for learners to join, or accept a session a learner
-                    has requested based on their preferred time and subject.
+                    has requested.
                 </p>
             </div>
 
