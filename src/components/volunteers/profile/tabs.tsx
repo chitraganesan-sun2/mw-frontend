@@ -99,9 +99,9 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         { label: "Teaching Traits, Preferences & Limitations", value: data?.volunteer_teaching_traits },
         { label: "Higher Education", value: data?.volunteer_higher_education },
         { label: "Grade / Education Level and Area of Specialization", value: data?.volunteer_education },
-        { label: "Volunteered Experience", value: data?.volunteer_experience },
+        { label: "Volunteer Experience", value: data?.volunteer_experience },
         { label: "Work Experience", value: data?.volunteer_work_experience },
-        { label: "Favorite Free Time Activities", value: data?.volunteer_favorite_activities },
+        { label: "Favorite Free-Time Activities", value: data?.volunteer_favorite_activities },
         { label: "Description", value: data?.volunteer_description },
         { label: "Consented from Guardian", value: showGuardian ? (data?.consented_from_parent ? "Yes" : "No") : "" },
         { label: "Guardian Name", value: showGuardian ? data?.volunteer_parent_name : "" },
@@ -150,7 +150,7 @@ export const VolunteerContactDetails = ({ data }: { data: Volunteercontactdetail
     const details = [
         { label: "Country of Residence", value: data?.country },
         { label: "Zip Code", value: data?.zip_code },
-        { label: "Timezone", value: data?.timezone },
+        { label: "Time Zone", value: data?.timezone },
         { label: "UTC Offset", value: data?.utc_offset },
     ]
 

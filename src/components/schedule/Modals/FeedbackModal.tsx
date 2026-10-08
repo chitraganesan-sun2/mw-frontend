@@ -30,7 +30,7 @@ const FeedbackModal = ({
 
     const [formData, setFormData] = useState<any>({});
     const { eventDetails } = useAppStore();
-    const feedbackTitle = mode === "edit" ? "Edit Feedback" : "Please Fill the Feedback";
+    const feedbackTitle = mode === "edit" ? "Edit Feedback" : "Share Your Feedback";
     const role = getCookie("role");
 
     const feedBackEventDetails = {
@@ -74,7 +74,7 @@ const FeedbackModal = ({
             ],
         };
         if (!submissionData?.notes || !submissionData?.rating || !submissionData?.classDuration) {
-            showToast({ message: "Please fill the feedback", type: "error" });
+            showToast({ message: "Please enter your feedback.", type: "error" });
             return;
         }
 
@@ -127,7 +127,7 @@ const FeedbackModal = ({
                 </div>
                 <Divider />
                 <div className="h-full p-4 flex flex-col gap-4 bg-background-input">
-                    <h6 className="text-xl font-medium">Please Fill the Feedback</h6>
+                    <h6 className="text-xl font-medium">Share Your Feedback</h6>
                     {/* <DetailsSection data={feedBackEventDetails} /> */}
                     <div className="flex flex-col gap-4 mt-3">
                         {LearnerFeedbackFormConstants.map((field: any) => (

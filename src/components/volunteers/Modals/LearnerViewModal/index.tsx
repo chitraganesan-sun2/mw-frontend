@@ -53,7 +53,7 @@ const ProfileHeader = ({
         <div className="flex items-center gap-2">
             <Button
                 onClick={onScheduleMeeting}
-                title="Schedule a session"
+                title="Schedule a Session"
                 className="text-sm btn-primary-fill"
             />
             <button
@@ -463,7 +463,7 @@ const OverviewContent = ({
             ),
         },
         {
-            title: "Cultural / Religious Considerations",
+            title: "Cultural/Religious Considerations",
             description: learnerData?.education?.cultural_religious_considerations || "",
         },
         {
@@ -471,7 +471,7 @@ const OverviewContent = ({
             description: learnerData?.education?.extracurricular_activities || "",
         },
         {
-            title: "Favorite Free Time Activities",
+            title: "Favorite Free-Time Activities",
             description: learnerData?.education?.favorite_free_time_activities || "",
         },
     ].filter((item) => (item.tags?.length ?? 0) > 0 || item.description);
@@ -570,7 +570,7 @@ const ReviewsContent = ({ learnerFeedback }: { learnerFeedback: any }) => {
                         <div className="flex justify-between">
                             <p className="text-base font-semibold md:hidden">Reviews</p>
                             <p className="text-gray text-sm">
-                                Sort By: <span className="text-black">Recently added</span>
+                                Sort by: <span className="text-black">Recently added</span>
                             </p>
                         </div>
                         <div className="flex flex-col gap-5 divide-y">

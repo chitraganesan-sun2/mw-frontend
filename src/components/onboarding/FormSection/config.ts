@@ -37,18 +37,18 @@ export const volunteerFormSchema = z
     .object({
         volunteer_first_name: z
             .string({ required_error: "First Name is required" })
-            .min(1, { message: "First Name cannot be empty" }),
+            .min(1, { message: "First Name is required" }),
         volunteer_last_name: z
             .string({ required_error: "Last Name is required" })
-            .min(1, { message: "Last Name cannot be empty" }),
-        volunteer_birth_date: z.string({ required_error: "Please select your birthday" }),
+            .min(1, { message: "Last Name is required" }),
+        volunteer_birth_date: z.string({ required_error: "Please select your date of birth" }),
         consented_from_parent: z.boolean().or(z.null()).optional(),
         volunteer_parent_name: z.string().or(z.null()).optional(),
         volunteer_parent_email: z.string().or(z.null()).optional(),
         volunteer_gender: z.string({ required_error: "Please select your gender" }),
         volunteer_education: z
             .string({ required_error: "Please provide your education details" })
-            .min(1, { message: "Education details cannot be empty" }),
+            .min(1, { message: "Education details are required" }),
         volunteer_higher_education: z.string({
             required_error: "Higher education details are required",
         }),
@@ -81,8 +81,8 @@ export const volunteerFormSchema = z
         // docs/learner-volunteer-onboarding-migration-plan.md for the full old->new field mapping.
         volunteer_parent_contact_number: contactNumberValidation.optional().or(z.null()),
         volunteer_favorite_activities: z
-            .string({ required_error: "Favorite Free Time Activities is required" })
-            .min(1, { message: "Favorite Free Time Activities is required" }),
+            .string({ required_error: "Favorite Free-Time Activities is required" })
+            .min(1, { message: "Favorite Free-Time Activities is required" }),
         preferred_learner_age_group: z
             .string({ required_error: "Preferred Learner Age Group is required" })
             .min(1, { message: "Preferred Learner Age Group is required" }),
@@ -101,14 +101,14 @@ export const volunteerFormSchema = z
                 .email("Please enter a valid email address"),
             contact_number: contactNumberValidation,
             zip_code: z
-                .string({ required_error: "Zip code is required" })
-                .min(1, { message: "Zip code cannot be empty" }),
+                .string({ required_error: "Zip Code is required" })
+                .min(1, { message: "Zip Code is required" }),
             country: z
                 .string({ required_error: "Country is required" })
-                .min(1, { message: "Country cannot be empty" }),
+                .min(1, { message: "Country is required" }),
             timezone: z
                 .string({ required_error: "Time Zone is required" })
-                .min(1, { message: "Time Zone cannot be empty" }),
+                .min(1, { message: "Time Zone is required" }),
             utc_offset: z.string().optional(),
         }),
 
@@ -287,7 +287,7 @@ export const volunteerFormSchema = z
         // Consent and Permissions
         consent_and_permissions: z.object({
             photo_or_video_consent: z.boolean({
-                required_error: "Photo or video consent is required",
+                required_error: "Photo or Video Consent is required",
             }),
         }),
 
@@ -295,10 +295,10 @@ export const volunteerFormSchema = z
         profile_picture: z
             .object({
                 image_url: z.string({ required_error: "Profile picture URL is required" }).min(1, {
-                    message: "Profile picture cannot be empty",
+                    message: "Profile picture is required",
                 }),
                 image_id: z.string({ required_error: "Profile picture ID is required" }).min(1, {
-                    message: "Profile picture cannot be empty",
+                    message: "Profile picture is required",
                 }),
             })
             .required(),
@@ -382,9 +382,9 @@ export function validateVolunteerParentDetails(data: any) {
 
     if (age < ADULT_VOLUNTEER_AGE) {
         const requiredFields = {
-            consented_from_parent: `Parent consent is required for volunteers under ${ADULT_VOLUNTEER_AGE}`,
-            volunteer_parent_name: `Parent name is required for volunteers under ${ADULT_VOLUNTEER_AGE}`,
-            volunteer_parent_email: `Parent email is required for volunteers under ${ADULT_VOLUNTEER_AGE}`,
+            consented_from_parent: `Guardian consent is required for volunteers under ${ADULT_VOLUNTEER_AGE}`,
+            volunteer_parent_name: `Guardian name is required for volunteers under ${ADULT_VOLUNTEER_AGE}`,
+            volunteer_parent_email: `Guardian email is required for volunteers under ${ADULT_VOLUNTEER_AGE}`,
         };
 
         Object.entries(requiredFields).forEach(([key, errorMessage]) => {
@@ -413,11 +413,11 @@ type learnerParentSchemaType = {
 };
 
 const learnerParentSchema = z.object({
-    parent_first_name: z.string({ required_error: "Parent's First Name is required" }).or(z.null()),
-    parent_last_name: z.string({ required_error: "Parent's Last Name is required" }).or(z.null()),
-    parent_email: z.string({ required_error: "Parent's Email is required" }).or(z.null()),
+    parent_first_name: z.string({ required_error: "Guardian's First Name is required" }).or(z.null()),
+    parent_last_name: z.string({ required_error: "Guardian's Last Name is required" }).or(z.null()),
+    parent_email: z.string({ required_error: "Guardian's Email is required" }).or(z.null()),
     parent_contact_number: z.any().optional().or(z.null()),
-    parent_address: z.string({ required_error: "Parent's Address is required" }).or(z.null()),
+    parent_address: z.string({ required_error: "Guardian's Address is required" }).or(z.null()),
     relationship_to_learner: z
         .string({
             required_error: "Relationship to Learner is required",
@@ -431,10 +431,10 @@ export const learnerFormSchema = z
         learner_personal_info: z.object({
             learner_first_name: z
                 .string({ required_error: "Learner's First Name is required" })
-                .min(1, { message: "Learner's First Name cannot be empty" }),
+                .min(1, { message: "Learner's First Name is required" }),
             learner_last_name: z
                 .string({ required_error: "Learner's Last Name is required" })
-                .min(1, { message: "Learner's Last Name cannot be empty" }),
+                .min(1, { message: "Learner's Last Name is required" }),
             learner_date_of_birth: z
                 .string({
                     required_error: "Learner's Date of Birth is required",
@@ -454,14 +454,14 @@ export const learnerFormSchema = z
                 email: z.string().optional().or(z.null()),
                 contact_number: contactNumberValidation,
                 zip_code: z
-                    .string({ required_error: "Zip code is required" })
-                    .min(1, { message: "Zip code cannot be empty" }),
+                    .string({ required_error: "Zip Code is required" })
+                    .min(1, { message: "Zip Code is required" }),
                 country: z
                     .string({ required_error: "Country is required" })
-                    .min(1, { message: "Country cannot be empty" }),
+                    .min(1, { message: "Country is required" }),
                 timezone: z
                     .string({ required_error: "Time Zone is required" })
-                    .min(1, { message: "Time Zone cannot be empty" }),
+                    .min(1, { message: "Time Zone is required" }),
                 utc_offset: z.string().optional(),
             }),
         }),
@@ -583,10 +583,10 @@ export const learnerFormSchema = z
         profile_picture: z
             .object({
                 image_url: z.string({ required_error: "Profile picture URL is required" }).min(1, {
-                    message: "Profile picture cannot be empty",
+                    message: "Profile picture is required",
                 }),
                 image_id: z.string({ required_error: "Profile picture ID is required" }).min(1, {
-                    message: "Profile picture cannot be empty",
+                    message: "Profile picture is required",
                 }),
             })
             .required(),
@@ -658,7 +658,7 @@ export function validateLearnerParentFields(data: any) {
                 contactNumberValidation.parse(field);
             } catch (e) {
                 errors[`parent_info.${key}`] =
-                    "Parent Contact Number is required for learners under 13";
+                    "Guardian Contact Number is required for learners under 13";
                 isSuccess = false;
             }
         }

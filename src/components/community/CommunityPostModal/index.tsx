@@ -85,7 +85,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
             onClose();
             reset({ description: "", images: [], video: null });
         } catch (error) {
-            showToast({ message: "Something went wrong!", type: "error" });
+            showToast({ message: "Something went wrong.", type: "error" });
         } finally {
             setIsSubmitting(false);
         }
@@ -110,7 +110,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
                     ? PUT_API(endpoints.post.updatePost(postId || ""), payload)
                     : POST_API(endpoints.post.createPost, payload),
             isEditMode ? "Post updated successfully" : "Post created successfully",
-            isEditMode ? "Failed to update post" : "Failed to create post"
+            isEditMode ? "Couldn't update the post. Please try again." : "Couldn't create the post. Please try again."
         );
     };
 

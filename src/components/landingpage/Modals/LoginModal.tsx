@@ -54,9 +54,9 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 // apiGoogleLogin uses a raw axios call, so the status is on err.response.
                 const status = err?.response?.status ?? err?.status;
                 if (status === 404) {
-                    return showToast({ type: "error", message: "User not found, please signup." });
+                    return showToast({ type: "error", message: "We couldn't find an account with that email. Please sign up first." });
                 }
-                showToast({ type: "error", message: "Sign in failed. Please try again." });
+                showToast({ type: "error", message: "Log in failed. Please try again." });
             })
     };
 
@@ -74,11 +74,11 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                     await SIGN_IN(accessToken);
                 } else {
                     setIsLoginLoading(false);
-                    showToast({ type: "error", message: "Google Sign-In failed. Please try again." });
+                    showToast({ type: "error", message: "Google log in failed. Please try again." });
                 }
             } catch (error) {
                 setIsLoginLoading(false);
-                showToast({ type: "error", message: "Google Sign-In failed. Please try again." });
+                showToast({ type: "error", message: "Google log in failed. Please try again." });
             }
         } else {
             // Web: use @react-oauth/google
@@ -111,7 +111,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                     </div>
                     <div className='mt-3 flex flex-col gap-5 divide-y'>
                         <Button
-                            title='Sign In With Google'
+                            title='Log In with Google'
                             btnVariant="secondary"
                             className='!bg-black w-full !px-3 !py-2 text-white hover:!bg-black hover:!text-white text-sm !rounded-xl'
                             icon={<FcGoogle className='text-xl' />}

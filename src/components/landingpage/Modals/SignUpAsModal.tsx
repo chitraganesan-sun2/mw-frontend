@@ -21,7 +21,7 @@ import { getDefaultRouteForRole } from "@/utils/routeGuard";
 
 const learnerOptions = [
     { label: "I am a parent filling this profile", value: "parent" },
-    { label: "I am filling for myself", value: "self" },
+    { label: "I am filling this profile for myself", value: "self" },
 ];
 
 const DateOfBirthInput = ({ value, onChange }: { value: any; onChange: (value: any) => void }) => (
@@ -47,7 +47,7 @@ const GoogleSignUpButton = ({
     <Button
         loading={loading}
         disabled={disabled}
-        title="Sign Up With Google"
+        title="Sign Up with Google"
         btnVariant="secondary"
         className="!bg-black w-full !px-3 !py-2 !text-white hover:!bg-black hover:!text-white text-sm !rounded-xl"
         icon={<FcGoogle className="text-xl" />}
@@ -100,7 +100,7 @@ const LearnerModalBody = ({
                         Learners under 13 should be onboarded by a parent.
                     </p>
                     <p>
-                        If the learner is over 13 but has limited legal or decision-making capacity,
+                        If the learner is 13 or older but has limited legal or decision-making capacity,
                         a parent or guardian should complete the form and schedule their sessions on
                         their behalf.
                     </p>
@@ -130,7 +130,7 @@ const VolunteerModalBody = ({
                 <DateOfBirthInput value={dob} onChange={setDob} />
                 <div className="rounded-md p-3 text-xs bg-background-input text-gray-light">
                     <span className="text-black font-medium mr-1">Note:</span>
-                    The minimum age to volunteer in MelodyWings should be 13.
+                    You must be at least 13 years old to volunteer with MelodyWings.
                 </div>
             </div>
             <GoogleSignUpButton
@@ -201,11 +201,11 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                     await SIGN_UP(accessToken, payloads);
                 } else {
                     setIsSignUpLoading(false);
-                    showToast({ type: "error", message: "Google Sign-In failed. Please try again." });
+                    showToast({ type: "error", message: "Google log in failed. Please try again." });
                 }
             } catch (error) {
                 setIsSignUpLoading(false);
-                showToast({ type: "error", message: "Google Sign-In failed. Please try again." });
+                showToast({ type: "error", message: "Google log in failed. Please try again." });
             }
         } else {
             // Web: use @react-oauth/google

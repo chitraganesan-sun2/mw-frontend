@@ -162,7 +162,7 @@ export default function LearnersPage() {
 
     useEffect(() => {
         setHeaderOptions({
-            searchPlaceholder: "Find your tutor",
+            searchPlaceholder: "Find a volunteer",
             actionButtonPlacement: "right",
             title: "Volunteers",
             hideSearch: isMatchesTab,
@@ -218,7 +218,7 @@ export default function LearnersPage() {
                 <>
                     {volunteerCardData.length === 0 ? (
                         <div className="flex-center h-full w-full flex-col gap-1">
-                            <p>No Volunteer Found</p>
+                            <p>No Volunteers Found</p>
                             {query && (
                                 <button
                                     className="text-primary underline"

@@ -127,7 +127,7 @@ const JoinUsStep3Page = () => {
         }
 
         if (!termsAccepted) {
-            showToast({ type: 'error', message: 'Please accept the Terms of Service to continue.' });
+            showToast({ type: 'error', message: 'Please accept the Terms and Conditions to continue.' });
             return;
         }
 
@@ -226,7 +226,7 @@ const JoinUsStep3Page = () => {
 
             router.push('/join-us/success');
         } catch (err: any) {
-            showToast({ type: 'error', message: err?.message || 'Failed to submit application' });
+            showToast({ type: 'error', message: err?.message || "Couldn't submit your application. Please try again." });
         } finally {
             setLoading(false);
         }
@@ -380,7 +380,7 @@ const JoinUsStep3Page = () => {
                             <div className="rounded-3xl md:border border-gray-200 md:px-6 py-4 md:py-5 space-y-4">
                                 <p className="text-[20px] font-medium text-gray-900">2. Sex Offender Registry Check</p>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Are you listed on any_state or national sex offender registries?</p>
+                                    <p className="text-[16px] text-gray-800">Are you listed on any state or national sex offender registries?</p>
                                     <RadioInput inputType="radio" name="sex_offender" value={sexOffenderCheck} onChange={(v) => setSexOffenderCheck(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" />
                                 </div>
                                 <div className="space-y-2">
@@ -404,7 +404,7 @@ const JoinUsStep3Page = () => {
                                     <RadioInput name="disc_1" value={disciplinary1} onChange={(v) => setDisciplinary1(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" inputType="radio" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Have you ever been involved in any_disputes with employers or organizations related to safety or ethical issues?</p>
+                                    <p className="text-[16px] text-gray-800">Have you ever been involved in any disputes with employers or organizations related to safety or ethical issues?</p>
                                     <RadioInput name="disc_2" value={disciplinary2} onChange={(v) => setDisciplinary2(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" inputType="radio" />
                                 </div>
                                 <div className="space-y-2">

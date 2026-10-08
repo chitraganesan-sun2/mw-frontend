@@ -66,7 +66,7 @@ const VolunteerCard = ({
             </div>
             <div className="flex flex-col gap-1">
                 <div className="flex flex-wrap gap-1">
-                    <CardChips label="Classes Taken" value={classesTaken || "-"} />
+                    <CardChips label="Sessions Taken" value={classesTaken || "-"} />
                 </div>
                 <div className="w-full border-t pt-3 mt-3 flex justify-between gap-2">
                     <Button
@@ -153,7 +153,7 @@ export default function VolunteerPage() {
             title: "My Volunteers",
             titleIcon: getHeaderIcon("backIcon"),
             titleIconClick: () => router.push("/learner/volunteer"),
-            searchPlaceholder: "Find your tutor",
+            searchPlaceholder: "Find a volunteer",
             showTitleButton: true,
         });
     }, [setHeaderOptions]);
@@ -190,7 +190,7 @@ export default function VolunteerPage() {
                 />
             )}
             {isMobileScreen && volunteerData?.length === 0 && (
-                <div className="flex-center h-full">No Volunteer Found</div>
+                <div className="flex-center h-full">No Volunteers Found</div>
             )}
         </div>
     );

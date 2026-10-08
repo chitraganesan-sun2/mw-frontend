@@ -322,7 +322,7 @@ const OnetImeScheduleModal = ({
             .catch((err) => {
                 // The backend re-validates (past time, overlap, > 1 hour) - say which.
                 showToast({
-                    message: getApiErrorMessage(err, "Error creating slots"),
+                    message: getApiErrorMessage(err, "Couldn't create the slots. Please try again."),
                     type: "error",
                 });
             })

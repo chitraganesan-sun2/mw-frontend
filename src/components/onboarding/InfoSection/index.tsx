@@ -9,7 +9,7 @@ const infoItems: InfoItem[] = [
     {
         title: 'Age Requirement:',
         description:
-            'Volunteers must be at least 14 years of age to tutor. Minors under 18 years will need permission from a guardian to participate.',
+            'Volunteers must be at least 13 years of age. Minors under 18 will need permission from a parent or guardian to participate.',
     },
     {
         title: 'Profile Details:',

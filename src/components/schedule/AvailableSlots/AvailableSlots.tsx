@@ -77,7 +77,7 @@ const AvailableSlotsRadioGroup: React.FC<AvailableSlotsRadioGroupProps> = ({
                 ) : (
                     <p className="text-xs font-normal mb-2 -mt-2 text-gray-400">
                         {fetchingSlots ? (
-                            <span>Fetching slots...</span>
+                            <span>Loading slots...</span>
                         ) : selectedDate ? (
                             <span>No slots available for this date.</span>
                         ) : (

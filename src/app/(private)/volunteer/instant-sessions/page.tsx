@@ -325,7 +325,7 @@ export default function VolunteerInstantSessionsPage() {
             showToast({ message: "Request accepted! A session has been created.", type: "success" });
             invalidateScheduleViews(queryClient, "volunteer");
         } catch (error: any) {
-            showToast({ message: getApiErrorMessage(error, "Failed to accept request"), type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Couldn't accept the request. Please try again."), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -337,7 +337,7 @@ export default function VolunteerInstantSessionsPage() {
             const res = await GET_API(endpoints.session.getSessionDetail(sessionId));
             setSessionDetail(res?.data);
         } catch (error) {
-            showToast({ message: "Failed to load session details", type: "error" });
+            showToast({ message: "Couldn't load the session details. Please try again.", type: "error" });
         } finally {
             setIsDetailLoading(false);
         }
@@ -345,7 +345,7 @@ export default function VolunteerInstantSessionsPage() {
 
     const handleCompleteSession = async (sessionId: string) => {
         if (isActionLoading) return;
-        if (!(await askConfirm({ title: "Mark as completed", description: "Mark this session as completed? This can't be undone.", confirmText: "Mark completed", cancelText: "Not yet" }))) return;
+        if (!(await askConfirm({ title: "Mark as completed", description: "Mark this session as completed? This can't be undone.", confirmText: "Mark as completed", cancelText: "Not yet" }))) return;
         setIsActionLoading(true);
         setDetailAction("complete");
         try {
@@ -354,7 +354,7 @@ export default function VolunteerInstantSessionsPage() {
             invalidateScheduleViews(queryClient, "volunteer");
             setSessionDetail(null);
         } catch (error: any) {
-            showToast({ message: getApiErrorMessage(error, "Failed to complete session"), type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Couldn't complete the session. Please try again."), type: "error" });
         } finally {
             setIsActionLoading(false);
             setDetailAction(null);
@@ -369,7 +369,7 @@ export default function VolunteerInstantSessionsPage() {
             showToast({ message: "Instant session withdrawn", type: "success" });
             invalidateScheduleViews(queryClient, "volunteer");
         } catch (error: any) {
-            showToast({ message: getApiErrorMessage(error, "Failed to withdraw session"), type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Couldn't withdraw the session. Please try again."), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -386,7 +386,7 @@ export default function VolunteerInstantSessionsPage() {
             invalidateScheduleViews(queryClient, "volunteer");
             setSessionDetail(null);
         } catch (error: any) {
-            showToast({ message: getApiErrorMessage(error, "Failed to cancel session"), type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Couldn't cancel the session. Please try again."), type: "error" });
         } finally {
             setIsActionLoading(false);
             setDetailAction(null);

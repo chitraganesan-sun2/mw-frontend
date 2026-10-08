@@ -61,7 +61,7 @@ const LearnerCard = ({ learner, handleMessage }: { learner: any; handleMessage: 
             </div>
             <div className="flex flex-col gap-1">
                 <div className="flex flex-wrap gap-1">
-                    <CardChips label="Classes Taken" value={classesTaken || "-"} />
+                    <CardChips label="Sessions Taken" value={classesTaken || "-"} />
                 </div>
                 <div className="w-full border-t pt-3 mt-3 flex justify-between gap-2">
                     <Button
@@ -144,7 +144,7 @@ export default function LearnersPage() {
 
     useEffect(() => {
         setHeaderOptions({
-            title: "Learners",
+            title: "My Learners",
             titleIcon: getHeaderIcon("backIcon"),
             titleIconClick: () => router.push("/volunteer/learners"),
             searchPlaceholder: "Find your learner",
@@ -184,7 +184,7 @@ export default function LearnersPage() {
                 />
             )}
             {isMobileScreen && learnerData?.length === 0 && (
-                <div className="flex-center h-full">No Learner Found</div>
+                <div className="flex-center h-full">No Learners Found</div>
             )}
         </div>
     );

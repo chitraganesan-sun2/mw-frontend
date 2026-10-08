@@ -15,7 +15,7 @@ const ForLearner = () => {
             <ContainerHeader
                 title="For Learners"
                 subTitle="Explore new horizons in learning and foster growth"
-                description="Search for a  champion your learner deserves and connect with volunteer to teach for free"
+                description="Search for a champion your learner deserves and connect with a volunteer to teach for free"
                 titleColor="!text-learner-dark"
             />
             <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">

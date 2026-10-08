@@ -286,7 +286,7 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                 ))
                                             ) : (
                                                 <div className="text-sm text-gray-500 font-medium border border-stroke-light text-center rounded-xl px-3 py-1.5 w-[267px]">
-                                                    No Schedules
+                                                    No schedules yet
                                                 </div>
                                             )}
                                         </div>

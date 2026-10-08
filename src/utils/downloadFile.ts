@@ -24,6 +24,6 @@ export async function downloadFile(endpoint: string, filename: string, mimeType:
         link.remove();
         window.URL.revokeObjectURL(objectUrl);
     } catch (error) {
-        showToast({ message: "Failed to download file", type: "error" });
+        showToast({ message: "Couldn't download the file. Please try again.", type: "error" });
     }
 }

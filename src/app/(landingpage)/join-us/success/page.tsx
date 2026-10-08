@@ -19,7 +19,7 @@ const JoinUsSuccessPage = () => {
                 // Role-neutral page: neutral icon instead of the volunteer-orange default.
                 iconBgColor="#EDEDED"
                 iconAccentColor="#121212"
-                description="Thank you for applying to join Melody Wings. We appreciate your interest and enthusiasm in becoming part of our community. Our team will review your application and get back to you soon. We look forward to connecting with you and exploring the possibilities ahead."
+                description="Thank you for applying to join MelodyWings. We appreciate your interest and enthusiasm in becoming part of our community. Our team will review your application and get back to you soon. We look forward to connecting with you and exploring the possibilities ahead."
             />
         </div>
     );

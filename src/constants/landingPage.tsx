@@ -83,7 +83,7 @@ export const volunteerData = [
     {
         icon: <SubjectIcon />,
         iconMobile: <SubjectIcon width={44} height={44} />,
-        title: "Choose the subject or skill you’d like to teach",
+        title: "Choose the subject or skill you'd like to teach",
     },
     {
         icon: <LearnerMatchIcon />,
@@ -93,7 +93,7 @@ export const volunteerData = [
     {
         icon: <LearnerScheduleIcon />,
         iconMobile: <LearnerScheduleIcon width={44} height={44} />,
-        title: "Schedule lessons that fit your availability",
+        title: "Schedule sessions that fit your availability",
     },
 ];
 
@@ -106,17 +106,17 @@ export const learnerData = [
     {
         icon: <ShareIcon />,
         iconMobile: <ShareIcon width={44} height={44} />,
-        title: "Share your learner’s learning needs and interests",
+        title: "Share your learner's learning needs and interests",
     },
     {
         icon: <MatchIcon />,
         iconMobile: <MatchIcon width={44} height={44} />,
-        title: "Get matched with a suitable tutor",
+        title: "Get matched with a suitable volunteer",
     },
     {
         icon: <ScheduleIcon />,
         iconMobile: <ScheduleIcon width={44} height={44} />,
-        title: "Schedule classes that fit your schedule",
+        title: "Schedule sessions that fit your availability",
     },
 ];
 
@@ -257,7 +257,7 @@ export const donateCardData = [
 export const testimonialsLearners: TestimonialData[] = [
     {
         category: "Learners",
-        quote: "My daughter usually finds change hard, so yoga felt like a big step. But the online setup gave her the comfort of home and clear, gentle guidance. The breathing exercises are now part of our evenings, and I’ve seen real progress in how she self-regulates. It’s been a wonderful shift for us.",
+        quote: "My daughter usually finds change hard, so yoga felt like a big step. But the online setup gave her the comfort of home and clear, gentle guidance. The breathing exercises are now part of our evenings, and I've seen real progress in how she self-regulates. It's been a wonderful shift for us.",
         author: "",
         role: "Parent of a 10-year-old autistic learner",
         image: TestimonialDummyImg,
@@ -318,6 +318,6 @@ export const meetOurTeamCardData: MeetOurTeamProps[] = [
     // {
     //     image: DummyProfile,
     //     name: "Nishaanth Krishnan",
-    //     role: "Secretary - Melody Wings"
+    //     role: "Secretary - MelodyWings"
     // }
 ]

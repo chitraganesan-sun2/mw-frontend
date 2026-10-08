@@ -58,7 +58,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
               }
             : {
                   href: "/volunteer",
-                  text: "Seek Volunteer",
+                  text: "Volunteers",
                   icon: <VolunteerIcon />,
               };
 
@@ -139,7 +139,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     <span className="text-[1.25rem] transition-all duration-300 text-black">
                         <SignOutIcon />
                     </span>
-                    <p className="!text-black transition-all duration-300 font-medium">Sign Out</p>
+                    <p className="!text-black transition-all duration-300 font-medium">Log Out</p>
                 </button>
             </div>
         </div>

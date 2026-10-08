@@ -6,9 +6,9 @@ export default function DonationHistorySection() {
     return (
         <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
             <div className="flex flex-col gap-2">
-                <p className="md:text-base text-[14px] font-medium">Your donation history</p>
+                <p className="md:text-base text-[14px] font-medium">Your Donation History</p>
                 <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
-                    See donations you&apos;ve made to MelodyWings while signed in to this account.
+                    See donations you&apos;ve made to MelodyWings while logged in to this account.
                 </p>
             </div>
             <Link

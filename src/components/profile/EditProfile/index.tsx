@@ -57,7 +57,7 @@ const EditProfileModal = ({
 
   type FormData = z.infer<typeof UserProfileFormSchema>;
 
-  const validateForm = () => isValid || showToast({ type: "error", message: "Fill required fields!" });
+  const validateForm = () => isValid || showToast({ type: "error", message: "Please fill in all required fields." });
 
   useEffect(() => {
     if (isOpen) reset(data);
@@ -78,7 +78,7 @@ const EditProfileModal = ({
         showToast({ message: "Profile not updated", type: "error" });
       }
     } catch (error) {
-      showToast({ message: "Something went wrong!", type: "error" });
+      showToast({ message: "Something went wrong.", type: "error" });
     } finally {
       setIsSubmitting(false);
     }

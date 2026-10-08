@@ -165,7 +165,7 @@ export function useScheduleSlots({
                 setRepeatFrequency(newRepeatFrequency);
             })
             .catch(() => {
-                showToast({ message: "Failed to load schedule", type: "error" });
+                showToast({ message: "Couldn't load your schedule. Please try again.", type: "error" });
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isActive]);
@@ -361,7 +361,7 @@ export function useScheduleSlots({
         if (res?.status === 201) {
             showToast({ message: "Schedule updated successfully", type: "success" });
         } else {
-            showToast({ message: "Failed to update schedule", type: "error" });
+            showToast({ message: "Couldn't update your schedule. Please try again.", type: "error" });
         }
         return res;
     };
@@ -376,7 +376,7 @@ export function useScheduleSlots({
         // A rejected save (e.g. the backend's overlap / one-hour validation) used to fail
         // silently - the request rejects before handleSave's own status check runs.
         error: (err) => {
-            showToast({ message: getApiErrorMessage(err, "Failed to update schedule"), type: "error" });
+            showToast({ message: getApiErrorMessage(err, "Couldn't update your schedule. Please try again."), type: "error" });
         },
     });
 

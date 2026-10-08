@@ -188,10 +188,10 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
                 onClaim?.();
                 return true;
             }
-            showToast({ message: "Failed to claim session", type: "error" });
+            showToast({ message: "Couldn't claim the session. Please try again.", type: "error" });
             return false;
         } catch {
-            showToast({ message: "Failed to claim session", type: "error" });
+            showToast({ message: "Couldn't claim the session. Please try again.", type: "error" });
             return false;
         } finally {
             setIsClaiming(false);

@@ -1,7 +1,7 @@
 export const alertModalConstants = {
-    title: "Alert!",
+    title: "Late Cancellation Notice",
     content:
-        "Canceling a scheduled session less than 6 hours in advance can impact your credibility as a volunteer. Please notify us at least 6 hours before the session if you need to reschedule or cancel.",
+        "Cancelling a scheduled session less than 6 hours in advance can affect your credibility as a volunteer. Please notify us at least 6 hours before the session if you need to reschedule or cancel.",
     placeholder: "Add notes here",
     rows: 6,
 };
@@ -9,10 +9,10 @@ export const alertModalConstants = {
 export const LearnerFeedbackFormConstants: FormField[] = [
     {
         name: "classDuration",
-        label: "How long was the class?",
+        label: "How long was the session?",
         inputType: "number",
         contentType: "number",
-        placeholder: "Enter the duration of the class",
+        placeholder: "Enter the duration of the session",
         sublabel: "(In hrs)",
         sublabelAlignment: "right",
         min: 0,
@@ -20,7 +20,7 @@ export const LearnerFeedbackFormConstants: FormField[] = [
     },
     {
         name: "rating",
-        label: "Focus/ Interest level of the student",
+        label: "Focus / interest level of the learner",
         inputType: "radio",
         variant: "rating",
         options: [

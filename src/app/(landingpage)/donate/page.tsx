@@ -421,7 +421,7 @@ const Donate = () => {
             })
             .catch((err) => {
                 console.error("Failed to create checkout session", err);
-                showToast({ type: "error", message: "Failed to process donation. Please try again." });
+                showToast({ type: "error", message: "Couldn't process your donation. Please try again." });
                 setIsSubmitting(false);
             })
             .finally(() => {
@@ -476,7 +476,7 @@ const Donate = () => {
                         Support Our Mission
                     </h1>
                     <p className="text-[14px] md:text-[20px] font-regular md:font-medium text-[#4F4F4F] md:max-w-[1068px] md:leading-[28.2px] tracking-tight mx-auto">
-                        At Melody Wings, we strive to provide opportunities for differently-abled
+                        At MelodyWings, we strive to provide opportunities for differently-abled
                         children to learn, grow, and unlock their potential. Your support helps us
                         sustain this mission and expand our reach to more learners in need.
                         Together, we can make a lasting impact.
@@ -646,7 +646,7 @@ const Donate = () => {
                                         onChange={(e) =>
                                             setCustomAmount(e.target.value.replace(/[^\d.]/g, ""))
                                         }
-                                        placeholder="Enter Amount here"
+                                        placeholder="Enter amount"
                                         suffix={<span className="text-[#121212]">$</span>}
                                         className={cn(
                                             "!h-[48px] !rounded-[12px] !border !border-[#E0E0E0] !bg-[#F4F7FB] min-w-[160px] w-[min(100%,280px)] md:w-[390px] flex-1 !px-3",
@@ -662,7 +662,7 @@ const Donate = () => {
 
                         <div className={sectionBox}>
                             <h3 className="text-[20px] font-medium text-[#121212] md:mb-6 mb-0">
-                                Personal details
+                                Personal Details
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                 <Input
@@ -673,7 +673,7 @@ const Donate = () => {
                                     required
                                     value={firstName}
                                     onChange={(v) => setFirstName(typeof v === "string" ? v : "")}
-                                    placeholder="Eg. John"
+                                    placeholder="e.g., John"
                                     rootClassName="w-full"
                                     inputClassName="w-full rounded-xl border-gray-200"
                                 />
@@ -685,7 +685,7 @@ const Donate = () => {
                                     required
                                     value={lastName}
                                     onChange={(v) => setLastName(typeof v === "string" ? v : "")}
-                                    placeholder="Eg. Doe"
+                                    placeholder="e.g., Doe"
                                     rootClassName="w-full"
                                     inputClassName="w-full rounded-xl border-gray-200"
                                 />
@@ -944,7 +944,7 @@ const Donate = () => {
                                             Cover processing fees
                                         </span>
                                         <p className="text-[12px] text-[#121212] -mt-1">
-                                            100% of your donation will go directly to Melody Wings when you
+                                            100% of your donation will go directly to MelodyWings when you
                                             cover fees.
                                         </p>
                                     </div>
@@ -958,7 +958,7 @@ const Donate = () => {
                                 label="Leave a message (Optional)"
                                 value={message}
                                 onChange={(v) => setMessage(typeof v === "string" ? v : "")}
-                                placeholder="Share why you are supporting Melody Wings."
+                                placeholder="Share why you are supporting MelodyWings."
                                 rows={4}
                                 rootClassName="w-full"
                                 inputClassName="w-full rounded-xl border-gray-200 !bg-background-input"

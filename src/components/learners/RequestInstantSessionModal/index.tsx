@@ -133,7 +133,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         };
         if (found.category || found.skill || found.level || found.details) {
             setErrors((e) => ({ ...e, ...found }));
-            showToast({ message: "Please complete the highlighted fields", type: "error" });
+            showToast({ message: "Please complete the highlighted fields.", type: "error" });
             return;
         }
         if (!date || !time) {
@@ -172,10 +172,10 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 onSuccess();
                 handleClose();
             } else {
-                showToast({ message: res.data?.detail || "Failed to create request", type: "error" });
+                showToast({ message: res.data?.detail || "Couldn't create your request. Please try again.", type: "error" });
             }
         } catch (error: any) {
-            showToast({ message: getApiErrorMessage(error, "An error occurred"), type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Something went wrong. Please try again."), type: "error" });
         } finally {
             setIsLoading(false);
         }

@@ -37,7 +37,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
         let message = "";
 
         if (!reportType) message = "Please select a reason for your report.";
-        if (reportType === "others" && !reportDescription) message = "Please, fill the report details";
+        if (reportType === "others" && !reportDescription) message = "Please enter the report details.";
         if (!postId) message = "Post ID is missing";
 
         if (message) {

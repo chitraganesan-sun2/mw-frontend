@@ -120,13 +120,13 @@ export const ResourceFormSchema = z.object({
             message: "Category selection is required",
         }),
     resource_notes: z
-        .string({ required_error: "Notes is required" })
-        .min(1, "Notes is required")
+        .string({ required_error: "Notes are required" })
+        .min(1, "Notes are required")
         .max(200, "Notes cannot exceed 200 characters"),
 
     curated_links: z.array(
         z.object({
-            title: z.string().min(4, "Title is required (Min 4 characters)"),
+            title: z.string().min(4, "Title must be at least 4 characters"),
             url: z.string()
                 .transform(url => url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`)
                 .refine(url => /^(https?:\/\/)([\w-]+\.)+[\w-]{2,}([\/?#].*)?$/.test(url), {

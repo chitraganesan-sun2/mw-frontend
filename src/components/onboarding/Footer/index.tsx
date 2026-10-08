@@ -109,7 +109,7 @@ const Footer = (props: Props) => {
                                 <Logo className="flex !flex-col" />
                             </Link>
                             <p className="text-gray-500 text-center text-sm">
-                                501c.3 | EIN:33-3734582
+                                501(c)(3) | EIN: 33-3734582
                             </p>
                             <p className="text-gray-400 text-center text-xs">
                                 &copy; {new Date().getFullYear()} MelodyWings
@@ -119,7 +119,7 @@ const Footer = (props: Props) => {
                         <div className="lg:hidden">{renderSocialLinks()}</div>
                         {/* Center - Terms of Use and Privacy Policy text */}
                         <p className="text-gray-500 text-center text-sm">
-                            Be sure to take a look at our Terms of Use
+                            Be sure to take a look at our Terms and Conditions
                             <br />
                             and Privacy Policy
                         </p>

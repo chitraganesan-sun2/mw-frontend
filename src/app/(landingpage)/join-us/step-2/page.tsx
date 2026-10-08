@@ -132,7 +132,7 @@ const JoinUsStep2Page = () => {
             router.push('/join-us/step-3');
             navigated = true;
         } catch (err: any) {
-            showToast({ type: 'error', message: err?.message || 'Something went wrong!' });
+            showToast({ type: 'error', message: err?.message || 'Something went wrong.' });
         } finally {
             if (!navigated) setLoading(false);
         }

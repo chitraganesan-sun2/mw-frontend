@@ -41,7 +41,7 @@ export default function DonationHistoryPage() {
                         href="/donate"
                         className="text-sm font-medium text-black underline-offset-2 hover:underline whitespace-nowrap"
                     >
-                        Donate again
+                        Donate Again
                     </Link>
                 </div>
 
@@ -87,7 +87,7 @@ export default function DonationHistoryPage() {
                 )}
 
                 <p className="text-xs text-gray-400 mt-6 text-center">
-                    Only donations made while signed in to this account appear here. Guest
+                    Only donations made while logged in to this account appear here. Guest
                     donations are still confirmed by email receipt.
                 </p>
             </div>

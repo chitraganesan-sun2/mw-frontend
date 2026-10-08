@@ -66,7 +66,7 @@ export function calculateVolunteerCompletion(data: any): { percentage: number; m
         { key: "volunteer_experience", label: "Experience" },
         { key: "volunteer_languages", label: "Languages" },
         { key: "volunteer_skills", label: "Skills" },
-        { key: "profile_picture", label: "Profile Photo" },
+        { key: "profile_picture", label: "Profile Picture" },
         { key: "profile_video", label: "Profile Video" },
         { key: "volunteer_higher_education", label: "Higher Education" },
     ];
@@ -104,8 +104,8 @@ export function calculateLearnerCompletion(data: any): { percentage: number; mis
         { value: personalInfo?.learner_date_of_birth, label: "Date of Birth" },
         { value: personalInfo?.learner_primary_language, label: "Primary Language" },
         { value: personalInfo?.learner_contact_details?.country, label: "Country" },
-        { value: personalInfo?.learner_contact_details?.timezone, label: "Timezone" },
-        { value: data?.profile_picture, label: "Profile Photo" },
+        { value: personalInfo?.learner_contact_details?.timezone, label: "Time Zone" },
+        { value: data?.profile_picture, label: "Profile Picture" },
         { value: data?.parent_info?.parent_first_name, label: "Guardian Info" },
         {
             value: [

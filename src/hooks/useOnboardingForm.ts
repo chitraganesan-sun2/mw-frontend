@@ -24,7 +24,7 @@ export const useOnboardingForm = (schema: any) => {
         fn: (data: z.infer<typeof schema>) =>
             PUT_API(endpoints.onboarding.update(role as "volunteer" | "learner"), { ...data, step: role === "volunteer" ? 5 : 6 }),
         success: () => {
-            showToast({ type: "success", message: "Form Submitted!" });
+            showToast({ type: "success", message: "Form submitted successfully." });
             setIsRedirecting(true);
             Cookies.set("onboarded_status", "verification_pending");
             router.push("/onboarding/verification");
@@ -33,7 +33,7 @@ export const useOnboardingForm = (schema: any) => {
             setDocumentId(null);
         },
         error: () => {
-            showToast({ type: "error", message: "Something went wrong!" });
+            showToast({ type: "error", message: "Something went wrong." });
         },
     });
 
@@ -42,7 +42,7 @@ export const useOnboardingForm = (schema: any) => {
             updateOnboarding(data);
         } catch (error) {
             console.error("Error submitting form:", error);
-            showToast({ type: "error", message: "Fill required Fields!" });
+            showToast({ type: "error", message: "Please fill in all required fields." });
             throw error;
         }
     };

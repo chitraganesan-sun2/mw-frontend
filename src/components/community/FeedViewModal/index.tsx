@@ -249,7 +249,7 @@ const FeedViewModal = ({
             apiCall: POST_API(endpoints.comment.createComment, payload),
             loadingMsg: "Posting Comment",
             successMsg: "Comment Posted Successfully",
-            errorMsg: "Failed to Post Comment",
+            errorMsg: "Couldn't post your comment. Please try again.",
         })
             .then(() => {
                 queryClient.invalidateQueries({ queryKey: ["get-post-comments", id] });

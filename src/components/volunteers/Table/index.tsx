@@ -42,7 +42,7 @@ const VolunteersTable: React.FC<VolunteersTableProps> = ({
             className: "!pl-7 px-6 py-4 text-sm w-1/3 font-medium text-gray-900",
         },
         {
-            title: "Classes Taken",
+            title: "Sessions Taken",
             dataIndex: "classesTaken",
             key: "classesTaken",
             sorter: (a: any, b: any) => a?.classesTaken - b?.classesTaken,

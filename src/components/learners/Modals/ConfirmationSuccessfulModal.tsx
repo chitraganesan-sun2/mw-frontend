@@ -231,7 +231,7 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
                             <VerifyTickIcon className="w-[26px] h-[26px]" />
-                            <h2 className="text-[20px] font-medium text-[#121212]">Confirmation Successfull</h2>
+                            <h2 className="text-[20px] font-medium text-[#121212]">Confirmation Successful</h2>
                         </div>
                         <button
                             type="button"
@@ -248,7 +248,7 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                             <div className="flex items-center">
                                 <VerifyTickIcon className="md:w-6 md:h-6 w-[26px] h-[26px]" />
                             </div>
-                            <h2 className="text-[20px] font-medium text-[#121212]">Confirmation Successfull</h2>
+                            <h2 className="text-[20px] font-medium text-[#121212]">Confirmation Successful</h2>
                         </div>
                     </div>
                 )

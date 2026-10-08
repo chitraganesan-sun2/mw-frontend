@@ -14,8 +14,8 @@ const ForVolunteer = () => {
         <ContainerWrapper id="for-volunteers" className="bg-white py-10 px-5">
             <ContainerHeader
                 title="For Volunteers"
-                subTitle="You’ll find more than a volunteer role—you’ll find a purpose that uplifts"
-                description="Have a passion for teach and helping others? Join our community where your efforts can make a world of difference!"
+                subTitle="You'll find more than a volunteer role—you'll find a purpose that uplifts"
+                description="Have a passion for teaching and helping others? Join our community where your efforts can make a world of difference!"
                 titleColor="!text-volunteer"
             />
 

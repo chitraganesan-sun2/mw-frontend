@@ -429,7 +429,7 @@ export default function InstantSessionsPage() {
                 identifier: session.id,
             });
         } catch (error) {
-            showToast({ message: "Failed to load session details", type: "error" });
+            showToast({ message: "Couldn't load the session details. Please try again.", type: "error" });
         } finally {
             setIsDetailLoading(false);
         }
@@ -483,7 +483,7 @@ export default function InstantSessionsPage() {
                 identifier: sessionId,
             });
         } catch (error) {
-            showToast({ message: "Failed to load session details", type: "error" });
+            showToast({ message: "Couldn't load the session details. Please try again.", type: "error" });
         } finally {
             setIsDetailLoading(false);
         }
@@ -497,7 +497,7 @@ export default function InstantSessionsPage() {
             invalidateScheduleViews(queryClient, "learner");
             showToast({ message: "Request cancelled successfully", type: "success" });
         } catch (e: any) {
-            showToast({ message: getApiErrorMessage(e, "Failed to cancel request"), type: "error" });
+            showToast({ message: getApiErrorMessage(e, "Couldn't cancel the request. Please try again."), type: "error" });
         } finally {
             setIsActionLoading(false);
         }
@@ -517,7 +517,7 @@ export default function InstantSessionsPage() {
             invalidateScheduleViews(queryClient, "learner");
             setSessionDetail(null);
         } catch (error: any) {
-            showToast({ message: getApiErrorMessage(error, "Failed to cancel session"), type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Couldn't cancel the session. Please try again."), type: "error" });
         } finally {
             setIsActionLoading(false);
         }

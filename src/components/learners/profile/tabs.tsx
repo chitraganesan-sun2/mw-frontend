@@ -55,7 +55,7 @@ export const ProfileDetails = ({ data }: { data: Learnerpersonalinfo }) => {
         { label: "Primary Language", value: formatString(data?.learner_primary_language) },
         { label: "Zip Code", value: contact_data?.zip_code },
         { label: "Country of Residence", value: formatString(contact_data?.country) },
-        { label: "Timezone", value: formatString(contact_data?.timezone) },
+        { label: "Time Zone", value: formatString(contact_data?.timezone) },
         { label: "UTC Offset", value: contact_data?.utc_offset },
     ].filter(item => item.value);
 
@@ -141,7 +141,7 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
                 { label: "Program or IEP or 504 Plan", value: data?.education?.program_iep_504_plan, fullWidth: true },
                 { label: "Cultural/Religious Considerations", value: data?.education?.cultural_religious_considerations, fullWidth: true },
                 { label: "Academic Strengths", value: data?.education?.academic_strengths?.map(formatString) },
-                { label: "Extracurriculars/ Non-Academic Skills", value: data?.education?.extracurricular_activities, fullWidth: true },
+                { label: "Extracurriculars / Non-Academic Skills", value: data?.education?.extracurricular_activities, fullWidth: true },
                 { label: "Favorite Free-Time Activities", value: data?.education?.favorite_free_time_activities, fullWidth: true },
             ],
         },
@@ -182,9 +182,9 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
 
 export const AdditionalInformation = ({ data }: { data: Additionalinfo }) => {
     const details = [
-        { label: "Cultural Consideration", value: data?.cultural_consideration ?? "" },
+        { label: "Cultural Considerations", value: data?.cultural_consideration ?? "" },
         { label: "Other Concerns or Requests", value: data?.other_concerns_or_requests ?? "" },
-        { label: "What Motivates to Learn", value: data?.what_motivates_to_learn ?? "" },
+        { label: "What Motivates Them to Learn", value: data?.what_motivates_to_learn ?? "" },
     ]
 
     return (

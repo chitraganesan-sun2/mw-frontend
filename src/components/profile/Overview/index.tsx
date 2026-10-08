@@ -64,8 +64,8 @@ const Overview = ({ data, reviewEndpoint }: any) => {
                 { Array.isArray(reviews?.feedbacks) && reviews?.feedbacks.map((item: any, index: number) => (
                     <RatingCard key={index} review={item?.comment} day={item?.created_at} profileImg={item?.author_profile_picture?.image_url} name={item?.author_name} rating={isLearner ? item?.learner_interest_level : item?.volunteer_commitment_level} />
                 ))}
-                { reviews?.feedbacks?.length === 0 && <div className="h-full flex-center">No Reviews Found</div> }
-                { isLoading && <div className="h-full flex-center">Loading Reviews...</div> }
+                { reviews?.feedbacks?.length === 0 && <div className="h-full flex-center">No reviews yet</div> }
+                { isLoading && <div className="h-full flex-center">Loading reviews...</div> }
             </div>
         </div>
     );

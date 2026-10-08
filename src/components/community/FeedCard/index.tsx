@@ -204,7 +204,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
             apiCall: POST_API(endpoints.comment.createComment, payload),
             loadingMsg: "Posting Comment",
             successMsg: "Comment Posted Successfully",
-            errorMsg: "Failed to Post Comment",
+            errorMsg: "Couldn't post your comment. Please try again.",
         })
             .then(() => {
                 queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab, debouncedSearchQuery] });
@@ -372,7 +372,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                 onClick={() => onClick(post.post_id)}
                                                 className="cursor-pointer text-primary font-medium bg-transparent border-0 p-0 inline"
                                             >
-                                                See More
+                                                See more
                                             </button>
                                         )}
                                     </p>
@@ -521,7 +521,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                 <PostSkeleton size={2} />
                             ) : (
                                 <div className="w-full text-center font-semibold text-success mt-4 px-5">
-                                    You’ve reached the end. No more posts to show!
+                                    You&apos;ve reached the end. No more posts to show!
                                 </div>
                             )}
                         </div>

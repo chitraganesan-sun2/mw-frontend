@@ -99,7 +99,7 @@ const ContactInput = (props: ContactInputProps) => {
                     name={`${props.name}_number`}
                     ariaLabel="Phone number"
                     inputType="text"
-                    placeholder="Enter Number Here"
+                    placeholder="Enter number"
                     className="!w-full !mb-0"
                     value={formData?.number || ""}
                     onChange={(e) => handleChange(e, "number")}

@@ -62,7 +62,7 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
 
             if (isSuccess) onClose();
         } catch (error) {
-            showToast({ type: "error", message: "Something went wrong!" });
+            showToast({ type: "error", message: "Something went wrong." });
         } finally {
             setIsSubmitting(false);
         }

@@ -41,7 +41,7 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
             }
         } catch (error: any) {
             toast.error(
-                getApiErrorMessage(error, "Failed to delete account. Please try again or contact support.")
+                getApiErrorMessage(error, "Couldn't delete your account. Please try again or contact support.")
             );
         } finally {
             setIsDeleting(false);

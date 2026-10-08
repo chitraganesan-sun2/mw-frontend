@@ -113,7 +113,7 @@ const JoinUsStep1Page = () => {
                     || responseData?.data?.id;
 
                 if (!newAppId) {
-                    showToast({ type: 'error', message: 'Application ID not returned. Check console.' });
+                    showToast({ type: 'error', message: "We couldn't start your application. Please try again." });
                     console.error("Step 1 POST Response:", res);
                     setLoading(false);
                     return;
@@ -131,7 +131,7 @@ const JoinUsStep1Page = () => {
                 router.push('/join-us/step-2');
             }
         } catch (err: any) {
-            showToast({ type: 'error', message: err?.message || 'Something went wrong!' });
+            showToast({ type: 'error', message: err?.message || 'Something went wrong.' });
         } finally {
             if (!navigated) setLoading(false);
         }
@@ -177,7 +177,7 @@ const JoinUsStep1Page = () => {
                                     value={fullName}
                                     error={fieldErrors.full_name}
                                     onChange={(v) => { clearError("full_name"); setFullName(typeof v === 'string' ? v : v?.[0] ?? ''); }}
-                                    placeholder="Eg. John Doe"
+                                    placeholder="e.g., John Doe"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
                                 />
@@ -191,7 +191,7 @@ const JoinUsStep1Page = () => {
                                     value={email}
                                     error={fieldErrors.email}
                                     onChange={(v: any) => { clearError("email"); setEmail(typeof v === 'string' ? v : v?.[0] ?? ''); }}
-                                    placeholder="Enter Email Address"
+                                    placeholder="Enter email address"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
                                 />
@@ -199,7 +199,7 @@ const JoinUsStep1Page = () => {
                                 {/* Phone */}
                                 <div className="flex flex-col gap-2 w-full min-w-0">
                                     <label className="text-[16px] md:text-sm  text-gray-700">
-                                        Phone No<span className="text-red-500"> *</span>
+                                        Phone Number<span className="text-red-500"> *</span>
                                     </label>
                                     <div className="flex gap-2 w-full min-w-0">
                                         <Input
@@ -217,7 +217,7 @@ const JoinUsStep1Page = () => {
                                             value={phoneNumber}
                                             error={fieldErrors.phone_number}
                                             onChange={(v) => { clearError("phone_number"); setPhoneNumber((typeof v === 'string' ? v : v?.[0] ?? '').replace(/\D/g, '')); }}
-                                            placeholder="Enter Phone number"
+                                            placeholder="Enter phone number"
                                             rootClassName="w-full flex-1 min-w-0 !mb-0"
                                             inputClassName="w-full !rounded-xl border-gray-200"
                                         />
@@ -298,7 +298,7 @@ const JoinUsStep1Page = () => {
                                     label="School / University"
                                     value={school}
                                     onChange={(v) => setSchool(typeof v === 'string' ? v : v?.[0] ?? '')}
-                                    placeholder="Enter School/University"
+                                    placeholder="Enter school or university"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
                                 />

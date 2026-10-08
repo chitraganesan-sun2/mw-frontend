@@ -25,7 +25,7 @@ export default function SessionExpiredNotice() {
         // Deferred: this mounts before the Toaster (inside QueryProvider) subscribes, and a
         // toast fired in that window never rendered.
         setTimeout(() => {
-            showToast({ type: "info", message: "You were signed out because your session expired. Please sign in again." });
+            showToast({ type: "info", message: "You were logged out because your session expired. Please log in again." });
             noticeScheduled = false;
         }, 500);
     }, []);

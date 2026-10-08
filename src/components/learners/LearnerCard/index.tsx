@@ -130,7 +130,7 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
                 <div className="flex-1">
                     <Button
                         onClick={handleScheduleMeeting}
-                        title="Schedule a session"
+                        title="Schedule a Session"
                         className="!rounded-xl !text-sm !w-full btn-primary-fill"
                     />
                 </div>

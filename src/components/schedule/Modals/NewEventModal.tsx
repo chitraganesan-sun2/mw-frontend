@@ -350,7 +350,7 @@ export default function NewEventModal({
         if (missing.category || missing.skill || missing.level || !formData.description?.trim()) {
             setFieldErrors(missing);
             if (!formData.description?.trim()) setDescriptionError("Please describe the session details and expectations.");
-            showToast({ message: "Please complete the highlighted fields", type: "error" });
+            showToast({ message: "Please complete the highlighted fields.", type: "error" });
             return;
         }
         if (!formData.duration || !formData.start_time) {
@@ -472,10 +472,10 @@ export default function NewEventModal({
                 setIsTimePickerOpen(false);
                 onClose();
             } else {
-                showToast({ message: "Failed to create instant session", type: "error" });
+                showToast({ message: "Couldn't create the instant session. Please try again.", type: "error" });
             }
         } catch (err) {
-            showToast({ message: getApiErrorMessage(err, "Failed to post instant session"), type: "error" });
+            showToast({ message: getApiErrorMessage(err, "Couldn't post the instant session. Please try again."), type: "error" });
         } finally {
             setIsSubmitting(false);
         }

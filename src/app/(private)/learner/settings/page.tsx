@@ -23,7 +23,7 @@ const SESSION_MATCH_OPTIONS = [
     },
     {
         value: "skills_to_learn",
-        label: "Sessions matched for exact skills / match by Sentiment Analysis",
+        label: "Sessions Matching What I Want to Learn",
         description:
             "Get an email only when a volunteer's session matches what you want to learn — exact matches plus closely related ones we detect automatically.",
     },

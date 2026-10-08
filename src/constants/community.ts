@@ -47,7 +47,7 @@ export const CommunityTabs = [
         route: null,
     },
     // {
-    //     name: "Suggested For You",
+    //     name: "Suggested for You",
     //     route: "suggested_for_you",
     // },
     {

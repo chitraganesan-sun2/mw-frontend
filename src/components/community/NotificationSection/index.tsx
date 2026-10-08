@@ -245,7 +245,7 @@ const NotificationSection: React.FC = () => {
             {isFetching ? (
                 <NotificationSkeleton size={10} />
             ) : (data?.pages[0]?.items?.length === 0) ? (
-                <div className="flex-center min-h-[50vh] w-full h-full">Notifications is Empty</div>
+                <div className="flex-center min-h-[50vh] w-full h-full">No notifications yet</div>
             ) : (
                 data?.pages.map((page, i) => (
                     <React.Fragment key={i}>

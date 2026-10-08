@@ -34,7 +34,7 @@ const VolunteerDetailsFields: FormField[] = [
         id: "volunteer_first_name",
         label: "First Name",
         inputType: "text",
-        placeholder: "Enter First Name",
+        placeholder: "Enter first name",
         gridCols: 1,
         required: true,
     },
@@ -42,13 +42,13 @@ const VolunteerDetailsFields: FormField[] = [
         id: "volunteer_last_name",
         label: "Last Name",
         inputType: "text",
-        placeholder: "Enter Last Name",
+        placeholder: "Enter last name",
         gridCols: 1,
         required: true,
     },
     {
         id: "volunteer_birth_date",
-        label: "Enter your birthday",
+        label: "Date of Birth",
         inputType: "birthdatepicker",
         placeholder: "DD/MM/YYYY",
         format: "DD-MM-YYYY",
@@ -74,9 +74,9 @@ const VolunteerDetailsFields: FormField[] = [
     {
         parent: "volunteer_contact_details",
         id: "email",
-        label: "Email address",
+        label: "Email Address",
         inputType: "text",
-        placeholder: "Enter Email ID",
+        placeholder: "Enter email address",
         gridCols: 1,
         disabled: true,
         required: true,
@@ -87,7 +87,7 @@ const VolunteerDetailsFields: FormField[] = [
         label: "Your contact number",
         sublabel: "(with country code)",
         inputType: "contact-input",
-        placeholder: "Enter Contact Number",
+        placeholder: "Enter contact number",
         sublabelAlignment: "right",
         gridCols: 1,
         disabled: false,
@@ -98,7 +98,7 @@ const VolunteerDetailsFields: FormField[] = [
         id: "zip_code",
         label: "Zip Code",
         inputType: "text",
-        placeholder: "Enter Zip Code",
+        placeholder: "Enter zip code",
         gridCols: 1,
         required: true,
     },
@@ -130,31 +130,31 @@ const VolunteerDetailsFields: FormField[] = [
 const ParentDetailsFields: FormField[] = [
     {
         id: "volunteer_parent_name",
-        label: "Parent Full Name",
+        label: "Guardian Full Name",
         inputType: "text",
-        placeholder: "Enter Parent FullName",
+        placeholder: "Enter guardian's full name",
         gridCols: 1,
     },
     {
         id: "volunteer_parent_email",
-        label: "Parent Email ID",
+        label: "Guardian Email Address",
         inputType: "text",
-        placeholder: "Enter Email ID",
+        placeholder: "Enter email address",
         gridCols: 1,
     },
     {
         id: "volunteer_parent_contact_number",
-        label: "Parent Contact Number",
+        label: "Guardian Contact Number",
         sublabel: "(with country code)",
         inputType: "contact-input",
-        placeholder: "Enter Contact Number",
+        placeholder: "Enter contact number",
         sublabelAlignment: "right",
         gridCols: 2,
     },
     {
         id: "consented_from_parent",
         label: "I'm a minor and I've consent from my parent or guardian to be a volunteer.",
-        sublabel: "(Parent/guardian details are required for minors, typically 18–21, depending on the U.S. state.)",
+        sublabel: "(Guardian details are required for minors. The age of majority is typically 18–21, depending on the U.S. state.)",
         inputType: "checkbox",
         gridCols: 2,
         inputClassName: "max-md:text-sm w-fit",
@@ -199,14 +199,14 @@ const EducationWorkExperienceFields: FormField[] = [
     },
     {
         id: "volunteer_experience",
-        label: "Prior Volunteer Experience",
+        label: "Previous Volunteer Experience",
         inputType: "text",
         placeholder: "Describe your volunteer work here",
         gridCols: 1,
     },
     {
         id: "volunteer_favorite_activities",
-        label: "Favorite Free Time Activities",
+        label: "Favorite Free-Time Activities",
         inputType: "textarea",
         placeholder: "Enter here",
         gridCols: 2,
@@ -215,7 +215,7 @@ const EducationWorkExperienceFields: FormField[] = [
 ];
 
 // "Profile Details" tab - new identity, repurposing the name after the old "Profile
-// Details" tab above is renamed to "Volunteer Info". Holds "Skills to teach Learners".
+// Details" tab above is renamed to "Volunteer Info". Holds "Skills to Teach Learners".
 const SkillsToTeachFields: FormField[] = [
     {
         id: "volunteer_languages",
@@ -264,7 +264,7 @@ const SkillsToTeachFields: FormField[] = [
     },
     {
         id: "volunteer_skills",
-        label: "Arts & Life Skills you're interested in teaching",
+        label: "Arts & Life Skills You're Interested in Teaching",
         inputType: "async-select",
         placeholder: "Don't see your option? Type it in to add.",
         creatable: true,
@@ -458,7 +458,7 @@ const OtherConsentsDetailsFields: FormField[] = [
     },
     {
         id: "agree_to_follow_organization_policies",
-        label: "Do you agree to follow the organization’s policies on confidentiality, behavior, and safeguarding procedures?",
+        label: "Do you agree to follow the organization's policies on confidentiality, behavior, and safeguarding procedures?",
         inputType: "radio",
         options: [
             { label: "Yes", value: true },
@@ -530,7 +530,7 @@ export const VolunteerFormSections: FormSectionConfig[] = [
             },
             {
                 parent: null,
-                title: "Parent Details",
+                title: "Guardian Details",
                 fields: ParentDetailsFields,
             },
             {
@@ -547,7 +547,7 @@ export const VolunteerFormSections: FormSectionConfig[] = [
         fields: [
             {
                 parent: null,
-                title: "Skills to teach Learners",
+                title: "Skills to Teach Learners",
                 fields: SkillsToTeachFields,
             },
         ],

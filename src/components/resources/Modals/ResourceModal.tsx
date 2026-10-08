@@ -201,7 +201,7 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
                 showToast({ message: errorMessage, type: "error" });
             }
         } catch (error) {
-            showToast({ message: "Something went wrong!", type: "error" });
+            showToast({ message: "Something went wrong.", type: "error" });
         } finally {
             setIsSubmitting(false);
         }

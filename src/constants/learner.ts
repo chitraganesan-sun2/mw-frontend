@@ -9,7 +9,7 @@ export const LEARNER_MIN_AGE = 5;
 export const LearnerOnboardingConstants = {
     title: "Enroll a learner",
     description:
-        "Thank you for your interest in joining MelodyWings. Fill out the form below and we'll get you a good fit.",
+        "Thank you for your interest in joining MelodyWings. Fill out the form below and we'll find the right fit for you.",
 };
 
 // Parent/Guardian Information Fields
@@ -18,14 +18,14 @@ const ParentGuardianFields: FormField[] = [
         id: "parent_first_name",
         label: "First Name",
         inputType: "text",
-        placeholder: "Enter First Name",
+        placeholder: "Enter first name",
         gridCols: 1,
     },
     {
         id: "parent_last_name",
         label: "Last Name",
         inputType: "text",
-        placeholder: "Enter Last Name",
+        placeholder: "Enter last name",
         gridCols: 1,
     },
     {
@@ -63,14 +63,14 @@ const ParentGuardianFields: FormField[] = [
     },
     {
         id: "parent_email",
-        label: "Email address",
+        label: "Email Address",
         inputType: "text",
         placeholder: "abc@example.com",
         gridCols: 1,
     },
     {
         id: "parent_contact_number",
-        label: "Guardian contact number",
+        label: "Guardian Contact Number",
         sublabel: "(with country code)",
         inputType: "contact-input",
         placeholder: "Enter contact number",
@@ -94,7 +94,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "learner_first_name",
         label: "First Name",
         inputType: "text",
-        placeholder: "Enter First Name",
+        placeholder: "Enter first name",
         gridCols: 1,
         required: true,
     },
@@ -102,7 +102,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "learner_last_name",
         label: "Last Name",
         inputType: "text",
-        placeholder: "Enter Last Name",
+        placeholder: "Enter last name",
         gridCols: 1,
         required: true,
     },
@@ -160,7 +160,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "email",
         label: "Email Address",
         inputType: "text",
-        placeholder: "Enter email",
+        placeholder: "Enter email address",
         gridCols: 1,
         required: true,
     },
@@ -179,7 +179,7 @@ const LearnerPersonalFields: FormField[] = [
         id: "zip_code",
         label: "Zip Code",
         inputType: "text",
-        placeholder: "Enter Zip Code",
+        placeholder: "Enter zip code",
         gridCols: 1,
         required: true,
     },
@@ -338,7 +338,7 @@ const EducationAndHobbiesFields: FormField[] = [
     },
     {
         id: "extracurricular_activities",
-        label: "Extracurriculars/ Non-Academic Skills",
+        label: "Extracurriculars / Non-Academic Skills",
         sublabel: "(current or past participation)",
         inputType: "text",
         placeholder: "Enter here",
@@ -347,7 +347,7 @@ const EducationAndHobbiesFields: FormField[] = [
     {
         id: "favorite_free_time_activities",
         label: "Favorite Free-Time Activities",
-        sublabel: "(Eg., music, sports - any activity that motivates the learner)",
+        sublabel: "(e.g., music, sports - any activity that motivates the learner)",
         inputType: "textarea",
         placeholder: "Enter here",
         gridCols: 2,
@@ -451,7 +451,7 @@ export const LearnerFormSections: FormSectionConfig[] = [
         type: "card",
     },
     {
-        title: "Profile Pic",
+        title: "Profile Picture",
         parent: null,
         fields: [
             {

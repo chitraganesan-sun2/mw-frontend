@@ -61,15 +61,15 @@ const ProfileHeader = ({
         <div className="flex items-center gap-2">
             <Button
                 onClick={onScheduleMeeting}
-                title="Schedule a session"
+                title="Schedule a Session"
                 className="text-sm btn-primary-fill"
             />
             <button
                 type="button"
                 onClick={onStartChat}
                 disabled={chatDisabled}
-                aria-label="Start chat"
-                title="Start chat"
+                aria-label="Start Chat"
+                title="Start Chat"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stroke text-black transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-black"
             >
                 <MessageIcon />
@@ -303,7 +303,7 @@ const OverviewContent = ({
         },
         {
             type: "description" as const,
-            title: "Favorite Free Time Activities",
+            title: "Favorite Free-Time Activities",
             description: volunteerData?.volunteer_favorite_activities,
         },
         {
@@ -420,7 +420,7 @@ const ReviewsContent = ({ volunteerFeedback }: { volunteerFeedback: any }) => {
                         <div className="flex justify-between">
                             <p className="text-base font-semibold md:hidden">Reviews</p>
                             <p className="text-gray text-sm">
-                                Sort By: <span className="text-black">Recently added</span>
+                                Sort by: <span className="text-black">Recently added</span>
                             </p>
                         </div>
                         <div className="flex flex-col gap-5 divide-y">

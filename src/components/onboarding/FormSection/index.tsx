@@ -142,7 +142,7 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
     return (
         <div>
             {(isUserLoading || !role) && (
-                <ModalLoader isLoading={true} title="Fetching user details..." />
+                <ModalLoader isLoading={true} title="Loading your details..." />
             )}
             {isRedirecting && <ModalLoader isLoading={isRedirecting} title="Loading..." />}
             <FormTabs

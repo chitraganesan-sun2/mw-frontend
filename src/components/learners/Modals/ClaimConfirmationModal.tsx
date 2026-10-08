@@ -164,11 +164,11 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
                 // Modal already closed by ConfirmationSuccessfulModal, just ensure state is updated
                 setIsSuccessModalOpen(false);
             } else {
-                showToast({ message: "Failed to unclaim session", type: "error" });
+                showToast({ message: "Couldn't unclaim the session. Please try again.", type: "error" });
             }
         } catch (error) {
             console.error("Error unclaiming session:", error);
-            showToast({ message: "Failed to unclaim session", type: "error" });
+            showToast({ message: "Couldn't unclaim the session. Please try again.", type: "error" });
         } finally {
             // Hide loader after all API calls complete
             onClaimLoadingChange?.(false);

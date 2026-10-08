@@ -24,7 +24,7 @@ const SESSION_MATCH_OPTIONS = [
     },
     {
         value: "skills_to_learn",
-        label: "Sessions matched for exact skills / match by Sentiment Analysis",
+        label: "Sessions Matching My Skills",
         description:
             "Receive email notifications when a learner posts an instant session that matches either the exact skills posted or the broader skill match identified through sentiment analysis.",
     },

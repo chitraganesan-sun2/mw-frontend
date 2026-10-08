@@ -32,7 +32,7 @@ interface ResourcesPageWrapperProps {
 
 const TabData = [
     { id: "topics", label: "Topics" },
-    { id: "suggested", label: "Suggested for you" },
+    { id: "suggested", label: "Suggested for You" },
 ];
 
 export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperProps) {
