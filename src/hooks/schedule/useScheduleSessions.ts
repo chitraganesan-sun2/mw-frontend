@@ -34,6 +34,13 @@ export interface ScheduleSession {
     session_date?: string;
     session_start_time?: string;
     session_end_time?: string;
+    /** This session is a pending request to move the session with this id. */
+    reschedules_session_id?: string | null;
+    /** This accepted session already has a reschedule request waiting for an answer. */
+    reschedule_pending?: boolean | null;
+    /** Participants' profile time zone labels (e.g. "PST - Pacific Standard Time (UTC-08:00)"). */
+    learner_timezone?: string | null;
+    volunteer_timezone?: string | null;
 }
 
 export const scheduleSessionsKey = (role: ScheduleRole, when: "upcoming" | "past") =>

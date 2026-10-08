@@ -64,7 +64,15 @@ function CompactSessionRow({
     return (
         <li className={`flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm ${showRespond ? "border-l-4 border-l-amber-400 bg-amber-50/40" : ""}`}>
             <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{session.session_title || "Session"}</p>
+                <p className="truncate font-medium">
+                    {session.session_title || "Session"}
+                    {session.status === "pending" && session.reschedules_session_id && (
+                        <span className="ml-2 text-xs font-semibold text-amber-700"> · New time requested</span>
+                    )}
+                    {session.status === "accepted" && session.reschedule_pending && (
+                        <span className="ml-2 text-xs font-semibold text-amber-700"> · Reschedule requested</span>
+                    )}
+                </p>
                 <p className="text-xs text-gray-600">
                     {formatShortSessionDate(session.volunteer_start_date)} ·{" "}
                     {formatSessionTime(session.volunteer_start_time)}

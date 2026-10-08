@@ -96,6 +96,12 @@ export default function AddNewMeetingModalVolunteer({
     const today = useProfileToday("volunteer");
     const searchParams = useSearchParams();
     const learnerId = searchParams.get("learnerId");
+    // ?reschedule=<session id>: ask the learner to move that accepted session to a new time.
+    const rescheduleId = searchParams.get("reschedule");
+    const [rescheduleSource, setRescheduleSource] = useState<{
+        academic: string[];
+        nonAcademic: string[];
+    } | null>(null);
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [slotError, setSlotError] = useState<string>("");
     const [fetchingSlots, setFetchingSlots] = useState<boolean>(false);
@@ -117,6 +123,29 @@ export default function AddNewMeetingModalVolunteer({
     const { academic: ownAcademic, nonAcademic: ownArts } = skillOptionsByCategory(ownProfile);
     const hasSkillOptions = ownAcademic.length > 0 || ownArts.length > 0;
     const pickedSkillName = formData.academic_skills?.[0] || formData.non_academic_skills?.[0] || "";
+
+    // Reschedule: carry over what the original session was about (title, details, skill).
+    useEffect(() => {
+        if (!isOpen || !rescheduleId) return;
+        let cancelled = false;
+        GET_API(endpoints.session.getSessionDetail(rescheduleId))
+            .then(({ data }: any) => {
+                if (cancelled || !data) return;
+                setRescheduleSource({
+                    academic: data.academic_skills || [],
+                    nonAcademic: data.non_academic_skills || [],
+                });
+                setFormData((prev) => ({
+                    ...prev,
+                    title_of_the_meeting: data.session_title || prev.title_of_the_meeting,
+                    description: data.session_description || prev.description,
+                }));
+            })
+            .catch(() => showToast({ message: "Couldn't load the session to reschedule.", type: "error" }));
+        return () => {
+            cancelled = true;
+        };
+    }, [isOpen, rescheduleId]);
 
     // Deep link (?learnerId=): preselect that learner, label included.
     useEffect(() => {
@@ -251,7 +280,7 @@ export default function AddNewMeetingModalVolunteer({
     };
 
     const validateForm = (): boolean => {
-        const skillProblems = hasSkillOptions
+        const skillProblems = hasSkillOptions && !rescheduleId
             ? {
                   category: category ? undefined : "Please choose a category.",
                   skill: pickedSkillName ? undefined : "Please choose a skill.",
@@ -289,6 +318,7 @@ export default function AddNewMeetingModalVolunteer({
         setSkillErrors({});
         setErrors({});
         setSlotError("");
+        setRescheduleSource(null);
     };
     const handleClose = () => {
         resetForm();
@@ -304,8 +334,9 @@ export default function AddNewMeetingModalVolunteer({
             session_end_time: formData.end_time,
             session_title: formData.title_of_the_meeting,
             session_description: formData.description,
-            academic_skills: formData.academic_skills || [],
-            non_academic_skills: formData.non_academic_skills || [],
+            academic_skills: rescheduleId ? rescheduleSource?.academic || [] : formData.academic_skills || [],
+            non_academic_skills: rescheduleId ? rescheduleSource?.nonAcademic || [] : formData.non_academic_skills || [],
+            ...(rescheduleId ? { reschedules_session_id: rescheduleId } : {}),
         };
         return await POST_API(endpoints.session.bookVolunteerInitiatedSession, payload);
     };
@@ -317,7 +348,7 @@ export default function AddNewMeetingModalVolunteer({
             handleClose();
             // It's a request the learner still has to accept, not a scheduled meeting.
             showToast({
-                message: "Session request sent",
+                message: rescheduleId ? "Reschedule request sent" : "Session request sent",
                 type: "success",
             });
         },
@@ -325,7 +356,12 @@ export default function AddNewMeetingModalVolunteer({
             // Previously empty: a conflict / double-booking rejection from the backend
             // left the modal open with no indication anything went wrong.
             showToast({
-                message: getApiErrorMessage(err, "Couldn't send the session request. Please try again."),
+                message: getApiErrorMessage(
+                    err,
+                    rescheduleId
+                        ? "Couldn't send the reschedule request. Please try again."
+                        : "Couldn't send the session request. Please try again."
+                ),
                 type: "error",
             });
         },
@@ -400,7 +436,7 @@ export default function AddNewMeetingModalVolunteer({
     const isMobileScreen = InnerWidth() < 768;
 
     const COUNTERPART_FIELD = "select_learner";
-    const skillFields = hasSkillOptions && (
+    const skillFields = hasSkillOptions && !rescheduleId && (
         <>
             <CategoryField
                 value={category}
@@ -444,8 +480,8 @@ export default function AddNewMeetingModalVolunteer({
     if (!isOpen) return null;
     return (
         <SideModal
-            title="Add New Session"
-            saveButtonText="Send Request"
+            title={rescheduleId ? "Reschedule Session" : "Add New Session"}
+            saveButtonText={rescheduleId ? "Send New Time" : "Send Request"}
             onClose={handleClose}
             isOpen={isOpen}
             onSave={handleSubmit}
@@ -454,6 +490,11 @@ export default function AddNewMeetingModalVolunteer({
             modalWidth={isMobileScreen ? 600 : 400}
         >
             <div className="flex flex-col max-lg:gap-3 px-5 mt-7">
+                {rescheduleId && (
+                    <p className="mb-3 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900">
+                        Pick a new time with {learnerOption?.label || "the learner"}. Your current session stays booked until the new time is accepted.
+                    </p>
+                )}
                 {VolunteerScheduleModalConstants.map((field: any) => {
                     const availableDaysForField =
                         field.name === "select_date" ? ownAvailableDays : undefined;

@@ -41,6 +41,8 @@ interface NotificationCardProps {
         learner_end_time: string;
         learner_start_date: string;
         is_read?: boolean;
+        /** Set when this request asks to move an already accepted session to a new time. */
+        reschedules_session_id?: string | null;
         academic_skills?: string[];
         non_academic_skills?: string[];
     };
@@ -118,7 +120,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                 </div>
                 <p className="font-normal">
                     <span className="font-semibold">{otherPartyName}</span>{" "}
-                    requested a session
+                    {data?.reschedules_session_id ? "asked to move your session to a new time" : "requested a session"}
                 </p>
             </div>
             <div className="flex gap-2 items-center justify-between">

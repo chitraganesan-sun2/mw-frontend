@@ -4,6 +4,7 @@ import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import ScheduleSessionCard, { isAwaitingMyResponse } from "./ScheduleSessionCard";
 import {
@@ -91,6 +92,18 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const [activeTab, setActiveTab] = useState<ScheduleTab>("posted");
     const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
     const tabRefs = useRef<Record<ScheduleTab, HTMLButtonElement | null>>({ posted: null, accepted: null, direct: null });
+
+    const router = useRouter();
+    // Reschedule = the booking form in "reschedule" mode: same person, new time.
+    const startReschedule = (session: ScheduleSession) => {
+        const counterpartId = role === "learner" ? session.volunteer_id : session.learner_id;
+        if (!counterpartId) return;
+        const modal = role === "learner" ? "add_new_meeting" : "add_new_session";
+        const counterpartParam = role === "learner" ? "volunteerId" : "learnerId";
+        router.push(
+            `/${role}/schedule?modal=${modal}&reschedule=${encodeURIComponent(session.session_id)}&${counterpartParam}=${encodeURIComponent(counterpartId)}`
+        );
+    };
 
     const openApprovals = useApprovalDrawer((state) => state.open);
     // Re-evaluated every minute so Join appears/disappears without a reload.
@@ -248,6 +261,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                             timeZoneLabel={timeZoneLabel}
                                             onOpenProfile={onOpenProfile}
                                             onRespond={openApprovals}
+                                            onReschedule={when === "upcoming" ? startReschedule : undefined}
                                             now={now}
                                         />
                                     ))}

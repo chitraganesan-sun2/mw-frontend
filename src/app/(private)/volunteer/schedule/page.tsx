@@ -141,7 +141,7 @@ export default function SchedulePage() {
                 }
             />
             <LearnerViewModal
-                isOpen={!!learnerId && modal !== "add_new_meeting"}
+                isOpen={!!learnerId && modal !== "add_new_meeting" && modal !== "add_new_session"}
                 onClose={() => {
                     setLearnerId(null);
                     setModal(null);

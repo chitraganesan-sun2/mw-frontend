@@ -31,6 +31,8 @@ interface ScheduleSessionCardProps {
     onOpenProfile?: (userId: string) => void;
     /** Opens the Approval drawer - shown on pending sessions awaiting the viewer's answer. */
     onRespond?: () => void;
+    /** Asks the other person to move this accepted session to a new time. */
+    onReschedule?: (session: ScheduleSession) => void;
     now?: dayjs.Dayjs;
 }
 
@@ -67,6 +69,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     timeZoneLabel,
     onOpenProfile,
     onRespond,
+    onReschedule,
     now = dayjs(),
 }) => {
     const { date, start, end } = localTimes(session, role);
@@ -86,6 +89,13 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     const timeRange = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
     const awaitingMe = isAwaitingMyResponse(session, role);
     const showRespond = Boolean(onRespond) && awaitingMe;
+    // Only an accepted session that hasn't started can be moved, one request at a time.
+    const canReschedule =
+        Boolean(onReschedule) &&
+        session.status === "accepted" &&
+        !session.reschedule_pending &&
+        Boolean(bounds && bounds.start.isAfter(now));
+    const isRescheduleRequest = session.status === "pending" && Boolean(session.reschedules_session_id);
     // A request nobody answered before its time passed is "Expired", not still "Pending".
     const statusKey = session.status === "pending" && bounds && !bounds.end.isAfter(now) ? "expired" : session.status;
     const showDescription =
@@ -135,6 +145,15 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
 
             {subjects && <p className="text-xs text-gray-600">{subjects}</p>}
 
+            {isRescheduleRequest && (
+                <p className="text-xs font-medium text-amber-700">
+                    New time requested – your current session stays until it&apos;s accepted
+                </p>
+            )}
+            {session.status === "accepted" && session.reschedule_pending && (
+                <p className="text-xs font-medium text-amber-700">Reschedule requested – waiting for an answer</p>
+            )}
+
             {showDescription && (
                 <p className="text-xs text-gray-600 line-clamp-2 break-words">{session.session_description}</p>
             )}
@@ -145,8 +164,18 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 </p>
             )}
 
-            {(joinStatus !== "none" || showRespond || (!isNativePlatform() && session.status === "accepted")) && (
+            {(joinStatus !== "none" || showRespond || canReschedule || (!isNativePlatform() && session.status === "accepted")) && (
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pt-0.5">
+                    {canReschedule && (
+                        <button
+                            type="button"
+                            onClick={() => onReschedule?.(session)}
+                            aria-label={`Ask to reschedule ${session.session_title || "this session"}`}
+                            className="text-xs font-medium text-gray-600 underline-offset-2 hover:underline hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
+                        >
+                            Reschedule
+                        </button>
+                    )}
                     {!isNativePlatform() && session.status === "accepted" && (
                         <button
                             type="button"
