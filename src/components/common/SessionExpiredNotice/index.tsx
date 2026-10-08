@@ -18,14 +18,21 @@ let noticeScheduled = false;
 export default function SessionExpiredNotice() {
     useEffect(() => {
         const url = new URL(window.location.href);
-        if (noticeScheduled || url.searchParams.get("session") !== "expired") return;
+        const expired = url.searchParams.get("session") === "expired";
+        const deleted = url.searchParams.get("account") === "deleted";
+        if (noticeScheduled || (!expired && !deleted)) return;
         noticeScheduled = true;
         url.searchParams.delete("session");
+        url.searchParams.delete("account");
         window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
         // Deferred: this mounts before the Toaster (inside QueryProvider) subscribes, and a
         // toast fired in that window never rendered.
         setTimeout(() => {
-            showToast({ type: "info", message: "You were logged out because your session expired. Please log in again." });
+            showToast(
+                deleted
+                    ? { type: "success", message: "Your account has been deleted." }
+                    : { type: "info", message: "You were logged out because your session expired. Please log in again." }
+            );
             noticeScheduled = false;
         }, 500);
     }, []);

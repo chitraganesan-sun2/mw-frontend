@@ -4,10 +4,8 @@ import { DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useState } from "react";
 import { Modal } from "antd";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
-import { isNativePlatform } from "@/utils/platform";
 import toast from "react-hot-toast";
+import { clearCookies } from "@/utils/auth";
 import { getApiErrorMessage } from "@/utils/apiError";
 
 interface DeleteAccountSectionProps {
@@ -19,7 +17,6 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [confirmText, setConfirmText] = useState("");
-    const router = useRouter();
 
     const handleDeleteAccount = async () => {
         if (confirmText !== "DELETE") return;
@@ -27,18 +24,13 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
         setIsDeleting(true);
         try {
             await DELETE_API(endpoints.user.deleteAccount);
-            // Clear all cookies
-            const allCookies = Cookies.get();
-            Object.keys(allCookies).forEach((cookieName) => {
-                Cookies.remove(cookieName);
-            });
-            toast.success("Your account has been deleted successfully.");
-            // Redirect to home
-            if (isNativePlatform()) {
-                router.replace("/");
-            } else {
-                window.location.href = "/";
-            }
+            // Same cleanup as a normal log out: the auth cookies AND the stored auth backup /
+            // persisted store, which the old cookie-only loop left behind on the device. Then a
+            // full page load (also in the mobile app) so the deleted user's cached profile and
+            // messages don't stay in memory. The page reload would swallow a toast, so the
+            // confirmation is shown on arrival (see SessionExpiredNotice, ?account=deleted).
+            clearCookies();
+            window.location.href = "/?account=deleted";
         } catch (error: any) {
             toast.error(
                 getApiErrorMessage(error, "Couldn't delete your account. Please try again or contact support.")
