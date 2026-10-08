@@ -58,11 +58,7 @@ const Header = () => {
         setIsSideNavBarOpen(!isSideNavBarOpen);
     };
 
-    // Learner / Volunteer entries jump to their home-page sections and carry the role
-    // colour (blue = Learner, orange = Volunteer) everywhere they appear.
     const links: { title: string; link: string; className?: string }[] = [
-        { title: "For Learners", link: "/#for-learners", className: "text-learner-dark" },
-        { title: "For Volunteers", link: "/#for-volunteers", className: "text-volunteer-dark" },
         { title: "Donate", link: "/donate" },
         { title: "About Us", link: "/about-us" },
         // { title: "Blogs", link: "/blogs" },

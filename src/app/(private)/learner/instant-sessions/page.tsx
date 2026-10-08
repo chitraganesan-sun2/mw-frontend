@@ -623,15 +623,9 @@ export default function InstantSessionsPage() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
                             No Requested Sessions
                         </h3>
-                        <p className="text-sm text-gray-500 mb-6">
+                        <p className="text-sm text-gray-500">
                             Requests you send will show up here
                         </p>
-                        <button
-                            onClick={() => setIsRequestModalOpen(true)}
-                            className="btn-primary-fill px-6 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
-                        >
-                            Request a Session
-                        </button>
                     </div>
                 )}
             </div>
