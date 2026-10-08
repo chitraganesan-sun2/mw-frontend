@@ -54,6 +54,18 @@ export const sectionsData = [
                 content: [
                     "We are currently using third-party payment processors such as PayPal, Stripe, Google Pay, Razorpay, and Paddle to collect and store the financial information you share with us for payment processing. However, we will update this Privacy Policy when we start using and storing such information."
                 ]
+            },
+            {
+                title: "b) Mobile App Information.",
+                content: [
+                    "When you use our Android app, we also collect (i) device and app identifiers, namely a push-notification registration token (Firebase Cloud Messaging) and a Firebase installation ID, so that we can send you notifications about sessions, messages, and matches. You can turn push notifications off in Settings or in your device settings; and (ii) crash reports and diagnostic information, such as your device model, operating system version, app version, and the technical details of an error, which are collected by our service provider Sentry so that we can find and fix problems. This information is not used for advertising. Product analytics through PostHog are used on our Website only, not in the mobile app."
+                ]
+            },
+            {
+                title: "c) Disability and Special Educational Needs Information.",
+                content: [
+                    "Learners (or their parents or guardians) may choose to provide information about disabilities or special educational needs. Providing it is optional. We use it to match learners with suitable volunteers and so that volunteers can prepare for sessions, and it may be shown to the volunteers a learner is matched with or has sessions with. We do not sell this information or use it for advertising."
+                ]
             }
         ]
     },

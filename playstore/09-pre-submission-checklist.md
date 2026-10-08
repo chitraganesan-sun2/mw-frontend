@@ -68,7 +68,8 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
 - [x] `AndroidManifest.xml`: `usesCleartextTraffic="false"` + `network_security_config.xml`.
 - [x] `build.gradle` release: `minifyEnabled`, `shrinkResources`, ProGuard rules, release `signingConfig`.
 - [x] `.env.mobile` `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` no longer the placeholder. *(done 2026-09-08)*
-- [x] `versionCode` / `versionName` correct for this upload (`06`). *(2026-09-21:
+- [x] `versionCode` / `versionName` correct for this upload (`06`). *(**2026-10-08: versionCode
+      5 / 1.3.0, uploaded to Internal testing.** Earlier entry, 2026-09-21:
       versionCode **3**, versionName **1.1.0**, and `.env.mobile`'s
       `NEXT_PUBLIC_CURRENT_VERSION=1.1.0` matches. versionCode 2 (1.0.1) was cut for the
       AD_ID fix; 3 is above both, and Play allows gaps as long as it increases.)*
@@ -88,8 +89,12 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
       `feature-graphic-1024x500.png` — and `playstore/screenshots/` (7 phone shots).
       Uploading them in the Console is still a manual step.)*
 - [ ] Privacy policy URL live at `https://melodywings.org/privacy-policy` and covers
-      everything in the Data safety form — `10`.
-- [ ] Data safety form submitted — `03`.
+      everything in the Data safety form — `10`. *(URL returns 200 as of 2026-10-08; mobile-app
+      and special-needs sections added in the repo, live after the next frontend deploy.)*
+- [ ] Data safety form submitted — `03`. *(**Use the corrected `03` (2026-10-08):** crash
+      logs + diagnostics = Yes (Sentry), no Firebase Analytics, no advertising ID. In the
+      "Advertising ID" declaration answer **No** — the AAB contains no AD_ID permission, only
+      the inert `ACCESS_ADSERVICES_*` ones pulled in by Firebase libs.)*
 - [ ] Content rating (IARC) questionnaire submitted — `04`.
 - [ ] App access: reviewer credentials/instructions provided — `07`.
 - [ ] Target audience = 13+, not "Designed for Families" — `05`.

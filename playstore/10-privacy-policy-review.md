@@ -37,13 +37,21 @@ actual live infra (no repo/deploy config references `render.com` anywhere) and c
 must ship `melody-wings-frontend/main` so `melodywings.org/privacy-policy` reflects it before
 submission (see the sign-off checklist below).
 
-### 2. Device identifiers / push tokens
+### 2. Device identifiers / push tokens — ✅ added 2026-10-08
+New policy sub-section "INFORMATION WE COLLECT → b) Mobile App Information" names the FCM
+registration token, the Firebase installation ID and Sentry crash/diagnostic data. (Original
+checklist text kept below for reference.)
+
 Confirm the "INFORMATION WE COLLECT" / "HOW DO WE COLLECT INFORMATION?" sections
 mention **device identifiers and push notification tokens** (FCM registration token,
 Firebase installation ID, Analytics app-instance ID). If not, add them — `03`
 declares "Device or other IDs" as collected.
 
-### 3. In-app account & data deletion
+### 3. In-app account & data deletion — ✅ already covered (verified 2026-10-08)
+The policy's retention section says an account can be deleted from Settings, that deletion is
+immediate and permanent, and that donation records / legally required records are kept. No
+retention-period number is needed because deletion is immediate. (Original text kept below.)
+
 Add an explicit line (in "OTHER PRIVACY RIGHTS" or "CHOICES USERS HAVE"):
 > "You can permanently delete your account and associated data at any time from
 > **Settings → Delete Account** in the app, or by emailing support@melodywings.org.
@@ -53,12 +61,18 @@ Add an explicit line (in "OTHER PRIVACY RIGHTS" or "CHOICES USERS HAVE"):
 `03` and `05` both assert deletion is available — the policy must say so and give a
 retention period.
 
-### 4. Native analytics
-The cookie section covers web analytics. Add a sentence that the mobile app uses
-**Firebase Analytics** for aggregate usage metrics (PostHog is web-only and disabled
-on mobile).
+### 4. Native analytics — ⚠️ CORRECTED 2026-10-08, original premise was wrong
+This gap originally said the app uses Firebase Analytics. **It does not**: the v1.3.0 AAB
+contains Firebase Messaging and Installations but no Firebase Analytics or measurement SDK.
+The mobile app's only usage/stability collection is **Sentry** (crash reports + diagnostics),
+and PostHog is web-only. The new policy text (item 2) says exactly that; do **not** add a
+Firebase Analytics sentence, and Data safety (`03`) was corrected to match.
 
-### 5. Special educational needs / disability information
+### 5. Special educational needs / disability information — ✅ added 2026-10-08
+New sub-section "c) Disability and Special Educational Needs Information" says it is optional,
+used for matching and session preparation, may be shown to matched volunteers, and is not sold.
+(Verified in code: `LearnerViewModal` shows it to volunteers; matching reads it.)
+
 If onboarding collects health-related SEN details (see the warning in `03` §2),
 the policy should name this category, its purpose (helping tutors prepare), and that
 it is optional and not shared.
@@ -80,8 +94,8 @@ The policy's COPPA section contemplates **under-13** learners with parental cons
 
 ## Sign-off
 
-- [ ] Policy owner updates `data.ts` (and the deployed `melodywings.org/privacy-policy`)
-      for gaps 1–5.
+- [ ] Policy owner reviews the wording added on 2026-10-08 (gaps 2, 4, 5 — see above) and
+      the deployed `melodywings.org/privacy-policy` shows it after the next frontend deploy.
 - [ ] Children/target-audience decision made and reflected consistently in `04`, `05`, `07`.
 - [ ] `https://melodywings.org/privacy-policy` loads publicly (no login, no geoblock)
       and matches the deployed content.

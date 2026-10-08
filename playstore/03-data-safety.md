@@ -62,26 +62,32 @@ see column · Purposes are listed per row.
 
 | Data type | Collected | Shared | Optional? | Purposes |
 |---|---|---|---|---|
-| App interactions | Yes | No | (Analytics — see note) | Analytics (Firebase Analytics on native) |
+| App interactions | Yes | No | Required | Analytics / app stability (Sentry breadcrumbs: screens visited and taps recorded with a crash report; **not** Firebase Analytics - see note) |
 | In-app search history | Yes | No | Optional | App functionality (volunteer / resource search) |
 | Other user-generated content | Yes | No | Optional | App functionality (feedback, ratings, testimonials, session notes) |
 
 > PostHog analytics is **web-only** — `PostHogProvider` no-ops on Capacitor, so it
-> is not part of the Android data collection. Native analytics is **Firebase
-> Analytics** via `google-services.json`.
+> is not part of the Android data collection. **Firebase Analytics is NOT in the app**
+> (checked 2026-10-08 in the v1.3.0 AAB's dex: only Firebase Messaging + Installations are
+> present; no `com.google.firebase.analytics`, no measurement SDK). The only native
+> usage/stability collection is **Sentry** (`@sentry/capacitor`).
 
 ### App info and performance
 
 | Data type | Collected | Shared | Optional? | Purposes |
 |---|---|---|---|---|
-| Crash logs | **Confirm** | No | — | Analytics / stability — declare **only if** Firebase Crashlytics is actually enabled (it is **not** in `package.json` today; Firebase SDK is present via google-services). If not enabled, answer **No**. |
-| Diagnostics | Same as above | | | |
+| Crash logs | **Yes** | No | Required | App stability (Sentry crash/error reports; `sendDefaultPii` is off, users are not identified) |
+| Diagnostics | **Yes** | No | Required | App stability (device model, OS and app version, performance traces at a 20% sample rate) |
+
+> Verified in the v1.3.0 AAB: `io.sentry` and `io.sentry.capacitor` are present. Sentry is a
+> service provider processing on our behalf, so this is **collected, not shared** in Play's terms.
+> Earlier versions of this table said "No / confirm" because Sentry was added after it was written.
 
 ### Device or other IDs
 
 | Data type | Collected | Shared | Optional? | Purposes |
 |---|---|---|---|---|
-| Device or other IDs | Yes | No | Required for push | App functionality (FCM push registration token; Firebase installation ID); Analytics (Analytics app-instance ID) |
+| Device or other IDs | Yes | No | Required for push | App functionality (FCM push registration token; Firebase installation ID). No advertising ID and no Analytics app-instance ID (no Firebase Analytics in the app). |
 
 ---
 
@@ -104,7 +110,8 @@ These receive data **only to provide a service to MelodyWings**:
 | Processor | Data | Role |
 |---|---|---|
 | Google (Sign-In / Identity) | Name, email, Google account id | Authentication |
-| Google Firebase | Device/installation IDs, analytics events, FCM tokens | Push + analytics |
+| Google Firebase | FCM push tokens, Firebase installation IDs | Push notifications |
+| Sentry (Functional Software, Inc.) | Crash reports, device model / OS / app version, performance traces | App stability |
 | Google Cloud Run | All backend data in transit/at rest | App backend hosting |
 | Cloudinary | Profile & post images/videos | Media storage / CDN |
 | Google Gemini API (server-side) | Learner/volunteer **profile text** (skills, goals) — no name/email/contact | Generates the match shortlist. ⚠️ Have legal confirm this counts as processing, not "sharing", under Play's definition and Google's API terms. |
