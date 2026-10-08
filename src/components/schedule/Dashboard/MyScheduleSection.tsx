@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import ScheduleSessionCard, { isAwaitingMyResponse } from "./ScheduleSessionCard";
+import NextSessionBanner, { findNextSession } from "./NextSessionBanner";
 import {
     SCHEDULE_LABELS,
     SCHEDULE_TAB_EMPTY,
@@ -149,6 +150,10 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         tabRefs.current[TABS[next]]?.focus();
     };
 
+    const nextSession = useMemo(
+        () => (when === "upcoming" ? findNextSession(upcoming.data?.items || [], role, timeZoneLabel, now) : null),
+        [when, upcoming.data, role, timeZoneLabel, now]
+    );
     const sessions = byTab[activeTab];
     const groups = useMemo(() => groupSessions(sessions, role, when, today), [sessions, role, when, today]);
     const hiddenPast = when === "past" && (past.data?.total ?? 0) > (past.data?.items.length ?? 0);
@@ -175,6 +180,8 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                     ))}
                 </div>
             </div>
+
+            {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
 
             <div role="tablist" aria-label={SCHEDULE_LABELS.mySchedule} className="flex flex-col gap-1 sm:flex-row sm:gap-2">
                 {TABS.map((tab) => {
