@@ -1,3 +1,48 @@
+# Release notes — v1.3.0 (versionCode 5)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.3
+
+• Reschedule an accepted session from My Sessions or the calendar
+• New My Schedule: next-session banner, search, filters and full history
+• Join opens 3 minutes before a session starts
+• See your session partner's local time when time zones differ
+• Softer button colours and one Notifications settings card
+• Clearer error messages and many booking and Community fixes
+```
+
+*(~430 chars.)*
+
+---
+
+## Internal changelog — what 1.3.0 contains
+
+Covers everything since 1.2.0 (`main@a330bd3`). Server-side changes (reschedule rules,
+conflict checks, full Past history, time-zone fields on session lists) are live for every
+client through the shared API; the items below are what the app build itself changes.
+
+**New**
+- Reschedule an accepted, not-yet-started session (My Sessions, volunteer Availability rows,
+  desktop calendar popover and mobile calendar sheet); the original stays booked until accepted
+- My Schedule redesign: next-session banner, date groups, search + status filter, Past "Show more",
+  other participant's time zone, "meeting link not available" note
+- One Notifications settings card (push + instant-session email)
+- Dismissible profile-completion reminder (< 80%, hides for a week)
+
+**Fixes / behaviour**
+- Join button available only 3 minutes before the start, everywhere (focusable, names its session)
+- Global error toast + Sentry report for unhandled failures
+- Community / booking race / time-zone Join / cancelled-blocks-slot fixes from the QA click-through
+- Consistent wording and headings; softer slate (not black) for common action buttons
+- Removed duplicate empty-state buttons; landing header no longer lists For Learners / For Volunteers
+
+**Excluded from the mobile build (verify in the synced bundle)**
+- `/dev-login` route and its strings; no localhost API URL
+
+---
+
 # Release notes — v1.2.0 (versionCode 4)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
