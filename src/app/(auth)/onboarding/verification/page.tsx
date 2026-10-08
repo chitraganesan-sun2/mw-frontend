@@ -77,7 +77,7 @@ export default function VerificationPage() {
     if (isError) {
         return (
             <div className="flex h-[60dvh] bg-background-input items-center justify-center">
-                <p className="text-gray-500 text-lg">Failed to check your verification status. Please try again.</p>
+                <p className="text-gray-500 text-lg">Couldn&apos;t check your verification status. Please try again.</p>
             </div>
         );
     }

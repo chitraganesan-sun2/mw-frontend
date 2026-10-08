@@ -176,7 +176,7 @@ export default function LearnersPage() {
 
     useEffect(() => {
         setHeaderOptions({
-            searchPlaceholder: "Find your learner",
+            searchPlaceholder: "Find a learner",
             actionButtonPlacement: "right",
             title: "Learners",
             hideSearch: isMatchesTab,

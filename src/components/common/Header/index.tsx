@@ -40,6 +40,8 @@ const CommonHeader: React.FC = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isMobile = InnerWidth() < 768;
+    // Blank on desktop for Instant Sessions, which carries its own page title - then no heading is rendered.
+    const headerTitle = formatString(!pathname?.includes("/instant-sessions") || isMobileOrTabScreen ? (title ?? "") : "");
     const isMessagesChatPage =
         (pathname?.includes("/volunteer/messages") || pathname?.includes("/learner/messages")) &&
         searchParams?.get("chatId");
@@ -120,13 +122,9 @@ const CommonHeader: React.FC = () => {
                                             {titleIcon}
                                         </span>
                                     ))}
-                                <h3 className="md:text-lg text-[20px] font-medium">
-                                    {formatString(
-                                        (!pathname?.includes("/instant-sessions") || isMobileOrTabScreen)
-                                            ? (title ?? "")
-                                            : ""
-                                    )}
-                                </h3>
+                                {headerTitle && (
+                                    <h1 className="md:text-lg text-[20px] font-medium">{headerTitle}</h1>
+                                )}
                             </>
                         )}
                     </div>

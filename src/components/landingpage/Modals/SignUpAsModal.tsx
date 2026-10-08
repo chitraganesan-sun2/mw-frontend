@@ -229,7 +229,7 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             >
                 <div className="w-full md:w-[450px]">
                     <div className="flex justify-between items-center">
-                        <span className="text-xl font-medium">Enroll as {role}</span>
+                        <span className="text-xl font-medium">{role === "volunteer" ? "Become a Volunteer" : "Enroll as Learner"}</span>
                         <button
                             type="button"
                             aria-label="Close"

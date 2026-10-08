@@ -33,7 +33,7 @@ export default function CommunityPage() {
     useEffect(() => {
         setHeaderOptions({
             searchPlaceholder: "Search",
-            actionButtonTitle: "Add new post",
+            actionButtonTitle: "Add New Post",
             actionButtonOnClick: handleAddNewPost,
             actionButtonClassName:
                 "!h-full !w-[101px] md:!w-auto !bg-background-secondary !text-black !rounded-xl hover:!bg-background-secondary hover:!text-black !text-xs !py-3 px-4",

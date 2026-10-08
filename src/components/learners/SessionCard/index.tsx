@@ -81,7 +81,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                    <h2 className="text-sm font-semibold text-gray-900 truncate">{session.title}</h2>
+                    <h3 className="text-sm font-semibold text-gray-900 truncate">{session.title}</h3>
                     <p className="text-sm text-gray-700 break-words">
                         <span className="text-gray-500">Volunteer: </span>
                         {/* The card is clickable (opens the session); the name opens the volunteer. */}

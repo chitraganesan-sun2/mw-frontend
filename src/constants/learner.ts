@@ -402,7 +402,7 @@ const SkillsToLearnFields: FormField[] = [
     {
         id: "preferred_volunteer_qualities",
         label: "Goals & Preferred Volunteer Qualities",
-        sublabel: "(what you hope the learner gains, and any traits you value in a tutor or mentor)",
+        sublabel: "(what you hope the learner gains, and any traits you value in a volunteer or mentor)",
         inputType: "textarea",
         placeholder: "Describe here",
         gridCols: 2,

@@ -72,7 +72,7 @@ const Header = () => {
                         </button>
                         <h1 className="flex items-center gap-2 text-xl font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
-                            {isCalendarView ? "My Calendar" : "Schedule"}
+                            {isCalendarView ? "My Calendar" : "My Schedule"}
                         </h1>
                         {/* The month only drives the calendar, so it only shows there. */}
                         {isCalendarView && (

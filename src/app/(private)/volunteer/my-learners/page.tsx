@@ -147,7 +147,7 @@ export default function LearnersPage() {
             title: "My Learners",
             titleIcon: getHeaderIcon("backIcon"),
             titleIconClick: () => router.push("/volunteer/learners"),
-            searchPlaceholder: "Find your learner",
+            searchPlaceholder: "Find a learner",
             showTitleButton: true,
         });
     }, [setHeaderOptions]);

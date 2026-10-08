@@ -34,7 +34,7 @@ export const LearnerFeedbackFormConstants: FormField[] = [
     },
     {
         name: "notes",
-        label: "Your comments",
+        label: "Your Comments",
         inputType: "textarea",
         placeholder: "Enter comments here",
         inputClassName: "bg-white",

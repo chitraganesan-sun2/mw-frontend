@@ -24,7 +24,7 @@ const Header = (props: Props) => {
                     className='flex items-center gap-1 cursor-pointer appearance-none border-0 bg-transparent p-0 font-medium text-black'
                 >
                     <SignOutIcon />
-                    Sign Out
+                    Log Out
                 </button>
             </div>
         </header>

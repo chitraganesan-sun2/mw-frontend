@@ -19,7 +19,7 @@ const TermsAndConditionsLink = () => {
             target="_blank"
             className="text-black underline hover:underline font-medium"
         >
-            Terms of Service
+            Terms and Conditions
         </Link>
     )
 }

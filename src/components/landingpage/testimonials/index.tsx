@@ -68,7 +68,7 @@ const Testimonials = () => {
             <ContainerWrapper>
                 <ContainerHeader
                     title="Testimonials"
-                    subTitle="What our community says"
+                    subTitle="What Our Community Says"
                     description="Heartwarming stories from volunteers and families who've experienced the joy of learning together."
                 />
             </ContainerWrapper>

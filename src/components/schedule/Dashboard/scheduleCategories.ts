@@ -58,7 +58,7 @@ export const SCHEDULE_LABELS = {
     myAvailabilitySchedule: "My Availability Schedule",
     slotsOffering: "Volunteer Slots I'm Offering (accepted by learners)",
     slotsTaken: "Volunteer Slots I've Taken (from learner postings)",
-    mySchedule: "My Schedule",
+    mySchedule: "My Sessions",
     scheduleAvailability: "Schedule my availability",
     viewCalendar: "View my calendar",
 } as const;

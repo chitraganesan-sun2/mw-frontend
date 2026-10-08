@@ -23,10 +23,10 @@ const Logo = ({ isFooterIcon, className }: LogoProps) => {
                         <LogoIcon width={isMobileScreen ? 34 : 44} height={isMobileScreen ? 30 : 40} />
                 }
             </span>
-            <h3 className="md:text-xl text-base font-medium flex-1 min-w-0">
+            <p className="md:text-xl text-base font-medium flex-1 min-w-0">
                 <span className="inline-block">Melody</span>
                 <span className="inline-block">Wings</span>
-            </h3>
+            </p>
 
         </div>
     );

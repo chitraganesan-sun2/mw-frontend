@@ -46,7 +46,7 @@ export const ResourceFormConstants: FormField[] = [
     },
     {
         name: "resource_skills",
-        label: "Skills you gain",
+        label: "Skills You Gain",
         inputType: "async-select",
         placeholder: "Select the skills",
         endpoint: "skills",

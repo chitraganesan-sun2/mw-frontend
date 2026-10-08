@@ -740,7 +740,7 @@ const Donate = () => {
 
                         <div className={sectionBox}>
                             <h3 className="text-[20px] font-medium text-[#121212] md:mb-6 mb-0">
-                                Billing address
+                                Billing Address
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                 <Input
@@ -831,7 +831,7 @@ const Donate = () => {
 
                         <div className={sectionBox}>
                             <h3 className="text-[20px] font-medium text-[#121212] mb-0 md:mb-10">
-                                Donation preferences
+                                Donation Preferences
                             </h3>
                             <div className="space-y-2">
                                 {/* <p className="text-base font-normal text-[#121212]">
@@ -955,7 +955,7 @@ const Donate = () => {
                                 labelClassName={DONATE_LABEL_CLASS}
                                 inputType="textarea"
                                 name="message"
-                                label="Leave a message (Optional)"
+                                label="Leave a Message (Optional)"
                                 value={message}
                                 onChange={(v) => setMessage(typeof v === "string" ? v : "")}
                                 placeholder="Share why you are supporting MelodyWings."

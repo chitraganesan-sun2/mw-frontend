@@ -28,7 +28,7 @@ const MyScheduleModal: React.FC<MyScheduleModalProps> = ({ isOpen, onClose }) =>
 
     return (
         <SideModal
-            title={isMobileScreen ? "" : "My Schedule"}
+            title={isMobileScreen ? "" : "My Availability"}
             onClose={onClose}
             saveButtonText="Save Schedule"
             cancelButtonText="Cancel"
