@@ -476,12 +476,9 @@ export default function VolunteerInstantSessionsPage() {
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                         <div className="text-5xl mb-4">📺</div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No Instant Sessions</h3>
-                        <p className="text-sm text-gray-500 mb-6">
+                        <p className="text-sm text-gray-500">
                             Sessions you start or accept will show up here
                         </p>
-                        <button onClick={() => setShowCreateForm(true)} className={START_SESSION_BTN_CLASS}>
-                            Start a New Session
-                        </button>
                     </div>
                 ) : (
                     <>
