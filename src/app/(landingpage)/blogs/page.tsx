@@ -54,7 +54,7 @@ const Blogs = () => {
                             text={tag}
                             className={cn(
                                 "!bg-white !text-black border-black  !cursor-pointer",
-                                selectedTags.includes(tag) && " !bg-black !text-white"
+                                selectedTags.includes(tag) && " !bg-action !text-white"
                             )}
                             onClick={() => handleTags([tag])}
                         />

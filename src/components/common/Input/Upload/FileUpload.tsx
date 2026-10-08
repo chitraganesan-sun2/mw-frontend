@@ -45,7 +45,7 @@ const FileUpload = ({ ...props }: FileUploadProps) => {
                             size="small"
                             title={getTitle()}
                             btnVariant="secondary"
-                            customClassName="!text-xs !text-white !border-black rounded-lg !bg-black"
+                            customClassName="!text-xs !text-white !border-action rounded-lg !bg-action"
                             onClick={handleClick}
                             loading={isLoading}
                         />

@@ -620,7 +620,7 @@ const Donate = () => {
                                                 className={cn(
                                                     "shrink-0 rounded-[12px] border px-4 py-2 text-sm font-medium transition-colors min-h-[48px]",
                                                     selected
-                                                        ? "bg-[#121212] text-white border-[#121212]"
+                                                        ? "bg-action text-white border-action"
                                                         : "bg-white text-[#121212] border-gray-200 hover:border-gray-300"
                                                 )}
                                             >
@@ -634,7 +634,7 @@ const Donate = () => {
                                     className={cn(
                                         "shrink-0 rounded-xl border px-4 py-2 text-[14px] font-medium transition-colors min-h-[48px]",
                                         isCustom
-                                            ? "bg-[#121212] text-white border-[#121212]"
+                                            ? "bg-action text-white border-action"
                                             : "bg-white text-[#121212] border-gray-200 hover:border-gray-300"
                                     )}
                                 >
@@ -984,7 +984,7 @@ const Donate = () => {
                             btnVariant="secondary"
                             loading={isSubmitting}
                             disabled={isSubmitting}
-                            customClassName="!w-full !rounded-[10px] !py-3 !h-12 !text-base !font-medium !text-white !bg-black hover:!bg-black"
+                            customClassName="!w-full !rounded-[10px] !py-3 !h-12 !text-base !font-medium !text-white !bg-action hover:!bg-action-hover"
                         />
                     </form>
                 </div>

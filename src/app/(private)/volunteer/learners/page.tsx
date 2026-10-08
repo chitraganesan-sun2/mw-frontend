@@ -172,7 +172,7 @@ export default function LearnersPage() {
     }, [searchParams, learnerId]);
 
     const learnersActionButtonClassName =
-        "!text-white !text-sm !justify-center !h-10 !min-h-[40px] !px-3 !py-0 !rounded-[12px] !bg-[#1E1E1E] hover:!bg-[#1E1E1E] hover:!text-white md:!h-[35px] md:!min-h-0 md:!rounded-full md:!px-4 md:!py-2 md:!bg-black md:hover:!bg-black";
+        "!text-white !text-sm !justify-center !h-10 !min-h-[40px] !px-3 !py-0 !rounded-[12px] !bg-[#1E1E1E] hover:!bg-[#1E1E1E] hover:!text-white md:!h-[35px] md:!min-h-0 md:!rounded-full md:!px-4 md:!py-2 md:!bg-action md:hover:!bg-action-hover";
 
     useEffect(() => {
         setHeaderOptions({

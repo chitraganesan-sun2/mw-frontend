@@ -56,7 +56,7 @@ export default function ProfilePage() {
             titleIconClick: handleBackButton,
             actionButtonTitle: "Edit Profile",
             actionButtonClassName:
-                "lg:hidden !bg-black !text-white !rounded-xl hover:!bg-black hover:!text-white !h-[35px] !text-sm !py-2 px-4",
+                "lg:hidden !bg-action !text-white !rounded-xl hover:!bg-action-hover hover:!text-white !h-[35px] !text-sm !py-2 px-4",
             actionButtonOnClick: () => setMode("edit"),
             actionButtonVariant: "secondary",
             actionButtonPlacement: "right",

@@ -44,7 +44,7 @@ const MultiSelect: React.FC<MultiSelectInputProps> = ({
                         onClose={() => onChange(value.filter(v => v !== item))}
                     text={item.toString().replace(/_/g, " ")}
                         isClose={true}
-                        className='!bg-black !text-white p-1 px-4'
+                        className='!bg-action !text-white p-1 px-4'
                     />
                 ))}
             </div>

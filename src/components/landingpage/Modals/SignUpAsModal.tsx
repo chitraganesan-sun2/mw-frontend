@@ -49,7 +49,7 @@ const GoogleSignUpButton = ({
         disabled={disabled}
         title="Sign Up with Google"
         btnVariant="secondary"
-        className="!bg-black w-full !px-3 !py-2 !text-white hover:!bg-black hover:!text-white text-sm !rounded-xl"
+        className="!bg-action w-full !px-3 !py-2 !text-white hover:!bg-action-hover hover:!text-white text-sm !rounded-xl"
         icon={<FcGoogle className="text-xl" />}
         onClick={onClick}
     />

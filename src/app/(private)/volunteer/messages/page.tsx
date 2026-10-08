@@ -508,7 +508,7 @@ const Messages = () => {
                                     onClick={handleScheduleMeeting}
                                     title="Schedule a Session"
                                     btnVariant="secondary"
-                                    className="!rounded-xl !w-full md:w-fit  !text-sm !bg-black hover:!bg-black !text-white transition-all duration-300"
+                                    className="!rounded-xl !w-full md:w-fit  !text-sm !bg-action hover:!bg-action-hover !text-white transition-all duration-300"
                                 />
                             </div>
                         </div>
@@ -568,7 +568,7 @@ const Messages = () => {
                                             onClick={handleSendMessage}
                                             title={isMobile ? undefined : "Send Message"}
                                             btnVariant="secondary"
-                                            className="!rounded-xl !text-sm !bg-black hover:!bg-black !text-white transition-all duration-300"
+                                            className="!rounded-xl !text-sm !bg-action hover:!bg-action-hover !text-white transition-all duration-300"
                                         >
                                             {isMobile ? <SendIcon /> : null}
                                         </Button>

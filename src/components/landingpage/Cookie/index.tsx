@@ -56,7 +56,7 @@ export default function CookieConsent() {
             title="Allow"
             btnVariant="secondary"
             onClick={() => handleConsent(true)}
-            rootClassName="!w-full !text-sm !py-2 !bg-black !text-white"
+            rootClassName="!w-full !text-sm !py-2 !bg-action !text-white"
           />
           <Button
             title="Decline"

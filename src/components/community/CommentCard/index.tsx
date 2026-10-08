@@ -80,14 +80,14 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
                             <p className="font-semibold text-black text-sm">
                                 {comment.author.name}
                             </p>
-                            <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                             <div className="flex items-center gap-2">
                                 <TagComponent
                                     text={comment.created_by}
                                     className="w-fit text-[12px] capitalize !m-0"
                                     tagClassName={roleTagClass(comment?.created_by)}
                                 />
-                                <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                                 <p className="font-semibold text-black text-sm">
                                     {timesAgo(comment.created_at)}
                                 </p>

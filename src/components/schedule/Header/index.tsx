@@ -124,7 +124,7 @@ const Header = () => {
                         <button
                             type="button"
                             onClick={openAddSession}
-                            className={`${actionBtn} col-span-2 !border-black !bg-black !text-white hover:!bg-gray-900`}
+                            className={`${actionBtn} col-span-2 !border-action !bg-action !text-white hover:!bg-action-hover`}
                         >
                             <HiOutlinePlus size={16} aria-hidden="true" />
                             Add New Session

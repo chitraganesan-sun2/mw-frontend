@@ -69,7 +69,7 @@ export const DETAILS_MAX_LENGTH = 2000;
 const labelClass = "text-base font-medium text-[#121212]";
 const pillClass = (selected: boolean) =>
     `py-2.5 px-2 rounded-xl border text-center text-sm font-medium transition-colors cursor-pointer ${
-        selected ? "border-black bg-black text-white" : "border-gray-200 text-[#121212] bg-white hover:border-gray-400"
+        selected ? "border-action bg-action text-white" : "border-gray-200 text-[#121212] bg-white hover:border-gray-400"
     }`;
 
 function FieldError({ id, message }: { id: string; message?: string | null }) {

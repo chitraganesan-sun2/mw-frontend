@@ -174,7 +174,7 @@ export default function LearnersPage() {
                         : "Volunteers I have worked with",
                     buttonOnClick: () => router.push("/learner/my-volunteers"),
                     buttonClassName:
-                        "!bg-black !text-white hover:!bg-black hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",
+                        "!bg-action !text-white hover:!bg-action-hover hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",
                     buttonPlacement: "right" as const,
                     showButton: true,
                 },
@@ -183,7 +183,7 @@ export default function LearnersPage() {
                     buttonOnClick: () => setIsFilterOpen(true),
                     buttonIcon: <RiFilter3Line className="text-lg" />,
                     buttonClassName:
-                        "!bg-black !text-white hover:!bg-black hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",
+                        "!bg-action !text-white hover:!bg-action-hover hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",
                     buttonPlacement: "right" as const,
                     showButton: !isMatchesTab,
                 },

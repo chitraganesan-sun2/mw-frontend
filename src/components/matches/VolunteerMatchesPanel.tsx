@@ -106,7 +106,7 @@ export default function VolunteerMatchesPanel() {
                     type="button"
                     onClick={handleFindMatch}
                     disabled={triggerMutation.isPending}
-                    className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+                    className="rounded-full bg-action px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
                 >
                     Find My Learner
                 </button>

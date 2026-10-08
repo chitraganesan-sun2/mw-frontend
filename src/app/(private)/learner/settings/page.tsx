@@ -143,7 +143,7 @@ const Settings = () => {
                         onChange={(value) => {
                             handlePermission(value);
                         }}
-                        className="w-fit [&.ant-switch-checked]:bg-black"
+                        className="w-fit [&.ant-switch-checked]:bg-action"
                     />
                 </div>
 
@@ -173,7 +173,7 @@ const Settings = () => {
                         checked={pushEnabled}
                         loading={isPushLoading}
                         onChange={(value) => handlePushPreferenceChange(value)}
-                        className="w-fit [&.ant-switch-checked]:bg-black"
+                        className="w-fit [&.ant-switch-checked]:bg-action"
                     />
                 </div>
 

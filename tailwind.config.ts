@@ -49,6 +49,10 @@ const config: Config = {
                 },
                 white: "var(--white-color)",
                 black: "var(--black-color)",
+                action: {
+                    DEFAULT: "var(--action-color)",
+                    hover: "var(--action-hover-color)",
+                },
                 stroke: "var(--border-stroke)",
                 error: {
                     DEFAULT: "var(--error-color)",

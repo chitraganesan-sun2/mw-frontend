@@ -120,7 +120,7 @@ const Header = () => {
                                 {appHref ? (
                                     <Link
                                         href={appHref}
-                                        className="inline-flex items-center bg-black px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg"
+                                        className="inline-flex items-center bg-action px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg"
                                     >
                                         Back to app
                                     </Link>
@@ -128,7 +128,7 @@ const Header = () => {
                                     <Button
                                         title="Log In"
                                         btnVariant="secondary"
-                                        className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg"
+                                        className="!bg-action !px-3 !py-1 text-white hover:!bg-action-hover hover:!text-white text-sm !rounded-lg"
                                         onClick={handleLoginModal}
                                     />
                                 )}
@@ -189,7 +189,7 @@ const Header = () => {
                                 {appHref ? (
                                     <Link
                                         href={appHref}
-                                        className="inline-flex items-center justify-center bg-black px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg min-w-[150px]"
+                                        className="inline-flex items-center justify-center bg-action px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg min-w-[150px]"
                                     >
                                         Back to app
                                     </Link>
@@ -197,7 +197,7 @@ const Header = () => {
                                     <Button
                                         title="Log In"
                                         btnVariant="secondary"
-                                        className="!bg-black !px-3 !py-1 text-white hover:!bg-black hover:!text-white text-sm !rounded-lg min-w-[150px]"
+                                        className="!bg-action !px-3 !py-1 text-white hover:!bg-action-hover hover:!text-white text-sm !rounded-lg min-w-[150px]"
                                         onClick={handleLoginModal}
                                     />
                                 )}

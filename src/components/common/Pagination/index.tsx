@@ -101,7 +101,7 @@ const Pagination: React.FC<PaginationProps> = ({
                             disabled={page === "..."}
                             className={`flex items-center justify-center w-8 h-8 sm:w-8 sm:h-8 rounded-md text-sm font-medium touch-manipulation ${
                                 page === currentPage
-                                    ? "bg-black text-white border border-black"
+                                    ? "bg-action text-white border border-action"
                                     : page === "..."
                                     ? "text-gray-400 cursor-default"
                                     : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"

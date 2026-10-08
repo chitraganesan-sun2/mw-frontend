@@ -115,7 +115,7 @@ const ContactUsModal = ({ isOpen, onClose }: ContactUsModalProps) => {
                     <Button
                         title="Send Message"
                         btnVariant="secondary"
-                        className="!bg-black w-full !px-3 !py-2 !text-white hover:!bg-black hover:!text-white text-sm !rounded-xl"
+                        className="!bg-action w-full !px-3 !py-2 !text-white hover:!bg-action-hover hover:!text-white text-sm !rounded-xl"
                         loading={isSubmitting}
                         disabled={!isValid}
                         onClick={handleSubmit}

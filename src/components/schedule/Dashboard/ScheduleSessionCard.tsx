@@ -219,7 +219,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             type="button"
                             onClick={onRespond}
                             aria-label={`Respond to the session request${counterpartName ? ` from ${counterpartName}` : ""}`}
-                            className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer"
+                            className="rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer"
                         >
                             Respond
                         </button>

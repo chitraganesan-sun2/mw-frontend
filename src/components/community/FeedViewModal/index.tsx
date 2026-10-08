@@ -425,13 +425,13 @@ const FeedViewModal = ({
                                             <p className="font-medium md:font-semibold text-black">
                                                 {post?.author?.name}
                                             </p>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                                             <TagComponent
                                                 text={post?.created_by}
                                                 className="w-fit capitalize !m-0"
                                                 tagClassName={roleTagClass(post?.created_by)}
                                             />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                                             <p className="font-medium md:font-semibold text-black">
                                                 {toUserTimeZone({ date: post?.created_at, format: "DD-MMM-YYYY" })}
                                             </p>

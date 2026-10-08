@@ -70,7 +70,7 @@ const ProfileHeader = ({
                 disabled={chatDisabled}
                 aria-label="Start Chat"
                 title="Start Chat"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stroke text-black transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-black"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stroke text-black transition-colors hover:bg-action-hover hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-black"
             >
                 <MessageIcon />
             </button>

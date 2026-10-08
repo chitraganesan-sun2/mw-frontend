@@ -33,7 +33,7 @@ const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange, a
                         onClick={() => onChange(t.key)}
                         className={`rounded-full px-4 py-1.5 text-sm font-medium border transition-colors ${
                             selected
-                                ? "bg-black text-white border-black"
+                                ? "bg-action text-white border-action"
                                 : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
                         }`}
                     >
@@ -48,7 +48,7 @@ const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange, a
                 <button
                     type="button"
                     onClick={action.onClick}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-black bg-black px-4 py-1.5 text-sm font-medium text-white hover:bg-gray-900 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-action bg-action px-4 py-1.5 text-sm font-medium text-white hover:bg-action-hover transition-colors"
                 >
                     <HiOutlinePlus size={16} aria-hidden="true" />
                     {action.label}

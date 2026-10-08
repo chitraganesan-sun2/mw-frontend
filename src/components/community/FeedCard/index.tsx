@@ -300,7 +300,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                 <p className="font-semibold text-sm md:text-base text-black">
                                                     {post?.author?.name}
                                                 </p>
-                                                <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-black"></div>
+                                                <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-action"></div>
                                                 <div className="flex items-center gap-1 md:gap-2">
                                                     {isManagePost || (
                                                         <div className="flex items-center">
@@ -309,7 +309,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                                 className="w-fit text-xs md:text-sm"
                                                                 tagClassName={roleTagClass(post?.created_by)}
                                                             />
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                                                         </div>
                                                     )}
                                                     <p className="font-semibold text-sm md:text-base text-black">

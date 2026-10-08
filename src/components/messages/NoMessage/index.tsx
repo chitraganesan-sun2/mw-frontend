@@ -45,7 +45,7 @@ const NoMessage = () => {
                 onClick={handleStartConversation}
                 loading={isNavigating}
                 disabled={isNavigating}
-                className="!text-[16px] !bg-black !text-white hover:!bg-black/80 hover:!text-white !rounded-full"
+                className="!text-[16px] !bg-action !text-white hover:!bg-action-hover hover:!text-white !rounded-full"
             >
                 Start Conversation
             </Button>

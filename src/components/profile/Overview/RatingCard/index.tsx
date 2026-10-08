@@ -23,12 +23,12 @@ const RatingCard: React.FC<RatingCardProps> = ({ profileImg, name, rating, day, 
                 <div className="ml-1 flex-1 flex flex-col gap-1">
                     <div className="flex items-center gap-2 w-full">
                         <p className="font-semibold text-black text-sm">{name}</p>
-                        <div className="w-1.5 h-1.5 rounded-full bg-black max-md:hidden"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-action max-md:hidden"></div>
                         <div className="flex items-center gap-1 max-md:hidden">
                             <p className="font-semibold text-black text-sm">{rating}</p>
                             <IoStarSharp className="text-[1rem] text-[#FFD700]" />
                         </div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                         <p className="font-semibold text-black text-sm">
                             {formatDisplayDate(day)}
                         </p>

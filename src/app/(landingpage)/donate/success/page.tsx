@@ -37,7 +37,7 @@ export default function DonateSuccessPage() {
                 <div className="flex flex-col gap-3">
                     <Link
                         href="/"
-                        className="w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors inline-block"
+                        className="w-full bg-action text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors inline-block"
                     >
                         Back to Home
                     </Link>

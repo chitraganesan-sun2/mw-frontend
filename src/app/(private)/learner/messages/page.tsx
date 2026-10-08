@@ -509,7 +509,7 @@ const Messages = () => {
                                 //             onClick={handleScheduleMeeting}
                                 //             title="Schedule a Session"
                                 //             btnVariant="secondary"
-                                //             className="!rounded-xl !text-[12px] !bg-black hover:!bg-black !text-white transition-all duration-300 !p-2"
+                                //             className="!rounded-xl !text-[12px] !bg-action hover:!bg-action-hover !text-white transition-all duration-300 !p-2"
                                 //         />
                                 //     ) : undefined
                                 // }
@@ -519,7 +519,7 @@ const Messages = () => {
                                     onClick={handleScheduleMeeting}
                                     title="Schedule a Session"
                                     btnVariant="secondary"
-                                    className="!rounded-xl !w-full md:w-fit  !text-sm !bg-black hover:!bg-black !text-white transition-all duration-300"
+                                    className="!rounded-xl !w-full md:w-fit  !text-sm !bg-action hover:!bg-action-hover !text-white transition-all duration-300"
                                 />
                             </div>
                         </div>
@@ -579,7 +579,7 @@ const Messages = () => {
                                             loading={false}
                                             onClick={handleSendMessage}
                                             title={isMobile ? undefined : "Send Message"}
-                                            className="!rounded-xl !text-sm !bg-[#1E1E1E] hover:!bg-black !text-white transition-all duration-300"
+                                            className="!rounded-xl !text-sm !bg-[#1E1E1E] hover:!bg-action-hover !text-white transition-all duration-300"
                                         >
                                             {isMobile ? <SendIcon /> : null}
                                         </Button>

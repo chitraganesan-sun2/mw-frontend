@@ -221,7 +221,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                 setSearch("");
                                 setStatusFilter("all");
                             }}
-                            className={`rounded-full px-3 py-1 font-medium capitalize ${when === w ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"}`}
+                            className={`rounded-full px-3 py-1 font-medium capitalize ${when === w ? "bg-action text-white" : "text-gray-700 hover:bg-gray-100"}`}
                         >
                             {w}
                         </button>
@@ -250,7 +250,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             tabIndex={selected ? 0 : -1}
                             onClick={() => setActiveTab(tab)}
                             onKeyDown={onTabKeyDown}
-                            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs font-medium leading-snug transition-colors ${selected ? "border-black bg-black text-white" : "border-gray-200 bg-white text-gray-800 hover:bg-gray-50"}`}
+                            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs font-medium leading-snug transition-colors ${selected ? "border-action bg-action text-white" : "border-gray-200 bg-white text-gray-800 hover:bg-gray-50"}`}
                         >
                             <span className="block">
                                 {tabTitle}
@@ -337,7 +337,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             <button
                                 type="button"
                                 onClick={onAddSession}
-                                className="rounded-full bg-black px-4 py-1.5 text-xs font-semibold text-white hover:bg-gray-900 border-0 cursor-pointer"
+                                className="rounded-full bg-action px-4 py-1.5 text-xs font-semibold text-white hover:bg-action-hover border-0 cursor-pointer"
                             >
                                 Add New Session
                             </button>

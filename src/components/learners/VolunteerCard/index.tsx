@@ -129,7 +129,7 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                         onClick={handleChatClick}
                         title="Start Chat"
                         btnVariant="secondary"
-                        className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-black hover:!text-white !text-black !border-stroke"
+                        className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-action-hover hover:!text-white !text-black !border-stroke"
                     />
                 </div>
             </div>

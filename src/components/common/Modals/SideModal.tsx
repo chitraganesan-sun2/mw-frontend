@@ -72,7 +72,7 @@ const SideModal: React.FC<SideModalProps> = ({
                             <Divider />
                             <div className="flex items-center justify-end gap-4 px-5 pt-4">
                                 {/* Cancel / Clear = black outline; Save = the viewer's role fill.
-                                    These used to pass !bg-white / !bg-black, which the fill
+                                    These used to pass !bg-white / !bg-action, which the fill
                                     class silently beat, so both rendered as the same tint. */}
                                 <Button
                                     onClick={onCancel}

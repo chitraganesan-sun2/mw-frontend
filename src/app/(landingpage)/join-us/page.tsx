@@ -82,7 +82,7 @@ const JoinUsPage = () => {
                                 title={isLoading ? "Loading..." : "Apply here to Get Involved"}
                                 btnVariant="secondary"
                                 loading={isLoading}
-                                customClassName="!w-full md:!w-auto !px-4 !py-[10px] !h-10 md:!h-12 lg:!text-[18px] !text-[14px] !font-medium !rounded-[10px] !text-white !bg-black hover:!bg-black"
+                                customClassName="!w-full md:!w-auto !px-4 !py-[10px] !h-10 md:!h-12 lg:!text-[18px] !text-[14px] !font-medium !rounded-[10px] !text-white !bg-action hover:!bg-action-hover"
                                 // onClick={() => {
                                 //     // Add your application link or modal handler here
                                 //     window.open(

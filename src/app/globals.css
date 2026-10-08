@@ -7,6 +7,10 @@
     --gray-light-color: #4f4f4f;
     --white-color: #ffffff;
     --black-color: #121212;
+    /* Role-neutral action buttons (Log In, Donate, Submit, Add New Session ...). A softer slate than
+       black; set both to #121212 / #000 to go back to black. */
+    --action-color: #475569;
+    --action-hover-color: #334155;
     --error-color: #ef4444;
     --error-light-color: #fee2e2;
     --success-color: #16a34a;
@@ -511,12 +515,12 @@ html {
     /* Role-neutral / common action (Log In, Sign in with Google, Sign out, Donate, Join us,
        onboarding Next/Submit): solid black. */
     .btn-common {
-        background-color: var(--black-color, #121212) !important;
+        background-color: var(--action-color, #475569) !important;
         color: var(--white-color, #fff) !important;
-        border: 1px solid var(--black-color, #121212) !important;
+        border: 1px solid var(--action-color, #475569) !important;
     }
     .btn-common:hover:not(:disabled) {
-        background-color: #000 !important;
+        background-color: var(--action-hover-color, #334155) !important;
         color: var(--white-color, #fff) !important;
     }
 

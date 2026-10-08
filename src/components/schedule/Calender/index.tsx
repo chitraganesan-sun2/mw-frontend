@@ -419,7 +419,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
                                 type="button"
                                 aria-pressed={view === option.value}
                                 onClick={() => changeView(option.value)}
-                                className={`rounded-full px-3 py-1 font-medium ${view === option.value ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"}`}
+                                className={`rounded-full px-3 py-1 font-medium ${view === option.value ? "bg-action text-white" : "text-gray-700 hover:bg-gray-100"}`}
                             >
                                 {option.label}
                             </button>

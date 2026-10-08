@@ -289,7 +289,7 @@ const AsyncSelect = ({
                             }
                             text={item.label}
                             isClose={true}
-                            className="!bg-black !text-white p-1 px-4"
+                            className="!bg-action !text-white p-1 px-4"
                         />
                     ))}
                 </div>
