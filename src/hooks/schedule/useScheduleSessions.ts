@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
@@ -48,13 +48,21 @@ export const scheduleSessionsKey = (role: ScheduleRole, when: "upcoming" | "past
 
 /** Page size the dashboard asks for; the API caps pages at 100. */
 const PAGE_SIZE = { upcoming: 100, past: 30 } as const;
+/** Past history is loaded in steps of this many sessions ("Show more"), up to the API's cap. */
+export const PAST_STEP = 30;
+export const MAX_PAGE_SIZE = 100;
 
 /**
  * The caller's sessions for the Schedule dashboard. One request per window feeds every
  * tab and availability grouping (they are split client-side by scheduleCategories), and the
  * backend narrows the query by date and only decrypts names for the returned page.
  */
-export function useScheduleSessions(role: ScheduleRole, when: "upcoming" | "past", enabled = true) {
+export function useScheduleSessions(
+    role: ScheduleRole,
+    when: "upcoming" | "past",
+    enabled = true,
+    size: number = PAGE_SIZE[when]
+) {
     // Deferred cookie read - see Sidebar/index.tsx for the SSR hydration reason.
     const [userId, setUserId] = useState<string | undefined>(undefined);
     useEffect(() => {
@@ -62,11 +70,11 @@ export function useScheduleSessions(role: ScheduleRole, when: "upcoming" | "past
     }, [role]);
 
     return useQuery({
-        queryKey: [...scheduleSessionsKey(role, when), userId],
+        queryKey: [...scheduleSessionsKey(role, when), userId, size],
+        // Keep the rows on screen while "Show more" fetches the larger page.
+        placeholderData: keepPreviousData,
         queryFn: async () => {
-            const res: any = await GET_API(
-                endpoints.session.getScheduleSessions(role, userId as string, when, PAGE_SIZE[when])
-            );
+            const res: any = await GET_API(endpoints.session.getScheduleSessions(role, userId as string, when, size));
             return {
                 items: (res?.data?.items || []) as ScheduleSession[],
                 total: Number(res?.data?.total ?? 0),

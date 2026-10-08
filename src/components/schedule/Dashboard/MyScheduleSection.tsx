@@ -1,7 +1,14 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
-import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
+import { joinNames } from "@/utils/joinNames";
+import { getStatusLabel } from "@/utils/sessionDisplay";
+import {
+    MAX_PAGE_SIZE,
+    PAST_STEP,
+    useScheduleSessions,
+    type ScheduleSession,
+} from "@/hooks/schedule/useScheduleSessions";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
@@ -111,8 +118,13 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const now = useNow();
     const today = useProfileToday(role);
 
+    // Past history grows in steps ("Show more"); search / status filter narrow what is loaded.
+    const [pastSize, setPastSize] = useState<number>(PAST_STEP);
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+
     const upcoming = useScheduleSessions(role, "upcoming");
-    const past = useScheduleSessions(role, "past", when === "past");
+    const past = useScheduleSessions(role, "past", when === "past", pastSize);
     const active = when === "upcoming" ? upcoming : past;
 
     const byTab = useMemo(() => {
@@ -154,9 +166,41 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         () => (when === "upcoming" ? findNextSession(upcoming.data?.items || [], role, timeZoneLabel, now) : null),
         [when, upcoming.data, role, timeZoneLabel, now]
     );
-    const sessions = byTab[activeTab];
+    const tabSessions = byTab[activeTab];
+    // Statuses present in this tab, for the filter dropdown.
+    const statusOptions = useMemo(
+        () => Array.from(new Set(tabSessions.map((s) => s.status).filter(Boolean) as string[])),
+        [tabSessions]
+    );
+    // A status picked on another tab may not exist here - fall back to "all".
+    useEffect(() => {
+        if (statusFilter !== "all" && !statusOptions.includes(statusFilter)) setStatusFilter("all");
+    }, [statusFilter, statusOptions]);
+    const isFiltering = search.trim() !== "" || statusFilter !== "all";
+    const sessions = useMemo(() => {
+        const needle = search.trim().toLowerCase();
+        return tabSessions.filter((s) => {
+            if (statusFilter !== "all" && s.status !== statusFilter) return false;
+            if (!needle) return true;
+            const person = role === "learner" ? s.volunteer_full_name : joinNames(s.learner_first_name, s.learner_last_name);
+            const haystack = [
+                s.session_title,
+                person,
+                ...(s.requested_skills || []),
+                ...(s.academic_skills || []),
+                ...(s.non_academic_skills || []),
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+            return haystack.includes(needle);
+        });
+    }, [tabSessions, search, statusFilter, role]);
     const groups = useMemo(() => groupSessions(sessions, role, when, today), [sessions, role, when, today]);
-    const hiddenPast = when === "past" && (past.data?.total ?? 0) > (past.data?.items.length ?? 0);
+    const loadedPast = past.data?.items.length ?? 0;
+    const hiddenPast = when === "past" && (past.data?.total ?? 0) > loadedPast;
+    const canShowMore = hiddenPast && pastSize < MAX_PAGE_SIZE;
+    const showFilters = tabSessions.length >= 4 || isFiltering;
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
@@ -172,7 +216,11 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             key={w}
                             type="button"
                             aria-pressed={when === w}
-                            onClick={() => setWhen(w)}
+                            onClick={() => {
+                                setWhen(w);
+                                setSearch("");
+                                setStatusFilter("all");
+                            }}
                             className={`rounded-full px-3 py-1 font-medium capitalize ${when === w ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"}`}
                         >
                             {w}
@@ -218,6 +266,34 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 })}
             </div>
 
+            {showFilters && (
+                <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                        type="search"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search by title, person or subject"
+                        aria-label="Search sessions"
+                        className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
+                    />
+                    {statusOptions.length > 1 && (
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            aria-label="Filter by status"
+                            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm"
+                        >
+                            <option value="all">All statuses</option>
+                            {statusOptions.map((status) => (
+                                <option key={status} value={status}>
+                                    {getStatusLabel(status)}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                </div>
+            )}
+
             <div
                 id={`schedule-panel-${activeTab}`}
                 role="tabpanel"
@@ -234,9 +310,25 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 ) : sessions.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-4 text-center">
                         <p className="text-sm text-gray-600">
-                            {when === "past" ? "No past sessions here yet." : SCHEDULE_TAB_EMPTY[role][activeTab]}
+                            {isFiltering
+                                ? "No sessions match your search."
+                                : when === "past"
+                                  ? "No past sessions here yet."
+                                  : SCHEDULE_TAB_EMPTY[role][activeTab]}
                         </p>
-                        {when === "upcoming" && onAddSession && (
+                        {isFiltering && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSearch("");
+                                    setStatusFilter("all");
+                                }}
+                                className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
+                            >
+                                Clear search
+                            </button>
+                        )}
+                        {!isFiltering && when === "upcoming" && onAddSession && (
                             <button
                                 type="button"
                                 onClick={onAddSession}
@@ -278,7 +370,21 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                     </div>
                 )}
                 {hiddenPast && (
-                    <p className="text-xs text-gray-500">Showing your {past.data?.items.length} most recent sessions.</p>
+                    <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+                        <p className="text-xs text-gray-500">
+                            Showing your {loadedPast} most recent of {past.data?.total} sessions.
+                        </p>
+                        {canShowMore && (
+                            <button
+                                type="button"
+                                onClick={() => setPastSize((size) => Math.min(size + PAST_STEP, MAX_PAGE_SIZE))}
+                                disabled={past.isFetching}
+                                className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-800 hover:bg-gray-50 cursor-pointer disabled:opacity-60"
+                            >
+                                {past.isFetching ? "Loading…" : "Show more"}
+                            </button>
+                        )}
+                    </div>
                 )}
             </div>
         </section>
