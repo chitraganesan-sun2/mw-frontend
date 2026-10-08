@@ -451,6 +451,7 @@ const Messages = () => {
         if (messageId.length > 0) {
             postReadMessage();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mark as read only when the message id changes
     }, [messageId]);
 
     // Desktop: sync the URL to the auto-selected first chat once loaded (data fetching

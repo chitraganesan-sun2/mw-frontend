@@ -36,6 +36,7 @@ const MonthYearPicker: React.FC = () => {
       setCurrentMonth(selectedDate.format("YYYY-MM"));
       router.push(`?${params.toString()}`);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- one-time default of the month in the URL on mount
   }, []);
 
   return (

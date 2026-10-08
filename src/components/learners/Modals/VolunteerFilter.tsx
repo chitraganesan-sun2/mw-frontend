@@ -66,7 +66,7 @@ export default function VolunteerFilterModal({
             available_time: { from, to },
             skill_ids: skill_ids?.split(",") || [],
         });
-    }, [language_ids, subject_ids, start_date, end_date, start_time, end_time, skill_ids]);
+    }, [language_ids, subject_ids, start_date, end_date, start_time, end_time, skill_ids, country]);
 
     const handleChange = (name: keyof FilterData, value: any) => {
         setFilterData((prev) => ({

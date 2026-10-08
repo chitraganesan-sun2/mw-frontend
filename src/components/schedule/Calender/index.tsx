@@ -279,7 +279,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
 
     useEffect(() => {
         setEventDetails(selectedEventForFeedback);
-    }, [selectedEventForFeedback]);
+    }, [selectedEventForFeedback, setEventDetails]);
 
     const handleEventMouseEnter = (mouseEnterInfo: any) => {
         const rect = mouseEnterInfo.el.getBoundingClientRect();

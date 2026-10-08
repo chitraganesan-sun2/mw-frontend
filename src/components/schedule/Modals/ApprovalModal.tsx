@@ -83,6 +83,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
             setNotificationsData(data?.items || []);
             handleUpdateReadsNotifications();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh the list and mark notifications read only when new data arrives
     }, [data]);
 
     const isMobileScreen = InnerWidth() < 768;

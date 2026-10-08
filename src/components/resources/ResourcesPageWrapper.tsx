@@ -144,6 +144,7 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
             titleIcon,
             titleIconClick: category !== null ? handleBackClick : undefined,
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- header handlers are recreated every render; re-registering on every render would loop the store
     }, [category, pathname, setHeaderOptions, ResourceCategories, topicSingleTitle]);
 
     // Viewer's own role theme (variant === the signed-in role, so the CSS-var theme is

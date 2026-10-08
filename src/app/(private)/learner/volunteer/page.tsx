@@ -191,7 +191,7 @@ export default function LearnersPage() {
             // (Filters means nothing on My Matches).
             ].filter((button) => button.showButton),
         });
-    }, [pathname, setHeaderOptions, appliedFiltersCount, isMatchesTab]);
+    }, [pathname, setHeaderOptions, appliedFiltersCount, isMatchesTab, router, isMobileScreen]);
 
     return (
         <div className="h-full animate-fadeIn">

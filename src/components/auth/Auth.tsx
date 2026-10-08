@@ -11,7 +11,7 @@ export default function isAuth (Component: any) {
             if (!auth) {
                 return redirect("/");
             }
-        }, []);
+        }, [auth]);
 
         if (!auth) {
             return null;

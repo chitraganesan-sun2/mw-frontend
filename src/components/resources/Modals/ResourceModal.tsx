@@ -175,12 +175,14 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
 
     useEffect(() => {
         setValue("created_by", userName || role || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- default the creator when the modal mode or resource changes, not on every name change
     }, [currentMode, resourceId]);
 
     useEffect(() => {
         if (currentMode === "create") {
             reset({ ...ResourceFormDefaultValues, created_by: userName || role || "" });
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset to defaults when the modal mode changes
     }, [currentMode, reset]);
 
     const handleResourceAction = async ({

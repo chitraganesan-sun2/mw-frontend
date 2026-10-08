@@ -234,6 +234,7 @@ const OnetImeScheduleModal = ({
         if (slots.length === 0 && isOpen) {
             addSlot();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- add the first slot when the modal opens
     }, [isOpen]);
 
 

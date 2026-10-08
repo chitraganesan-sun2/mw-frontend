@@ -156,7 +156,7 @@ export default function VolunteerPage() {
             searchPlaceholder: "Find a volunteer",
             showTitleButton: true,
         });
-    }, [setHeaderOptions]);
+    }, [setHeaderOptions, router]);
 
     return (
         <div className="w-full h-full p-6 animate-fadeIn">

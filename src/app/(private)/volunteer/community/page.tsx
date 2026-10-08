@@ -42,6 +42,7 @@ export default function CommunityPage() {
             title: "Community",
             titleIcon: getHeaderIcon(pathname),
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- header action is registered once per page/route; the handler only calls a stable setter
     }, [pathname, setHeaderOptions]);
 
     const handleCloseModal = () => {

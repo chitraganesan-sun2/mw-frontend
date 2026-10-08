@@ -465,6 +465,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
             setVolunteerAcademicOptions([]);
             setVolunteerNonAcademicOptions([]);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs when the selected volunteer changes; depending on the handlers/date would reset the form on every render
     }, [formData.select_volunteer]);
 
     // Handle calendar open/close

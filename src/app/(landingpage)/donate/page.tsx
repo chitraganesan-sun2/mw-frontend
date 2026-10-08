@@ -221,6 +221,7 @@ const Donate = () => {
                 if (!nameVisibility && options[0]) setNameVisibility(options[0].value);
             })
             .catch((e) => console.error("Failed to load name visibility options", e));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount; depending on the selection would refetch and reset what the user picked
     }, []);
 
 
@@ -314,6 +315,7 @@ const Donate = () => {
                 }
             })
             .catch((e) => console.error("Failed to load fund destinations", e));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount; depending on the selection would refetch and reset what the user picked
     }, []);
 
     const handleDonateSubmit = (e: React.FormEvent) => {

@@ -64,6 +64,7 @@ export default function ProfilePage() {
             showTitleButton: true,
             hideSearch: true
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- header is configured once on mount; handlers are recreated every render and would loop the store
     }, []);
 
     useEffect(() => {
@@ -96,7 +97,7 @@ export default function ProfilePage() {
         };
 
         setVolunteerData({ bio: bioData, overview: overviewData });
-    }, [data]);
+    }, [data, setVolunteerDetails, volunteerId]);
 
     if (isLoading || !volunteerId) {
         return (

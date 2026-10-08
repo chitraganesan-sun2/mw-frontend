@@ -66,7 +66,7 @@ const AsyncSelect = ({
 
     useEffect(() => {
         refetch();
-    }, [pathname]);
+    }, [pathname, refetch]);
 
     const handleChange = (value: any) => {
         if (!data) return;

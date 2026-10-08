@@ -102,7 +102,7 @@ const Settings = () => {
             titleIcon: getHeaderIcon(pathname),
             hideSearch: true,
         });
-    }, [setHeaderOptions]);
+    }, [setHeaderOptions, pathname]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -122,7 +122,7 @@ const Settings = () => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, []);
+    }, [learnerId]);
     return (
         <div className="w-full h-full bg-white flex border border-gray-200 md:rounded-tl-[3rem] animate-fadeIn">
             <div className="p-4 bg-[#f4f7fb] md:bg-transparent md:p-10 flex flex-col md:gap-8 gap-4 w-full">

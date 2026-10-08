@@ -166,6 +166,7 @@ const FormTabsSection = forwardRef(
         setActiveTab(validTab);
         setHighestTab(validTab);
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-clamp the saved tab only when the number of tabs changes
     }, [formData.length]);
 
     // ✅ Reset tabs when parent calls it or on unmount
@@ -184,7 +185,7 @@ const FormTabsSection = forwardRef(
       return () => {
         localStorage.removeItem(`editProfile_activeTab_${role}`);
       };
-    }, []);
+    }, [role]);
 
     const fields = ["consented_from_parent", "volunteer_parent_name", "volunteer_parent_email"];
     const volunteerAge = () => {

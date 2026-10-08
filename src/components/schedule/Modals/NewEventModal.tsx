@@ -200,6 +200,7 @@ export default function NewEventModal({
             setIsTimePickerOpen(false);
             setSelectedMeridiem(null);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-seed the form when the modal opens or the time zone changes
     }, [isOpen, volunteerUtcOffsetValue, volunteerTimezone]);
 
     // Sync tempTime with formData.start_time

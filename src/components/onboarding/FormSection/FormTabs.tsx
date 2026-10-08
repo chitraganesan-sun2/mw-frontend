@@ -152,6 +152,7 @@ const FormTabs = ({
                 }
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- form is reset when the loaded data changes; the helper is recreated every render
     }, [onboardingData, role, reset, setValue, getValues]);
 
     const handleValidationErrors = ({ success, errors }: { success: boolean; errors: any }) => {

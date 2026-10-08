@@ -104,7 +104,7 @@ const Settings = () => {
             titleIcon: getHeaderIcon(pathname),
             hideSearch: true,
         });
-    }, [setHeaderOptions]);
+    }, [setHeaderOptions, pathname]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -124,7 +124,7 @@ const Settings = () => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, []);
+    }, [volunteerId]);
 
     return (
         <div className="w-full h-full bg-white flex border border-gray-200 md:rounded-tl-[3rem] animate-fadeIn">

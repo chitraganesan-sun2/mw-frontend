@@ -235,6 +235,7 @@ const NotificationSection: React.FC = () => {
                 container.removeEventListener("scroll", handleScroll);
             }
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleScroll closes over exactly the values listed, re-attaching on every render is unnecessary
     }, [visibleIds, hasNextPage, isFetchingNextPage]);
 
     if (isError) return (<ErrorMsg />);

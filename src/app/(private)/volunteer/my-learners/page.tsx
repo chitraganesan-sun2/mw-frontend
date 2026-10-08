@@ -150,7 +150,7 @@ export default function LearnersPage() {
             searchPlaceholder: "Find a learner",
             showTitleButton: true,
         });
-    }, [setHeaderOptions]);
+    }, [setHeaderOptions, router]);
 
     return (
         <div className="w-full h-full py-6 px-4 md:p-6 animate-fadeIn">
