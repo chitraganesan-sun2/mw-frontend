@@ -6,6 +6,7 @@ import QueryProvider from "@/providers/QueryWrapper";
 import { Suspense } from "react";
 import useAutoLogout from "@/hooks/useAutoLogout";
 import useMobileInit from "@/hooks/useMobileInit";
+import useGlobalErrorReporting from "@/hooks/useGlobalErrorReporting";
 import { useRouter } from "next/navigation";
 import RouteGuard from "@/components/guards/RouteGuard";
 import NetworkStatus from "@/components/common/NetworkStatus";
@@ -25,6 +26,7 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
     const router = useRouter();
     useAutoLogout(router);
     useMobileInit();
+    useGlobalErrorReporting();
 
     return (
         <SentryReact.ErrorBoundary
