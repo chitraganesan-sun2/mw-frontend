@@ -150,7 +150,19 @@ const Settings = () => {
                     />
                 </div>
 
-                <p className="md:text-2xl text-[16px] font-medium mt-4 md:mt-0">Notification Preferences</p>
+                {/* One card for every way we get in touch: push + email. */}
+                <section
+                    aria-labelledby="notifications-heading"
+                    className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 md:p-6"
+                >
+                    <div className="flex flex-col gap-1">
+                        <h2 id="notifications-heading" className="md:text-2xl text-[16px] font-medium">
+                            Notifications
+                        </h2>
+                        <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
+                            Choose how we let you know about sessions, messages and instant sessions.
+                        </p>
+                    </div>
 
                 <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
@@ -168,7 +180,7 @@ const Settings = () => {
                     />
                 </div>
 
-                <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
+                <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full md:border-t md:border-gray-100 md:pt-5">
                     <div className="flex flex-col gap-2">
                         {/* A real <label htmlFor> - AntD Select drops aria-label before it
                             reaches the combobox input, but forwards id. */}
@@ -215,6 +227,8 @@ const Settings = () => {
                         className="session-match-select w-full md:w-[400px] [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-300 [&_.ant-select-selector]:!h-auto [&_.ant-select-selector]:!min-h-10"
                     />
                 </div>
+
+                </section>
 
                 <DonationHistorySection />
                 <VolunteerCertificateSection />
