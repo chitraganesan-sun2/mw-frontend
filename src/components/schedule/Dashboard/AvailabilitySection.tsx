@@ -283,6 +283,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 {SCHEDULE_LABELS.availabilityHeading}
             </h2>
 
+            {/* Full-width section: the groups sit side by side on wide screens instead of one tall column. */}
+            <div className={isVolunteer ? "grid grid-cols-1 gap-4 items-start lg:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"}>
             {isVolunteer && renderSessionGroup(SCHEDULE_LABELS.slotsOffering, offering, "No learner has booked your availability yet.")}
             {isVolunteer && renderSessionGroup(SCHEDULE_LABELS.slotsTaken, taken, "You haven't taken any learner postings yet.")}
 
@@ -407,6 +409,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                         </button>
                     </form>
                 )}
+            </div>
             </div>
         </section>
     );

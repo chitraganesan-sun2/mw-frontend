@@ -24,7 +24,7 @@ interface ScheduleDashboardLayoutProps {
 
 /**
  * The Schedule dashboard (the signed-in landing page). Two views, switched from the header:
- * - schedule: Availability and My Schedule (side by side on wide screens, stacked on small);
+ * - schedule: My Sessions and Availability, stacked as full-width sections (horizontal layouts inside);
  * - calendar: the calendar on its own, full width.
  * The calendar used to sit below everything else, which made the page long and "View my
  * calendar" only scrolled to it.
@@ -74,11 +74,11 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     }
 
     return (
-        <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 xl:grid-cols-5 items-start">
-            <div className="xl:col-span-3 min-w-0">
+        <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
+            <div className="min-w-0">
                 <MyScheduleSection role={role} timeZoneLabel={tz} onOpenProfile={onOpenProfile} />
             </div>
-            <div className="xl:col-span-2 min-w-0">
+            <div className="min-w-0">
                 <AvailabilitySection
                     role={role}
                     timeZoneLabel={tz}

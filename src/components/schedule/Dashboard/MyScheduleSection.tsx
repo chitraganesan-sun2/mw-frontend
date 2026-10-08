@@ -148,7 +148,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 ) : (
                     // grid-cols-1 = minmax(0, 1fr): an implicit auto column grew to the cards'
                     // content width on phones, pushing Join past the section edge.
-                    <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
                         {sessions.map((session) => (
                             <ScheduleSessionCard
                                 key={session.session_id}
