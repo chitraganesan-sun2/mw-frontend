@@ -91,6 +91,8 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
 - [ ] Privacy policy URL live at `https://melodywings.org/privacy-policy` and covers
       everything in the Data safety form — `10`. *(URL returns 200 as of 2026-10-08; mobile-app
       and special-needs sections added in the repo, live after the next frontend deploy.)*
+- [ ] **Delete account URL** entered in Play Console (Data safety → data deletion): `https://melodywings.org/delete-account`
+      *(page created 2026-10-08; live after the frontend deploy)*.
 - [ ] Data safety form submitted — `03`. *(**Use the corrected `03` (2026-10-08):** crash
       logs + diagnostics = Yes (Sentry), no Firebase Analytics, no advertising ID. In the
       "Advertising ID" declaration answer **No** — the AAB contains no AD_ID permission, only

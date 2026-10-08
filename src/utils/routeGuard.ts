@@ -50,6 +50,7 @@ export const LANDING_PAGE_ROUTES = [
     "/join-us/success",
     "/privacy-policy",
     "/terms-and-conditions",
+    "/delete-account",
 ];
 
 // Public routes with a dynamic sub-path (e.g. /blogs/[id]) that LANDING_PAGE_ROUTES'
@@ -86,6 +87,7 @@ export const ALWAYS_ACCESSIBLE_ROUTES = [
     "/donate/history",
     "/privacy-policy",
     "/terms-and-conditions",
+    "/delete-account",
 ];
 
 export const PROTECTED_ROUTES = ["/learner", "/volunteer"];

@@ -17,8 +17,8 @@ submitting — a wrong Data safety form is a top-3 rejection reason.
 |---|---|
 | Does your app collect or share any of the required user data types? | **Yes** |
 | Is all of the user data collected by your app encrypted in transit? | **Yes** (HTTPS only; `usesCleartextTraffic="false"`, `network_security_config.xml`) |
-| Do you provide a way for users to request that their data be deleted? | **Yes** — in-app: Settings → **Delete Account** (type `DELETE` to confirm) → `DELETE /api/v1/auth/delete-account`; soft-deletes the account and blocks future sign-in. Also reachable by emailing `support@melodywings.org`. |
-| Deletion URL (if you offer a web deletion request) | `https://melodywings.org/privacy-policy` (documents the in-app route + support email) |
+| Do you provide a way for users to request that their data be deleted? | **Yes** — in-app: Settings → **Delete Account** (type `DELETE` to confirm) → `DELETE /api/v1/auth/delete-account`; **hard-deletes** the account and every document keyed to it, removes uploaded photos/videos/documents from Cloudinary and R2 (added 2026-10-08), notifies the other person for open sessions, and signs the user out everywhere. Also reachable by emailing `support@melodywings.org`. |
+| Deletion URL (if you offer a web deletion request) | **`https://melodywings.org/delete-account`** (public page added 2026-10-08: in-app steps, email option with 45-day response, what is deleted / kept). Play requires this URL for apps with account creation. |
 
 ---
 
