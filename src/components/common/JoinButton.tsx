@@ -16,6 +16,9 @@ interface JoinButtonProps {
     wrapperClassName?: string;
     /** For cards that are themselves clickable. */
     stopPropagation?: boolean;
+    /** What is being joined ("Guitar lesson") - lets a screen reader tell a page of "Join"
+     * buttons apart. */
+    contextLabel?: string;
 }
 
 /** The one Join button. Always visible on a joinable session; disabled (with a hint) until 3
@@ -28,22 +31,26 @@ export default function JoinButton({
     variant = "pill",
     wrapperClassName = "",
     stopPropagation = false,
+    contextLabel,
 }: JoinButtonProps) {
     if (state === "none") return null;
     const early = state === "early";
     const stop = (e: React.SyntheticEvent) => {
         if (stopPropagation) e.stopPropagation();
     };
+    const named = contextLabel ? `${label} ${contextLabel}` : label;
 
     if (variant === "pill") {
         if (early) {
             return (
                 <span title={JOIN_EARLY_HINT} className="inline-flex" onClick={stop}>
+                    {/* aria-disabled (not disabled): stays in the Tab order so keyboard and screen
+                        reader users hear why Join isn't available yet. */}
                     <button
                         type="button"
-                        disabled
                         aria-disabled="true"
-                        aria-label={`${label} (${JOIN_EARLY_HINT.toLowerCase()})`}
+                        aria-label={`${named} (${JOIN_EARLY_HINT.toLowerCase()})`}
+                        onClick={(e) => e.preventDefault()}
                         className="rounded-full border-0 bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-500 cursor-not-allowed"
                     >
                         {label}
@@ -53,7 +60,14 @@ export default function JoinButton({
         }
         const pill = "rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90";
         return href ? (
-            <a href={href} target="_blank" rel="noopener noreferrer" onClick={stop} className={pill}>
+            <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={stop}
+                aria-label={`${named} (opens in a new tab)`}
+                className={pill}
+            >
                 {label}
             </a>
         ) : (
@@ -63,6 +77,7 @@ export default function JoinButton({
                     stop(e);
                     onClick?.();
                 }}
+                aria-label={contextLabel ? named : undefined}
                 className={pill}
             >
                 {label}

@@ -85,7 +85,7 @@ const NextSessionBanner: React.FC<NextSessionBannerProps> = ({ session, role, ti
                     {tz}
                 </p>
             </div>
-            <JoinButton state={state} href={href} />
+            <JoinButton state={state} href={href} contextLabel={session.session_title || "next session"} />
         </div>
     );
 };

@@ -294,6 +294,11 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 </div>
             )}
 
+            {/* Announces the result of a search / filter to screen readers. */}
+            <p role="status" aria-live="polite" className="sr-only">
+                {isFiltering ? `${sessions.length} of ${tabSessions.length} sessions shown` : ""}
+            </p>
+
             <div
                 id={`schedule-panel-${activeTab}`}
                 role="tabpanel"
@@ -341,14 +346,20 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 ) : (
                     <div className="flex flex-col gap-3">
                         {groups.map((group) => (
-                            <div key={group.key} className="flex flex-col gap-2">
-                                <p
+                            <div
+                                key={group.key}
+                                role="group"
+                                aria-labelledby={`schedule-group-${group.key}`}
+                                className="flex flex-col gap-2"
+                            >
+                                <h3
+                                    id={`schedule-group-${group.key}`}
                                     className={`text-[11px] font-semibold uppercase tracking-wide ${
                                         group.accent ? "text-amber-700" : "text-gray-500"
                                     }`}
                                 >
                                     {group.label} <span className="font-normal">({group.items.length})</span>
-                                </p>
+                                </h3>
                                 {/* grid-cols-1 = minmax(0, 1fr): an implicit auto column grew to the cards'
                                     content width on phones, pushing Join past the section edge. */}
                                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">

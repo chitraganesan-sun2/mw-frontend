@@ -224,7 +224,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             Respond
                         </button>
                     )}
-                    <JoinButton state={joinStatus} href={joinHref} />
+                    <JoinButton state={joinStatus} href={joinHref} contextLabel={session.session_title || "session"} />
                 </div>
             )}
         </article>
