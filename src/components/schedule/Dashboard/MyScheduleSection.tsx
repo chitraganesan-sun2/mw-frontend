@@ -48,11 +48,14 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const byTab = useMemo(() => {
         const groups: Record<ScheduleTab, ScheduleSession[]> = { posted: [], accepted: [], direct: [] };
         (active.data?.items || []).forEach((session) => {
-            const tab = getScheduleTab(session, role);
+            // A volunteer's slot bookings are listed under Availability while upcoming, but that
+            // section has no past view - so in Past they appear under Direct (a specific learner
+            // booked the slot) instead of vanishing from history.
+            const tab = getScheduleTab(session, role) ?? (when === "past" ? "direct" : null);
             if (tab) groups[tab].push(session);
         });
         return groups;
-    }, [active.data, role]);
+    }, [active.data, role, when]);
 
     // Open on the first tab that has sessions (once per Upcoming/Past switch), rather than
     // an empty "Posted" tab while e.g. Direct has bookings. Manual tab picks are respected.
@@ -82,11 +85,13 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 id="my-schedule-heading" className="text-base font-semibold">
+            {/* Heading centered, Upcoming/Past toggle at the right (stacked and centered on phones). */}
+            <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr]">
+                <span aria-hidden="true" className="hidden sm:block" />
+                <h2 id="my-schedule-heading" className="text-lg font-semibold text-center">
                     {SCHEDULE_LABELS.mySchedule}
                 </h2>
-                <div role="group" aria-label="Show sessions" className="inline-flex rounded-full border border-gray-200 p-0.5 text-xs">
+                <div role="group" aria-label="Show sessions" className="inline-flex rounded-full border border-gray-200 p-0.5 text-xs sm:justify-self-end">
                     {(["upcoming", "past"] as const).map((w) => (
                         <button
                             key={w}

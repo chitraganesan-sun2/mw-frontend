@@ -279,7 +279,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 }}
             />
 
-            <h2 id="availability-heading" className="text-base font-semibold">
+            <h2 id="availability-heading" className="text-lg font-semibold text-center">
                 {SCHEDULE_LABELS.availabilityHeading}
             </h2>
 
