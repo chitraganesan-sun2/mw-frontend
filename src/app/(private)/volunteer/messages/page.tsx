@@ -16,7 +16,7 @@ import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
 import VolunteerChatList from "@/components/messages/VolunteerChatList";
 import NoMessage from "@/components/messages/NoMessage";
-import LottieLoader from "@/components/common/Loader/Lottie";
+import { ChatBubblesSkeleton, MessagesPageSkeleton } from "@/components/messages/MessagesSkeleton";
 import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { useAppStore } from "@/store/useAppStore";
@@ -462,7 +462,7 @@ const Messages = () => {
     }, [isMobile, chats, urlChatId, urlLearnerId, router]);
 
     if (noChats === null && !isErrorChats) {
-        return <LottieLoader isLoading={true} />;
+        return <MessagesPageSkeleton />;
     }
 
     return (
@@ -514,9 +514,7 @@ const Messages = () => {
                         </div>
                         <div className="flex flex-col md:gap-4 p-4 bg-[#f4f7fb] md:bg-white h-[calc(100vh-16em)] overflow-y-auto">
                             {isIndividualLoading ? (
-                                <div className="flex-1 flex items-center justify-center min-h-[200px]">
-                                    <LottieLoader isLoading={true} />
-                                </div>
+                                <ChatBubblesSkeleton />
                             ) : (
                                 <>
                                     {individualChat?.map((message: any, index: any) => (

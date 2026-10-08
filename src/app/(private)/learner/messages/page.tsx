@@ -22,7 +22,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { SendIcon } from "@/assets/icons";
-import LottieLoader from "@/components/common/Loader/Lottie";
+import { ChatBubblesSkeleton, MessagesPageSkeleton } from "@/components/messages/MessagesSkeleton";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { showToast } from "@/components/common/Toast";
 
@@ -463,7 +463,7 @@ const Messages = () => {
     }, [isMobile, chats, urlChatId, urlVolunteerId, router]);
 
     if (noChats === null && !isErrorChats) {
-        return <LottieLoader isLoading={true} />;
+        return <MessagesPageSkeleton />;
     }
     return (
         <>
@@ -525,9 +525,7 @@ const Messages = () => {
                         </div>
                         <div className="flex flex-col md:gap-4 p-4 bg-[#f4f7fb] md:bg-white h-[calc(100vh-16em)] overflow-y-auto">
                             {isIndividualLoading ? (
-                                <div className="flex-1 flex items-center justify-center min-h-[200px]">
-                                    <LottieLoader isLoading={true} />
-                                </div>
+                                <ChatBubblesSkeleton />
                             ) : (
                                 <>
                                     {individualChat?.map((message: any, index: any) => (
