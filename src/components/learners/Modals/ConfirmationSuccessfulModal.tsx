@@ -9,6 +9,9 @@ import ModalCloseIcon from "@/assets/icons/ModalCloseIcon";
 import PersonImg from "@/assets/images/Person.png";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { safeHref } from "@/utils/safeHref";
+import type dayjs from "dayjs";
+import { canJoinSession, isJoinTooEarly, joinOpensAt, JOIN_OPENS_MINUTES_BEFORE } from "@/utils/sessionDisplay";
+import { useNow } from "@/hooks/schedule/useProfileTimeZone";
 
 interface ConfirmationSuccessfulModalProps {
     isOpen: boolean;
@@ -25,6 +28,8 @@ interface ConfirmationSuccessfulModalProps {
             profilePicture?: string;
         };
         meetingLink?: string;
+        /** Absolute start/end - Join opens 3 minutes before the start. */
+        joinBounds?: { start: dayjs.Dayjs; end: dayjs.Dayjs } | null;
         guests?: string[];
         is_learner?: boolean;
     };
@@ -41,7 +46,12 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
 }) => {
     const [copied, setCopied] = useState(false);
     // Only a real http(s) Meet link - Join used to open an empty window when there was none.
-    const meetHref = safeHref(session.meetingLink);
+    const now = useNow();
+    const linkHref = safeHref(session.meetingLink);
+    // The link is only offered (and shown / copyable) from 3 minutes before the start.
+    const meetHref = linkHref && canJoinSession({ status: "booked", meet_link: linkHref }, session.joinBounds, now) ? linkHref : undefined;
+    const tooEarly = Boolean(linkHref) && isJoinTooEarly(session.joinBounds, now);
+    const opensAt = joinOpensAt(session.joinBounds);
 
     const handleCopyLink = () => {
         if (meetHref) {
@@ -148,7 +158,9 @@ const ConfirmationSuccessfulModal: React.FC<ConfirmationSuccessfulModalProps> = 
                                 </a>
                             ) : (
                                 <span id="meet-link-missing" className="text-[12px] text-[#4F4F4F] font-medium">
-                                    The Meet link isn&apos;t available yet.
+                                    {tooEarly
+                                        ? `Join opens ${JOIN_OPENS_MINUTES_BEFORE} minutes before the session starts.`
+                                        : "The Meet link isn't available yet."}
                                 </span>
                             )}
                         </div>

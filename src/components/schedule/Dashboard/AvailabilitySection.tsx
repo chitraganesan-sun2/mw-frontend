@@ -9,7 +9,7 @@ import { showToast } from "@/components/common/Toast";
 import { useConfirm } from "@/hooks/useConfirm";
 import { getApiErrorMessage } from "@/utils/apiError";
 import {
-    canJoinSession,
+    joinState,
     formatSessionDate,
     formatSessionTime,
     formatShortSessionDate,
@@ -21,6 +21,7 @@ import {
 } from "@/utils/sessionDisplay";
 import { joinNames } from "@/utils/joinNames";
 import { safeHref } from "@/utils/safeHref";
+import JoinButton from "@/components/common/JoinButton";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
@@ -58,7 +59,7 @@ function CompactSessionRow({
         timeZoneLabel,
     });
     const joinHref = safeHref(session.meet_link);
-    const showJoin = Boolean(joinHref) && canJoinSession(session, bounds?.end, now);
+    const joinStatus = joinHref ? joinState(session, bounds, now) : "none";
     const showRespond = isAwaitingMyResponse(session, "volunteer");
     return (
         <li className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm">
@@ -97,16 +98,7 @@ function CompactSessionRow({
                         Respond
                     </button>
                 )}
-                {showJoin && (
-                    <a
-                        href={joinHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold"
-                    >
-                        Join
-                    </a>
-                )}
+                <JoinButton state={joinStatus} href={joinHref} />
             </span>
         </li>
     );

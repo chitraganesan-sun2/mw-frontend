@@ -414,23 +414,54 @@ interface JoinableSession {
     meet_link?: string | null;
 }
 
+/** Join opens this many minutes before the scheduled start (product rule, everywhere). */
+export const JOIN_OPENS_MINUTES_BEFORE = 3;
+
+interface JoinBounds {
+    start?: dayjs.Dayjs | null;
+    end?: dayjs.Dayjs | null;
+}
+
+/** The moment Join becomes available (3 minutes before the start), or null if the start is unknown. */
+export function joinOpensAt(bounds: JoinBounds | null | undefined): dayjs.Dayjs | null {
+    return bounds?.start ? bounds.start.subtract(JOIN_OPENS_MINUTES_BEFORE, "minute") : null;
+}
+
+/** True while it is too early to join (more than 3 minutes before the start). */
+export function isJoinTooEarly(bounds: JoinBounds | null | undefined, now: dayjs.Dayjs = dayjs()): boolean {
+    const opensAt = joinOpensAt(bounds);
+    return Boolean(opensAt && now.isBefore(opensAt));
+}
+
+export type JoinState = "open" | "early" | "none";
+
 /**
- * Whether to show a Join button. Mirrors the existing product rule (there is no
- * "too early to join" window anywhere in the app): a participant may join an accepted /
- * in-progress session that has a Meet link until it ends. Never for cancelled, declined,
- * completed, expired or pending sessions. The API only returns a Meet link to the
- * session's own participants, so a missing link also covers "not authorised".
+ * What the Join button should do. "none": no Join at all (not a live session, no Meet link, or
+ * already ended). "early": the session can be joined but not yet - the button stays visible and
+ * disabled until 3 minutes before the scheduled start. "open": joinable now (from 3 minutes
+ * before the start until it ends). The API only returns a Meet link to the session's own
+ * participants, so a missing link also covers "not authorised". Unknown bounds do not block
+ * (there is nothing to compare against).
  */
+export function joinState(
+    session: JoinableSession,
+    bounds: JoinBounds | null | undefined,
+    now: dayjs.Dayjs = dayjs()
+): JoinState {
+    const status = normalizeStatus(session.status);
+    if (!session.meet_link) return "none";
+    if (status !== "accepted" && status !== "active" && status !== "booked") return "none";
+    if (bounds?.end && !bounds.end.isAfter(now)) return "none";
+    return isJoinTooEarly(bounds, now) ? "early" : "open";
+}
+
+/** True only while the session can be joined right now. */
 export function canJoinSession(
     session: JoinableSession,
-    endsAt: dayjs.Dayjs | null | undefined,
+    bounds: JoinBounds | null | undefined,
     now: dayjs.Dayjs = dayjs()
 ): boolean {
-    const status = normalizeStatus(session.status);
-    if (!session.meet_link) return false;
-    if (status !== "accepted" && status !== "active" && status !== "booked") return false;
-    if (endsAt && !endsAt.isAfter(now)) return false;
-    return true;
+    return joinState(session, bounds, now) === "open";
 }
 
 /**

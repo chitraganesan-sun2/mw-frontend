@@ -19,6 +19,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
 import WhenLine from "@/components/common/WhenLine";
+import JoinButton from "@/components/common/JoinButton";
+import JoinOpensNote from "@/components/common/JoinOpensNote";
 import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 import { useDebounce } from "use-debounce";
 import dayjs from "dayjs";
@@ -27,7 +29,7 @@ import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import {
     canCompleteSession,
-    canJoinSession,
+    joinState,
     formatDuration,
     formatLevel,
     formatSessionDate,
@@ -143,7 +145,7 @@ function MySessionCard({
     const isLive = session.status === "accepted" || session.status === "active";
     const isOpen = session.status === "open";
     const bounds = sessionBounds(session, timeZoneLabel);
-    const joinable = canJoinSession({ status: session.status, meet_link: safeHref(session.meet_link) }, bounds?.end, now);
+    const joinStatus = joinState({ status: session.status, meet_link: safeHref(session.meet_link) }, bounds, now);
     // Complete only once the scheduled end has passed (the backend rejects it before that).
     const completable = canCompleteSession(session, bounds, now);
     const level = session.requested_level || session.grade_level || session.expertise_level;
@@ -217,23 +219,15 @@ function MySessionCard({
                                     </button>
                                 </>
                             )}
-                            {joinable ? (
-                                <button
-                                    className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90 disabled:opacity-50"
-                                    disabled={isActionLoading}
-                                    onClick={() => onView(session.session_id)}
-                                >
-                                    Join
-                                </button>
-                            ) : (
-                                <button
-                                    className={`${actionClass} text-gray-700 underline underline-offset-2 hover:text-gray-900`}
-                                    disabled={isActionLoading}
-                                    onClick={() => onView(session.session_id)}
-                                >
-                                    View
-                                </button>
-                            )}
+                            <button
+                                className={`${actionClass} text-gray-700 underline underline-offset-2 hover:text-gray-900`}
+                                disabled={isActionLoading}
+                                onClick={() => onView(session.session_id)}
+                            >
+                                View
+                            </button>
+                            {/* Always visible on a live session; disabled until 3 minutes before the start. */}
+                            <JoinButton state={joinStatus} onClick={() => onView(session.session_id)} />
                         </>
                     )}
                 </div>
@@ -584,12 +578,13 @@ export default function VolunteerInstantSessionsPage() {
                             customClassName="flex-1"
                             onClick={() => setSessionDetail(null)}
                         />
-                        {sessionDetail &&
-                            detailJoinHref &&
-                            canJoinSession({ status: sessionDetail.status, meet_link: detailJoinHref }, detailBounds?.end, now) && (
-                            <a href={detailJoinHref} target="_blank" rel="noopener noreferrer" className="flex-1">
-                                <Button title="Join" btnVariant="primary" customClassName="w-full" />
-                            </a>
+                        {sessionDetail && detailJoinHref && (
+                            <JoinButton
+                                variant="block"
+                                state={joinState({ status: sessionDetail.status, meet_link: detailJoinHref }, detailBounds, now)}
+                                href={detailJoinHref}
+                                wrapperClassName="flex-1"
+                            />
                         )}
                         {sessionDetail?.status && !["completed", "cancelled", "expired"].includes(sessionDetail.status) && (
                             <>
@@ -632,6 +627,12 @@ export default function VolunteerInstantSessionsPage() {
                                 timeZoneLabel,
                             })}
                         </p>
+                        <JoinOpensNote
+                            status={sessionDetail.status}
+                            meetLink={detailJoinHref}
+                            bounds={detailBounds}
+                            now={now}
+                        />
                         {sessionDetail.learner_full_name && (
                             <p>
                                 <span className="font-medium">Learner: </span>

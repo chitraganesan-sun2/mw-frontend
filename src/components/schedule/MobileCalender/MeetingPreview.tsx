@@ -1,4 +1,7 @@
 "use client";
+import { useNow } from "@/hooks/schedule/useProfileTimeZone";
+import JoinOpensNote from "@/components/common/JoinOpensNote";
+import JoinButton from "@/components/common/JoinButton";
 import { endpoints } from "@/api/constants";
 import { PUT_API } from "@/api/request";
 import FeedModalCloseIcon from "@/assets/icons/FeedModalCloseIcon";
@@ -21,7 +24,7 @@ import { safeHref } from "@/utils/safeHref";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import {
     canCompleteSession,
-    canJoinSession,
+    joinState,
     formatSessionWhen,
     getSessionInstantBounds,
     getStatusLabel,
@@ -107,6 +110,8 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         }
     }, [isOpen]);
 
+    // Ticks so Join appears 3 minutes before the start without a reload (a hook: it must sit before the early return).
+    const now = useNow();
     if ((!isAnimating && !isOpen) || !event) return null;
 
     const eventData = event;
@@ -139,7 +144,8 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         timeZoneLabel,
     });
     const joinHref = safeHref(meetLink);
-    const showJoin = Boolean(joinHref) && canJoinSession({ status, meet_link: joinHref }, bounds?.end);
+    const joinStatus = joinHref ? joinState({ status, meet_link: joinHref }, bounds, now) : "none";
+    const showJoin = joinStatus === "open";
     // Completion is only allowed once the scheduled end has passed (backend-enforced).
     const showComplete = canCompleteSession({ status }, bounds);
 
@@ -232,6 +238,15 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                                         customClassName="w-fit text-sm rounded-full !py-0 !px-2"
                                         onClick={handleLinkCopy}
                                     />
+                                </div>
+                                <Divider />
+                            </div>
+                        )}
+                        {joinStatus === "early" && (
+                            <div>
+                                <div className="flex flex-col gap-2 mb-5">
+                                    <JoinButton state="early" variant="block" label="Join with Google Meet" wrapperClassName="w-fit" />
+                                    <JoinOpensNote status={status} meetLink={joinHref} bounds={bounds} now={now} />
                                 </div>
                                 <Divider />
                             </div>

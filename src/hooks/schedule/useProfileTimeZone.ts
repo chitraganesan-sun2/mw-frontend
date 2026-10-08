@@ -70,7 +70,8 @@ export function useProfileToday(role?: ScheduleRole): string {
 
 /** A dayjs "now" that re-renders the caller every `intervalMs` (default 1 min), so time-based
  * UI (Join / Complete availability) updates without a reload. */
-export function useNow(intervalMs = 60 * 1000): dayjs.Dayjs {
+// 15s: the Join button appears 3 minutes before a session, so a 60s tick could be a minute late.
+export function useNow(intervalMs = 15 * 1000): dayjs.Dayjs {
     const [now, setNow] = useState(() => dayjs());
     useEffect(() => {
         const timer = setInterval(() => setNow(dayjs()), intervalMs);

@@ -24,12 +24,14 @@ import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
 import WhenLine from "@/components/common/WhenLine";
+import JoinButton from "@/components/common/JoinButton";
+import JoinOpensNote from "@/components/common/JoinOpensNote";
 import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import {
-    canJoinSession,
+    joinState,
     formatDuration,
     formatLevel,
     formatSessionDate,
@@ -44,7 +46,7 @@ import {
 } from "@/utils/sessionDisplay";
 import { safeHref } from "@/utils/safeHref";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
-import { useProfileTimeZone, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+import { useNow, useProfileTimeZone, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 
 export interface Session {
     id: string;
@@ -265,6 +267,8 @@ export default function InstantSessionsPage() {
     // Today/tomorrow in the learner's PROFILE timezone (not the browser's), re-evaluated every
     // minute and on focus so an open tab rolls over at midnight.
     const timeZoneLabel = useProfileTimeZone("learner");
+    // Ticks so Join appears 3 minutes before the start without a reload.
+    const now = useNow();
     const todayStr = useProfileToday("learner");
     const tomorrowStr = useMemo(() => dayjs(todayStr).add(1, "day").format("YYYY-MM-DD"), [todayStr]);
     // Browsing is always "today + tomorrow" combined, no per-date navigation - users
@@ -410,8 +414,8 @@ export default function InstantSessionsPage() {
                 }),
                 hostName: apiData?.volunteer_name ?? session.instructor.name,
                 meetLink: safeHref(apiData?.meet_link),
-                // Absolute end (UTC fields) - the local fields are in the profile timezone.
-                endsAt: getSessionInstantBounds(
+                // Absolute start/end (UTC fields) - the local fields are in the profile timezone.
+                joinBounds: getSessionInstantBounds(
                     { ...session.instant, ...apiData },
                     {
                         date: apiData?.date ?? session.date,
@@ -419,7 +423,7 @@ export default function InstantSessionsPage() {
                         end: apiData?.end_time ?? session.end_time_24,
                         timeZoneLabel,
                     }
-                )?.end,
+                ),
                 status: "accepted",
                 cancelAction: "unclaim",
                 identifier: session.id,
@@ -468,12 +472,12 @@ export default function InstantSessionsPage() {
                 }),
                 hostName: apiData?.volunteer_full_name,
                 meetLink: safeHref(apiData?.meet_link),
-                endsAt: getSessionInstantBounds(apiData, {
+                joinBounds: getSessionInstantBounds(apiData, {
                     date: apiData?.learner_start_date,
                     start: apiData?.learner_start_time,
                     end: apiData?.learner_end_time,
                     timeZoneLabel,
-                })?.end,
+                }),
                 status: apiData?.status,
                 cancelAction: ["completed", "cancelled", "expired"].includes(apiData?.status) ? "none" : "cancel",
                 identifier: sessionId,
@@ -700,16 +704,13 @@ export default function InstantSessionsPage() {
                             customClassName="flex-1"
                             onClick={() => setSessionDetail(null)}
                         />
-                        {sessionDetail &&
-                            canJoinSession({ status: sessionDetail.status, meet_link: sessionDetail.meetLink }, sessionDetail.endsAt) && (
-                            <a
+                        {sessionDetail && sessionDetail.meetLink && (
+                            <JoinButton
+                                variant="block"
+                                state={joinState({ status: sessionDetail.status, meet_link: sessionDetail.meetLink }, sessionDetail.joinBounds, now)}
                                 href={sessionDetail.meetLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1"
-                            >
-                                <Button title="Join" btnVariant="primary" customClassName="w-full" />
-                            </a>
+                                wrapperClassName="flex-1"
+                            />
                         )}
                         {sessionDetail?.cancelAction && sessionDetail.cancelAction !== "none" && (
                             <Button
@@ -731,6 +732,12 @@ export default function InstantSessionsPage() {
                             <span className="font-medium">When: </span>
                             {sessionDetail.whenLabel}
                         </p>
+                        <JoinOpensNote
+                            status={sessionDetail.status}
+                            meetLink={sessionDetail.meetLink}
+                            bounds={sessionDetail.joinBounds}
+                            now={now}
+                        />
                         {sessionDetail.hostName && (
                             <p>
                                 <span className="font-medium">Volunteer: </span>

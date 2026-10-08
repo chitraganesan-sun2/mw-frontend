@@ -3,9 +3,10 @@
 import React from "react";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
 import WhenLine from "@/components/common/WhenLine";
+import JoinButton from "@/components/common/JoinButton";
 import { onEnterOrSpace } from "@/utils/a11y";
 import {
-    canJoinSession,
+    joinState,
     formatSessionDate,
     getSessionInstantBounds,
     getStatusLabel,
@@ -13,6 +14,7 @@ import {
     type SessionInstantFields,
 } from "@/utils/sessionDisplay";
 import { safeHref } from "@/utils/safeHref";
+import { useNow } from "@/hooks/schedule/useProfileTimeZone";
 
 interface SessionCardProps {
     session: {
@@ -48,16 +50,18 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
     const status = { label: getStatusLabel(session.status), className: getStatusPillClass(session.status) };
     // Absolute end from the UTC fields (the 24h times are profile-local wall clock, which the
     // browser's timezone would misread).
-    const endsAt = getSessionInstantBounds(session.instant, {
+    const bounds = getSessionInstantBounds(session.instant, {
         date: session.date,
         start: session.start_time_24,
         end: session.end_time_24,
-    })?.end;
+    });
+    // Ticks so Join appears 3 minutes before the start without a reload.
+    const now = useNow();
     const joinHref = safeHref(session.meetLink);
-    const showJoin =
-        session.status === "claimed" &&
-        session.claimedByMe &&
-        canJoinSession({ status: "booked", meet_link: joinHref }, endsAt);
+    const joinStatus =
+        session.status === "claimed" && session.claimedByMe && joinHref
+            ? joinState({ status: "booked", meet_link: joinHref }, bounds, now)
+            : "none";
 
     const tags = (session.tags || [])
         .map((tag) => (typeof tag === "string" ? tag : (tag as any)?.skill_name ?? (tag as any)?.name ?? ""))
@@ -102,17 +106,9 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick }) => {
             )}
             {/* Join - shown directly on the learner's own claimed cards so they don't have to
                 open the detail modal to join. */}
-            {showJoin && (
+            {joinStatus !== "none" && (
                 <div className="flex justify-end pt-0.5">
-                    <a
-                        href={joinHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90"
-                    >
-                        Join
-                    </a>
+                    <JoinButton state={joinStatus} href={joinHref} stopPropagation />
                 </div>
             )}
         </article>

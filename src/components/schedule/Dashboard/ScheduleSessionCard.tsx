@@ -6,8 +6,9 @@ import { downloadFile } from "@/utils/downloadFile";
 import { isNativePlatform } from "@/utils/platform";
 import { joinNames } from "@/utils/joinNames";
 import { safeHref } from "@/utils/safeHref";
+import JoinButton from "@/components/common/JoinButton";
 import {
-    canJoinSession,
+    joinState,
     formatDuration,
     formatSessionDate,
     formatLevel,
@@ -81,7 +82,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     const counterpartRole = isLearnerViewer ? "Volunteer" : "Learner";
     const subjects = subjectLine(session);
     const joinHref = safeHref(session.meet_link);
-    const showJoin = Boolean(joinHref) && canJoinSession(session, bounds?.end, now);
+    const joinStatus = joinHref ? joinState(session, bounds, now) : "none";
     const timeRange = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
     const showRespond = Boolean(onRespond) && isAwaitingMyResponse(session, role);
     const showDescription =
@@ -139,7 +140,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 </p>
             )}
 
-            {(showJoin || showRespond || (!isNativePlatform() && session.status === "accepted")) && (
+            {(joinStatus !== "none" || showRespond || (!isNativePlatform() && session.status === "accepted")) && (
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pt-0.5">
                     {!isNativePlatform() && session.status === "accepted" && (
                         <button
@@ -170,16 +171,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             Respond
                         </button>
                     )}
-                    {showJoin && (
-                        <a
-                            href={joinHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold"
-                        >
-                            Join
-                        </a>
-                    )}
+                    <JoinButton state={joinStatus} href={joinHref} />
                 </div>
             )}
         </article>

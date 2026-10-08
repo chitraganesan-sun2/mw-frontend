@@ -9,7 +9,8 @@ import { GET_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "@/components/common/Toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDuration, formatSessionDate, formatSessionTime, getDurationMinutes, shortTimeZone } from "@/utils/sessionDisplay";
+import { formatDuration, formatSessionDate, formatSessionTime, getDurationMinutes, getSessionInstantBounds, shortTimeZone } from "@/utils/sessionDisplay";
+import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { cn } from "@/utils/merge-class";
@@ -53,6 +54,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
     onClaimLoadingChange,
 }) => {
     const queryClient = useQueryClient();
+    const profileTimeZoneLabel = useProfileTimeZone("learner");
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [successSession, setSuccessSession] = useState<any>(session);
     const [showConfirmation, setShowConfirmation] = useState(true);
@@ -98,6 +100,13 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
                                 profilePicture: apiData.volunteer_image?.image_url || "/dummy-profile.webp",
                             },
                             meetingLink: apiData.meet_link,
+                            // Absolute start/end - Join opens 3 minutes before the start.
+                            joinBounds: getSessionInstantBounds(apiData, {
+                                date: apiData.date,
+                                start: apiData.start_time,
+                                end: apiData.end_time,
+                                timeZoneLabel: profileTimeZoneLabel,
+                            }),
                             // The backend deliberately stops returning volunteer_email/
                             // learner_email here (privacy fix) - apiData.volunteer_name is
                             // the only participant name this endpoint actually provides, so
