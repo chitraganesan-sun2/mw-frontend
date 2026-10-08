@@ -3,8 +3,9 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
-import { useNow } from "@/hooks/schedule/useProfileTimeZone";
-import ScheduleSessionCard from "./ScheduleSessionCard";
+import dayjs from "dayjs";
+import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+import ScheduleSessionCard, { isAwaitingMyResponse } from "./ScheduleSessionCard";
 import {
     SCHEDULE_LABELS,
     SCHEDULE_TAB_EMPTY,
@@ -20,6 +21,60 @@ interface MyScheduleSectionProps {
     role: ScheduleRole;
     timeZoneLabel?: string;
     onOpenProfile: (userId: string) => void;
+    /** Opens Add New Session - offered from the empty states. */
+    onAddSession?: () => void;
+}
+
+/** "My Posted Sessions (accepted by learners)" -> ["My Posted Sessions", "accepted by learners"]. */
+function splitTabLabel(label: string): [string, string] {
+    const m = label.match(/^(.*?)\s*\((.*)\)$/);
+    return m ? [m[1], m[2]] : [label, ""];
+}
+
+interface SessionGroup {
+    key: string;
+    label: string;
+    accent?: boolean;
+    items: ScheduleSession[];
+}
+
+/** Date groups so the next session is easy to spot. Upcoming: requests waiting for the viewer
+ * first, then Today / Tomorrow / This week / Next week / Later. Past: Today / Yesterday /
+ * Earlier this week / Earlier this month / Older, with cancelled or declined sessions that were
+ * scheduled for a later date kept together. Input order (already sorted by the API) is kept. */
+function groupSessions(sessions: ScheduleSession[], role: ScheduleRole, when: "upcoming" | "past", today: string): SessionGroup[] {
+    const groups: SessionGroup[] = [];
+    const add = (key: string, label: string, session: ScheduleSession, accent = false) => {
+        let group = groups.find((g) => g.key === key);
+        if (!group) {
+            group = { key, label, accent, items: [] };
+            groups.push(group);
+        }
+        group.items.push(session);
+    };
+    const base = dayjs(today);
+    sessions.forEach((session) => {
+        if (when === "upcoming" && isAwaitingMyResponse(session, role)) {
+            add("respond", "Needs your response", session, true);
+            return;
+        }
+        const date = role === "volunteer" ? session.volunteer_start_date : session.learner_start_date;
+        const diff = date && base.isValid() ? dayjs(date).diff(base, "day") : 0;
+        if (when === "upcoming") {
+            if (diff <= 0) add("today", "Today", session);
+            else if (diff === 1) add("tomorrow", "Tomorrow", session);
+            else if (diff <= 6) add("week", "This week", session);
+            else if (diff <= 13) add("next", "Next week", session);
+            else add("later", "Later", session);
+        } else if (diff > 0) {
+            add("cancelled-later", "Cancelled or declined", session);
+        } else if (diff === 0) add("today", "Today", session);
+        else if (diff === -1) add("yesterday", "Yesterday", session);
+        else if (diff >= -6) add("week", "Earlier this week", session);
+        else if (diff >= -30) add("month", "Earlier this month", session);
+        else add("older", "Older", session);
+    });
+    return groups;
 }
 
 export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
@@ -32,7 +87,7 @@ export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
     );
 }
 
-const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile }) => {
+const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile, onAddSession }) => {
     const [activeTab, setActiveTab] = useState<ScheduleTab>("posted");
     const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
     const tabRefs = useRef<Record<ScheduleTab, HTMLButtonElement | null>>({ posted: null, accepted: null, direct: null });
@@ -40,6 +95,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const openApprovals = useApprovalDrawer((state) => state.open);
     // Re-evaluated every minute so Join appears/disappears without a reload.
     const now = useNow();
+    const today = useProfileToday(role);
 
     const upcoming = useScheduleSessions(role, "upcoming");
     const past = useScheduleSessions(role, "past", when === "past");
@@ -81,6 +137,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     };
 
     const sessions = byTab[activeTab];
+    const groups = useMemo(() => groupSessions(sessions, role, when, today), [sessions, role, when, today]);
     const hiddenPast = when === "past" && (past.data?.total ?? 0) > (past.data?.items.length ?? 0);
 
     return (
@@ -110,6 +167,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 {TABS.map((tab) => {
                     const selected = tab === activeTab;
                     const count = active.data ? byTab[tab].length : null;
+                    const [tabTitle, tabNote] = splitTabLabel(SCHEDULE_TAB_LABELS[role][tab]);
                     return (
                         <button
                             key={tab}
@@ -126,8 +184,15 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             onKeyDown={onTabKeyDown}
                             className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs font-medium leading-snug transition-colors ${selected ? "border-black bg-black text-white" : "border-gray-200 bg-white text-gray-800 hover:bg-gray-50"}`}
                         >
-                            {SCHEDULE_TAB_LABELS[role][tab]}
-                            {count !== null && <span className={`ml-1 ${selected ? "text-gray-300" : "text-gray-500"}`}>({count})</span>}
+                            <span className="block">
+                                {tabTitle}
+                                {count !== null && <span className={`ml-1 ${selected ? "text-gray-300" : "text-gray-500"}`}>({count})</span>}
+                            </span>
+                            {tabNote && (
+                                <span className={`block text-[11px] font-normal ${selected ? "text-gray-300" : "text-gray-500"}`}>
+                                    {tabNote}
+                                </span>
+                            )}
                         </button>
                     );
                 })}
@@ -147,23 +212,47 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 ) : active.isError ? (
                     <QueryErrorNotice message="Couldn't load your sessions." onRetry={() => active.refetch()} />
                 ) : sessions.length === 0 ? (
-                    <p className="text-sm text-gray-600 py-2">
-                        {when === "past" ? "No past sessions here yet." : SCHEDULE_TAB_EMPTY[role][activeTab]}
-                    </p>
+                    <div className="flex flex-col items-center gap-2 py-4 text-center">
+                        <p className="text-sm text-gray-600">
+                            {when === "past" ? "No past sessions here yet." : SCHEDULE_TAB_EMPTY[role][activeTab]}
+                        </p>
+                        {when === "upcoming" && onAddSession && (
+                            <button
+                                type="button"
+                                onClick={onAddSession}
+                                className="rounded-full bg-black px-4 py-1.5 text-xs font-semibold text-white hover:bg-gray-900 border-0 cursor-pointer"
+                            >
+                                Add New Session
+                            </button>
+                        )}
+                    </div>
                 ) : (
-                    // grid-cols-1 = minmax(0, 1fr): an implicit auto column grew to the cards'
-                    // content width on phones, pushing Join past the section edge.
-                    <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-                        {sessions.map((session) => (
-                            <ScheduleSessionCard
-                                key={session.session_id}
-                                session={session}
-                                role={role}
-                                timeZoneLabel={timeZoneLabel}
-                                onOpenProfile={onOpenProfile}
-                                onRespond={openApprovals}
-                                now={now}
-                            />
+                    <div className="flex flex-col gap-3">
+                        {groups.map((group) => (
+                            <div key={group.key} className="flex flex-col gap-2">
+                                <p
+                                    className={`text-[11px] font-semibold uppercase tracking-wide ${
+                                        group.accent ? "text-amber-700" : "text-gray-500"
+                                    }`}
+                                >
+                                    {group.label} <span className="font-normal">({group.items.length})</span>
+                                </p>
+                                {/* grid-cols-1 = minmax(0, 1fr): an implicit auto column grew to the cards'
+                                    content width on phones, pushing Join past the section edge. */}
+                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
+                                    {group.items.map((session) => (
+                                        <ScheduleSessionCard
+                                            key={session.session_id}
+                                            session={session}
+                                            role={role}
+                                            timeZoneLabel={timeZoneLabel}
+                                            onOpenProfile={onOpenProfile}
+                                            onRespond={openApprovals}
+                                            now={now}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}

@@ -84,7 +84,10 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     const joinHref = safeHref(session.meet_link);
     const joinStatus = joinHref ? joinState(session, bounds, now) : "none";
     const timeRange = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
-    const showRespond = Boolean(onRespond) && isAwaitingMyResponse(session, role);
+    const awaitingMe = isAwaitingMyResponse(session, role);
+    const showRespond = Boolean(onRespond) && awaitingMe;
+    // A request nobody answered before its time passed is "Expired", not still "Pending".
+    const statusKey = session.status === "pending" && bounds && !bounds.end.isAfter(now) ? "expired" : session.status;
     const showDescription =
         Boolean(session.session_description) &&
         !isRedundantLevelDescription(session.session_description, session.requested_level);
@@ -92,7 +95,9 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     return (
         <article
             aria-label={session.session_title || "Session"}
-            className="min-w-0 rounded-lg border border-gray-200 bg-white p-3 flex flex-col gap-1.5"
+            className={`min-w-0 rounded-lg border bg-white p-3 flex flex-col gap-1.5 ${
+                awaitingMe ? "border-amber-300 border-l-4 border-l-amber-400" : "border-gray-200"
+            }`}
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -117,8 +122,8 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                         </p>
                     )}
                 </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass(session.status)}`}>
-                    {getStatusLabel(session.status)}
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${getStatusPillClass(statusKey)}`}>
+                    {getStatusLabel(statusKey)}
                 </span>
             </div>
 

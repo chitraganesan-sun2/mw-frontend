@@ -62,7 +62,7 @@ function CompactSessionRow({
     const joinStatus = joinHref ? joinState(session, bounds, now) : "none";
     const showRespond = isAwaitingMyResponse(session, "volunteer");
     return (
-        <li className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm">
+        <li className={`flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm ${showRespond ? "border-l-4 border-l-amber-400 bg-amber-50/40" : ""}`}>
             <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{session.session_title || "Session"}</p>
                 <p className="text-xs text-gray-600">
@@ -179,14 +179,12 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
 
     // Same query (and cache entry) as My Schedule's upcoming list - no extra request.
     const upcoming = useScheduleSessions(role, "upcoming", isVolunteer);
-    const { offering, taken } = useMemo(() => {
-        const groups: { offering: ScheduleSession[]; taken: ScheduleSession[] } = { offering: [], taken: [] };
-        (upcoming.data?.items || []).forEach((s) => {
-            const group = getVolunteerSlotGroup(s);
-            if (group) groups[group].push(s);
-        });
-        return groups;
-    }, [upcoming.data]);
+    // Sessions learners booked from this volunteer's availability. Sessions taken from learner
+    // postings are NOT repeated here - they are already under My Sessions > Accepted.
+    const offering = useMemo(
+        () => (upcoming.data?.items || []).filter((s) => getVolunteerSlotGroup(s) === "offering"),
+        [upcoming.data]
+    );
 
     const weeklyRows = useMemo(
         () =>
@@ -284,9 +282,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             </h2>
 
             {/* Full-width section: the groups sit side by side on wide screens instead of one tall column. */}
-            <div className={isVolunteer ? "grid grid-cols-1 gap-4 items-start lg:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"}>
+            <div className={isVolunteer ? "grid grid-cols-1 gap-4 items-start lg:grid-cols-2" : "flex flex-col gap-4"}>
             {isVolunteer && renderSessionGroup(SCHEDULE_LABELS.slotsOffering, offering, "No learner has booked your availability yet.")}
-            {isVolunteer && renderSessionGroup(SCHEDULE_LABELS.slotsTaken, taken, "You haven't taken any learner postings yet.")}
 
             <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
@@ -312,7 +309,16 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                         }}
                     />
                 ) : nothingScheduled ? (
-                    <p className="text-sm text-gray-600">You haven&apos;t scheduled any availability yet.</p>
+                    <div className="flex flex-col items-start gap-2">
+                        <p className="text-sm text-gray-600">You haven&apos;t scheduled any availability yet.</p>
+                        <button
+                            type="button"
+                            onClick={onScheduleAvailability}
+                            className="rounded-full bg-black px-4 py-1.5 text-xs font-semibold text-white hover:bg-gray-900 border-0 cursor-pointer"
+                        >
+                            Schedule my availability
+                        </button>
+                    </div>
                 ) : (
                     <ul className="flex flex-col divide-y divide-gray-100 rounded-lg border border-gray-200">
                         {weeklyRows.map(({ day, slot }, i) => (

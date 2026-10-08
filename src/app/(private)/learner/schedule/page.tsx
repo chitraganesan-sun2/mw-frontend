@@ -123,6 +123,7 @@ export default function LearnerSchedulePage() {
                 isCalendarView={isCalendarView}
                 timeZoneLabel={learnerTimeZone}
                 onScheduleAvailability={() => setModal("my_availability")}
+                onAddSession={() => setModal("add_new_meeting")}
                 onOpenProfile={(id) => setVolunteerId(id)}
                 events={data}
                 isLoading={isLoading || !currentMonth}
