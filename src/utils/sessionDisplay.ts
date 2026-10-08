@@ -376,6 +376,24 @@ export function getSessionInstantBounds(
     return null;
 }
 
+/** The session's start in the OTHER participant's time zone ("5:00 PM GMT", with the date when it
+ * falls on a different day), or null when they share the viewer's UTC offset / it is unknown. */
+export function counterpartTimeNote(
+    bounds: { start: dayjs.Dayjs } | null | undefined,
+    viewerLabel?: string | null,
+    otherLabel?: string | null
+): string | null {
+    if (!bounds || !otherLabel) return null;
+    const otherZone = profileTimeZoneIana(otherLabel);
+    if (!otherZone) return null;
+    const viewerZone = profileTimeZoneIana(viewerLabel);
+    const mine = viewerZone ? bounds.start.tz(viewerZone) : bounds.start.local();
+    const theirs = bounds.start.tz(otherZone);
+    if (!theirs.isValid() || mine.utcOffset() === theirs.utcOffset()) return null;
+    const otherDay = theirs.format("YYYY-MM-DD") !== mine.format("YYYY-MM-DD") ? ` (${theirs.format("MMM D")})` : "";
+    return `${theirs.format("h:mm A")}${otherDay} ${zoneAbbreviation(otherZone, bounds.start)}`.trim();
+}
+
 /** True once the session's scheduled end has passed (unknown bounds -> false). */
 export function hasSessionEnded(
     bounds: { end: dayjs.Dayjs } | null | undefined,

@@ -13,6 +13,7 @@ import {
     formatSessionDate,
     formatLevel,
     formatSessionTime,
+    counterpartTimeNote,
     getDurationMinutes,
     getSessionInstantBounds,
     getStatusLabel,
@@ -87,6 +88,11 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     const joinHref = safeHref(session.meet_link);
     const joinStatus = joinHref ? joinState(session, bounds, now) : "none";
     const timeRange = [formatSessionTime(start), formatSessionTime(end)].filter(Boolean).join(" – ");
+    const theirTime = counterpartTimeNote(
+        bounds,
+        timeZoneLabel,
+        isLearnerViewer ? session.volunteer_timezone : session.learner_timezone
+    );
     const awaitingMe = isAwaitingMyResponse(session, role);
     const showRespond = Boolean(onRespond) && awaitingMe;
     // Only an accepted session that hasn't started can be moved, one request at a time.
@@ -142,9 +148,22 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 {timeRange && <span> · {timeRange}{timeZoneLabel ? ` ${shortTimeZone(timeZoneLabel, date)}` : ""}</span>}
                 {duration && <span> · {duration}</span>}
             </p>
+            {theirTime && (
+                <p className="text-[11px] text-gray-500">
+                    {counterpartName ? `${counterpartName}'s time` : "Their time"}: {theirTime}
+                </p>
+            )}
 
             {subjects && <p className="text-xs text-gray-600">{subjects}</p>}
 
+            {/* Accepted but the calendar event/Meet link was never created (calendar outage) -
+                otherwise the card just has no Join button and nothing says why. */}
+            {session.status === "accepted" && !joinHref && bounds && bounds.end.isAfter(now) && (
+                <p className="text-xs font-medium text-amber-700">
+                    Meeting link not available yet
+                    {counterpartName ? ` – message ${counterpartName} if it doesn't appear` : ""}
+                </p>
+            )}
             {isRescheduleRequest && (
                 <p className="text-xs font-medium text-amber-700">
                     New time requested – your current session stays until it&apos;s accepted
