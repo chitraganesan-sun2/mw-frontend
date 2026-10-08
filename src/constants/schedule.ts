@@ -25,7 +25,7 @@ export const LearnerFeedbackFormConstants: FormField[] = [
         variant: "rating",
         options: [
             { label: "Bad", value: "1" },
-            { label: "Normal", value: "2" },
+            { label: "Average", value: "2" },
             { label: "Good", value: "3" },
             { label: "Very Good", value: "4" },
             { label: "Excellent", value: "5" },
