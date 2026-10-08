@@ -5,6 +5,7 @@ import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import AvailabilitySection from "./AvailabilitySection";
 import CalendarLegend from "./CalendarLegend";
 import MyScheduleSection from "./MyScheduleSection";
+import ProfileNudge from "./ProfileNudge";
 import type { ScheduleRole } from "./scheduleCategories";
 
 interface ScheduleDashboardLayoutProps {
@@ -77,6 +78,7 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
 
     return (
         <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
+            <ProfileNudge role={role} />
             <div className="min-w-0">
                 <MyScheduleSection role={role} timeZoneLabel={tz} onOpenProfile={onOpenProfile} onAddSession={onAddSession} />
             </div>
