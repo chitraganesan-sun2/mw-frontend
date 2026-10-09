@@ -1,6 +1,12 @@
 import { create } from "zustand";
 
 export type EndpointProps = {
+    profileChanges: {
+        mine: string;
+        submit: (role: "volunteer" | "learner") => string;
+        preview: (role: "volunteer" | "learner") => string;
+        withdraw: (requestId: string) => string;
+    };
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${typeof role}`;
         getOnboardingStatus: (id: string, role: "volunteer" | "learner") => string;

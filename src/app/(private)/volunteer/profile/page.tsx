@@ -16,6 +16,7 @@ import MobileProfileView from "@/components/profile/MobileProfileView";
 import InnerWidth from "@/utils/innerWidth";
 import { useQueryState } from "nuqs";
 import EditProfileModal from "@/components/profile/EditProfile";
+import ProfileChangeBanner from "@/components/profile/ProfileChangeBanner";
 import VolunteerProfileBio from "@/components/volunteers/profile";
 import { joinNames } from "@/utils/joinNames";
 
@@ -115,13 +116,15 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="h-full animate-fadeIn ">
+        <div className="h-full animate-fadeIn flex flex-col">
             <EditProfileModal
                 data={data}
                 isOpen={mode === "edit"}
                 onClose={() => setMode(null)}
                 triggerReload={triggerReload}
             />
+            <ProfileChangeBanner />
+            <div className="flex-1 min-h-0">
             {
                 isMobileOrTabScreen ?
                     <MobileProfileView
@@ -135,6 +138,7 @@ export default function ProfilePage() {
                         <Overview data={volunteerData.overview} reviewEndpoint={endpoints.volunterFeedback.get(volunteerId)} />
                     </div>
             }
+            </div>
         </div>
     );
 }

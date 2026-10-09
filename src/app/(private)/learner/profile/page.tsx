@@ -15,6 +15,7 @@ import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import MobileProfileView from "@/components/profile/MobileProfileView";
 import InnerWidth from "@/utils/innerWidth";
 import EditProfileModal from "@/components/profile/EditProfile";
+import ProfileChangeBanner from "@/components/profile/ProfileChangeBanner";
 import { useQueryState } from "nuqs";
 import LearnerProfileBio from "@/components/learners/profile";
 import { joinNames } from "@/utils/joinNames";
@@ -117,13 +118,15 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="h-full animate-fadeIn">
+        <div className="h-full animate-fadeIn flex flex-col">
             <EditProfileModal
                 data={data}
                 isOpen={mode === "edit"}
                 onClose={() => setMode(null)}
                 triggerReload={triggerReload}
             />
+            <ProfileChangeBanner />
+            <div className="flex-1 min-h-0">
             {
                 isMobileOrTabScreen ?
                     <MobileProfileView
@@ -137,6 +140,7 @@ export default function ProfilePage() {
                         <Overview data={learnerData?.overview} reviewEndpoint={endpoints.learnerFeedback.get(learnerId)} />
                     </div>
             }
+            </div>
         </div>
     );
 }

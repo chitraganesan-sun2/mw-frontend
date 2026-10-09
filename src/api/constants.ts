@@ -16,6 +16,12 @@ type CommonPath =
     | (string & {});
 
 export const endpoints: EndpointProps = {
+    profileChanges: {
+        mine: "profile-changes/mine",
+        submit: (role: "volunteer" | "learner") => `profile-changes/${role}`,
+        preview: (role: "volunteer" | "learner") => `profile-changes/${role}?preview=true`,
+        withdraw: (requestId: string) => `profile-changes/${requestId}`,
+    },
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${role}`,
         getOnboardingStatus: (id: string, role: "volunteer" | "learner") =>
