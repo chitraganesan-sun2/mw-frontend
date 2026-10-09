@@ -2,6 +2,7 @@ import { z } from "zod";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 import { useEffect, useState, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,10 @@ import { cn } from "@/utils/merge-class";
 
 import { updateLearnerProfile } from "@/api/learners";
 import { updateVolunteerProfile } from "@/api/volunteers";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { getProfileChangeState, previewProfileChange, ProfileChangeDiffItem, submitProfileChange } from "@/api/profileChanges";
+import ProfileChangeReviewModal from "../ProfileChangeReviewModal";
+import { PROFILE_CHANGE_QUERY_KEY } from "../ProfileChangeBanner";
 import FormTabsSection from "./FormSection";
 import { learnerFormSchema, volunteerFormSchema } from "@/components/onboarding/FormSection/config";
 import { LearnerProfileFormSections } from "@/constants/learner";
@@ -32,12 +37,24 @@ const EditProfileModal = ({
 }: EditProfileModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  // Set while the member is looking at the before/after of what they're about to submit.
+  const [pendingSubmit, setPendingSubmit] = useState<{ formData: any; diff: ProfileChangeDiffItem[] } | null>(null);
+  const queryClient = useQueryClient();
   const isMobile = useMediaQuery("(max-width: 767px)");
   const formRef = useRef<any>(null);
 
   const role = getCookie("role");
   const isVolunteer = role === "volunteer";
   const userId = isVolunteer ? getCookie("volunteer_id") : getCookie("learner_id");
+
+  // Approved members' edits are held for admin review instead of saved straight away;
+  // anyone still awaiting approval keeps the direct save.
+  const { data: reviewState, isLoading: reviewStateLoading } = useQuery({
+    queryKey: PROFILE_CHANGE_QUERY_KEY,
+    queryFn: getProfileChangeState,
+    enabled: isOpen,
+  });
+  const requiresReview = !!reviewState?.requires_review;
 
   const UserProfileFormConstants = isVolunteer ? VolunteerProfileFormConstants : LearnerProfileFormSections;
   const UserProfileFormSchema = isVolunteer ? volunteerFormSchema : learnerFormSchema;
@@ -66,6 +83,13 @@ const EditProfileModal = ({
   const onSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
     try {
+      if (requiresReview) {
+        // Step 1: show the member exactly what an admin will see; nothing is stored yet.
+        const diff = await previewProfileChange(isVolunteer ? "volunteer" : "learner", formData);
+        setPendingSubmit({ formData, diff });
+        return;
+      }
+
       const updateProfile = isVolunteer ? updateVolunteerProfile : updateLearnerProfile;
       const status = await updateProfile(userId || "", formData);
 
@@ -78,7 +102,24 @@ const EditProfileModal = ({
         showToast({ message: "Profile not updated", type: "error" });
       }
     } catch (error) {
-      showToast({ message: "Something went wrong.", type: "error" });
+      showToast({ message: getApiErrorMessage(error, "Something went wrong."), type: "error" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const confirmSubmitForReview = async () => {
+    if (!pendingSubmit) return;
+    setIsSubmitting(true);
+    try {
+      await submitProfileChange(isVolunteer ? "volunteer" : "learner", pendingSubmit.formData);
+      showToast({ message: "Submitted for admin review" });
+      queryClient.invalidateQueries({ queryKey: PROFILE_CHANGE_QUERY_KEY });
+      setPendingSubmit(null);
+      formRef.current?.resetTabs?.();
+      onClose();
+    } catch (error) {
+      showToast({ message: getApiErrorMessage(error, "Couldn't submit your changes. Please try again."), type: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -128,10 +169,10 @@ const EditProfileModal = ({
     },
     primary: {
       onClick: handleSubmit(onSubmit, onError),
-      title: isSubmitting ? "Saving" : "Save",
+      title: isSubmitting ? (requiresReview ? "Checking" : "Saving") : requiresReview ? "Review changes" : "Save",
       btnVariant: "primary",
-      customClassName: cn("!rounded-xl sm:w-auto w-[72px]"),
-      disabled: isSubmitting,
+      customClassName: cn("!rounded-xl sm:w-auto", requiresReview ? "w-auto" : "w-[72px]"),
+      disabled: isSubmitting || reviewStateLoading,
     },
   };
 
@@ -176,10 +217,19 @@ const EditProfileModal = ({
         setError={setError}
         clearErrors={clearErrors}
         onSubmit={handleSubmit(onSubmit, onError)}
-        isLoading={isSubmitting}
+        isLoading={isSubmitting || reviewStateLoading}
         savedData={data}
+        submitLabel={requiresReview ? "Review & submit changes" : "Save Changes"}
       />
     </CenterModal>
+    <ProfileChangeReviewModal
+      isOpen={!!pendingSubmit}
+      diff={pendingSubmit?.diff ?? []}
+      replacesPending={!!reviewState?.pending}
+      isLoading={isSubmitting}
+      onConfirm={confirmSubmitForReview}
+      onCancel={() => setPendingSubmit(null)}
+    />
     <ConfirmModal
       isOpen={showDiscardConfirm}
       title="Discard changes"

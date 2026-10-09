@@ -1,0 +1,96 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Button from "@/components/common/Button";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { getProfileChangeState, withdrawProfileChange } from "@/api/profileChanges";
+import ProfileChangeReviewModal from "./ProfileChangeReviewModal";
+
+export const PROFILE_CHANGE_QUERY_KEY = ["profile-change-state"];
+
+const SMALL_BTN = "!py-2 !px-4 !h-auto !text-sm";
+
+const dismissKey = (requestId: string) => `profile-change-dismissed-${requestId}`;
+
+/** Status strip on the profile page: a pending request (with its diff and a Withdraw
+ * action), or the reason the last one was declined. Renders nothing otherwise. */
+const ProfileChangeBanner = () => {
+    const queryClient = useQueryClient();
+    const [showDiff, setShowDiff] = useState(false);
+    const [dismissedId, setDismissedId] = useState<string | null>(null);
+
+    const { data } = useQuery({ queryKey: PROFILE_CHANGE_QUERY_KEY, queryFn: getProfileChangeState });
+
+    const rejected = data?.last_decision?.status === "rejected" ? data.last_decision : null;
+    const rejectedId = rejected?.request_id;
+
+    useEffect(() => {
+        if (!rejectedId) return;
+        try {
+            if (window.localStorage.getItem(dismissKey(rejectedId))) setDismissedId(rejectedId);
+        } catch {
+            // storage unavailable - the banner just stays visible
+        }
+    }, [rejectedId]);
+
+    const withdraw = useMutation({
+        mutationFn: (requestId: string) => withdrawProfileChange(requestId),
+        onSuccess: () => {
+            showToast({ message: "Request withdrawn" });
+            queryClient.invalidateQueries({ queryKey: PROFILE_CHANGE_QUERY_KEY });
+        },
+        onError: (err) => showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't withdraw the request. Please try again.") }),
+    });
+
+    const dismiss = (requestId: string) => {
+        setDismissedId(requestId);
+        try {
+            window.localStorage.setItem(dismissKey(requestId), "1");
+        } catch {
+            // best effort
+        }
+    };
+
+    const pending = data?.pending;
+    if (pending) {
+        return (
+            <>
+                <div className="mx-5 mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#F2D98A] bg-[#FFF8E1] px-4 py-3">
+                    <p className="text-sm text-[#5C4A00]">
+                        Your profile changes ({pending.change_count}) are waiting for admin review. Your profile keeps showing the current details until they&apos;re approved.
+                    </p>
+                    <div className="flex gap-2">
+                        <Button title="View changes" btnVariant="outline" customClassName={SMALL_BTN} onClick={() => setShowDiff(true)} />
+                        <Button
+                            title="Withdraw"
+                            btnVariant="outline"
+                            customClassName={SMALL_BTN}
+                            onClick={() => withdraw.mutate(pending.request_id)}
+                            loading={withdraw.isPending}
+                            disabled={withdraw.isPending}
+                        />
+                    </div>
+                </div>
+                <ProfileChangeReviewModal isOpen={showDiff} diff={pending.diff ?? []} readOnly onCancel={() => setShowDiff(false)} />
+            </>
+        );
+    }
+
+    if (rejected && dismissedId !== rejected.request_id) {
+        return (
+            <div className="mx-5 mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#F5C2C0] bg-[#FDECEA] px-4 py-3">
+                <p className="text-sm text-[#7A1F1A]">
+                    Your last profile changes weren&apos;t approved
+                    {rejected.rejection_reason ? `: ${rejected.rejection_reason}` : "."} Your profile was left as it was.
+                </p>
+                <Button title="Dismiss" btnVariant="outline" customClassName={SMALL_BTN} onClick={() => dismiss(rejected.request_id)} />
+            </div>
+        );
+    }
+
+    return null;
+};
+
+export default ProfileChangeBanner;

@@ -27,6 +27,8 @@ type FormTabsSectionProps = {
   onFormSubmitted?: () => void;
   // The profile as last saved - a locked field that has no saved value is left editable.
   savedData?: any;
+  // Label of the final-tab submit button ("Submit for review" when edits go to an admin).
+  submitLabel?: string;
 };
 
 // ✅ using forwardRef so parent can call resetTabs
@@ -46,6 +48,7 @@ const FormTabsSection = forwardRef(
       clearErrors,
       onFormSubmitted,
       savedData,
+      submitLabel = "Save Changes",
     }: FormTabsSectionProps,
     ref
   ) => {
@@ -378,7 +381,7 @@ const FormTabsSection = forwardRef(
                       onClick={onSubmit}
                       loading={isLoading}
                       disabled={isLoading}
-                      title="Save Changes"
+                      title={submitLabel}
                       size="large"
                       customClassName="w-full sm:w-[50%] lg:w-fit max-lg:mx-auto hover:!bg-background-secondary !text-sm !bg-background-secondary !text-black !rounded-lg !shadow-2xl !font-normal"
                     />
