@@ -217,8 +217,9 @@ const EditProfileModal = ({
         setError={setError}
         clearErrors={clearErrors}
         onSubmit={handleSubmit(onSubmit, onError)}
-        isLoading={isSubmitting}
+        isLoading={isSubmitting || reviewStateLoading}
         savedData={data}
+        submitLabel={requiresReview ? "Review & submit changes" : "Save Changes"}
       />
     </CenterModal>
     <ProfileChangeReviewModal

@@ -19,15 +19,15 @@ type Props = {
 const ProfileChangeReviewModal = ({ isOpen, diff, readOnly = false, replacesPending = false, isLoading = false, onConfirm, onCancel }: Props) => {
     const footer = readOnly ? (
         <div className="w-full flex pb-2">
-            <Button title="Close" btnVariant="outline" customClassName="flex-1" onClick={onCancel} />
+            <Button title="Close" btnVariant="outline" customClassName="flex-1 !px-2 min-w-0" onClick={onCancel} />
         </div>
     ) : (
         <div className="w-full flex gap-3 pb-2">
-            <Button title="Back to editing" btnVariant="outline" customClassName="flex-1" onClick={onCancel} disabled={isLoading} />
+            <Button title="Back to editing" btnVariant="outline" customClassName="flex-1 !px-2 min-w-0" onClick={onCancel} disabled={isLoading} />
             <Button
                 title="Submit for review"
                 btnVariant="primary"
-                customClassName="flex-1"
+                customClassName="flex-1 !px-2 min-w-0"
                 onClick={onConfirm}
                 disabled={isLoading}
                 loading={isLoading}
