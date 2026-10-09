@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import Cookies from "js-cookie";
 import { clearCookies, getCookie } from "@/utils/auth";
-import { unregisterTokenFromBackend } from "@/services/push-notifications";
+import { unregisterTokenBeforeLogout } from "@/services/push-notifications";
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 const COOKIE_EXPIRY_DAYS = INACTIVITY_TIMEOUT / (1000 * 60 * 60 * 24);
@@ -12,10 +12,10 @@ const useAutoLogout = (router: any) => {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const initializedRef = useRef(false);
 
-  const clearSession = useCallback(() => {
-    // Fire-and-forget, and before clearCookies() - it needs the still-valid auth
+  const clearSession = useCallback(async () => {
+    // Awaited (bounded) and before clearCookies() - it needs the still-valid auth
     // cookie to identify which device's token to remove.
-    unregisterTokenFromBackend();
+    await unregisterTokenBeforeLogout();
     clearCookies();
     // Full reload (like Log Out) rather than router.refresh(): an SPA refresh kept the
     // previous user's react-query cache and in-memory store alive on a shared device, and

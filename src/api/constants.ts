@@ -26,13 +26,8 @@ export const endpoints: EndpointProps = {
         update: (role: "volunteer" | "learner") => `onboarding/${role}`,
         getOnboardingStatus: (id: string, role: "volunteer" | "learner") =>
             `onboarding/status/${role}/${id}`,
-        setLearnerOnboardingStatus: (id: string) =>
-            `onboarding/update_verification_status/learner/${id}?verification_status=verification_completed`,
         getOnboardingVolunteerData: (id: string) => `auth/decrypt_volunteer_details/${id}`,
         getOnboardingLearnerData: (id: string) => `auth/decrypt_learner_details/${id}`,
-    },
-    auth: {
-        oauth2callback: "auth/oauth2callback",
     },
     user: {
         signIn: "auth/signup",
@@ -91,8 +86,6 @@ export const endpoints: EndpointProps = {
         getPendingInvitesForLearner: (learnerId: string) => `session/pending_invites/learner/${learnerId}`,
         createInstantSession: "session/instant_session",
         claimInstantSession: "session/instant_session/claim",
-        /** GET all active instant sessions (for dedicated instant sessions page) */
-        getInstantSessions: "session/instant_session/active",
         validateInstantSession: (session_date: string, session_start_time: string, session_end_time: string) =>
             `session/instant_session/validate?session_date=${encodeURIComponent(session_date)}&session_start_time=${encodeURIComponent(session_start_time)}&session_end_time=${encodeURIComponent(session_end_time)}`,
         /** GET learner instant sessions (query: date YYYY-MM-DD, is_accepted boolean, free-text search) */

@@ -10,12 +10,8 @@ export type EndpointProps = {
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${typeof role}`;
         getOnboardingStatus: (id: string, role: "volunteer" | "learner") => string;
-        setLearnerOnboardingStatus: (id: string) => string;
         getOnboardingVolunteerData: (id: string) => string;
         getOnboardingLearnerData: (id: string) => string;
-    };
-    auth: {
-        oauth2callback: string;
     };
     user: {
         signIn: string;
@@ -69,7 +65,6 @@ export type EndpointProps = {
         getPendingInvitesForLearner: (learnerId: string) => string;
         createInstantSession: string;
         claimInstantSession: string;
-        getInstantSessions: string;
         validateInstantSession: (session_date: string, session_start_time: string, session_end_time: string) => string;
         getLearnerInstantSession: (date: string, isAccepted?: boolean, query?: string) => string;
         getAcceptedInstantSessionsByDate: (date: string) => string;
