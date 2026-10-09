@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Button from "@/components/common/Button";
 import { showToast } from "@/components/common/Toast";
@@ -21,7 +21,29 @@ const ProfileChangeBanner = () => {
     const [showDiff, setShowDiff] = useState(false);
     const [dismissedId, setDismissedId] = useState<string | null>(null);
 
-    const { data } = useQuery({ queryKey: PROFILE_CHANGE_QUERY_KEY, queryFn: getProfileChangeState });
+    // The global default is a 5-minute staleTime with no focus refetch, which left this banner
+    // (and the profile behind it) showing "waiting for review" long after an admin decided.
+    const { data } = useQuery({
+        queryKey: PROFILE_CHANGE_QUERY_KEY,
+        queryFn: getProfileChangeState,
+        staleTime: 0,
+        refetchOnMount: "always",
+        refetchOnWindowFocus: true,
+        refetchInterval: (query) => (query.state.data?.pending ? 60_000 : false),
+    });
+
+    // When a request we were showing as pending is no longer pending, an admin approved it,
+    // rejected it or it was withdrawn - reload the profile so approved details appear.
+    const seenPendingRef = useRef<string | null>(null);
+    const pendingId = data?.pending?.request_id ?? null;
+    useEffect(() => {
+        if (!data) return;
+        if (seenPendingRef.current && seenPendingRef.current !== pendingId) {
+            queryClient.invalidateQueries({ queryKey: ["learner"] });
+            queryClient.invalidateQueries({ queryKey: ["volunteer"] });
+        }
+        seenPendingRef.current = pendingId;
+    }, [data, pendingId, queryClient]);
 
     const rejected = data?.last_decision?.status === "rejected" ? data.last_decision : null;
     const rejectedId = rejected?.request_id;
@@ -37,11 +59,17 @@ const ProfileChangeBanner = () => {
 
     const withdraw = useMutation({
         mutationFn: (requestId: string) => withdrawProfileChange(requestId),
-        onSuccess: () => {
-            showToast({ message: "Request withdrawn" });
-            queryClient.invalidateQueries({ queryKey: PROFILE_CHANGE_QUERY_KEY });
-        },
-        onError: (err) => showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't withdraw the request. Please try again.") }),
+        onSuccess: () => showToast({ message: "Request withdrawn" }),
+        onError: (err: any) =>
+            showToast({
+                type: "error",
+                message:
+                    err?.status === 404 || err?.status === 409
+                        ? "This request was already reviewed."
+                        : getApiErrorMessage(err, "Couldn't withdraw the request. Please try again."),
+            }),
+        // Refresh either way: on an error the request was most likely decided meanwhile.
+        onSettled: () => queryClient.invalidateQueries({ queryKey: PROFILE_CHANGE_QUERY_KEY }),
     });
 
     const dismiss = (requestId: string) => {

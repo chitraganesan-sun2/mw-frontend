@@ -150,7 +150,7 @@ const ProfileInfo = ({
                     className="rounded-xl md:hidden"
                 />
                 <OverViewCard
-                    title="Students Connected"
+                    title="Learners Connected"
                     value={volunteerData?.students_connected}
                     icon={""}
                     className="rounded-xl md:hidden"
@@ -164,7 +164,7 @@ const ProfileInfo = ({
             className="max-md:hidden"
         />
         <OverViewCard
-            title="Students Connected"
+            title="Learners Connected"
             value={volunteerData?.students_connected}
             icon={<LearnerConnectIcon />}
             className="max-md:hidden"

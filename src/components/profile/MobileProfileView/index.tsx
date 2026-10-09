@@ -52,14 +52,14 @@ const ProfileInfo = ({
                 </p>
                 <OverViewCard
                     // Was hard-coded to the volunteer wording, so learners saw
-                    // "Hours Volunteered / Students Connected" on their own profile.
+                    // "Hours Volunteered / Learners Connected" on their own profile.
                     title={isLearner ? "Hours Attended" : "Hours Volunteered"}
                     value={bioData?.total_hours || 0}
                     icon={""}
                     className="rounded-xl"
                 />
                 <OverViewCard
-                    title={isLearner ? "Volunteers Connected" : "Students Connected"}
+                    title={isLearner ? "Volunteers Connected" : "Learners Connected"}
                     value={bioData?.connections}
                     icon={""}
                     className="rounded-xl"

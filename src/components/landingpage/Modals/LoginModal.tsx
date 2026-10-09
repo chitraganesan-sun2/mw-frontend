@@ -56,7 +56,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 if (status === 404) {
                     return showToast({ type: "error", message: "We couldn't find an account with that email. Please sign up first." });
                 }
-                showToast({ type: "error", message: "Log in failed. Please try again." });
+                showToast({ type: "error", message: "Couldn't log in. Please try again." });
             })
     };
 

@@ -49,10 +49,14 @@ const EditProfileModal = ({
 
   // Approved members' edits are held for admin review instead of saved straight away;
   // anyone still awaiting approval keeps the direct save.
-  const { data: reviewState, isLoading: reviewStateLoading } = useQuery({
+  const { data: reviewState, isFetching: reviewStateLoading } = useQuery({
     queryKey: PROFILE_CHANGE_QUERY_KEY,
     queryFn: getProfileChangeState,
     enabled: isOpen,
+    // Always re-check when the modal opens: a member approved a minute ago must not take
+    // the direct-save path off a cached "no review needed" answer.
+    staleTime: 0,
+    refetchOnMount: "always",
   });
   const requiresReview = !!reviewState?.requires_review;
 
@@ -86,6 +90,10 @@ const EditProfileModal = ({
       if (requiresReview) {
         // Step 1: show the member exactly what an admin will see; nothing is stored yet.
         const diff = await previewProfileChange(isVolunteer ? "volunteer" : "learner", formData);
+        if (diff.length === 0) {
+          showToast({ type: "info", message: "You haven't changed anything." });
+          return;
+        }
         setPendingSubmit({ formData, diff });
         return;
       }
@@ -99,10 +107,10 @@ const EditProfileModal = ({
         formRef.current?.resetTabs?.(); // ✅ Reset tabs on success
         onClose();
       } else {
-        showToast({ message: "Profile not updated", type: "error" });
+        showToast({ message: "Couldn't update your profile. Please try again.", type: "error" });
       }
     } catch (error) {
-      showToast({ message: getApiErrorMessage(error, "Something went wrong."), type: "error" });
+      showToast({ message: getApiErrorMessage(error, "Couldn't update your profile. Please try again."), type: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -169,7 +177,7 @@ const EditProfileModal = ({
     },
     primary: {
       onClick: handleSubmit(onSubmit, onError),
-      title: isSubmitting ? (requiresReview ? "Checking" : "Saving") : requiresReview ? "Review changes" : "Save",
+      title: isSubmitting ? (requiresReview ? "Checking" : "Saving") : requiresReview ? "Review Changes" : "Save",
       btnVariant: "primary",
       customClassName: cn("!rounded-xl sm:w-auto", requiresReview ? "w-auto" : "w-[72px]"),
       disabled: isSubmitting || reviewStateLoading,
@@ -219,7 +227,7 @@ const EditProfileModal = ({
         onSubmit={handleSubmit(onSubmit, onError)}
         isLoading={isSubmitting || reviewStateLoading}
         savedData={data}
-        submitLabel={requiresReview ? "Review & submit changes" : "Save Changes"}
+        submitLabel={requiresReview ? "Review & Submit Changes" : "Save Changes"}
       />
     </CenterModal>
     <ProfileChangeReviewModal
