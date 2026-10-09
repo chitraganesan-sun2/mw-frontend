@@ -53,7 +53,7 @@ export const imapactData = [
     },
     {
         title: "3",
-        subTitle: "Students Reached",
+        subTitle: "Learners Reached",
     },
     {
         title: "5",

@@ -138,6 +138,16 @@ export const unregisterTokenFromBackend = async (): Promise<void> => {
   }
 };
 
+/**
+ * Unregister the device token and WAIT for it (bounded) before the caller clears the auth
+ * cookies. The request interceptor reads the token cookie asynchronously, so firing this and
+ * clearing cookies straight away sent the DELETE with no Authorization header (401).
+ */
+export const unregisterTokenBeforeLogout = async (): Promise<void> => {
+  if (!isNativePlatform()) return;
+  await Promise.race([unregisterTokenFromBackend(), new Promise<void>((resolve) => setTimeout(resolve, 2000))]);
+};
+
 /** Show a local notification */
 export const showLocalNotification = async (
   title: string,

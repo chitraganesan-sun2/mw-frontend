@@ -197,7 +197,9 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
             comment_text: text,
             created_by: role,
             post_id: postId,
-            parent_id: "",
+            // The backend field is parent_comment_id; the old "parent_id" was silently ignored,
+            // so a reply from the mobile panel posted as a top-level comment.
+            parent_comment_id: parentId || null,
         };
 
         await callbackToast({

@@ -23,9 +23,9 @@ const ProfileChangeReviewModal = ({ isOpen, diff, readOnly = false, replacesPend
         </div>
     ) : (
         <div className="w-full flex gap-3 pb-2">
-            <Button title="Back to editing" btnVariant="outline" customClassName="flex-1 !px-2 min-w-0" onClick={onCancel} disabled={isLoading} />
+            <Button title="Back to Editing" btnVariant="outline" customClassName="flex-1 !px-2 min-w-0" onClick={onCancel} disabled={isLoading} />
             <Button
-                title="Submit for review"
+                title="Submit for Review"
                 btnVariant="primary"
                 customClassName="flex-1 !px-2 min-w-0"
                 onClick={onConfirm}
@@ -44,7 +44,7 @@ const ProfileChangeReviewModal = ({ isOpen, diff, readOnly = false, replacesPend
             hideCloseIcon
             headerComponent={
                 <h2 className="text-[20px] font-medium text-[#121212]">
-                    {readOnly ? "Changes awaiting review" : "Review your changes"}
+                    {readOnly ? "Changes Awaiting Review" : "Review Your Changes"}
                 </h2>
             }
             headerClassName="!px-6 !py-5 !border-0 !justify-start"

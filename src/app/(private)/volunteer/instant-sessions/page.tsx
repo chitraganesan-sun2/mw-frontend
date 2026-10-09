@@ -143,7 +143,9 @@ function MySessionCard({
     const statusClass = getStatusPillClass(session.status);
     const statusLabel = getStatusLabel(session.status);
     const isLive = session.status === "accepted" || session.status === "active";
-    const isOpen = session.status === "open";
+    // An unclaimed post past its end time has status "expired" but is still an open post with no
+    // session behind it (View/Join 404'd) - it only supports Withdraw, like a live open post.
+    const isOpen = session.status === "open" || session.is_open_instant_session === true;
     const bounds = sessionBounds(session, timeZoneLabel);
     const joinStatus = joinState({ status: session.status, meet_link: safeHref(session.meet_link) }, bounds, now);
     // Complete only once the scheduled end has passed (the backend rejects it before that).
@@ -171,7 +173,9 @@ function MySessionCard({
                     <p className="text-sm text-gray-700 break-words">
                         <span className="text-gray-500">Learner: </span>
                         {isOpen ? (
-                            <span className="italic text-gray-500">Waiting for a learner to claim</span>
+                            <span className="italic text-gray-500">
+                                {session.status === "expired" ? "No learner claimed this" : "Waiting for a learner to claim"}
+                            </span>
                         ) : session.learner_name ? (
                             <ProfileNameLink role="learner" id={session.learner_id} name={session.learner_name} className="font-semibold" />
                         ) : (

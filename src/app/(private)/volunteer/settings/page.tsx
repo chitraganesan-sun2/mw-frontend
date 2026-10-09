@@ -121,6 +121,9 @@ const Settings = () => {
                     setPushEnabled(res.data.push_notifications_enabled);
                 }
             })
+            .catch((err) => {
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't load your settings. Please try again.") });
+            })
             .finally(() => {
                 setIsLoading(false);
             });

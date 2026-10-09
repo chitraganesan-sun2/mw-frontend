@@ -108,7 +108,10 @@ export function getRedirectForRoute(pathname: string, auth: AuthState): string |
     const onboardedStatus = normalizeStatus(auth.onboardedStatus);
     auth = { ...auth, onboardedStatus };
 
-    if (!auth.isAuthenticated) {
+    // A token without a role cookie can't be routed anywhere sensible (every default route is
+    // role-specific, and "/volunteer/..." fails the "/undefined" prefix check on the way back,
+    // which redirected a page to itself forever). Treat it as signed out.
+    if (!auth.isAuthenticated || !auth.role) {
         if (isPublicLandingRoute(pathname)) return null;
         return isKnownGatedRoute(pathname) ? "/" : null;
     }
