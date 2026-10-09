@@ -1,3 +1,32 @@
+# Release notes — v1.3.1 (versionCode 6)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.3.1
+
+• Deleting your account now fully clears your data from the device
+• Updated privacy policy inside the app
+• Smaller fixes and stability improvements
+```
+
+---
+
+## Internal changelog — what 1.3.1 contains
+
+Covers everything since 1.3.0 (`main@c60680f`, bundle of 2026-10-08).
+
+- **Delete Account** uses the same cleanup as a normal log out (cookies plus the stored auth backup and
+  persisted store) and does a full page load in the app, so the deleted user's cached data does not stay in
+  memory; a confirmation is shown after the reload
+- In-app privacy policy matches the website (Mobile App Information, special-needs info is required,
+  volunteer background information)
+- `.env.mobile` version corrected to 1.3.1 (it still said 1.2.0, so crash reports carried the wrong release)
+- Manifest: `READ_/WRITE_EXTERNAL_STORAGE` limited to API 32 and below (they are inert on Android 13+ and
+  drew broad-storage scrutiny)
+
+---
+
 # Release notes — v1.3.0 (versionCode 5)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
