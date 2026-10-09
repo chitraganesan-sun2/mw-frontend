@@ -69,8 +69,11 @@ and PostHog is web-only. The new policy text (item 2) says exactly that; do **no
 Firebase Analytics sentence, and Data safety (`03`) was corrected to match.
 
 ### 5. Special educational needs / disability information — ✅ added 2026-10-08
-New sub-section "c) Disability and Special Educational Needs Information" says it is optional,
-used for matching and session preparation, may be shown to matched volunteers, and is not sold.
+New sub-section "c) Disability and Special Educational Needs Information" says it is **required**
+to create a learner profile (corrected 2026-10-09 - it first said optional, which was wrong), used
+for matching and session preparation, may be shown to matched volunteers, and is not sold.
+New "d) Volunteer Background Information" discloses the self-reported criminal-history answers and
+background-check consent (staff-only, not shown to learners) - the policy had no mention of them.
 (Verified in code: `LearnerViewModal` shows it to volunteers; matching reads it.)
 
 If onboarding collects health-related SEN details (see the warning in `03` §2),

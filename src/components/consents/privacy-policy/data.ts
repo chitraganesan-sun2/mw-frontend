@@ -64,7 +64,13 @@ export const sectionsData = [
             {
                 title: "c) Disability and Special Educational Needs Information.",
                 content: [
-                    "Learners (or their parents or guardians) may choose to provide information about disabilities or special educational needs. Providing it is optional. We use it to match learners with suitable volunteers and so that volunteers can prepare for sessions, and it may be shown to the volunteers a learner is matched with or has sessions with. We do not sell this information or use it for advertising."
+                    "When a learner profile is created, the learner (or their parent or guardian) provides information about the learner's disability or special educational needs, such as the type of developmental disability, the level of support needed, assistive devices used, communication style, and a description of needs. This information is required to create a learner profile. We use it to match learners with suitable volunteers and so that volunteers can prepare for sessions, and it may be shown to the volunteers a learner is matched with or has sessions with. We do not sell this information or use it for advertising."
+                ]
+            },
+            {
+                title: "d) Volunteer Background Information.",
+                content: [
+                    "Volunteers provide self-reported answers about their criminal history (for example, whether they have been convicted of a felony) and consent to background checks. This information is reviewed only by MelodyWings staff to help keep learners safe. It is not shown to learners and is not used for advertising."
                 ]
             }
         ]

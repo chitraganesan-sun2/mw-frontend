@@ -35,15 +35,23 @@ see column · Purposes are listed per row.
 | Email address | Yes | No | Required (from Google Sign-In) | App functionality; Account management; Security/fraud prevention |
 | Phone number | Yes | No | **Optional** (onboarding field) | App functionality; Account management |
 | Address (city / region only) | Yes | No | Optional | App functionality (matching by locale/timezone) |
-| Date of birth | Yes | No | Required | App functionality; Comply with age policy (13+) |
+| User IDs (account id: learner_id / volunteer_id) | Yes | No | Required | App functionality; Account management |
+| Other info — date of birth, gender, education / employment details | Yes | No | Required (gender and DOB required at onboarding) | App functionality; Account management; Comply with age policy (13+). *Play has no separate "date of birth" type - it goes under Other info.* |
 | Other info — guardian name (for under-18 learners) | Yes | No | Conditionally required | App functionality; Safety |
 | Other info — "what I need help with" free text, learning goals | Yes | No | Required | App functionality (matching) |
+| Other info — volunteers' self-reported criminal-history answers and background-check consent | Yes | No | Required (volunteers) | Security / fraud prevention; Safety. Staff-only (admin console); never shown to learners. |
 
-> ⚠️ **Special-needs / disability details.** Onboarding collects information about a
-> learner's disabilities or special educational needs so tutors can prepare. If any
-> of these fields capture **health-related** information, also declare **Health and
-> fitness → Health info** (Collected, No-share, Optional, purpose: App functionality).
-> Confirm with the onboarding schema and, ideally, legal before finalising.
+### Health and fitness
+
+| Data type | Collected | Shared | Optional? | Purposes |
+|---|---|---|---|---|
+| **Health info** (learner's disability / special-needs details) | **Yes** | No (shown only to matched volunteers inside the app - not a third-party transfer) | **Required** for learners | App functionality (matching; volunteers prepare for sessions) |
+
+> ✅ **Verified 2026-10-09 against the onboarding schema** (`learner_special_needs`: type of
+> developmental disability, level of support, assistive device, communication style and a
+> description are all *required*; areas of support / behaviour notes optional). This is health
+> information, so it **must** be declared. An earlier version of this doc and the privacy policy
+> called it optional - that was wrong and is corrected.
 
 ### Photos and videos
 
@@ -51,6 +59,12 @@ see column · Purposes are listed per row.
 |---|---|---|---|---|
 | Photos | Yes | No | Optional | App functionality (profile picture; images in community posts) |
 | Videos | Yes | No | Optional | App functionality (video posts in the community feed) |
+
+### Files and docs
+
+| Data type | Collected | Shared | Optional? | Purposes |
+|---|---|---|---|---|
+| Files and docs | Yes | No | Optional | App functionality (the app accepts `application/*` and `text/*` uploads, e.g. PDFs attached to resources) |
 
 ### Messages
 
@@ -98,7 +112,6 @@ see column · Purposes are listed per row.
 - Web browsing history
 - Contacts, Calendar, SMS/call log
 - Audio recordings
-- Health & fitness *(unless the SEN fields above are health info — see the warning)*
 - Installed apps, other app performance beyond the crash-log note
 
 ---
@@ -113,7 +126,8 @@ These receive data **only to provide a service to MelodyWings**:
 | Google Firebase | FCM push tokens, Firebase installation IDs | Push notifications |
 | Sentry (Functional Software, Inc.) | Crash reports, device model / OS / app version, performance traces | App stability |
 | Google Cloud Run | All backend data in transit/at rest | App backend hosting |
-| Cloudinary | Profile & post images/videos | Media storage / CDN |
+| Cloudinary | Profile & post **images** | Media storage / CDN |
+| Cloudflare R2 | Uploaded **videos and documents** | File storage |
 | Google Gemini API (server-side) | Learner/volunteer **profile text** (skills, goals) — no name/email/contact | Generates the match shortlist. ⚠️ Have legal confirm this counts as processing, not "sharing", under Play's definition and Google's API terms. |
 
 ---
