@@ -21,7 +21,7 @@ MelodyWings v1.0.0. (Data safety and Content ratings have their own files — `0
 ## App access (for review)
 
 - **All functionality is restricted / requires sign-in** → **Yes, some functionality is restricted.**
-- Provide reviewer credentials + steps — see `07-testing-instructions.md`. Google
+- Provide reviewer credentials + steps — see `11-app-access-instructions.md` (copy-paste text + account setup checklist). Google
   Sign-In is required; supply a working test Google account or a walkthrough of how
   the reviewer can create learner and volunteer accounts.
 

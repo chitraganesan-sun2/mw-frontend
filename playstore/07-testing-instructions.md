@@ -7,26 +7,9 @@ App access**. The rest is for your own internal-testing track.
 
 ## For the Google reviewer
 
-> MelodyWings requires a Google account to sign in. All features are behind sign-in.
->
-> **Test account:** `melodywings.reviewer@gmail.com` — password provided in the
-> App access form's credential fields. This account is pre-onboarded as a **learner**
-> with an approved verification status, so the reviewer lands directly on the
-> learner dashboard.
->
-> To see the **volunteer** side, sign in with `melodywings.reviewer.vol@gmail.com`
-> (also pre-onboarded, approved).
->
-> There is **no payment** anywhere in the app. The "Donate" button opens an external
-> web page in the browser and can be ignored for review.
->
-> **Account deletion** (Play requirement) is at: bottom nav → **Settings** →
-> "Danger Zone" → **Delete Account** → type `DELETE` → confirm. It deletes the
-> account and blocks future sign-in.
-
-*(Create both Gmail accounts before submitting. Do not use a personal account. If you
-prefer not to share a Google password, instead provide a short screen-recording of a
-full learner + volunteer walkthrough and attach it — Play accepts either.)*
+**Superseded 2026-10-09 - use `11-app-access-instructions.md`.** The old text here was out of date
+(it said Donate opens an external browser page, that deletion only blocks sign-in, and gave no
+country / onboarding / approval steps).
 
 ---
 

@@ -21,6 +21,7 @@ Play Console screen, plus the build runbook.
 | 08 | [`08-build-and-sign-runbook.md`](08-build-and-sign-runbook.md) | How to produce the signed `.aab` |
 | 09 | [`09-pre-submission-checklist.md`](09-pre-submission-checklist.md) | Final gate before hitting "Send for review" |
 | 10 | [`10-privacy-policy-review.md`](10-privacy-policy-review.md) | Cross-check the hosted privacy policy vs. what we declare |
+| 11 | [`11-app-access-instructions.md`](11-app-access-instructions.md) | Reviewer sign-in text for Play's App access form + how to prepare the two review accounts |
 
 ## Suggested order
 
