@@ -86,7 +86,7 @@ keytool -list -v -keystore keystores/melodywings-release.keystore -alias melodyw
 - [ ] Main store listing complete — `01` (name, short & full description, contact email, category **Education**).
 - [ ] Graphics uploaded — `02` (512 icon, 1024×500 feature graphic, ≥2 phone screenshots).
       *(the files themselves are ready in `playstore/assets/` — `icon-512.png`,
-      `feature-graphic-1024x500.png` — and `playstore/screenshots/` (7 phone shots).
+      `feature-graphic-1024x500.png` — and `playstore/screenshots/` (8 phone shots, retaken 2026-10-09 from the v1.3.0 UI at 1080x2040 — see its README for the upload order).
       Uploading them in the Console is still a manual step.)*
 - [ ] Privacy policy URL live at `https://melodywings.org/privacy-policy` and covers
       everything in the Data safety form — `10`. *(URL returns 200 as of 2026-10-08; mobile-app
