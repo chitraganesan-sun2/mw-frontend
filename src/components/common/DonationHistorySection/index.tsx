@@ -1,8 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { isIOS } from "@/utils/platform";
 
 export default function DonationHistorySection() {
+    // Donations are not offered inside the iOS app (see appstore/00-ios-readiness-plan.md). Decided after
+    // mount so the statically exported page hydrates identically on every platform.
+    const [hidden, setHidden] = useState(false);
+    useEffect(() => setHidden(isIOS()), []);
+    if (hidden) return null;
+
     return (
         <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
             <div className="flex flex-col gap-2">

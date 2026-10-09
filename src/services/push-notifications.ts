@@ -1,6 +1,6 @@
 import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { isNativePlatform } from '@/utils/platform';
+import { getPlatformName, isNativePlatform } from '@/utils/platform';
 import { DELETE_API, POST_API } from '@/api/request';
 import { endpoints } from '@/api/constants';
 
@@ -115,7 +115,8 @@ export const registerTokenWithBackend = async (token: string): Promise<void> => 
   try {
     await POST_API(endpoints.push_notifications.registerDevice, {
       fcm_token: token,
-      platform: 'android',
+      // The backend stores one token per (user, platform); it already accepts 'ios'.
+      platform: getPlatformName() === 'ios' ? 'ios' : 'android',
     });
   } catch (error) {
     console.error('[Push] Failed to register token with backend:', error);

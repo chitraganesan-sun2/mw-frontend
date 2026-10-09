@@ -1,6 +1,6 @@
 import { SocialLogin } from '@capgo/capacitor-social-login';
-import { isNativePlatform } from '@/utils/platform';
-import { GOOGLE_WEB_CLIENT_ID } from '@/definitions';
+import { isIOS, isNativePlatform } from '@/utils/platform';
+import { GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from '@/definitions';
 
 /**
  * Native Google Authentication using @capgo/capacitor-social-login.
@@ -22,6 +22,12 @@ export const initNativeGoogleAuth = async (): Promise<void> => {
     await SocialLogin.initialize({
       google: {
         webClientId: GOOGLE_WEB_CLIENT_ID || '',
+        // iOS signs in with its own OAuth client (type "iOS", bundle id org.melodywings.app) and
+        // uses the web client as the server client. Unset until the iOS client exists, so Android
+        // and web are unaffected.
+        ...(isIOS() && GOOGLE_IOS_CLIENT_ID
+          ? { iOSClientId: GOOGLE_IOS_CLIENT_ID, iOSServerClientId: GOOGLE_WEB_CLIENT_ID || '' }
+          : {}),
       },
     });
   } catch (error) {

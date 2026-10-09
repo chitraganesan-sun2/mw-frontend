@@ -14,6 +14,7 @@ import { useQueryState } from "nuqs";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GOOGLE_WEB_CLIENT_ID } from "@/definitions";
 import { getCookie, isAuthenticated } from "@/utils/auth";
+import { isIOS } from "@/utils/platform";
 import { getDefaultRouteForRole, type Role } from "@/utils/routeGuard";
 
 const Header = () => {
@@ -29,9 +30,13 @@ const Header = () => {
     // a way back into the app instead of "Log In". Read after mount: cookies aren't
     // available during SSR.
     const [appHref, setAppHref] = useState<string | null>(null);
+    // No Donate link in the iOS app (Apple 3.2.1(vi): in-app nonprofit fundraising needs Apple Pay and
+    // approved nonprofit status). Set after mount so the exported page hydrates the same everywhere.
+    const [hideDonate, setHideDonate] = useState(false);
 
     useEffect(() => {
         setMounted(true);
+        setHideDonate(isIOS());
         if (isAuthenticated()) {
             setAppHref(getDefaultRouteForRole(getCookie("role") as Role));
         }
@@ -64,6 +69,7 @@ const Header = () => {
         // { title: "Blogs", link: "/blogs" },
         // { title: "Team Up", link: "/" },
     ];
+    const visibleLinks = links.filter((l) => !(hideDonate && l.link === "/donate"));
 
     // "/#for-learners" style links: on the home page scroll straight to the section
     // (a plain hash navigation there is undone by the page's own URL cleanup); from any
@@ -102,7 +108,7 @@ const Header = () => {
                     <>
                         <div className="hidden md:flex 2xl:gap-6 gap-4 items-center">
                             <nav className="flex 2xl:gap-6 gap-4">
-                                {links.map((link, index) => (
+                                {visibleLinks.map((link, index) => (
                                     <Link
                                         href={link.link}
                                         key={index}
@@ -174,7 +180,7 @@ const Header = () => {
                             </button>
                         </div>
                         <div className="flex flex-col gap-10 justify-center items-center mt-16">
-                            {links.map((link, index) => (
+                            {visibleLinks.map((link, index) => (
                                 <button
                                     type="button"
                                     onClick={() => handleLinkClick(link.link)}
