@@ -56,7 +56,12 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 if (status === 404) {
                     return showToast({ type: "error", message: "We couldn't find an account with that email. Please sign up first." });
                 }
-                showToast({ type: "error", message: "Couldn't log in. Please try again." });
+                // 403 carries the reason (application not approved, account deleted...).
+                const detail = err?.response?.data?.detail;
+                showToast({
+                    type: "error",
+                    message: status === 403 && typeof detail === "string" ? detail : "Couldn't log in. Please try again.",
+                });
             })
     };
 

@@ -104,6 +104,8 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
                 break;
             case "onboarding_approved":
             case "onboarding_rejected":
+            case "profile_change_approved":
+            case "profile_change_rejected":
                 router.push(`/${role}/profile`);
                 break;
             case "match_found":

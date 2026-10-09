@@ -7,7 +7,7 @@ export const getNotifications = async ({ page = 1, size = 20 }: { page?: number,
 }
 
 export const markNotificationsAsRead = async (notificationIds: string[]) => {
-    const response: any = await PUT_API(endpoints.post.readNotifications, { notificationIds });
+    const response: any = await PUT_API(endpoints.post.readNotifications, notificationIds);
     return response.data;
 }
 
