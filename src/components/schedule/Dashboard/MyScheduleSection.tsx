@@ -30,8 +30,6 @@ interface MyScheduleSectionProps {
     role: ScheduleRole;
     timeZoneLabel?: string;
     onOpenProfile: (userId: string) => void;
-    /** Opens Add New Session - offered from the empty states. */
-    onAddSession?: () => void;
 }
 
 /** "My Posted Sessions (accepted by learners)" -> ["My Posted Sessions", "accepted by learners"]. */
@@ -96,7 +94,7 @@ export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
     );
 }
 
-const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile, onAddSession }) => {
+const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile }) => {
     const [activeTab, setActiveTab] = useState<ScheduleTab>("posted");
     const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
     const tabRefs = useRef<Record<ScheduleTab, HTMLButtonElement | null>>({ posted: null, accepted: null, direct: null });
@@ -321,15 +319,6 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                 className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
                             >
                                 Clear search
-                            </button>
-                        )}
-                        {!isFiltering && when === "upcoming" && onAddSession && (
-                            <button
-                                type="button"
-                                onClick={onAddSession}
-                                className="rounded-full bg-action px-4 py-1.5 text-xs font-semibold text-white hover:bg-action-hover border-0 cursor-pointer"
-                            >
-                                Add New Session
                             </button>
                         )}
                     </div>

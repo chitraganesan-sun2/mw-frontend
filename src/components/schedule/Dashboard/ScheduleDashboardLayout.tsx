@@ -14,7 +14,6 @@ interface ScheduleDashboardLayoutProps {
     isCalendarView: boolean;
     timeZoneLabel?: string;
     onScheduleAvailability: () => void;
-    onAddSession?: () => void;
     onAddDateSlot?: (date: string) => void;
     onOpenProfile: (userId: string) => void;
     events?: unknown[];
@@ -36,7 +35,6 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     isCalendarView,
     timeZoneLabel,
     onScheduleAvailability,
-    onAddSession,
     onAddDateSlot,
     onOpenProfile,
     events,
@@ -80,7 +78,7 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
         <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
             <ProfileNudge role={role} />
             <div className="min-w-0">
-                <MyScheduleSection role={role} timeZoneLabel={tz} onOpenProfile={onOpenProfile} onAddSession={onAddSession} />
+                <MyScheduleSection role={role} timeZoneLabel={tz} onOpenProfile={onOpenProfile} />
             </div>
             <div className="min-w-0">
                 <AvailabilitySection
