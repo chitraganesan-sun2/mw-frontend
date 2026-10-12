@@ -19,6 +19,9 @@ export type EndpointProps = {
         deleteAccount: string;
         emailOtpRequest: string;
         emailOtpVerify: string;
+        emailSignup: string;
+        emailLogin: string;
+        emailResetPassword: string;
     };
     learner: {
         update: (id: string) => string;

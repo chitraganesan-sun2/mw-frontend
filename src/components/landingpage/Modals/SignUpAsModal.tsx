@@ -18,7 +18,7 @@ import { isNativePlatform } from "@/utils/platform";
 import { nativeGoogleSignIn } from "@/services/native-auth";
 import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications";
 import { getDefaultRouteForRole } from "@/utils/routeGuard";
-import EmailCodeAuth from "./EmailCodeAuth";
+import EmailPasswordAuth from "./EmailPasswordAuth";
 
 const learnerOptions = [
     { label: "I am a parent filling this profile", value: "parent" },
@@ -62,7 +62,7 @@ const LearnerModalBody = ({
     isLoading,
 }: {
     handleSignUp: (payloads: any) => void;
-    onEmailSignUp: (token: string, payloads: any) => void;
+    onEmailSignUp: (call: () => Promise<any>) => Promise<void>;
     isLoading: boolean;
 }) => {
     const [enrolledBy, setEnrolledBy] = useState("parent");
@@ -116,11 +116,13 @@ const LearnerModalBody = ({
                 disabled={enrolledBy === "self" && !dob}
                 onClick={handleClick}
             />
-            <EmailCodeAuth
+            <EmailPasswordAuth
+                mode="signup"
                 actionLabel="Sign Up with Email"
                 loading={isLoading}
                 disabled={enrolledBy === "self" && !dob}
-                onVerified={(token) => onEmailSignUp(token, payloads)}
+                signupPayload={payloads}
+                run={onEmailSignUp}
             />
         </div>
     );
@@ -132,7 +134,7 @@ const VolunteerModalBody = ({
     isLoading,
 }: {
     handleSignUp: (payloads: any) => void;
-    onEmailSignUp: (token: string, payloads: any) => void;
+    onEmailSignUp: (call: () => Promise<any>) => Promise<void>;
     isLoading: boolean;
 }) => {
     const [dob, setDob] = useState("");
@@ -150,11 +152,13 @@ const VolunteerModalBody = ({
                 disabled={!dob}
                 onClick={() => handleSignUp({ signup_type: "volunteer", date_of_birth: dob })}
             />
-            <EmailCodeAuth
+            <EmailPasswordAuth
+                mode="signup"
                 actionLabel="Sign Up with Email"
                 loading={isLoading}
                 disabled={!dob}
-                onVerified={(token) => onEmailSignUp(token, { signup_type: "volunteer", date_of_birth: dob })}
+                signupPayload={{ signup_type: "volunteer", date_of_birth: dob }}
+                run={onEmailSignUp}
             />
         </div>
     );
@@ -168,10 +172,13 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     const [isSignUpLoading, setIsSignUpLoading] = useState(false);
     const [signupPayload, setSignupPayload] = useState<any>(null);
 
-    const SIGN_UP = async (access_token: any, payloads: any) => {
+    const SIGN_UP = (access_token: any, payloads: any) => AUTHENTICATE(() => apiGoogleSignUp(access_token, payloads));
+
+    // Runs any sign-up call (Google token or email + password) through the shared handling.
+    const AUTHENTICATE = async (call: () => Promise<any>) => {
         setIsSignUpLoading(true);
 
-        await apiGoogleSignUp(access_token, payloads)
+        await call()
             .then((response: any) => {
                 setModalLoader(true);
                 if (isNativePlatform()) {
@@ -265,13 +272,13 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                         {role === "learner" ? (
                             <LearnerModalBody
                                 handleSignUp={handleSignUp}
-                                onEmailSignUp={SIGN_UP}
+                                onEmailSignUp={AUTHENTICATE}
                                 isLoading={isSignUpLoading}
                             />
                         ) : (
                             <VolunteerModalBody
                                 handleSignUp={handleSignUp}
-                                onEmailSignUp={SIGN_UP}
+                                onEmailSignUp={AUTHENTICATE}
                                 isLoading={isSignUpLoading}
                             />
                         )}

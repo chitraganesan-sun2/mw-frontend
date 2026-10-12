@@ -58,3 +58,34 @@ export const apiVerifyEmailOtp = async (email: string, code: string): Promise<st
     const { data } = await axios.post(`${apiUrl}/${endpoints.user.emailOtpVerify}`, { email, code });
     return data.email_token;
 };
+
+const bearer = (token: string) => ({ headers: { Authorization: `Bearer ${token}` } });
+
+export const apiEmailSignUp = async (emailToken: string, payload: any, password: string) => {
+    const apiUrl = getAPI_URL();
+    const { data, status } = await axios.post(
+        `${apiUrl}/${endpoints.user.emailSignup}`,
+        { ...payload, password },
+        bearer(emailToken),
+    );
+    if (status === 201) handleCookie(data);
+    return { ...data, status };
+};
+
+export const apiEmailLogin = async (email: string, password: string) => {
+    const apiUrl = getAPI_URL();
+    const { data, status } = await axios.post(`${apiUrl}/${endpoints.user.emailLogin}`, { email, password });
+    if (status === 200) handleCookie(data);
+    return { ...data, status };
+};
+
+export const apiEmailResetPassword = async (emailToken: string, password: string) => {
+    const apiUrl = getAPI_URL();
+    const { data, status } = await axios.post(
+        `${apiUrl}/${endpoints.user.emailResetPassword}`,
+        { password },
+        bearer(emailToken),
+    );
+    if (status === 200) handleCookie(data);
+    return { ...data, status };
+};

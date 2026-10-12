@@ -14,7 +14,7 @@ import { isNativePlatform } from "@/utils/platform"
 import { nativeGoogleSignIn } from "@/services/native-auth"
 import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications"
 import { getDefaultRouteForRole } from "@/utils/routeGuard"
-import EmailCodeAuth from "./EmailCodeAuth"
+import EmailPasswordAuth from "./EmailPasswordAuth"
 
 export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     const router = useRouter();
@@ -26,9 +26,12 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
         setParamMode(role);
         onClose();
     }
-    const SIGN_IN = async (access_token: any) => {
+    const SIGN_IN = (access_token: any) => AUTHENTICATE(() => apiGoogleLogin(access_token));
+
+    // Runs any login call (Google token, email + password, password reset) through the shared handling.
+    const AUTHENTICATE = async (call: () => Promise<any>) => {
         setIsLoginLoading(true);
-        await apiGoogleLogin(access_token)
+        await call()
             .then((response: any) => {
                 setModalLoader(true);
                 if (isNativePlatform()) {
@@ -61,7 +64,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 const detail = err?.response?.data?.detail;
                 showToast({
                     type: "error",
-                    message: status === 403 && typeof detail === "string" ? detail : "Couldn't log in. Please try again.",
+                    message: [401, 403, 429].includes(status) && typeof detail === "string" ? detail : "Couldn't log in. Please try again.",
                 });
             })
     };
@@ -125,10 +128,11 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                             onClick={handleGoogleLogin}
                         />
                         <div className="pt-4">
-                            <EmailCodeAuth
+                            <EmailPasswordAuth
+                                mode="login"
                                 actionLabel="Log In with Email"
                                 loading={isLoginLoading}
-                                onVerified={SIGN_IN}
+                                run={AUTHENTICATE}
                             />
                         </div>
                         <div className="pt-4">
