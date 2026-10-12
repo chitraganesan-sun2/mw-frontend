@@ -32,6 +32,8 @@ export const endpoints: EndpointProps = {
     user: {
         signIn: "auth/signup",
         login: "auth/login",
+        emailOtpRequest: "auth/email-otp/request",
+        emailOtpVerify: "auth/email-otp/verify",
         deleteAccount: "auth/delete-account",
     },
     learner: {

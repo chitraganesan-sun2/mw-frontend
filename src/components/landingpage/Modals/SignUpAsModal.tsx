@@ -18,6 +18,7 @@ import { isNativePlatform } from "@/utils/platform";
 import { nativeGoogleSignIn } from "@/services/native-auth";
 import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications";
 import { getDefaultRouteForRole } from "@/utils/routeGuard";
+import EmailCodeAuth from "./EmailCodeAuth";
 
 const learnerOptions = [
     { label: "I am a parent filling this profile", value: "parent" },
@@ -57,20 +58,23 @@ const GoogleSignUpButton = ({
 
 const LearnerModalBody = ({
     handleSignUp,
+    onEmailSignUp,
     isLoading,
 }: {
     handleSignUp: (payloads: any) => void;
+    onEmailSignUp: (token: string, payloads: any) => void;
     isLoading: boolean;
 }) => {
     const [enrolledBy, setEnrolledBy] = useState("parent");
     const [dob, setDob] = useState("");
 
+    const payloads =
+        enrolledBy === "self"
+            ? { signup_type: "learner", enrolled_by: enrolledBy, date_of_birth: dob }
+            : { signup_type: "learner", enrolled_by: enrolledBy };
+
     const handleClick = () => {
         if (enrolledBy === "self" && !dob) return;
-        const payloads =
-            enrolledBy === "self"
-                ? { signup_type: "learner", enrolled_by: enrolledBy, date_of_birth: dob }
-                : { signup_type: "learner", enrolled_by: enrolledBy };
         handleSignUp(payloads);
     };
 
@@ -112,15 +116,23 @@ const LearnerModalBody = ({
                 disabled={enrolledBy === "self" && !dob}
                 onClick={handleClick}
             />
+            <EmailCodeAuth
+                actionLabel="Sign Up with Email"
+                loading={isLoading}
+                disabled={enrolledBy === "self" && !dob}
+                onVerified={(token) => onEmailSignUp(token, payloads)}
+            />
         </div>
     );
 };
 
 const VolunteerModalBody = ({
     handleSignUp,
+    onEmailSignUp,
     isLoading,
 }: {
     handleSignUp: (payloads: any) => void;
+    onEmailSignUp: (token: string, payloads: any) => void;
     isLoading: boolean;
 }) => {
     const [dob, setDob] = useState("");
@@ -137,6 +149,12 @@ const VolunteerModalBody = ({
                 loading={isLoading}
                 disabled={!dob}
                 onClick={() => handleSignUp({ signup_type: "volunteer", date_of_birth: dob })}
+            />
+            <EmailCodeAuth
+                actionLabel="Sign Up with Email"
+                loading={isLoading}
+                disabled={!dob}
+                onVerified={(token) => onEmailSignUp(token, { signup_type: "volunteer", date_of_birth: dob })}
             />
         </div>
     );
@@ -247,11 +265,13 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                         {role === "learner" ? (
                             <LearnerModalBody
                                 handleSignUp={handleSignUp}
+                                onEmailSignUp={SIGN_UP}
                                 isLoading={isSignUpLoading}
                             />
                         ) : (
                             <VolunteerModalBody
                                 handleSignUp={handleSignUp}
+                                onEmailSignUp={SIGN_UP}
                                 isLoading={isSignUpLoading}
                             />
                         )}

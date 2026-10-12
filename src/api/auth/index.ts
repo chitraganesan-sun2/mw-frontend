@@ -46,3 +46,15 @@ export const apiGoogleLogin = async (access_token: string) => {
     if (status === 200) handleCookie(data);
     return { ...data, status };
 };
+
+export const apiRequestEmailOtp = async (email: string) => {
+    const apiUrl = getAPI_URL();
+    await axios.post(`${apiUrl}/${endpoints.user.emailOtpRequest}`, { email });
+};
+
+// Returns a proof-of-email token; send it as the Bearer to signup/login like a Google token.
+export const apiVerifyEmailOtp = async (email: string, code: string): Promise<string> => {
+    const apiUrl = getAPI_URL();
+    const { data } = await axios.post(`${apiUrl}/${endpoints.user.emailOtpVerify}`, { email, code });
+    return data.email_token;
+};

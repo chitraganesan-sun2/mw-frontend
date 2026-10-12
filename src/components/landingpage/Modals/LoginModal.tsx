@@ -14,6 +14,7 @@ import { isNativePlatform } from "@/utils/platform"
 import { nativeGoogleSignIn } from "@/services/native-auth"
 import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications"
 import { getDefaultRouteForRole } from "@/utils/routeGuard"
+import EmailCodeAuth from "./EmailCodeAuth"
 
 export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     const router = useRouter();
@@ -123,6 +124,13 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                             loading={isLoginLoading}
                             onClick={handleGoogleLogin}
                         />
+                        <div className="pt-4">
+                            <EmailCodeAuth
+                                actionLabel="Log In with Email"
+                                loading={isLoginLoading}
+                                onVerified={SIGN_IN}
+                            />
+                        </div>
                         <div className="pt-4">
                             <span className='text-xl font-medium'>New User?</span>
                             <div className="flex flex-col md:flex-row gap-3 mt-3">
