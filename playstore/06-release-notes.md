@@ -1,3 +1,35 @@
+# Release notes — v1.4.0 (versionCode 7)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.4.0
+
+• Log in or sign up with any email address: no Google account needed
+• Request changes to your profile after you're approved, and track the review
+• Clearer My Sessions page and other small fixes
+• Stability improvements
+```
+
+---
+
+## Internal changelog — what 1.4.0 contains
+
+Covers everything since 1.3.1 (`main@ea8da22c`; the 1.3.1 tag was `4688115`).
+
+- **Email + password sign-in** for people without a Google account: email is verified with a 6-digit emailed
+  code, then a password is chosen. Strict email validation (Gmail rules, domain check), password rules, lockout
+  after 5 wrong attempts, forgot-password via the same code. Google sign-in is unchanged. Needs the backend
+  deployed first (it is: `master@ce6d5b4`)
+- **Edit Profile -> admin-reviewed change requests** for approved members
+- Consistency / contract fixes: notifications mark-as-read, replies in Community, login 403 reason shown,
+  expired open instant sessions offer Withdraw, logout waits for push-token unregister
+- My Sessions empty state no longer shows a duplicate "Add New Session" button
+- iOS groundwork is in the code (platform-aware push, Donate hidden on iOS); no effect on Android
+- Version bumped: `android/app/build.gradle` versionCode 7 / versionName 1.4.0, `.env.mobile` 1.4.0
+
+---
+
 # Release notes — v1.3.1 (versionCode 6)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
