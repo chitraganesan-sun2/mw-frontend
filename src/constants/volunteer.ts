@@ -1,4 +1,5 @@
 import nationalities from "@/data/nationalities.json";
+import { HEARD_ABOUT_US_FIELDS } from "@/constants/onboarding";
 import timezones from "@/data/selectiveTimeZones.json";
 
 // 18, matching the backend VOLUNTEER_AGE_LIMIT. This was 21, so 18-20 year olds were asked for
@@ -642,6 +643,7 @@ export const VolunteerFormSections: FormSectionConfig[] = [
                 required: false,
                 gridCols: 1,
             },
+            ...HEARD_ABOUT_US_FIELDS,
             // {
             //     id: "acknowledgement_of_program_policies",
             //     label: "Acknowledgment of Program Policies ",

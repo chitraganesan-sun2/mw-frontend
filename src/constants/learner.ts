@@ -1,4 +1,5 @@
 import nationalities from "@/data/nationalities.json";
+import { HEARD_ABOUT_US_FIELDS } from "@/constants/onboarding";
 import timezones from "@/data/selectiveTimeZones.json";
 // Shared with the Learner Filter (constants/modals.ts) so both list the same options in the same order.
 import academicStrengths from "@/data/academicStrengths.json";
@@ -481,6 +482,7 @@ export const LearnerFormSections: FormSectionConfig[] = [
                 required: false,
                 gridCols: 1,
             },
+            ...HEARD_ABOUT_US_FIELDS,
             // {
             //     id: "acknowledgement_of_program_policies",
             //     label: "Acknowledgment of Program Policies ",
