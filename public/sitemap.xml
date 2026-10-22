@@ -3,7 +3,7 @@
 
     <url>
         <loc>https://melodywings.org/</loc>
-        <lastmod>2026-01-19</lastmod>
+        <lastmod>2026-10-22</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -36,7 +36,7 @@
 
     <url>
         <loc>https://melodywings.org/join-us</loc>
-        <lastmod>2026-09-23</lastmod>
+        <lastmod>2026-10-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -48,12 +48,8 @@
         <priority>0.5</priority>
     </url>
 
-    <url>
-        <loc>https://melodywings.org/delete-account</loc>
-        <lastmod>2026-10-08</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.3</priority>
-    </url>
+    <!-- /delete-account deliberately excluded: it is a utility page (account deletion
+         instructions required by app stores), not something to rank for. -->
 
     <url>
         <loc>https://melodywings.org/terms-and-conditions</loc>

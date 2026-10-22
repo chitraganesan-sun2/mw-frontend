@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SHARE_IMAGES } from "@/constants/seo";
 
 // The donate page itself ("use client") can't export metadata directly - App Router
 // requires a Server Component for that, so this layout carries it instead.
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
         title: "Donate | MelodyWings",
         description: "Support free 1:1 tutoring for students with disabilities and special needs.",
         url: "/donate",
+        images: SHARE_IMAGES,
     },
 };
 

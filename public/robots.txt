@@ -5,6 +5,11 @@ Allow: /donate
 Allow: /join-us
 Allow: /privacy-policy
 Allow: /terms-and-conditions
+Allow: /contact
+
+# Developer-only sign-in helper and the payment-confirmation page: nothing to index
+Disallow: /dev-login
+Disallow: /donate/success
 
 # Sitemap location
 Sitemap: https://melodywings.org/sitemap.xml
