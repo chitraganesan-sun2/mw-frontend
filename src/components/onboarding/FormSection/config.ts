@@ -8,6 +8,7 @@ import {
     SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS,
 } from "@/constants/volunteer";
 import { LEARNER_MIN_AGE } from "@/constants/learner";
+import { HEARD_ABOUT_US_OPTIONS, HEARD_ABOUT_US_OTHER } from "@/constants/onboarding";
 
 dayjs.extend(customParseFormat);
 
@@ -289,6 +290,12 @@ export const volunteerFormSchema = z
             photo_or_video_consent: z.boolean({
                 required_error: "Photo or Video Consent is required",
             }),
+            heard_about_us: z
+                .string({ required_error: "Please tell us how you heard about us" })
+                .refine((v) => HEARD_ABOUT_US_OPTIONS.includes(v), {
+                    message: "Please tell us how you heard about us",
+                }),
+            heard_about_us_other: z.string().max(200, "Please keep this under 200 characters").optional(),
         }),
 
         // Profile Picture
@@ -327,6 +334,16 @@ export const volunteerFormSchema = z
         }),
     })
     .superRefine((data, ctx) => {
+        if (
+            data?.consent_and_permissions?.heard_about_us === HEARD_ABOUT_US_OTHER &&
+            !data?.consent_and_permissions?.heard_about_us_other?.trim()
+        ) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Please tell us how you heard about us",
+                path: ["consent_and_permissions", "heard_about_us_other"],
+            });
+        }
         if (!data?.privacy_policy_accepted) {
             ctx.addIssue({
                 code: "custom",
@@ -579,6 +596,12 @@ export const learnerFormSchema = z
             photo_or_video_consent: z.boolean({
                 required_error: "Photo or Video Consent is required",
             }),
+            heard_about_us: z
+                .string({ required_error: "Please tell us how you heard about us" })
+                .refine((v) => HEARD_ABOUT_US_OPTIONS.includes(v), {
+                    message: "Please tell us how you heard about us",
+                }),
+            heard_about_us_other: z.string().max(200, "Please keep this under 200 characters").optional(),
         }),
         profile_picture: z
             .object({
@@ -601,6 +624,16 @@ export const learnerFormSchema = z
         }),
     })
     .superRefine((data, ctx) => {
+        if (
+            data?.consent_and_permissions?.heard_about_us === HEARD_ABOUT_US_OTHER &&
+            !data?.consent_and_permissions?.heard_about_us_other?.trim()
+        ) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Please tell us how you heard about us",
+                path: ["consent_and_permissions", "heard_about_us_other"],
+            });
+        }
         if (!data?.privacy_policy_accepted) {
             ctx.addIssue({
                 code: "custom",

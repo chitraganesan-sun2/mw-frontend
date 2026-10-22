@@ -1,6 +1,7 @@
 "use client";
 
 import { FormField } from "./FormField";
+import { HEARD_ABOUT_US_OTHER } from "@/constants/onboarding";
 import CardWrapper from "../CardWrapper";
 import Button from "@/components/common/Button";
 import { showToast } from "@/components/common/Toast";
@@ -64,6 +65,7 @@ const FormTabs = ({
     const volunteer_birth_date = useWatch({ name: "volunteer_birth_date", control: control });
     const enrolled_by = useWatch({ name: "enrolled_by", control: control });
     const support_preference = useWatch({ name: "support_preference", control: control });
+    const heard_about_us = useWatch({ name: "consent_and_permissions.heard_about_us", control: control });
     const [isStepUpdatePending, setIsStepUpdatePending] = useState(false);
     // Form Tabs
     const [activeTab, setActiveTab] = useState(0);
@@ -418,8 +420,11 @@ const FormTabs = ({
         return age >= ADULT_VOLUNTEER_AGE;
     };
 
-    const hideFields = (field: any) =>
-        role === "learner" ? null : fields.includes(field.id) && volunteerAge();
+    const hideFields = (field: any) => {
+        // The "how exactly?" box only matters when "Other" was picked as the way they heard of us.
+        if (field.id === "heard_about_us_other") return heard_about_us !== HEARD_ABOUT_US_OTHER;
+        return role === "learner" ? null : fields.includes(field.id) && volunteerAge();
+    };
 
     // Leaf-field-level hiding within a card subsection (e.g. "Please tell us more" only
     // shows once a support_preference option that needs an explanation is selected).
