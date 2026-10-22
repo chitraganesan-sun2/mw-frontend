@@ -184,9 +184,6 @@ export type EndpointProps = {
     publicSessions: {
         getInstantSessions: (limit?: number) => string;
     };
-    contact: {
-        create: string;
-    };
     push_notifications: {
         registerDevice: string;
         unregisterDevice: string;

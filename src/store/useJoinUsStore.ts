@@ -12,6 +12,8 @@ interface JoinUsState {
     step1Data: any;
     step2Data: any;
     step3Data: any;
+    // The resume already uploaded for this application (display info only).
+    resume: { filename: string; size_bytes?: number | null } | null;
 
     setApplicationId: (id: string | null) => void;
     setStep1Submitted: (submitted: boolean) => void;
@@ -21,6 +23,7 @@ interface JoinUsState {
     setStep1Data: (data: any) => void;
     setStep2Data: (data: any) => void;
     setStep3Data: (data: any) => void;
+    setResume: (resume: { filename: string; size_bytes?: number | null } | null) => void;
     
     clearStore: () => void;
 }
@@ -33,6 +36,7 @@ const initialState = {
     step1Data: {},
     step2Data: {},
     step3Data: {},
+    resume: null,
 };
 
 export const useJoinUsStore = create<JoinUsState>()(
@@ -47,6 +51,7 @@ export const useJoinUsStore = create<JoinUsState>()(
                 setStep1Data: (data) => set({ step1Data: data }),
                 setStep2Data: (data) => set({ step2Data: data }),
                 setStep3Data: (data) => set({ step3Data: data }),
+                setResume: (resume) => set({ resume }),
                 clearStore: () => set(initialState),
             }),
             {

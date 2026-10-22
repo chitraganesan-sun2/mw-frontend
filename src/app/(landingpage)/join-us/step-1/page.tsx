@@ -1,24 +1,24 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useJoinUsStore } from '@/store/useJoinUsStore';
 import { submitStep1, updateStep1 } from '@/api/join-us';
 import { useCountryOptions, useStateOptions } from '@/hooks/useCountriesAndStates';
 import { showToast } from '@/components/common/Toast';
+import { getApiErrorMessage } from '@/utils/apiError';
 import Button from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
-import RadioInput from '@/components/common/Input/RadioButton';
 import { COUNTRY_CODE_OPTIONS, countryDialCodes } from '@/utils/countryDialCodes';
 
 const JoinUsStep1Page = () => {
     const router = useRouter();
     const { applicationId, setApplicationId, step1Submitted, setStep1Submitted, step1Data, setStep1Data } = useJoinUsStore();
     const [loading, setLoading] = useState(false);
+    const submitting = useRef(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const [compensationPreference, setCompensationPreference] = useState<'unpaid_ok' | 'paid_only' | ''>(step1Data?.compensation_preference || '');
     const [fullName, setFullName] = useState(step1Data?.full_name || '');
     const [email, setEmail] = useState(step1Data?.email || '');
     const [phoneCountryCode, setPhoneCountryCode] = useState<string | number>(step1Data?.phone?.country_code || '+1');
@@ -30,7 +30,6 @@ const JoinUsStep1Page = () => {
     const [school, setSchool] = useState(step1Data?.education?.school_or_university || '');
     const [gradeLevel, setGradeLevel] = useState(step1Data?.education?.grade_level_or_year || '');
     const [employmentDetails, setEmploymentDetails] = useState(step1Data?.current_employment_details || '');
-    const [compensation, setCompensation] = useState(step1Data?.compensation_expectation || '');
 
     const { countryOptions, countriesLoading } = useCountryOptions();
     const { stateOptions, statesLoading } = useStateOptions(country);
@@ -59,14 +58,15 @@ const JoinUsStep1Page = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submitting.current) return;
         const errs: Record<string, string> = {};
         if (!fullName.trim()) errs.full_name = "Please enter your full name.";
         if (!emailRegex.test(email)) errs.email = "Please enter a valid email address.";
         if (!phoneCountryCode || phoneNumber.trim().length === 0) errs.phone_number = "Please enter your phone number.";
+        else if (phoneNumber.length < 4 || phoneNumber.length > 15) errs.phone_number = "Please enter a valid phone number.";
         if (!dateOfBirth) errs.date_of_birth = "Please select your date of birth.";
         if (!country) errs.country = "Please select your country.";
         if (!state) errs.state = "Please select your state.";
-        if (!compensationPreference) errs.compensation = "Please confirm compensation preference.";
         setFieldErrors(errs);
         const first = Object.keys(errs)[0];
         if (first) {
@@ -93,11 +93,10 @@ const JoinUsStep1Page = () => {
                 school_or_university: school || null,
                 grade_level_or_year: gradeLevel || null
             },
-            current_employment_details: employmentDetails || null,
-            compensation_expectation: compensation || null,
-            compensation_preference: compensationPreference
+            current_employment_details: employmentDetails || null
         };
 
+        submitting.current = true;
         setLoading(true);
         let navigated = false;
         try {
@@ -114,7 +113,7 @@ const JoinUsStep1Page = () => {
 
                 if (!newAppId) {
                     showToast({ type: 'error', message: "We couldn't start your application. Please try again." });
-                    console.error("Step 1 POST Response:", res);
+                    submitting.current = false;
                     setLoading(false);
                     return;
                 }
@@ -131,9 +130,12 @@ const JoinUsStep1Page = () => {
                 router.push('/join-us/step-2');
             }
         } catch (err: any) {
-            showToast({ type: 'error', message: err?.message || 'Something went wrong.' });
+            showToast({ type: 'error', message: getApiErrorMessage(err, "Couldn't save your details. Please try again.") });
         } finally {
-            if (!navigated) setLoading(false);
+            if (!navigated) {
+                submitting.current = false;
+                setLoading(false);
+            }
         }
     };
 
@@ -326,62 +328,6 @@ const JoinUsStep1Page = () => {
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
                                 />
-
-                                {/* Compensation */}
-                                <Input
-                                    inputType="text"
-                                    name="compensation"
-                                    label="Compensation / Stipend Expectation"
-                                    value={compensation}
-                                    onChange={(v) => setCompensation(typeof v === 'string' ? v : v?.[0] ?? '')}
-                                    placeholder="Enter here"
-                                    rootClassName="w-full md:col-span-2"
-                                    inputClassName="w-full !rounded-xl border-gray-200"
-                                />
-                            </div>
-
-                            {/* Info text */}
-                            <div className="mt-2 text-[14px]  text-[#4F4F4F] leading-relaxed">
-                                This internship is currently unpaid and designed as a volunteer or learning
-                                opportunity. MelodyWings is a nonprofit organization, and while compensation
-                                cannot be guaranteed at this time, stipends or honorariums may be offered in the
-                                future if donations or funding become available.
-                            </div>
-
-                            {/* Radio confirmation */}
-                            <div className="mt-4 space-y-3">
-                                <p className="text-[14px]     text-[#4F4F4F]">
-                                    Please confirm that you understand and are comfortable with this arrangement.<span className="text-red-500"> *</span>
-                                </p>
-
-                                <RadioInput
-                                    inputType="radio"
-                                    name="compensation_preference"
-                                    value={compensationPreference}
-                                    onChange={(value) => {
-                                        clearError("compensation");
-                                        setCompensationPreference(
-                                            value as '' | 'unpaid_ok' | 'paid_only'
-                                        );
-                                    }}
-                                    options={[
-                                        {
-                                            value: 'unpaid_ok',
-                                            label: 'Yes, I understand and am willing to participate under these conditions',
-                                        },
-                                        {
-                                            value: 'paid_only',
-                                            label: 'I would prefer only paid opportunities',
-                                        },
-                                    ]}
-                                    inputClassName="mt-1"
-                                    radioButtonClassName="w-full md:w-auto"
-                                />
-                                {fieldErrors.compensation && (
-                                    <p role="alert" className="text-xs text-red-700 first-letter:uppercase font-medium">
-                                        {fieldErrors.compensation}
-                                    </p>
-                                )}
                             </div>
 
                             {/* Navigation buttons */}

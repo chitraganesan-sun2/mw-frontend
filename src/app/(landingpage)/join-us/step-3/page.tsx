@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useJoinUsStore } from '@/store/useJoinUsStore';
@@ -8,10 +8,14 @@ import { submitStep3, updateStep3 } from '@/api/join-us';
 import { showToast } from '@/components/common/Toast';
 import Button from '@/components/common/Button';
 import RadioInput from '@/components/common/Input/RadioButton';
+import ResumeUpload from '@/components/joinus/ResumeUpload';
+import { getApiErrorMessage } from '@/utils/apiError';
+import { HOURS_MAX, HOURS_MIN, hoursError } from '@/utils/joinUsValidation';
 
 const JoinUsStep3Page = () => {
     const router = useRouter();
-    const { applicationId, step1Submitted, step2Submitted, step3Submitted, setStep3Submitted, step3Data, setStep3Data, clearStore } = useJoinUsStore();
+    const { applicationId, step2Submitted, step3Submitted, setStep3Submitted, step3Data, setStep3Data, resume, setResume } = useJoinUsStore();
+    const submitting = useRef(false);
     const [loading, setLoading] = useState(false);
     const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -30,14 +34,16 @@ const JoinUsStep3Page = () => {
     const initLegal = step3Data?.legal_and_safety || {};
     const initPerms = step3Data?.permissions || {};
 
-    const [isInternship, setIsInternship] = useState<'yes' | 'no' | ''>(getBoolOrEmpty(initQs.looking_for_internship));
-    const [hoursAvailable, setHoursAvailable] = useState(initQs.hours_per_week || '');
+    const [hoursAvailable, setHoursAvailable] = useState(initQs.hours_per_week != null ? String(initQs.hours_per_week) : '');
+    const [showHoursError, setShowHoursError] = useState(false);
     const [startDate, setStartDate] = useState(initQs.available_start_date || '');
 
     const [qMelodyWings, setQMelodyWings] = useState(initQs.interest_in_melodywings || '');
     const [qRole, setQRole] = useState(initQs.interest_in_selected_role || '');
-    const [qExp, setQExp] = useState(initQs.relevant_experience || '');
-    const [qSkills, setQSkills] = useState(initQs.skills_for_role || '');
+    // One combined answer (it used to be two questions: experience, and skills).
+    const [qExpSkills, setQExpSkills] = useState(
+        initQs.experience_and_skills || [initQs.relevant_experience, initQs.skills_for_role].filter(Boolean).join('\n\n')
+    );
     const [qChildren, setQChildren] = useState(initQs.children_or_neurodivergent_experience || '');
     const [qAdditional, setQAdditional] = useState(initQs.additional_information || '');
 
@@ -85,13 +91,11 @@ const JoinUsStep3Page = () => {
 
     const isNextEnabled =
         !loading &&
-        !!isInternship &&
-        !!hoursAvailable.trim() &&
+        !hoursError(hoursAvailable) &&
         !!startDate.trim() &&
         !!qMelodyWings.trim() &&
         !!qRole.trim() &&
-        !!qExp.trim() &&
-        !!qSkills.trim() &&
+        !!qExpSkills.trim() &&
         !!criminalCheck1 &&
         !!criminalCheck2 &&
         !!criminalCheck3 &&
@@ -119,10 +123,19 @@ const JoinUsStep3Page = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submitting.current) return;
 
         if (!applicationId) {
             showToast({ type: 'error', message: 'Application ID missing. Please start from Step 1.' });
             router.push('/join-us/step-1');
+            return;
+        }
+
+        const hoursProblem = hoursError(hoursAvailable);
+        if (hoursProblem) {
+            setShowHoursError(true);
+            showToast({ type: 'error', message: hoursProblem });
+            document.getElementById('hours_per_week')?.focus();
             return;
         }
 
@@ -164,12 +177,10 @@ const JoinUsStep3Page = () => {
         const payload = {
             application_id: applicationId,
             application_questions: {
-                looking_for_internship: isInternship === 'yes',
                 interest_in_melodywings: qMelodyWings || null,
                 interest_in_selected_role: qRole || null,
-                relevant_experience: qExp || null,
-                skills_for_role: qSkills || null,
-                hours_per_week: hoursAvailable || "Not Provided", // Making it a string as per swagger Schema, required
+                experience_and_skills: qExpSkills.trim() || null,
+                hours_per_week: Number(hoursAvailable),
                 available_start_date: startDate || null,
                 children_or_neurodivergent_experience: qChildren || null,
                 additional_information: qAdditional || null
@@ -212,6 +223,7 @@ const JoinUsStep3Page = () => {
             }
         };
 
+        submitting.current = true;
         setLoading(true);
         try {
             if (!step3Submitted) {
@@ -226,8 +238,8 @@ const JoinUsStep3Page = () => {
 
             router.push('/join-us/success');
         } catch (err: any) {
-            showToast({ type: 'error', message: err?.message || "Couldn't submit your application. Please try again." });
-        } finally {
+            showToast({ type: 'error', message: getApiErrorMessage(err, "Couldn't submit your application. Please try again.") });
+            submitting.current = false;
             setLoading(false);
         }
     };
@@ -260,26 +272,9 @@ const JoinUsStep3Page = () => {
                                 Application Questions
                             </h2>
 
-                            <div className="space-y-2">
-                                <p className="text-[16px] md:text-sm font-normal text-gray-800">
-                                    Are you looking for an internship opportunity?
-                                </p>
-                                <RadioInput
-                                    inputType="radio"
-                                    name="internship_opportunity"
-                                    value={isInternship}
-                                    onChange={(value) => setIsInternship(value as '' | 'yes' | 'no')}
-                                    options={[
-                                        { value: 'yes', label: 'Yes' },
-                                        { value: 'no', label: 'No' },
-                                    ]}
-                                    inputClassName="mt-1"
-                                />
-                            </div>
-
                             <div className="space-y-4 md:space-y-5">
                                 <div className="space-y-2">
-                                    <label className="text-[16px] md:text-sm font-normal text-gray-800">Why are you interested in this opportunity with MelodyWings?</label>
+                                    <label className="text-[16px] md:text-sm font-normal text-gray-800">Why are you interested in joining MelodyWings?</label>
                                     <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qMelodyWings} onChange={(e) => setQMelodyWings(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
@@ -287,28 +282,60 @@ const JoinUsStep3Page = () => {
                                     <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qRole} onChange={(e) => setQRole(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[16px] md:text-sm font-normal text-gray-800">What relevant experience do you have for this role?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Clubs, volunteer work, internships, school projects, etc." value={qExp} onChange={(e) => setQExp(e.target.value)} />
+                                    <label htmlFor="experience_and_skills" className="text-[16px] md:text-sm font-normal text-gray-800">
+                                        Experience &amp; Skills<span className="text-red-500"> *</span>
+                                    </label>
+                                    <p className="text-xs md:text-sm text-gray-600">
+                                        Tell us about the experience you have for this role (clubs, volunteer work, school projects, jobs) and the skills you would bring.
+                                    </p>
+                                    <textarea
+                                        id="experience_and_skills"
+                                        rows={6}
+                                        required
+                                        maxLength={4000}
+                                        className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border"
+                                        placeholder="Experience: ... Skills: ..."
+                                        value={qExpSkills}
+                                        onChange={(e) => setQExpSkills(e.target.value)}
+                                    />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[16px] md:text-sm font-normal text-gray-800">What skills would you bring to this role?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qSkills} onChange={(e) => setQSkills(e.target.value)} />
-                                </div>
+
+                                {applicationId && (
+                                    <ResumeUpload
+                                        applicationId={applicationId}
+                                        value={resume}
+                                        onChange={setResume}
+                                        disabled={loading}
+                                    />
+                                )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full min-w-0">
                                     <div className="space-y-2 w-full min-w-0">
-                                        <label className="text-[16px] font-normal text-gray-800">
-                                            How many hours per week are you available?
+                                        <label htmlFor="hours_per_week" className="text-[16px] font-normal text-gray-800">
+                                            Hours Per Week<span className="text-red-500"> *</span>
                                         </label>
-
                                         <input
-                                            type="text"
+                                            id="hours_per_week"
+                                            name="hours_per_week"
+                                            type="number"
+                                            inputMode="numeric"
+                                            min={HOURS_MIN}
+                                            max={HOURS_MAX}
+                                            step={1}
                                             required
+                                            aria-invalid={showHoursError && !!hoursError(hoursAvailable)}
+                                            aria-describedby="hours_per_week_help"
                                             className="w-full min-w-0 rounded-xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border"
-                                            placeholder="Enter here"
+                                            placeholder={`${HOURS_MIN} - ${HOURS_MAX}`}
                                             value={hoursAvailable}
                                             onChange={(e) => setHoursAvailable(e.target.value)}
+                                            onBlur={() => setShowHoursError(true)}
                                         />
+                                        <p id="hours_per_week_help" className={`text-xs ${showHoursError && hoursError(hoursAvailable) ? 'text-red-700 font-medium' : 'text-gray-600'}`} role={showHoursError && hoursError(hoursAvailable) ? 'alert' : undefined}>
+                                            {showHoursError && hoursError(hoursAvailable)
+                                                ? hoursError(hoursAvailable)
+                                                : `How many hours can you commit each week? (${HOURS_MIN}-${HOURS_MAX})`}
+                                        </p>
                                     </div>
                                     <div className="space-y-2 w-full min-w-0">
                                         <label className="text-[16px] md:text-sm font-normal text-gray-800">

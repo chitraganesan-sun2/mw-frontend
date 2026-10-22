@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import { useJoinUsStore } from "@/store/useJoinUsStore";
 import { submitStep2, updateStep2 } from "@/api/join-us";
 import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 import Button from "@/components/common/Button";
 import PositionCard from "../PositionCard";
 
+// `value` is the key stored on submitted applications (it still carries the old "_intern"
+// suffix on purpose - changing it would orphan existing records); only `label` is shown.
 const POSITION_OPTIONS = [
     {
         value: "social_media_intern",
-        label: "Social Media Intern",
+        label: "Social Media",
         description:
             "Help grow MelodyWings' online presence by creating engaging content and sharing stories from our community.",
         responsibilities: [
@@ -23,7 +26,7 @@ const POSITION_OPTIONS = [
     },
     {
         value: "volunteer_outreach_intern",
-        label: "Volunteer Outreach Intern",
+        label: "Volunteer Outreach",
         description:
             "Support the growth of our volunteer community by helping recruit and communicate with new mentors.",
         responsibilities: [
@@ -34,7 +37,7 @@ const POSITION_OPTIONS = [
     },
     {
         value: "learner_outreach_intern",
-        label: "Learner Outreach Intern",
+        label: "Learner Outreach",
         description:
             "Help connect more learners and families to MelodyWings so they can benefit from our sessions.",
         responsibilities: [
@@ -45,7 +48,7 @@ const POSITION_OPTIONS = [
     },
     {
         value: "operations_intern",
-        label: "Operations Intern",
+        label: "Operations",
         description:
             "Help support the behind the scenes systems that keep MelodyWings running smoothly.",
         responsibilities: [
@@ -57,7 +60,7 @@ const POSITION_OPTIONS = [
     },
     {
         value: "partnerships_intern",
-        label: "Partnerships & Community Relations Intern",
+        label: "Partnerships & Community Relations",
         description:
             "Help MelodyWings build relationships with organizations that share our mission.",
         responsibilities: [
@@ -132,7 +135,7 @@ const JoinUsStep2Page = () => {
             router.push('/join-us/step-3');
             navigated = true;
         } catch (err: any) {
-            showToast({ type: 'error', message: err?.message || 'Something went wrong.' });
+            showToast({ type: 'error', message: getApiErrorMessage(err, "Couldn't save your selection. Please try again.") });
         } finally {
             if (!navigated) setLoading(false);
         }

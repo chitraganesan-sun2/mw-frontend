@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { FaLinkedin, FaInstagram, FaWhatsapp, FaFacebook, FaGoogle } from "react-icons/fa";
 import { IconType } from "react-icons";
 import Logo from "@/components/common/Logo";
-import ContactUsModal from "@/components/landingpage/Modals/ContactUsModal";
+import { SUPPORT_EMAIL } from "@/constants/contact";
 // import { FaSquareXTwitter } from "react-icons/fa6";
 
 type Props = {};
@@ -14,7 +13,6 @@ type PolicyLink = {
     href?: string;
     label: string;
     target?: string;
-    onClick?: () => void;
 };
 
 type SocialLink = {
@@ -24,16 +22,11 @@ type SocialLink = {
 };
 
 const Footer = (props: Props) => {
-    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-
     const policyLinks: PolicyLink[] = [
         { href: "/privacy-policy", target: "_blank", label: "Privacy Policy" },
         { href: "/terms-and-conditions", target: "_blank", label: "Terms and Conditions" },
         { href: "/join-us", label: "Join Us" },
-        {
-            label: "Contact Us - support@melodywings.org",
-            onClick: () => setIsContactModalOpen(true),
-        },
+        { href: "/contact", label: `Contact Us - ${SUPPORT_EMAIL}` },
     ];
 
     const socialLinks: SocialLink[] = [
@@ -79,28 +72,17 @@ const Footer = (props: Props) => {
                 <div className="flex w-full flex-col lg:flex-row justify-between items-center lg:items-start gap-4 py-8 lg:py-0">
                     {/* Left side - Policy and Terms links */}
                     <div className="flex flex-col max-lg:items-center mb-5 lg:mb-0 gap-6">
-                        {policyLinks.map((link, index) =>
-                            link.onClick ? (
-                                <button
-                                    key={link.label}
-                                    type="button"
-                                    onClick={link.onClick}
-                                    className="text-sm text-gray-600 underline hover:text-gray-900 transition-colors text-left"
-                                >
-                                    {link.label}
-                                </button>
-                            ) : (
-                                <Link
-                                    key={link?.href || index}
-                                    href={link?.href || "#"}
-                                    rel="noopener noreferrer"
-                                    target={link?.target}
-                                    className="text-sm text-gray-600 underline hover:text-gray-900 transition-colors"
-                                >
-                                    {link.label}
-                                </Link>
-                            )
-                        )}
+                        {policyLinks.map((link, index) => (
+                            <Link
+                                key={link?.href || index}
+                                href={link?.href || "#"}
+                                rel="noopener noreferrer"
+                                target={link?.target}
+                                className="text-sm text-gray-600 underline hover:text-gray-900 transition-colors"
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
                     </div>
 
                     <div className="flex-center flex-col gap-6">
@@ -129,10 +111,6 @@ const Footer = (props: Props) => {
                     <div className="hidden lg:block">{renderSocialLinks()}</div>
                 </div>
             </div>
-            <ContactUsModal
-                isOpen={isContactModalOpen}
-                onClose={() => setIsContactModalOpen(false)}
-            />
         </footer>
     );
 };

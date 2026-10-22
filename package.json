@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:unit": "node --experimental-strip-types --test tests/unit/*.test.ts",
     "prebuild:mobile": "node scripts/use-mobile-config.js",
     "build:mobile": "next build",
     "postbuild:mobile": "node scripts/restore-web-config.js",

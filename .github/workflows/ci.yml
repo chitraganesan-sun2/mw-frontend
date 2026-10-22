@@ -23,6 +23,8 @@ jobs:
       # `next build` is the real gate: it generates next-env.d.ts (gitignored)
       # and type-checks. A bare `tsc --noEmit` on a fresh checkout can't resolve
       # the image-module ambient types that next-env.d.ts provides.
+      - name: Unit tests
+        run: npm run test:unit
       - name: Build
         run: npx next build
       - name: Lint
