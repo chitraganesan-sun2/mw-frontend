@@ -3,6 +3,7 @@ import TitleSection from "@/components/onboarding/TitleSection";
 import AboutSectionCard from "@/components/landingpage/AboutUs/AboutSectionCard";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { SHARE_IMAGES } from "@/constants/seo";
 
 export const metadata: Metadata = {
     title: "About Us",
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
         title: "About Us | MelodyWings",
         description: "MelodyWings is a heartfelt initiative providing free tutoring for students with disabilities and special needs, connecting them with volunteers who gain valuable experience and community service hours.",
         url: "/about-us",
+        images: SHARE_IMAGES,
     },
 };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import { SHARE_IMAGES } from "@/constants/seo";
 import { FiMail, FiPhone } from "react-icons/fi";
 import { SUPPORT_EMAIL, SUPPORT_PHONE, hasSupportPhone, phoneToTelHref } from "@/constants/contact";
 
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
         title: "Contact Us | MelodyWings",
         description: "Get in touch with MelodyWings by phone or email.",
         url: "/contact",
+        images: SHARE_IMAGES,
     },
 };
 
