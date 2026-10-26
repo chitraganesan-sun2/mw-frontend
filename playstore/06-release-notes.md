@@ -1,4 +1,4 @@
-# Release notes — v1.5.0 (versionCode 8)
+# Release notes — v1.5.0 (versionCode 10)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
 
@@ -26,7 +26,7 @@ Covers everything since 1.4.0 (`ad4b2fcc`), built from `main@400f1757`.
 - CSP now allows Google Analytics hosts; official support phone set for the mobile build
 - Web-only in this range (no app effect): SEO share image / structured data, careers form revamp, About page team update
 - Needs the matching backend changes live (onboarding question, booking fields): confirm before release
-- Version bumped: `android/app/build.gradle` versionCode 8 / versionName 1.5.0, `.env.mobile` 1.5.0
+- Version bumped: `android/app/build.gradle` versionCode 10 / versionName 1.5.0, `.env.mobile` 1.5.0
 
 ---
 
