@@ -87,12 +87,5 @@ export const VolunteerScheduleModalConstants = [
         placeholder: "Enter session title",
         required: true,
     },
-    {
-        name: "select_date",
-        label: "Date",
-        inputType: "datepicker",
-        placeholder: "Select a date",
-        required: true,
-    },
 ];
 

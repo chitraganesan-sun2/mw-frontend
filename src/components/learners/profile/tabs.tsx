@@ -61,7 +61,7 @@ export const ProfileDetails = ({ data }: { data: Learnerpersonalinfo }) => {
 
     return (
         <div>
-            <h5 className="text-xl font-semibold mb-3">Profile Details</h5>
+            <h5 className="text-xl font-semibold mb-3">About</h5>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {details.map((detail) => (
                     <InfoItem key={detail.label} label={detail.label} value={detail.value} />

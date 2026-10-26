@@ -28,6 +28,10 @@ const csp = [
         apiOrigin,
         "https://www.google-analytics.com",
         "https://*.google-analytics.com",
+        // GA4 sends its hits to www.google.com/g/collect (and the GTM host); without these the
+        // browser blocked every analytics event.
+        "https://www.google.com",
+        "https://www.googletagmanager.com",
         "https://us.i.posthog.com",
         "https://us-assets.i.posthog.com",
         "https://accounts.google.com",

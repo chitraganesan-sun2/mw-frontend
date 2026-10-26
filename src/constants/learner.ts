@@ -459,7 +459,7 @@ export const LearnerFormSections: FormSectionConfig[] = [
                 id: "profile_picture",
                 label: "Learner's Profile Picture",
                 inputType: "upload",
-                required: false,
+                required: true,
                 gridCols: 1,
                 variant: "profile-image",
                 fileType: "image/*",
