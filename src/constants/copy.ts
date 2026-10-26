@@ -43,6 +43,8 @@ export const HELP = {
         "Browse volunteers in your country. Filter by language, skill or available time, then open a profile to message the volunteer or book a session.",
     browseLearners:
         "Browse learners. Filter by language, disability type or skill to learn, then open a profile to message the learner or propose a session.",
+    myVolunteers: "Volunteers you have had sessions with, and how many sessions you have taken together.",
+    myLearners: "Learners you have had sessions with, and how many sessions you have had together.",
     matchesLearner:
         "We compare your profile with volunteers and suggest the best fit. You can ask for a new suggestion after a short wait.",
     matchesVolunteer:

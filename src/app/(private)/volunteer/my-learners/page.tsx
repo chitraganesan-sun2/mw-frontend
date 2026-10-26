@@ -1,6 +1,8 @@
 "use client";
 
 import { endpoints } from "@/api/constants";
+import PageIntro from "@/components/common/PageIntro";
+import { EMPTY, HELP } from "@/constants/copy";
 import { GET_API } from "@/api/request";
 import LearnersTable from "@/components/learners/Table";
 import { getHeaderIcon } from "@/layouts/helper";
@@ -154,6 +156,7 @@ export default function LearnersPage() {
 
     return (
         <div className="w-full h-full py-6 px-4 md:p-6 animate-fadeIn">
+            <PageIntro className="mb-4">{HELP.myLearners}</PageIntro>
             {isMobileScreen ? (
                 (isLoading || isFetching) && learnerData.length === 0 ? (
                     <LottieLoader isLoading={true} />
@@ -184,7 +187,9 @@ export default function LearnersPage() {
                 />
             )}
             {isMobileScreen && learnerData?.length === 0 && (
-                <div className="flex-center h-full">No Learners Found</div>
+                <div className="flex-center h-full px-5 text-center">
+                    {query ? EMPTY.noResultsForFilters("learners") : EMPTY.noneYet("learners", "They appear here once you have had a session together.")}
+                </div>
             )}
         </div>
     );

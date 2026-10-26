@@ -13,6 +13,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UNREAD_MESSAGES_QUERY_KEY } from "@/hooks/useUnreadMessages";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { ERRORS } from "@/constants/copy";
 import { getCookie } from "@/utils/auth";
 import NoMessage from "@/components/messages/NoMessage";
 import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
@@ -472,7 +473,7 @@ const Messages = () => {
 
             <VolunteerViewModal isOpen={isOpen} onClose={handleModal} />
             {isErrorChats && noChats === null ? (
-                <div className="flex-center h-full w-full">Something went wrong loading your messages.</div>
+                <div className="flex-center h-full w-full px-5 text-center">{ERRORS.load("your messages")}</div>
             ) : noChats ? (
                 <NoMessage />
             ) : (

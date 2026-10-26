@@ -1,5 +1,6 @@
 "use client";
 
+import { EMPTY } from "@/constants/copy";
 import Button from "@/components/common/Button";
 import { getMyResources, getResources } from "@/api/resources";
 import { GET_API } from "@/api/request";
@@ -264,7 +265,9 @@ export default function ResourcesPageWrapper({ variant }: ResourcesPageWrapperPr
                         </>
                     ) : (MyResources?.length === 0) ? (
                         <div className="max-md:!min-h-[300px] h-full w-full flex-center flex-col gap-1">
-                            <p>No Resources Found</p>
+                            <p className="text-center px-5">
+                                {searchQuery ? EMPTY.noResultsForFilters("resources") : "You haven't added any resources yet. Select Add Resource to share one."}
+                            </p>
                             {
                                 searchQuery ? (
                                     <Button btnVariant="link" title="Clear Search" onClick={() => setSearchQuery(null)} />

@@ -203,7 +203,7 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
                 showToast({ message: errorMessage, type: "error" });
             }
         } catch (error) {
-            showToast({ message: "Something went wrong.", type: "error" });
+            showToast({ message: "Couldn't save the resource. Please try again.", type: "error" });
         } finally {
             setIsSubmitting(false);
         }
@@ -214,7 +214,7 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
             ? (d: FormData) => updateResource(resourceId || "", d)
             : (d: FormData) => addResource({ ...d, created_by: role });
         const successMessage = isEditMode ? "Resource updated" : "Resource created";
-        const errorMessage = isEditMode ? "Resource not updated" : "Resource not created";
+        const errorMessage = isEditMode ? "Couldn't update the resource. Please try again." : "Couldn't create the resource. Please try again.";
 
         handleResourceAction({ data, actionFn, successMessage, errorMessage });
     };

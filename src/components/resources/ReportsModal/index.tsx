@@ -57,12 +57,12 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
             const isSuccess = await reportResource(payload);
             showToast({
                 type: isSuccess ? "success" : "error",
-                message: isSuccess ? "Report Submitted!" : "Report Not Submitted!",
+                message: isSuccess ? "Report submitted. Thank you." : "Couldn't submit your report. Please try again.",
             });
 
             if (isSuccess) onClose();
         } catch (error) {
-            showToast({ type: "error", message: "Something went wrong." });
+            showToast({ type: "error", message: "Couldn't submit your report. Please try again." });
         } finally {
             setIsSubmitting(false);
         }

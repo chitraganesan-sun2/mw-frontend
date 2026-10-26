@@ -58,7 +58,7 @@ const CategorySection = ({ topicSingleTitle, handleViewOrEditResource }: Categor
                             ))}
                         </div> ) : (
                         <span className="min-w-[250px] min-h-[275px] h-full w-full flex-center">
-                            No Resources Found
+                            No resources in this category yet.
                         </span>
                     )}
                 </>

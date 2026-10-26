@@ -1,5 +1,6 @@
 "use client";
 
+import { EMPTY } from "@/constants/copy";
 import Button from "@/components/common/Button";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Fragment, useRef } from "react";
@@ -92,7 +93,9 @@ const SectionWrapper = ({
                         <>
                             {data?.length === 0 ? (
                                 <span className="min-w-[250px] min-h-[275px] h-full w-full flex-center flex-col gap-1">
-                                    <p>No Resources Found</p>
+                                    <p className="text-center px-5">
+                                        {searchQuery ? EMPTY.noResultsForFilters("resources") : EMPTY.noneYet("resources")}
+                                    </p>
                                     {
                                         searchQuery && (
                                             <Button btnVariant="link" title="Clear Search" onClick={() => setSearchQuery(null)} />

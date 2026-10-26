@@ -100,10 +100,10 @@ const DetailModal = ({
                 triggerReload();
                 onClose();
             } else {
-                showToast({ message: "Resource not deleted", type: "error" });
+                showToast({ message: "Couldn't delete the resource. Please try again.", type: "error" });
             }
         } catch (err) {
-            showToast({ message: getApiErrorMessage(err, "Resource not deleted"), type: "error" });
+            showToast({ message: getApiErrorMessage(err, "Couldn't delete the resource. Please try again."), type: "error" });
         } finally {
             setIsDeleting(false);
         }

@@ -186,9 +186,7 @@ export default function LearnersPage() {
 
             actionButtons: [
                 {
-                    buttonTitle: isMobileScreen
-                        ? "Learners History"
-                        : "Learners I have worked with",
+                    buttonTitle: "My Learners",
                     buttonOnClick: () => router.push("/volunteer/my-learners"),
                     buttonClassName: learnersActionButtonClassName,
                     buttonPlacement: "right" as const,

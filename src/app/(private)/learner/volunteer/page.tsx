@@ -171,9 +171,7 @@ export default function LearnersPage() {
             titleIcon: getHeaderIcon(pathname),
             actionButtons: [
                 {
-                    buttonTitle: isMobileScreen
-                        ? "Volunteer History"
-                        : "Volunteers I have worked with",
+                    buttonTitle: "My Volunteers",
                     buttonOnClick: () => router.push("/learner/my-volunteers"),
                     buttonClassName:
                         "!bg-action !text-white hover:!bg-action-hover hover:!text-white !h-[35px] !text-sm !py-2 px-4 !rounded-full",

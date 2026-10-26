@@ -531,7 +531,7 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
     if (isError) {
         return (
             <ViewModal modalOpen={isOpen} onClose={handleClose} width={855} isError>
-                <div className="p-5">Error loading volunteer data</div>
+                <div className="p-5">Couldn&apos;t load this volunteer&apos;s profile. Close this window and try again.</div>
             </ViewModal>
         );
     }

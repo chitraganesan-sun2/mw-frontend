@@ -31,6 +31,7 @@ import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { BsFillBookmarkFill, BsBookmark } from "react-icons/bs";
 import { useDebounce } from "use-debounce";
+import { EMPTY } from "@/constants/copy";
 import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 
 interface FeedCardProps {
@@ -531,7 +532,9 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
 
                     {posts.length === 0 && (
                         <div className="flex-center w-full h-full min-h-[50vh] flex-col gap-1">
-                            <p>No Posts Found</p>
+                            <p className="text-center px-5">
+                                {searchQuery ? EMPTY.noResultsForFilters("posts") : EMPTY.noneYet("posts", "Be the first to share something with the community.")}
+                            </p>
                             {searchQuery && (
                                 <Button btnVariant="link" title="Clear Search" onClick={() => setSearchQuery(null)} />
                             ) }

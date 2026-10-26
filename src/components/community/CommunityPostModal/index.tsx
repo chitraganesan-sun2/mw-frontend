@@ -85,7 +85,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
             onClose();
             reset({ description: "", images: [], video: null });
         } catch (error) {
-            showToast({ message: "Something went wrong.", type: "error" });
+            showToast({ message: "Couldn't save your post. Please try again.", type: "error" });
         } finally {
             setIsSubmitting(false);
         }
