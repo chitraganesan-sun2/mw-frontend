@@ -6,8 +6,8 @@
  *   [Select Volunteer / Select Learner]  (scheduled only)
  *   Category -> Skill (exactly one) -> Level (instant only)
  *   [Session Title]                       (scheduled only; instant sessions are auto-titled)
- *   Session Details & Expectations *   (the learner's booking form words it "What do you want to learn?")
- *   [What should the volunteer know or prepare?]   (learner's booking form only, optional)
+ *   Session Details & Expectations *   (the learner's booking form words it "What do you want to learn?",
+ *                                        which also covers what the volunteer should know or prepare)
  *   Date -> Start Time / Available Slots -> Duration   (learner's booking form: one Available Times dropdown)
  */
 import { useState } from "react";
@@ -33,7 +33,6 @@ export const SESSION_FIELD_LABELS = {
     expertiseLevel: "Expertise Level",
     title: "Session Title",
     details: "Session Details & Expectations",
-    preparation: "What should the volunteer know or prepare?",
     availability: "Available Times",
     date: "Date",
     startTime: "Start Time",
@@ -321,16 +320,18 @@ export function SessionDetailsField({
     onChange,
     placeholder,
     error,
+    label = SESSION_FIELD_LABELS.details,
 }: {
     value: string;
     onChange: (value: string) => void;
     placeholder: string;
     error?: string | null;
+    label?: string;
 }) {
     return (
         <div className="flex flex-col gap-2">
             <label htmlFor="session-details" className={labelClass}>
-                {SESSION_FIELD_LABELS.details} <span aria-hidden="true">*</span>
+                {label} <span aria-hidden="true">*</span>
             </label>
             <textarea
                 id="session-details"
@@ -358,47 +359,8 @@ export function SessionDetailsField({
     );
 }
 
-export const PREPARATION_PLACEHOLDER =
-    "Share any specific topics, questions, background information, or materials the volunteer should review before your session.";
-
-/** Optional note from the learner on what the volunteer should know or prepare. */
-export function PreparationDetailsField({
-    value,
-    onChange,
-    error,
-}: {
-    value: string;
-    onChange: (value: string) => void;
-    error?: string | null;
-}) {
-    return (
-        <div className="flex flex-col gap-2">
-            <label htmlFor="session-preparation" className={labelClass}>
-                {SESSION_FIELD_LABELS.preparation}
-            </label>
-            <textarea
-                id="session-preparation"
-                value={value}
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? "session-preparation-error" : "session-preparation-hint"}
-                maxLength={DETAILS_MAX_LENGTH}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={PREPARATION_PLACEHOLDER}
-                rows={4}
-                className={`w-full px-4 py-3 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] resize-none ${
-                    error ? "border-red-600" : "border-gray-200"
-                }`}
-            />
-            {error ? (
-                <FieldError id="session-preparation-error" message={error} />
-            ) : (
-                <p id="session-preparation-hint" className="text-xs text-gray-500">
-                    Optional · {value.length}/{DETAILS_MAX_LENGTH}
-                </p>
-            )}
-        </div>
-    );
-}
+export const LEARNER_DETAILS_PLACEHOLDER =
+    "Tell us what you want to learn, plus any topics, questions, background information, or materials the volunteer should know about or review before your session.";
 
 /** "October 30, 2026 · 6:00 PM – 6:45 PM EDT" - the zone is the one in effect on that date. */
 export function formatSlotOption(slot: UpcomingSlot, timeZoneLabel?: string): string {

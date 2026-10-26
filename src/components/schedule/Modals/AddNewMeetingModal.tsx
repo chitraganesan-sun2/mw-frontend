@@ -21,8 +21,7 @@ import { NONE_SKILL_OPTION, NONE_SUBJECT_OPTION } from "@/constants/volunteer";
 import {
     AvailabilityField,
     CategoryField,
-    DETAILS_MAX_LENGTH,
-    PreparationDetailsField,
+    LEARNER_DETAILS_PLACEHOLDER,
     SessionDetailsField,
     SkillField,
     type PickedSkill,
@@ -41,7 +40,6 @@ const EMPTY_FORM = {
     end_time: "",
     google_meet_link: "",
     description: "",
-    preparation_details: "",
     selected_slot: "",
     academic_skills: [] as string[],
     non_academic_skills: [] as string[],
@@ -78,8 +76,6 @@ const meetingFormSchema = z.object({
     end_time: z.string(),
     google_meet_link: z.string(),
     description: z.string().trim().min(1, "Please describe the session details and expectations."),
-    // Optional - what the volunteer should know or prepare.
-    preparation_details: z.string().max(DETAILS_MAX_LENGTH, `Please keep this under ${DETAILS_MAX_LENGTH} characters.`).optional().default(""),
     selected_slot: z.string().min(1, SLOT_REQUIRED),
     // Optional - picked from the selected volunteer's own declared subjects/skills.
     academic_skills: z.array(z.string()).optional().default([]),
@@ -163,7 +159,6 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     ...prev,
                     title_of_the_meeting: data.session_title || prev.title_of_the_meeting,
                     description: data.session_description || prev.description,
-                    preparation_details: data.preparation_details || prev.preparation_details,
                 }));
             })
             .catch(() => showToast({ message: "Couldn't load the session to reschedule.", type: "error" }));
@@ -282,7 +277,6 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
             session_end_time: formData.end_time,
             session_title: formData.title_of_the_meeting,
             session_description: formData.description,
-            preparation_details: formData.preparation_details?.trim() || undefined,
             learner_id: learnerId,
             academic_skills: rescheduleId ? rescheduleSource?.academic || [] : formData.academic_skills || [],
             non_academic_skills: rescheduleId ? rescheduleSource?.nonAcademic || [] : formData.non_academic_skills || [],
@@ -411,13 +405,9 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
             <SessionDetailsField
                 value={formData.description}
                 error={errors.description}
-                placeholder="What do you want to learn?"
+                label="What do you want to learn?"
+                placeholder={LEARNER_DETAILS_PLACEHOLDER}
                 onChange={(value) => handleChange("description", value)}
-            />
-            <PreparationDetailsField
-                value={formData.preparation_details || ""}
-                error={errors.preparation_details}
-                onChange={(value) => handleChange("preparation_details", value)}
             />
         </div>
     );
