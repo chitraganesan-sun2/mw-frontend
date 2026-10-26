@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { joinNames } from "@/utils/joinNames";
 import { getStatusLabel } from "@/utils/sessionDisplay";
@@ -95,9 +95,7 @@ export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
 }
 
 const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile }) => {
-    const [activeTab, setActiveTab] = useState<ScheduleTab>("posted");
     const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
-    const tabRefs = useRef<Record<ScheduleTab, HTMLButtonElement | null>>({ posted: null, accepted: null, direct: null });
 
     const startReschedule = useStartReschedule(role);
 
@@ -127,47 +125,25 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         return groups;
     }, [active.data, role, when]);
 
-    // Open on the first tab that has sessions (once per Upcoming/Past switch), rather than
-    // an empty "Posted" tab while e.g. Direct has bookings. Manual tab picks are respected.
-    const autoPicked = useRef<string | null>(null);
-    useEffect(() => {
-        if (!active.data || autoPicked.current === when) return;
-        autoPicked.current = when;
-        const firstWithItems = TABS.find((tab) => byTab[tab].length > 0);
-        if (firstWithItems) setActiveTab(firstWithItems);
-    }, [active.data, byTab, when]);
-
-    const onTabKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
-        const index = TABS.indexOf(activeTab);
-        let next: number | null = null;
-        if (e.key === "ArrowRight") next = (index + 1) % TABS.length;
-        if (e.key === "ArrowLeft") next = (index - 1 + TABS.length) % TABS.length;
-        if (e.key === "Home") next = 0;
-        if (e.key === "End") next = TABS.length - 1;
-        if (next === null) return;
-        e.preventDefault();
-        setActiveTab(TABS[next]);
-        tabRefs.current[TABS[next]]?.focus();
-    };
-
     const nextSession = useMemo(
         () => (when === "upcoming" ? findNextSession(upcoming.data?.items || [], role, timeZoneLabel, now) : null),
         [when, upcoming.data, role, timeZoneLabel, now]
     );
-    const tabSessions = byTab[activeTab];
-    // Statuses present in this tab, for the filter dropdown.
+    const allSessions = useMemo(() => TABS.flatMap((tab) => byTab[tab]), [byTab]);
+    // Statuses present anywhere, for the filter dropdown.
     const statusOptions = useMemo(
-        () => Array.from(new Set(tabSessions.map((s) => s.status).filter(Boolean) as string[])),
-        [tabSessions]
+        () => Array.from(new Set(allSessions.map((s) => s.status).filter(Boolean) as string[])),
+        [allSessions]
     );
-    // A status picked on another tab may not exist here - fall back to "all".
+    // A status that no longer exists (e.g. after switching Upcoming/Past) falls back to "all".
     useEffect(() => {
         if (statusFilter !== "all" && !statusOptions.includes(statusFilter)) setStatusFilter("all");
     }, [statusFilter, statusOptions]);
     const isFiltering = search.trim() !== "" || statusFilter !== "all";
-    const sessions = useMemo(() => {
+    // Search and status narrow all three columns at once.
+    const filteredByTab = useMemo(() => {
         const needle = search.trim().toLowerCase();
-        return tabSessions.filter((s) => {
+        const matches = (s: ScheduleSession) => {
             if (statusFilter !== "all" && s.status !== statusFilter) return false;
             if (!needle) return true;
             const person = role === "learner" ? s.volunteer_full_name : joinNames(s.learner_first_name, s.learner_last_name);
@@ -182,13 +158,14 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 .join(" ")
                 .toLowerCase();
             return haystack.includes(needle);
-        });
-    }, [tabSessions, search, statusFilter, role]);
-    const groups = useMemo(() => groupSessions(sessions, role, when, today), [sessions, role, when, today]);
+        };
+        return Object.fromEntries(TABS.map((tab) => [tab, byTab[tab].filter(matches)])) as Record<ScheduleTab, ScheduleSession[]>;
+    }, [byTab, search, statusFilter, role]);
+    const shownCount = TABS.reduce((n, tab) => n + filteredByTab[tab].length, 0);
     const loadedPast = past.data?.items.length ?? 0;
     const hiddenPast = when === "past" && (past.data?.total ?? 0) > loadedPast;
     const canShowMore = hiddenPast && pastSize < MAX_PAGE_SIZE;
-    const showFilters = tabSessions.length >= 4 || isFiltering;
+    const showFilters = allSessions.length >= 4 || isFiltering;
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
@@ -218,41 +195,6 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
             </div>
 
             {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
-
-            <div role="tablist" aria-label={SCHEDULE_LABELS.mySchedule} className="flex flex-col gap-1 sm:flex-row sm:gap-2">
-                {TABS.map((tab) => {
-                    const selected = tab === activeTab;
-                    const count = active.data ? byTab[tab].length : null;
-                    const [tabTitle, tabNote] = splitTabLabel(SCHEDULE_TAB_LABELS[role][tab]);
-                    return (
-                        <button
-                            key={tab}
-                            ref={(el) => {
-                                tabRefs.current[tab] = el;
-                            }}
-                            id={`schedule-tab-${tab}`}
-                            type="button"
-                            role="tab"
-                            aria-selected={selected}
-                            aria-controls={`schedule-panel-${tab}`}
-                            tabIndex={selected ? 0 : -1}
-                            onClick={() => setActiveTab(tab)}
-                            onKeyDown={onTabKeyDown}
-                            className={`flex-1 rounded-lg border px-3 py-2 text-left text-xs font-medium leading-snug transition-colors ${selected ? "border-action bg-action text-white" : "border-gray-200 bg-white text-gray-800 hover:bg-gray-50"}`}
-                        >
-                            <span className="block">
-                                {tabTitle}
-                                {count !== null && <span className={`ml-1 ${selected ? "text-gray-300" : "text-gray-500"}`}>({count})</span>}
-                            </span>
-                            {tabNote && (
-                                <span className={`block text-[11px] font-normal ${selected ? "text-gray-300" : "text-gray-500"}`}>
-                                    {tabNote}
-                                </span>
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
 
             {showFilters && (
                 <div className="flex flex-col gap-2 sm:flex-row">
@@ -284,81 +226,103 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
 
             {/* Announces the result of a search / filter to screen readers. */}
             <p role="status" aria-live="polite" className="sr-only">
-                {isFiltering ? `${sessions.length} of ${tabSessions.length} sessions shown` : ""}
+                {isFiltering ? `${shownCount} of ${allSessions.length} sessions shown` : ""}
             </p>
 
-            <div
-                id={`schedule-panel-${activeTab}`}
-                role="tabpanel"
-                aria-labelledby={`schedule-tab-${activeTab}`}
-                className="flex flex-col gap-2"
-            >
-                {/* isPending, not isLoading: the query stays disabled until the user id is read
-                    from the cookie, and a disabled query reports isLoading=false - the empty-state
-                    text used to flash before the real list. */}
-                {active.isPending ? (
-                    <SessionListSkeleton />
-                ) : active.isError ? (
-                    <QueryErrorNotice message="Couldn't load your sessions." onRetry={() => active.refetch()} />
-                ) : sessions.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-4 text-center">
-                        <p className="text-sm text-gray-600">
-                            {isFiltering
-                                ? "No sessions match your search."
-                                : when === "past"
-                                  ? "No past sessions here yet."
-                                  : SCHEDULE_TAB_EMPTY[role][activeTab]}
-                        </p>
-                        {isFiltering && (
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setSearch("");
-                                    setStatusFilter("all");
-                                }}
-                                className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
+            {/* isPending, not isLoading: the query stays disabled until the user id is read
+                from the cookie, and a disabled query reports isLoading=false - the empty-state
+                text used to flash before the real list. */}
+            {active.isError ? (
+                <QueryErrorNotice message="Couldn't load your sessions." onRetry={() => active.refetch()} />
+            ) : (
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                    {TABS.map((tab) => {
+                        const [colTitle, colNote] = splitTabLabel(SCHEDULE_TAB_LABELS[role][tab]);
+                        const sessions = filteredByTab[tab];
+                        const groups = groupSessions(sessions, role, when, today);
+                        const count = active.data ? byTab[tab].length : null;
+                        return (
+                            <section
+                                key={tab}
+                                aria-labelledby={`schedule-col-${tab}`}
+                                className="flex min-w-0 flex-col gap-2 rounded-lg border border-gray-200 p-2"
                             >
-                                Clear search
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <div className="flex flex-col gap-3">
-                        {groups.map((group) => (
-                            <div
-                                key={group.key}
-                                role="group"
-                                aria-labelledby={`schedule-group-${group.key}`}
-                                className="flex flex-col gap-2"
-                            >
-                                <h3
-                                    id={`schedule-group-${group.key}`}
-                                    className={`text-[11px] font-semibold uppercase tracking-wide ${
-                                        group.accent ? "text-amber-700" : "text-gray-500"
-                                    }`}
-                                >
-                                    {group.label} <span className="font-normal">({group.items.length})</span>
-                                </h3>
-                                {/* grid-cols-1 = minmax(0, 1fr): an implicit auto column grew to the cards'
-                                    content width on phones, pushing Join past the section edge. */}
-                                <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-                                    {group.items.map((session) => (
-                                        <ScheduleSessionCard
-                                            key={session.session_id}
-                                            session={session}
-                                            role={role}
-                                            timeZoneLabel={timeZoneLabel}
-                                            onOpenProfile={onOpenProfile}
-                                            onRespond={openApprovals}
-                                            onReschedule={when === "upcoming" ? (s) => startReschedule(s) : undefined}
-                                            now={now}
-                                        />
-                                    ))}
+                                <div className="px-1 pt-0.5">
+                                    <h3 id={`schedule-col-${tab}`} className="text-sm font-semibold leading-snug">
+                                        {colTitle}
+                                        {count !== null && <span className="ml-1 font-normal text-gray-500">({count})</span>}
+                                    </h3>
+                                    {colNote && <p className="text-[11px] text-gray-500">{colNote}</p>}
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                {/* Each column scrolls on its own. */}
+                                <div
+                                    tabIndex={0}
+                                    role="region"
+                                    aria-label={`${colTitle} list`}
+                                    className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto pr-1 lg:max-h-[65vh]"
+                                >
+                                    {active.isPending ? (
+                                        <SessionListSkeleton />
+                                    ) : sessions.length === 0 ? (
+                                        <div className="flex flex-col items-center gap-2 py-4 text-center">
+                                            <p className="text-sm text-gray-600">
+                                                {isFiltering
+                                                    ? "No sessions match your search."
+                                                    : when === "past"
+                                                      ? "No past sessions here yet."
+                                                      : SCHEDULE_TAB_EMPTY[role][tab]}
+                                            </p>
+                                            {isFiltering && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSearch("");
+                                                        setStatusFilter("all");
+                                                    }}
+                                                    className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
+                                                >
+                                                    Clear search
+                                                </button>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        groups.map((group) => (
+                                            <div
+                                                key={group.key}
+                                                role="group"
+                                                aria-labelledby={`schedule-group-${tab}-${group.key}`}
+                                                className="flex flex-col gap-2"
+                                            >
+                                                <h4
+                                                    id={`schedule-group-${tab}-${group.key}`}
+                                                    className={`text-[11px] font-semibold uppercase tracking-wide ${
+                                                        group.accent ? "text-amber-700" : "text-gray-500"
+                                                    }`}
+                                                >
+                                                    {group.label} <span className="font-normal">({group.items.length})</span>
+                                                </h4>
+                                                {group.items.map((session) => (
+                                                    <ScheduleSessionCard
+                                                        key={session.session_id}
+                                                        session={session}
+                                                        role={role}
+                                                        timeZoneLabel={timeZoneLabel}
+                                                        onOpenProfile={onOpenProfile}
+                                                        onRespond={openApprovals}
+                                                        onReschedule={when === "upcoming" ? (s) => startReschedule(s) : undefined}
+                                                        now={now}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </section>
+                        );
+                    })}
+                </div>
+            )}
+            <div className="flex flex-col gap-2">
                 {hiddenPast && (
                     <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
                         <p className="text-xs text-gray-500">
