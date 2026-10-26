@@ -1,3 +1,35 @@
+# Release notes — v1.5.0 (versionCode 8)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.5.0
+
+• Book for Later: pick from a volunteer's available times and add what to prepare
+• My Sessions now shows your sessions in three easy-to-scan columns
+• Clearer guidance and friendlier empty and error messages across the app
+• New "How did you hear about us?" question when you sign up
+• Stability improvements
+```
+
+---
+
+## Internal changelog — what 1.5.0 contains
+
+Covers everything since 1.4.0 (`ad4b2fcc`), built from `main@400f1757`.
+
+- **Book for Later**: availability dropdown, learning goal + preparation note merged into one required field, Profile label
+- **My Sessions**: three independently scrolling columns instead of tabs
+- **UX copy/guidance**: shared InfoTip/PageIntro, central copy constants, clearer empty/error states and names on Community, Resources, Messages, My Volunteers/Learners
+- **Onboarding**: required "How did you hear about us?" question (Handshake first) on the volunteer and learner forms
+- Volunteer propose form uses the Available Times dropdown; learner picture shown as required; About tab
+- CSP now allows Google Analytics hosts; official support phone set for the mobile build
+- Web-only in this range (no app effect): SEO share image / structured data, careers form revamp, About page team update
+- Needs the matching backend changes live (onboarding question, booking fields): confirm before release
+- Version bumped: `android/app/build.gradle` versionCode 8 / versionName 1.5.0, `.env.mobile` 1.5.0
+
+---
+
 # Release notes — v1.4.0 (versionCode 7)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
