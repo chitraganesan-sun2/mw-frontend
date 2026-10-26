@@ -28,6 +28,8 @@ import {
     type SessionCategory,
 } from "@/components/schedule/forms/SessionFormFields";
 import CounterpartSelect, { type CounterpartOption } from "@/components/schedule/forms/CounterpartSelect";
+import PageIntro from "@/components/common/PageIntro";
+import { HELP, TERMS } from "@/constants/copy";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 import { useUpcomingSlots, type UpcomingSlot } from "@/hooks/schedule/useUpcomingSlots";
@@ -415,7 +417,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     if (!isOpen) return null;
     return (
         <SideModal
-            title={rescheduleId ? "Reschedule Session" : "Book for Later"}
+            title={rescheduleId ? "Reschedule Session" : TERMS.bookForLater}
             saveButtonText={rescheduleId ? "Send New Time" : "Send Request"}
             onClose={handleClose}
             isOpen={isOpen}
@@ -430,6 +432,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                         Pick a new time with {volunteerOption?.label || "the volunteer"}. Your current session stays booked until the new time is accepted.
                     </p>
                 )}
+                {!rescheduleId && <PageIntro className="mb-3">{HELP.bookForLater}</PageIntro>}
                 {LearnerScheduleModalConstants.map((field: any) => {
                     if (field.name === COUNTERPART_FIELD) {
                         return (

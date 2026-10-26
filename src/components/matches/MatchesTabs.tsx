@@ -1,5 +1,7 @@
 "use client";
 
+import PageIntro from "@/components/common/PageIntro";
+
 export type ListTab = "all" | "matches";
 
 interface MatchesTabsProps {
@@ -7,10 +9,12 @@ interface MatchesTabsProps {
     /** "All Volunteers" / "All Learners". */
     allLabel: string;
     onChange: (tab: ListTab) => void;
+    /** One line under the tabs saying what this page is for. */
+    description?: string;
 }
 
 /** "All … | My Matches" switch at the top of Seek Volunteer (learner) and Learners (volunteer). */
-const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange }) => {
+const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange, description }) => {
     const tabs: { key: ListTab; label: string }[] = [
         { key: "all", label: allLabel },
         { key: "matches", label: "My Matches" },
@@ -38,6 +42,7 @@ const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange })
                 );
             })}
             </div>
+            {description && <PageIntro className="basis-full">{description}</PageIntro>}
         </div>
     );
 };

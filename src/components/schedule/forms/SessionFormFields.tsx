@@ -434,6 +434,11 @@ export function AvailabilityField({
                     )}
                 </p>
             )}
+            {!status && !error && (
+                <p className="text-xs text-gray-500">
+                    Times are shown in your profile timezone{timeZoneLabel ? ` (${shortTimeZone(timeZoneLabel) || timeZoneLabel})` : ""}.
+                </p>
+            )}
             <FieldError id="session-availability-error" message={error} />
         </div>
     );

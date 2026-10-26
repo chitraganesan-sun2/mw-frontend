@@ -8,6 +8,7 @@ import { useComponentStore } from "@/store/useComponenetStore";
 import { IoIosArrowBack } from "react-icons/io";
 import { POST_API, GET_API, PUT_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { TERMS } from "@/constants/copy";
 import { getCookie } from "@/utils/auth";
 import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
@@ -52,7 +53,7 @@ const NewEventModal = dynamic(() => import("@/components/schedule/Modals/NewEven
 // dayjs(time, "HH:mm") needs this plugin - without it the parse is Invalid Date.
 dayjs.extend(customParseFormat);
 
-// Same style as the learner page's "+ Request a Session" (theme primary = volunteer orange).
+// Same style as the learner page's "+ Request an Instant Session" (theme primary = volunteer orange).
 const START_SESSION_BTN_CLASS =
     "btn-primary-fill px-5 py-2.5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity";
 // Section-header controls (title + action button + filter) share one fixed height so the
@@ -442,7 +443,7 @@ export default function VolunteerInstantSessionsPage() {
 
             {/* My Posted Instant Sessions (sessions this volunteer started or accepted) - shown first */}
             <div className="mb-10">
-                {/* Title left; "+ Start a New Session" and the status filter side by side on
+                {/* Title left; "+ Post an Instant Session" and the status filter side by side on
                     the right. On narrow phones the pair wraps under the title as one row and
                     the dropdown shrinks rather than dropping to a third line / overflowing. */}
                 <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
@@ -454,7 +455,7 @@ export default function VolunteerInstantSessionsPage() {
                             onClick={() => setShowCreateForm(true)}
                             className={`${START_SESSION_BTN_CLASS} ${SECTION_CONTROL_HEIGHT} !py-0 max-sm:!px-4 inline-flex items-center shrink-0 whitespace-nowrap`}
                         >
-                            + Start a New Session
+                            + {TERMS.postInstantSession}
                         </button>
                         <select
                             aria-label="Filter by status"

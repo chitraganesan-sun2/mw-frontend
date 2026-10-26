@@ -26,6 +26,8 @@ import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useS
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+import PageIntro from "@/components/common/PageIntro";
+import { HELP } from "@/constants/copy";
 import { isAwaitingMyResponse } from "./ScheduleSessionCard";
 import { useStartReschedule } from "@/hooks/schedule/useStartReschedule";
 import OneTimeSlotEditModal, { type OneTimeSlot } from "./OneTimeSlotEditModal";
@@ -306,6 +308,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             <h2 id="availability-heading" className="text-lg font-semibold text-center">
                 {SCHEDULE_LABELS.availabilityHeading}
             </h2>
+            <PageIntro className="text-center -mt-2">{isVolunteer ? HELP.availabilityVolunteer : HELP.availabilityLearner}</PageIntro>
 
             {/* Full-width section: the groups sit side by side on wide screens instead of one tall column. */}
             <div className={isVolunteer ? "grid grid-cols-1 gap-4 items-start lg:grid-cols-2" : "flex flex-col gap-4"}>

@@ -13,6 +13,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { HiOutlineArrowLeft, HiOutlineCalendarDays, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
+import { HELP, TERMS } from "@/constants/copy";
 
 /** ?view=calendar shows the calendar on its own; no param = the schedule (availability +
  * sessions). A URL param, not local state, so the view survives a refresh / can be linked. */
@@ -105,7 +106,7 @@ const Header = () => {
                                 <MonthYearPicker />
                             </div>
                         )}
-                        <button type="button" onClick={toggleCalendar} className={actionBtn}>
+                        <button type="button" onClick={toggleCalendar} title={isCalendarView ? undefined : HELP.viewCalendar} className={actionBtn}>
                             {isCalendarView ? (
                                 <>
                                     <HiOutlineArrowLeft size={16} aria-hidden="true" />
@@ -118,16 +119,17 @@ const Header = () => {
                                 </>
                             )}
                         </button>
-                        <button type="button" onClick={openAvailability} className={actionBtn}>
+                        <button type="button" onClick={openAvailability} title={HELP.scheduleAvailability} className={actionBtn}>
                             {SCHEDULE_LABELS.scheduleAvailability}
                         </button>
                         <button
                             type="button"
                             onClick={openAddSession}
+                            title={HELP.bookForLater}
                             className={`${actionBtn} col-span-2 !border-action !bg-action !text-white hover:!bg-action-hover`}
                         >
                             <HiOutlinePlus size={16} aria-hidden="true" />
-                            Book for Later
+                            {TERMS.bookForLater}
                         </button>
                     </div>
                 )}

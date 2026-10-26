@@ -17,6 +17,7 @@ import { getHeaderIcon } from "@/layouts/helper";
 import { usePathname } from "next/navigation";
 import { GET_API, DELETE_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { TERMS } from "@/constants/copy";
 import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { showToast } from "@/components/common/Toast";
 import { Spin } from "antd";
@@ -574,7 +575,7 @@ export default function InstantSessionsPage() {
                         onClick={() => setIsRequestModalOpen(true)}
                         className="btn-primary-fill h-10 inline-flex items-center px-5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity ml-auto shrink-0 whitespace-nowrap"
                     >
-                        + Request a Session
+                        + {TERMS.requestInstantSession}
                     </button>
                 </div>
 

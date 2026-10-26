@@ -15,6 +15,8 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import MatchesTabs from "@/components/matches/MatchesTabs";
+import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { EMPTY, ERRORS, HELP } from "@/constants/copy";
 import VolunteerMatchesPanel from "@/components/matches/VolunteerMatchesPanel";
 import { useEffect, useMemo, useState } from "react";
 import { RiFilter3Line } from "react-icons/ri";
@@ -71,7 +73,7 @@ export default function LearnersPage() {
     const isMobileScreen = InnerWidth() < 768;
 
     const [query] = useDebounce(searchQuery, 500);
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, refetch } = useQuery({
         queryKey: [
             "volunteer",
             query,
@@ -219,18 +221,23 @@ export default function LearnersPage() {
                 active={isMatchesTab ? "matches" : "all"}
                 allLabel="All Learners"
                 onChange={(t) => setTab(t === "matches" ? "matches" : null)}
+                description={isMatchesTab ? HELP.matchesVolunteer : HELP.browseLearners}
             />
             {isMatchesTab ? (
                 <VolunteerMatchesPanel />
             ) : isLoading ? (
                 <LottieLoader isLoading={true} />
             ) : isError ? (
-                <div className="flex-center h-full w-full">Something went wrong</div>
+                <div className="flex-center h-full w-full px-5"><QueryErrorNotice message={ERRORS.load("learners")} onRetry={() => refetch()} /></div>
             ) : (
                 <>
                     {learnerCardData.length === 0 ? (
                         <div className="flex-center h-full w-full flex-col gap-1">
-                            <p>No Learners Found</p>
+                            <p className="text-center px-5">
+                                {query || appliedFiltersCount > 0
+                                    ? EMPTY.noResultsForFilters("learners")
+                                    : EMPTY.noneYet("learners", "Check back soon.")}
+                            </p>
                             {query && (
                                 <button
                                     className="text-primary underline"

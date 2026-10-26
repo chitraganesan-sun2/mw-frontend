@@ -13,7 +13,10 @@ import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import dayjs from "dayjs";
 import { useStartReschedule } from "@/hooks/schedule/useStartReschedule";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
-import ScheduleSessionCard, { isAwaitingMyResponse } from "./ScheduleSessionCard";
+import InfoTip from "@/components/common/InfoTip";
+import PageIntro from "@/components/common/PageIntro";
+import { HELP } from "@/constants/copy";
+import ScheduleSessionCard,{ isAwaitingMyResponse } from "./ScheduleSessionCard";
 import NextSessionBanner, { findNextSession } from "./NextSessionBanner";
 import {
     SCHEDULE_LABELS,
@@ -194,6 +197,8 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 </div>
             </div>
 
+            <PageIntro className="text-center">{HELP.mySessions}</PageIntro>
+
             {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
 
             {showFilters && (
@@ -248,9 +253,14 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                 className="flex min-w-0 flex-col gap-2 rounded-lg border border-gray-200 p-2"
                             >
                                 <div className="px-1 pt-0.5">
-                                    <h3 id={`schedule-col-${tab}`} className="text-sm font-semibold leading-snug">
-                                        {colTitle}
-                                        {count !== null && <span className="ml-1 font-normal text-gray-500">({count})</span>}
+                                    <h3 id={`schedule-col-${tab}`} className="flex items-center gap-1 text-sm font-semibold leading-snug">
+                                        <span>
+                                            {colTitle}
+                                            {count !== null && <span className="ml-1 font-normal text-gray-500">({count})</span>}
+                                        </span>
+                                        <InfoTip label={colTitle}>
+                                            <p>{HELP.sessionColumn[role][tab]}</p>
+                                        </InfoTip>
                                     </h3>
                                     {colNote && <p className="text-[11px] text-gray-500">{colNote}</p>}
                                 </div>
