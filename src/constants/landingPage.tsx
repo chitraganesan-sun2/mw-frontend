@@ -18,6 +18,7 @@ import DonateImg4 from "@/assets/images/DonateImg4.png";
 import DummyProfile from "@/assets/images/DummyProfile.png";
 import ChitraGanesan from "@/assets/images/our-team/ChitraGanesan.jpg"
 import NithilaShanmugam from "@/assets/images/our-team/NithilaShanmugam.jpg"
+import UmangJaiswalN from "@/assets/images/our-team/UmangJaiswalN.png"
 
 import { TestimonialData } from "@/components/landingpage/testimonials";
 import TestimonialDummyImg from "@/assets/images/dummy-profile.webp";
@@ -314,6 +315,11 @@ export const meetOurTeamCardData: MeetOurTeamProps[] = [
         image: NithilaShanmugam,
         name: "Nithila Shanmugam",
         role: "Co-founder"
+    },
+    {
+        image: UmangJaiswalN,
+        name: "Umang Jaiswal N",
+        role: "Tech Lead"
     },
     // {
     //     image: DummyProfile,

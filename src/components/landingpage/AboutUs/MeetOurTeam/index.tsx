@@ -25,7 +25,9 @@ function MeetOurTeam() {
           </>
         ) : (
           meetOurTeamCardData.map((team) => (
-            <TeamCard key={team.name} {...team} />
+            <div key={team.name} className="col-span-1 lg:col-span-2 h-full">
+              <TeamCard {...team} />
+            </div>
           ))
         )}
       </div>
