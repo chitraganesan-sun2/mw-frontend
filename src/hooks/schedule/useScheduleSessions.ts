@@ -11,6 +11,8 @@ export interface ScheduleSession {
     session_title?: string;
     session_description?: string;
     session_expectations?: string | null;
+    /** The learner's optional "what should the volunteer know or prepare?" note. */
+    preparation_details?: string | null;
     requested_level?: string | null;
     requested_skills?: string[] | null;
     academic_skills?: string[] | null;

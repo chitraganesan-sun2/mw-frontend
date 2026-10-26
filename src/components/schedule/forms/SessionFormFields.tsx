@@ -6,8 +6,9 @@
  *   [Select Volunteer / Select Learner]  (scheduled only)
  *   Category -> Skill (exactly one) -> Level (instant only)
  *   [Session Title]                       (scheduled only; instant sessions are auto-titled)
- *   Session Details & Expectations *
- *   Date -> Start Time / Available Slots -> Duration
+ *   Session Details & Expectations *   (the learner's booking form words it "What do you want to learn?")
+ *   [What should the volunteer know or prepare?]   (learner's booking form only, optional)
+ *   Date -> Start Time / Available Slots -> Duration   (learner's booking form: one Available Times dropdown)
  */
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +16,8 @@ import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { Input } from "@/components/common/Input";
 import { showToast } from "@/components/common/Toast";
-import { formatSessionDate } from "@/utils/sessionDisplay";
+import { formatSessionDate, formatSessionTime, shortTimeZone } from "@/utils/sessionDisplay";
+import type { UpcomingSlot } from "@/hooks/schedule/useUpcomingSlots";
 
 export type SessionCategory = "academic" | "non_academic";
 
@@ -31,6 +33,8 @@ export const SESSION_FIELD_LABELS = {
     expertiseLevel: "Expertise Level",
     title: "Session Title",
     details: "Session Details & Expectations",
+    preparation: "What should the volunteer know or prepare?",
+    availability: "Available Times",
     date: "Date",
     startTime: "Start Time",
     slots: "Available Slots",
@@ -142,16 +146,25 @@ export function CategoryField({
     available?: SessionCategory[];
     error?: string | null;
 }) {
+    // A greyed-out pill with no reason looks broken; say why it can't be picked.
+    const unavailable = available ? CATEGORY_OPTIONS.filter((o) => !available.includes(o.value)) : [];
     return (
-        <PillGroup
-            name="session-category"
-            label={SESSION_FIELD_LABELS.category}
-            columns={2}
-            value={value || null}
-            onChange={onChange}
-            error={error}
-            options={CATEGORY_OPTIONS.map((o) => ({ ...o, disabled: available ? !available.includes(o.value) : false }))}
-        />
+        <div className="flex flex-col gap-2">
+            <PillGroup
+                name="session-category"
+                label={SESSION_FIELD_LABELS.category}
+                columns={2}
+                value={value || null}
+                onChange={onChange}
+                error={error}
+                options={CATEGORY_OPTIONS.map((o) => ({ ...o, disabled: available ? !available.includes(o.value) : false }))}
+            />
+            {unavailable.length > 0 && (
+                <p className="text-xs text-gray-500">
+                    This person doesn&apos;t offer {unavailable.map((o) => o.label).join(" or ")}, so it can&apos;t be picked.
+                </p>
+            )}
+        </div>
     );
 }
 
@@ -341,6 +354,125 @@ export function SessionDetailsField({
                     Required · {value.length}/{DETAILS_MAX_LENGTH}
                 </p>
             )}
+        </div>
+    );
+}
+
+export const PREPARATION_PLACEHOLDER =
+    "Share any specific topics, questions, background information, or materials the volunteer should review before your session.";
+
+/** Optional note from the learner on what the volunteer should know or prepare. */
+export function PreparationDetailsField({
+    value,
+    onChange,
+    error,
+}: {
+    value: string;
+    onChange: (value: string) => void;
+    error?: string | null;
+}) {
+    return (
+        <div className="flex flex-col gap-2">
+            <label htmlFor="session-preparation" className={labelClass}>
+                {SESSION_FIELD_LABELS.preparation}
+            </label>
+            <textarea
+                id="session-preparation"
+                value={value}
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "session-preparation-error" : "session-preparation-hint"}
+                maxLength={DETAILS_MAX_LENGTH}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={PREPARATION_PLACEHOLDER}
+                rows={4}
+                className={`w-full px-4 py-3 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] resize-none ${
+                    error ? "border-red-600" : "border-gray-200"
+                }`}
+            />
+            {error ? (
+                <FieldError id="session-preparation-error" message={error} />
+            ) : (
+                <p id="session-preparation-hint" className="text-xs text-gray-500">
+                    Optional · {value.length}/{DETAILS_MAX_LENGTH}
+                </p>
+            )}
+        </div>
+    );
+}
+
+/** "October 30, 2026 · 6:00 PM – 6:45 PM EDT" - the zone is the one in effect on that date. */
+export function formatSlotOption(slot: UpcomingSlot, timeZoneLabel?: string): string {
+    const range = `${formatSessionTime(slot.start_time)} – ${formatSessionTime(slot.end_time)}`;
+    const zone = timeZoneLabel ? shortTimeZone(timeZoneLabel, slot.date) : "";
+    return `${formatSessionDate(slot.date)} · ${[range, zone].filter(Boolean).join(" ")}`;
+}
+
+/**
+ * The volunteer's bookable times as one dropdown, replacing the date picker + radio slots.
+ * Times are already in the viewer's profile timezone, which the options are labelled with.
+ */
+export function AvailabilityField({
+    slots,
+    value,
+    onChange,
+    isLoading,
+    isError,
+    onRetry,
+    timeZoneLabel,
+    error,
+}: {
+    slots: UpcomingSlot[];
+    value: string;
+    onChange: (slot: UpcomingSlot | null) => void;
+    isLoading: boolean;
+    isError: boolean;
+    onRetry: () => void;
+    timeZoneLabel?: string;
+    error?: string | null;
+}) {
+    let status: string | null = null;
+    if (isLoading) status = "Loading available times...";
+    else if (isError) status = "Couldn't load available times.";
+    else if (slots.length === 0) status = "This volunteer has no open times in the next few weeks.";
+
+    return (
+        <div className="flex flex-col gap-2">
+            <label htmlFor="session-availability" className={labelClass}>
+                {SESSION_FIELD_LABELS.availability} <span aria-hidden="true">*</span>
+            </label>
+            <select
+                id="session-availability"
+                value={value}
+                required
+                aria-required="true"
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "session-availability-error" : status ? "session-availability-status" : undefined}
+                disabled={isLoading || isError || slots.length === 0}
+                onChange={(e) => onChange(slots.find((s) => s.volunteer_slot_id === e.target.value) ?? null)}
+                className={`w-full h-12 px-4 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 ${
+                    error ? "border-red-600" : "border-gray-200"
+                }`}
+            >
+                <option value="" disabled>
+                    {isLoading ? "Loading..." : "Select a time"}
+                </option>
+                {slots.map((slot) => (
+                    <option key={`${slot.date}-${slot.volunteer_slot_id}`} value={slot.volunteer_slot_id}>
+                        {formatSlotOption(slot, timeZoneLabel)}
+                    </option>
+                ))}
+            </select>
+            {status && (
+                <p id="session-availability-status" role="status" className="text-xs text-gray-500">
+                    {status}{" "}
+                    {isError && (
+                        <button type="button" onClick={onRetry} className="underline font-medium text-black">
+                            Try again
+                        </button>
+                    )}
+                </p>
+            )}
+            <FieldError id="session-availability-error" message={error} />
         </div>
     );
 }

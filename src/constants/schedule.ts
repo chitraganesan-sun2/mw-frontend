@@ -66,13 +66,6 @@ export const LearnerScheduleModalConstants = [
         placeholder: "Enter session title",
         required: true,
     },
-    {
-        name: "select_date",
-        label: "Date",
-        inputType: "datepicker",
-        placeholder: "Select a date",
-        required: true,
-    },
 ];
 
 // Shared session-form order (see components/schedule/forms/SessionFormFields): counterpart,

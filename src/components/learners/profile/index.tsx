@@ -11,7 +11,7 @@ import { joinNames } from "@/utils/joinNames";
 const tabs = [
     { id: "profile-details", title: "Profile Details" },
     { id: "parent-guardian-information", title: "Guardian Info" },
-    { id: "learner-information", title: "Personal Info" },
+    { id: "learner-information", title: "Profile" },
 ];
 
 const LearnerProfileBio = ({ data }: any) => {

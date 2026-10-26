@@ -176,6 +176,12 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
             {showDescription && (
                 <p className="text-xs text-gray-600 line-clamp-2 break-words">{session.session_description}</p>
             )}
+            {session.preparation_details && (
+                <p className="text-xs text-gray-600 line-clamp-3 break-words" title={session.preparation_details}>
+                    <span className="font-medium text-gray-800">To prepare: </span>
+                    {session.preparation_details}
+                </p>
+            )}
             {session.session_expectations && (
                 <p className="text-xs text-gray-600 line-clamp-2 break-words">
                     <span className="font-medium text-gray-800">Expectations: </span>

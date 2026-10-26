@@ -83,7 +83,7 @@ export default function LearnerSchedulePage() {
         router.push(`/learner/schedule?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
     };
 
-    // Clicking a day on the calendar opens Add New Session for that date - the learner
+    // Clicking a day on the calendar opens Book for Later for that date - the learner
     // counterpart of the volunteer's click-a-day-to-add-availability.
     const handleDateSelect = (date: string) => {
         // "Today" in the learner's PROFILE timezone, not the browser's.
@@ -136,7 +136,7 @@ export default function LearnerSchedulePage() {
                     )
                 }
             />
-            {/* Volunteer profile from a session card. Hidden while Add New Session is open -
+            {/* Volunteer profile from a session card. Hidden while Book for Later is open -
                 the profile's own "book a session" action routes through that modal. */}
             <VolunteerViewModal
                 isOpen={!!volunteerId && modal !== "add_new_meeting"}

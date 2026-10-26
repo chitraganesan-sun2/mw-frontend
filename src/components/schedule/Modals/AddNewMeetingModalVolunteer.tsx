@@ -480,7 +480,7 @@ export default function AddNewMeetingModalVolunteer({
     if (!isOpen) return null;
     return (
         <SideModal
-            title={rescheduleId ? "Reschedule Session" : "Add New Session"}
+            title={rescheduleId ? "Reschedule Session" : "Book for Later"}
             saveButtonText={rescheduleId ? "Send New Time" : "Send Request"}
             onClose={handleClose}
             isOpen={isOpen}

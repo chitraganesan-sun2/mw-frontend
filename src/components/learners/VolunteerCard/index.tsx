@@ -111,14 +111,14 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                 )}
             </div>
             <Divider />
-            {/* "Schedule a session" only when the volunteer has recurring availability slots
+            {/* "Book for Later" only when the volunteer has recurring availability slots
                 (hasTimeSlots). An explicit false hides it; undefined callers keep both buttons. */}
             <div className="flex items-center gap-2">
                 {hasTimeSlots !== false && (
                     <div className="flex-1">
                         <Button
                             onClick={handleScheduleMeeting}
-                            title="Schedule a Session"
+                            title="Book for Later"
                             className="!rounded-xl !text-sm !w-full btn-primary-fill"
                         />
                     </div>

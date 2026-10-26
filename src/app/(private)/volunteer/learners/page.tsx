@@ -219,7 +219,6 @@ export default function LearnersPage() {
                 active={isMatchesTab ? "matches" : "all"}
                 allLabel="All Learners"
                 onChange={(t) => setTab(t === "matches" ? "matches" : null)}
-                action={{ label: "Add New Session", onClick: () => setModalQuery("add_new_meeting") }}
             />
             {isMatchesTab ? (
                 <VolunteerMatchesPanel />

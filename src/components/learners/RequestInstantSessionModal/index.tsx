@@ -235,7 +235,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 <SessionDetailsField
                     value={sessionDetails}
                     error={errors.details}
-                    placeholder="What do you want to cover? Anything the volunteer should know or prepare?"
+                    placeholder="What do you want to learn? Anything the volunteer should know or prepare?"
                     onChange={(value) => {
                         setSessionDetails(value);
                         if (value.trim()) setErrors((e) => ({ ...e, details: undefined }));

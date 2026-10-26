@@ -161,7 +161,7 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
 
     return (
         <div className="flex flex-col">
-            <h5 className="text-xl font-semibold mb-2">Personal Info</h5>
+            <h5 className="text-xl font-semibold mb-2">Profile</h5>
             <div className="flex flex-col gap-3 divide-y divide-gray-dark">
                 {sections.map(({ title, fields }) => (
                     <div key={title} className="py-3">

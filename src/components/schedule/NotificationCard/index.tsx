@@ -45,6 +45,9 @@ interface NotificationCardProps {
         reschedules_session_id?: string | null;
         academic_skills?: string[];
         non_academic_skills?: string[];
+        session_description?: string | null;
+        /** The learner's optional "what should the volunteer know or prepare?" note. */
+        preparation_details?: string | null;
     };
     /** Whose approval queue this card is shown in - determines which party's name/picture
      * and local time to display. Defaults to "volunteer" (the original, learner-initiated
@@ -155,6 +158,18 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                             )
                         )}
                     </div>
+                </div>
+            )}
+            {data?.session_description && (
+                <div className="flex flex-col gap-1">
+                    <p className="text-[0.75rem] font-medium text-gray-light">Details</p>
+                    <p className="text-sm whitespace-pre-line break-words">{data.session_description}</p>
+                </div>
+            )}
+            {data?.preparation_details && (
+                <div className="flex flex-col gap-1">
+                    <p className="text-[0.75rem] font-medium text-gray-light">What to know or prepare</p>
+                    <p className="text-sm whitespace-pre-line break-words">{data.preparation_details}</p>
                 </div>
             )}
             { data?.overlapped_slot &&

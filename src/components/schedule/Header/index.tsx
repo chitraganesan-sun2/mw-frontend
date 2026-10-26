@@ -127,7 +127,7 @@ const Header = () => {
                             className={`${actionBtn} col-span-2 !border-action !bg-action !text-white hover:!bg-action-hover`}
                         >
                             <HiOutlinePlus size={16} aria-hidden="true" />
-                            Add New Session
+                            Book for Later
                         </button>
                     </div>
                 )}

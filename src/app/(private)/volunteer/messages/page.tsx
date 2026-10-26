@@ -507,7 +507,7 @@ const Messages = () => {
                             <div className="w-full  md:w-fit pb-4 md:pb-0 px-3">
                                 <Button
                                     onClick={handleScheduleMeeting}
-                                    title="Schedule a Session"
+                                    title="Book for Later"
                                     btnVariant="secondary"
                                     className="!rounded-xl !w-full md:w-fit  !text-sm !bg-action hover:!bg-action-hover !text-white transition-all duration-300"
                                 />

@@ -1,7 +1,5 @@
 "use client";
 
-import { HiOutlinePlus } from "react-icons/hi2";
-
 export type ListTab = "all" | "matches";
 
 interface MatchesTabsProps {
@@ -9,12 +7,10 @@ interface MatchesTabsProps {
     /** "All Volunteers" / "All Learners". */
     allLabel: string;
     onChange: (tab: ListTab) => void;
-    /** Optional action at the far right of the row (e.g. "Add New Session"). */
-    action?: { label: string; onClick: () => void };
 }
 
 /** "All … | My Matches" switch at the top of Seek Volunteer (learner) and Learners (volunteer). */
-const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange, action }) => {
+const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange }) => {
     const tabs: { key: ListTab; label: string }[] = [
         { key: "all", label: allLabel },
         { key: "matches", label: "My Matches" },
@@ -42,18 +38,6 @@ const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange, a
                 );
             })}
             </div>
-            {action && (
-                // One-on-one session with a specific person - the same black "Add New Session"
-                // action as the Schedule page.
-                <button
-                    type="button"
-                    onClick={action.onClick}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-action bg-action px-4 py-1.5 text-sm font-medium text-white hover:bg-action-hover transition-colors"
-                >
-                    <HiOutlinePlus size={16} aria-hidden="true" />
-                    {action.label}
-                </button>
-            )}
         </div>
     );
 };

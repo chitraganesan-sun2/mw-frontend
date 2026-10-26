@@ -1,5 +1,5 @@
 "use client";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { endpoints } from "@/api/constants";
 import { GET_API, POST_API } from "@/api/request";
 import { Input } from "@/components/common/Input";
@@ -7,16 +7,7 @@ import SideModal from "@/components/common/Modals/SideModal";
 import {
     LearnerScheduleModalConstants,
 } from "@/constants/schedule";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { useEffect, useState } from "react";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-import AvailableSlots from "../AvailableSlots/AvailableSlots";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useSendData } from "@/hooks/useReactQuery";
 import { z } from "zod";
@@ -28,7 +19,10 @@ import { joinNames } from "@/utils/joinNames";
 import { compareOptionLabels } from "@/utils/optionOrder";
 import { NONE_SKILL_OPTION, NONE_SUBJECT_OPTION } from "@/constants/volunteer";
 import {
+    AvailabilityField,
     CategoryField,
+    DETAILS_MAX_LENGTH,
+    PreparationDetailsField,
     SessionDetailsField,
     SkillField,
     type PickedSkill,
@@ -36,7 +30,8 @@ import {
 } from "@/components/schedule/forms/SessionFormFields";
 import CounterpartSelect, { type CounterpartOption } from "@/components/schedule/forms/CounterpartSelect";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
-import { useProfileTimeZone, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
+import { useUpcomingSlots, type UpcomingSlot } from "@/hooks/schedule/useUpcomingSlots";
 
 const EMPTY_FORM = {
     title_of_the_meeting: "",
@@ -46,6 +41,7 @@ const EMPTY_FORM = {
     end_time: "",
     google_meet_link: "",
     description: "",
+    preparation_details: "",
     selected_slot: "",
     academic_skills: [] as string[],
     non_academic_skills: [] as string[],
@@ -71,20 +67,20 @@ export function skillOptionsByCategory(profile: any): { academic: string[]; nonA
     return { academic: unique(academic), nonAcademic: unique(nonAcademic) };
 }
 
+const SLOT_REQUIRED = "Please choose a time.";
+
 // Define Zod schema for form validation
 const meetingFormSchema = z.object({
     title_of_the_meeting: z.string().trim().min(1, "Please enter a session title."),
     select_volunteer: z.string().min(1, "Please choose a volunteer."),
-    select_date: z
-        .union([z.string(), z.date(), z.null()])
-        .refine((val) => val !== null && val !== "", {
-            message: "Please choose a date.",
-        }),
+    select_date: z.string().min(1, SLOT_REQUIRED),
     start_time: z.string(),
     end_time: z.string(),
     google_meet_link: z.string(),
     description: z.string().trim().min(1, "Please describe the session details and expectations."),
-    selected_slot: z.string().min(1, "Please choose a time slot."),
+    // Optional - what the volunteer should know or prepare.
+    preparation_details: z.string().max(DETAILS_MAX_LENGTH, `Please keep this under ${DETAILS_MAX_LENGTH} characters.`).optional().default(""),
+    selected_slot: z.string().min(1, SLOT_REQUIRED),
     // Optional - picked from the selected volunteer's own declared subjects/skills.
     academic_skills: z.array(z.string()).optional().default([]),
     non_academic_skills: z.array(z.string()).optional().default([]),
@@ -96,14 +92,13 @@ type FormData = z.infer<typeof meetingFormSchema>;
 interface AddNewMeetingModalProps {
     isOpen: boolean;
     onClose: () => void;
-    /** "YYYY-MM-DD" - the date clicked on the calendar. The date field only appears once a
-     *  volunteer is picked (and picking one resets it), so it's applied at that point. */
+    /** "YYYY-MM-DD" - the date clicked on the calendar. Once the volunteer's times load, the
+     *  first one on that date is preselected (if they have any that day). */
     initialDate?: string | null;
 }
 
 export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: AddNewMeetingModalProps) {
     const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
-    const [availableSlots, setAvailableSlots] = useState<any[]>([]);
     // Options for the two skill pickers, sourced from the selected volunteer's own
     // declared subjects (academic) / skills (non-academic).
     const [volunteerAcademicOptions, setVolunteerAcademicOptions] = useState<
@@ -119,9 +114,8 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     // The picked volunteer (id + display name) for the searchable picker.
     const [volunteerOption, setVolunteerOption] = useState<CounterpartOption | null>(null);
     const queryClient = useQueryClient();
-    // Profile timezone label + "today" in it (date gates must not use the browser's date).
+    // Profile timezone label: the volunteer's open times are returned (and shown) in it.
     const profileTimeZone = useProfileTimeZone("learner");
-    const today = useProfileToday("learner");
     const searchParams = useSearchParams();
     const volunteerId = searchParams.get("volunteerId");
     // ?reschedule=<session id>: ask the volunteer to move that accepted session to a new time.
@@ -131,15 +125,9 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         nonAcademic: string[];
     } | null>(null);
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-    const [slotError, setSlotError] = useState<string>("");
-    const [fetchingSlots, setFetchingSlots] = useState<boolean>(false);
-    const [volunteerAvailableDays, setVolunteerAvailableDays] = useState<string[]>([]);
-    const [volunteerAvailableDates, setVolunteerAvailableDates] = useState<string[]>([]);
-    const [volunteerUnavailableDates, setVolunteerUnavailableDates] = useState<string[]>([]);
-    const [selectedVolunteerId, setSelectedVolunteerId] = useState<string>("");
-    const [isLoadingAvailableDays, setIsLoadingAvailableDays] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState<string>(dayjs().format("YYYY-MM"));
     const learnerId = getCookie("learner_id");
+    const selectedVolunteerId = formData.select_volunteer;
+    const upcoming = useUpcomingSlots(isOpen ? selectedVolunteerId || undefined : undefined, profileTimeZone);
 
     // Deep link (?volunteerId=): preselect that volunteer, label included.
     useEffect(() => {
@@ -175,6 +163,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     ...prev,
                     title_of_the_meeting: data.session_title || prev.title_of_the_meeting,
                     description: data.session_description || prev.description,
+                    preparation_details: data.preparation_details || prev.preparation_details,
                 }));
             })
             .catch(() => showToast({ message: "Couldn't load the session to reschedule.", type: "error" }));
@@ -183,48 +172,10 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         };
     }, [isOpen, rescheduleId]);
 
-    const getAvailableDays = async () => {
-        try {
-            if (!selectedVolunteerId || !currentMonth) return [];
-            setIsLoadingAvailableDays(true);
-            const response = await GET_API(
-                endpoints.volunteer_slot.availableDays(selectedVolunteerId, currentMonth)
-            );
-
-            // Make sure we're getting the array directly
-            const availableDays = Array.isArray(response.data)
-                ? response.data
-                : response.data.available_days;
-
-            // Handle available and unavailable dates
-            const availableDates = response.data.available_dates || [];
-            const unavailableDates = response.data.unavailable_dates || [];
-
-
-            setVolunteerAvailableDays(availableDays);
-            setVolunteerAvailableDates(availableDates);
-            setVolunteerUnavailableDates(unavailableDates);
-            setIsLoadingAvailableDays(false);
-            return availableDays;
-        } catch (error) {
-            console.error("Error fetching available days:", error);
-            setIsLoadingAvailableDays(false);
-            return [];
-        }
-    };
-
-    const { refetch: refetchAvailableDays } = useQuery({
-        queryKey: ["availableDays", selectedVolunteerId, currentMonth],
-        queryFn: getAvailableDays,
-        enabled: false, // Don't auto-fetch, only fetch when calendar opens
-    });
-
-    const handleChange = async (name: string, value: any) => {
-        const processedValue = name === "select_date" && !value ? null : value;
-
+    const handleChange = (name: string, value: any) => {
         setFormData((prev) => ({
             ...prev,
-            [name]: processedValue,
+            [name]: value,
         }));
 
         // Clear error for the field being changed
@@ -233,27 +184,10 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
             [name]: undefined,
         }));
 
-        // If changing date or volunteer, reset slot selection and its error
-        if (name === "select_date" || name === "select_volunteer") {
-            setFormData((prev) => ({
-                ...prev,
-                selected_slot: "",
-                start_time: "",
-                end_time: "",
-            }));
-
-            // Clear available slots and set error when date is cleared
-            if (name === "select_date" && !value) {
-                setAvailableSlots([]);
-                setSlotError("Please select a date first");
-                return;
-            }
-        }
-
         // Validate single field
         try {
             const fieldSchema = meetingFormSchema.pick({ [name]: true } as any);
-            fieldSchema.parse({ [name]: processedValue });
+            fieldSchema.parse({ [name]: value });
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldError = error.errors[0];
@@ -263,52 +197,31 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                 }));
             }
         }
-
-        // Check for date selection and if we have a selected volunteer
-        if (name === "select_date" && value && formData.select_volunteer) {
-            const formattedDate = dayjs(value).format("YYYY-MM-DD");
-            setAvailableSlots([]);
-            setSlotError("");
-            setFetchingSlots(true);
-            try {
-                const response = await GET_API(
-                    endpoints.volunteer_slot.availableSlots(
-                        formData.select_volunteer,
-                        formattedDate
-                    )
-                );
-                if (response.data.slots.length === 0) {
-                    setSlotError("No slots available for this date");
-                    setAvailableSlots([]);
-                    setFetchingSlots(false);
-                } else {
-                    setAvailableSlots(response.data.slots);
-                    setSlotError("");
-                    setFetchingSlots(false);
-                }
-            } catch (error) {
-                setAvailableSlots([]);
-                setSlotError("No slots available for this date");
-                setFetchingSlots(false);
-                console.error("Error fetching available slots:", error);
-            }
-        }
     };
 
-
-    const handleSlotSelection = (slotId: string, startTime: string, endTime: string) => {
+    const handleSlotSelection = (slot: UpcomingSlot | null) => {
         setFormData((prev) => ({
             ...prev,
-            selected_slot: slotId,
-            start_time: startTime,
-            end_time: endTime,
+            selected_slot: slot?.volunteer_slot_id ?? "",
+            select_date: slot?.date ?? "",
+            start_time: slot?.start_time ?? "",
+            end_time: slot?.end_time ?? "",
         }));
-        setSlotError("");
-        setErrors((prev) => ({
-            ...prev,
-            selected_slot: undefined,
-        }));
+        setErrors((prev) => ({ ...prev, selected_slot: undefined, select_date: undefined }));
     };
+
+    // Calendar-clicked date: once the volunteer's times load, preselect their first one that day.
+    const presetApplied = useRef(false);
+    useEffect(() => {
+        if (!isOpen) presetApplied.current = false;
+    }, [isOpen]);
+    useEffect(() => {
+        if (presetApplied.current || !initialDate || !selectedVolunteerId || upcoming.isLoading) return;
+        presetApplied.current = true;
+        const first = upcoming.slots.find((s) => s.date === initialDate);
+        if (first) handleSlotSelection(first);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- applied once per open, when the times arrive
+    }, [isOpen, initialDate, selectedVolunteerId, upcoming.isLoading, upcoming.slots]);
 
     const hasSkillOptions = volunteerAcademicOptions.length > 0 || volunteerNonAcademicOptions.length > 0;
     const pickedSkillName = formData.academic_skills?.[0] || formData.non_academic_skills?.[0] || "";
@@ -336,6 +249,8 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                         newErrors[err.path[0] as keyof FormData] = err.message;
                     }
                 });
+                // One slot control - show the missing-time message on it, whichever field flagged it.
+                if (newErrors.select_date && !newErrors.selected_slot) newErrors.selected_slot = newErrors.select_date;
                 setErrors(newErrors);
                 // Submitting with no slot used to do nothing visible - say what's missing.
                 showToast({ message: error.errors[0]?.message || "Please complete the highlighted fields.", type: "error" });
@@ -348,12 +263,9 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     const resetForm = () => {
         setFormData(EMPTY_FORM);
         setVolunteerOption(null);
-        setAvailableSlots([]);
         setCategory("");
         setSkillErrors({});
         setErrors({});
-        setSlotError("");
-        setSelectedVolunteerId("");
         setRescheduleSource(null);
     };
     const handleClose = () => {
@@ -365,11 +277,12 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         const payload = {
             volunteer_id: formData.select_volunteer,
             volunteer_slot_id: formData.selected_slot,
-            session_date: dayjs(formData.select_date).format("YYYY-MM-DD"),
+            session_date: formData.select_date,
             session_start_time: formData.start_time,
             session_end_time: formData.end_time,
             session_title: formData.title_of_the_meeting,
             session_description: formData.description,
+            preparation_details: formData.preparation_details?.trim() || undefined,
             learner_id: learnerId,
             academic_skills: rescheduleId ? rescheduleSource?.academic || [] : formData.academic_skills || [],
             non_academic_skills: rescheduleId ? rescheduleSource?.nonAcademic || [] : formData.non_academic_skills || [],
@@ -401,6 +314,9 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                 ),
                 type: "error",
             });
+            // The time may have just been taken: reload the list and make them pick again.
+            handleSlotSelection(null);
+            upcoming.refetch();
         },
     });
 
@@ -412,109 +328,54 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         onSave(formData);
     };
 
-    // Slot times come back from the API already in the LEARNER's local time, so they are
-    // labelled with the learner's own profile timezone (AvailableSlots resolves the label).
+    // New volunteer: their skills, times and any picked slot are different. Their open times
+    // load through useUpcomingSlots (keyed on the volunteer).
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
             select_date: "",
+            selected_slot: "",
+            start_time: "",
+            end_time: "",
             academic_skills: [],
             non_academic_skills: [],
         }));
         setCategory("");
         setSkillErrors({});
         if (formData.select_volunteer) {
-            setSelectedVolunteerId(formData.select_volunteer);
-
-            // Fetch volunteer timezone + the skills they've declared they can teach,
-            // which populate the Academic / Non-Academic Skills pickers.
-            const fetchVolunteerDetails = async () => {
-                try {
-                    const { data } = await GET_API(
-                        endpoints.volunteer.getIndividualVolunteer(formData.select_volunteer)
-                    );
+            // The skills they've declared they can teach populate the Category / Skill pickers.
+            let cancelled = false;
+            GET_API(endpoints.volunteer.getIndividualVolunteer(formData.select_volunteer))
+                .then(({ data }) => {
+                    if (cancelled) return;
                     const { academic, nonAcademic } = skillOptionsByCategory(data);
                     setVolunteerAcademicOptions(academic.map((name) => ({ label: name, value: name })));
                     setVolunteerNonAcademicOptions(nonAcademic.map((name) => ({ label: name, value: name })));
-                } catch (error) {
+                    // Only one category on offer: preselect it instead of leaving the other greyed out.
+                    if (!rescheduleId && (academic.length === 0) !== (nonAcademic.length === 0)) {
+                        setCategory(academic.length > 0 ? "academic" : "non_academic");
+                    }
+                })
+                .catch((error) => {
+                    if (cancelled) return;
                     console.error("Error fetching volunteer details:", error);
                     setVolunteerAcademicOptions([]);
                     setVolunteerNonAcademicOptions([]);
-                }
+                });
+            return () => {
+                cancelled = true;
             };
-            fetchVolunteerDetails();
-
-            setFormData((prev) => ({
-                ...prev,
-                select_date: "",
-            }));
-            setAvailableSlots([]);
-            // Reset to current month when volunteer changes
-            setCurrentMonth(dayjs().format("YYYY-MM"));
-            // Clear available days when volunteer changes (will be fetched when calendar opens)
-            setVolunteerAvailableDays([]);
-            setVolunteerAvailableDates([]);
-            setVolunteerUnavailableDates([]);
-
-            // Pre-fill the calendar-clicked date (also loads that volunteer's slots for it).
-            const preset = initialDate ? dayjs(initialDate) : null;
-            if (preset?.isValid() && preset.format("YYYY-MM-DD") >= today) {
-                handleChange("select_date", preset.toDate());
-            }
-        } else {
-            setVolunteerAcademicOptions([]);
-            setVolunteerNonAcademicOptions([]);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs when the selected volunteer changes; depending on the handlers/date would reset the form on every render
+        setVolunteerAcademicOptions([]);
+        setVolunteerNonAcademicOptions([]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- runs when the selected volunteer changes; depending on anything else would reset the form on every render
     }, [formData.select_volunteer]);
-
-    // Handle calendar open/close
-    const handleDatePickerOpenChange = async (open: boolean) => {
-        if (open && selectedVolunteerId) {
-            // When calendar opens, determine the month to fetch
-            let monthToFetch = currentMonth;
-            if (formData.select_date) {
-                monthToFetch = dayjs(formData.select_date).format("YYYY-MM");
-            } else {
-                monthToFetch = dayjs().format("YYYY-MM");
-            }
-
-            // Update currentMonth if needed
-            if (monthToFetch !== currentMonth) {
-                setCurrentMonth(monthToFetch);
-            }
-
-            // Fetch available days for the displayed month
-            // Use setTimeout to ensure state is updated, or fetch directly with the month
-            try {
-                setIsLoadingAvailableDays(true);
-                const response = await GET_API(
-                    endpoints.volunteer_slot.availableDays(selectedVolunteerId, monthToFetch)
-                );
-
-                const availableDays = Array.isArray(response.data)
-                    ? response.data
-                    : response.data.available_days;
-
-                const availableDates = response.data.available_dates || [];
-                const unavailableDates = response.data.unavailable_dates || [];
-
-                setVolunteerAvailableDays(availableDays);
-                setVolunteerAvailableDates(availableDates);
-                setVolunteerUnavailableDates(unavailableDates);
-                setIsLoadingAvailableDays(false);
-            } catch (error) {
-                console.error("Error fetching available days:", error);
-                setIsLoadingAvailableDays(false);
-            }
-        }
-    };
 
     const isMobileScreen = InnerWidth() < 768;
 
     const COUNTERPART_FIELD = "select_volunteer";
     const skillFields = selectedVolunteerId !== "" && hasSkillOptions && !rescheduleId && (
-        <>
+        <div className="flex flex-col gap-4 mb-4">
             <CategoryField
                 value={category}
                 error={skillErrors.category}
@@ -543,21 +404,28 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     setSkillErrors((e) => ({ ...e, skill: undefined }));
                 }}
             />
-        </>
+        </div>
     );
     const detailsField = (
-        <SessionDetailsField
-            value={formData.description}
-            error={errors.description}
-            placeholder="What do you want to cover? Anything the volunteer should know or prepare?"
-            onChange={(value) => handleChange("description", value)}
-        />
+        <div className="flex flex-col gap-4 mb-4">
+            <SessionDetailsField
+                value={formData.description}
+                error={errors.description}
+                placeholder="What do you want to learn?"
+                onChange={(value) => handleChange("description", value)}
+            />
+            <PreparationDetailsField
+                value={formData.preparation_details || ""}
+                error={errors.preparation_details}
+                onChange={(value) => handleChange("preparation_details", value)}
+            />
+        </div>
     );
 
     if (!isOpen) return null;
     return (
         <SideModal
-            title={rescheduleId ? "Reschedule Session" : "Add New Session"}
+            title={rescheduleId ? "Reschedule Session" : "Book for Later"}
             saveButtonText={rescheduleId ? "Send New Time" : "Send Request"}
             onClose={handleClose}
             isOpen={isOpen}
@@ -573,16 +441,6 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     </p>
                 )}
                 {LearnerScheduleModalConstants.map((field: any) => {
-                    const availableDaysForField =
-                        field.name === "select_date" ? volunteerAvailableDays : undefined;
-                    const availableDatesForField =
-                        field.name === "select_date" ? volunteerAvailableDates : undefined;
-                    const unavailableDatesForField =
-                        field.name === "select_date" ? volunteerUnavailableDates : undefined;
-
-
-                    if (field.name === "select_date" && selectedVolunteerId === "") return null;
-
                     if (field.name === COUNTERPART_FIELD) {
                         return (
                             <Fragment key={field.name}>
@@ -606,120 +464,29 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
 
                     return (
                         <Fragment key={field.name}>
-                        <Input
-                            {...field}
-                            earliestDate={field.name === "select_date" ? today : undefined}
-                            onChange={(value: any) => handleChange(field.name, value)}
-                            value={formData[field.name as keyof FormData]}
-                            required={field.required}
-                            error={errors[field.name as keyof FormData]}
-                            availableDays={availableDaysForField}
-                            availableDates={availableDatesForField}
-                            unavailableDates={unavailableDatesForField}
-                            isLoading={
-                                field.name === "select_date" ? isLoadingAvailableDays : false
-                            }
-                            onOpenChange={
-                                field.name === "select_date"
-                                    ? handleDatePickerOpenChange
-                                    : undefined
-                            }
-                            onPanelChange={
-                                field.name === "select_date"
-                                    ? async (value: any, mode: any) => {
-                                        // Prevent multiple requests when user clicks month/year arrows rapidly
-                                        if (isLoadingAvailableDays) return;
-                                        // When panel changes (month navigation), fetch available days for the new month
-                                        // value is a dayjs object representing the displayed month/year
-                                        if (value && selectedVolunteerId) {
-                                            // Extract month from the value - value is a dayjs object from Ant Design
-                                            let newMonth: string;
-
-                                            // Handle dayjs object (from Ant Design DatePicker)
-                                            if (dayjs.isDayjs(value)) {
-                                                newMonth = value.format("YYYY-MM");
-                                            } else if (
-                                                value &&
-                                                typeof value.format === "function"
-                                            ) {
-                                                // If it has format method, it's likely dayjs
-                                                newMonth = value.format("YYYY-MM");
-                                            } else if (
-                                                value &&
-                                                typeof value.toDate === "function"
-                                            ) {
-                                                // If it's a dayjs object with toDate method
-                                                newMonth = dayjs(value.toDate()).format(
-                                                    "YYYY-MM"
-                                                );
-                                            } else {
-                                                // Fallback - try to parse as dayjs or moment
-                                                const parsed = dayjs(value);
-                                                newMonth = parsed.isValid()
-                                                    ? parsed.format("YYYY-MM")
-                                                    : dayjs(value).format("YYYY-MM");
-                                            }
-
-                                            // Always update and fetch, even if month appears the same (to handle edge cases)
-                                            setCurrentMonth(newMonth);
-
-                                            // Directly fetch available days for the new month
-                                            try {
-                                                setIsLoadingAvailableDays(true);
-                                                const apiUrl =
-                                                    endpoints.volunteer_slot.availableDays(
-                                                        selectedVolunteerId,
-                                                        newMonth
-                                                    );
-
-                                                const response = await GET_API(apiUrl);
-
-                                                const availableDays = Array.isArray(response.data)
-                                                    ? response.data
-                                                    : response.data.available_days;
-
-                                                const availableDates =
-                                                    response.data.available_dates || [];
-                                                const unavailableDates =
-                                                    response.data.unavailable_dates || [];
-
-                                                setVolunteerAvailableDays(availableDays);
-                                                setVolunteerAvailableDates(availableDates);
-                                                setVolunteerUnavailableDates(unavailableDates);
-                                                setIsLoadingAvailableDays(false);
-                                            } catch (error) {
-                                                console.error(
-                                                    "Error fetching available days for month",
-                                                    newMonth,
-                                                    ":",
-                                                    error
-                                                );
-                                                setIsLoadingAvailableDays(false);
-                                            }
-                                        }
-                                    }
-                                    : undefined
-                            }
-                        />
-                        {field.name === "title_of_the_meeting" && detailsField}
+                            <Input
+                                {...field}
+                                onChange={(value: any) => handleChange(field.name, value)}
+                                value={formData[field.name as keyof FormData]}
+                                required={field.required}
+                                error={errors[field.name as keyof FormData]}
+                            />
+                            {field.name === "title_of_the_meeting" && detailsField}
                         </Fragment>
                     );
                 })}
-                <AvailableSlots
-                    availableSlots={availableSlots}
-                    selectedSlot={formData.selected_slot || ""}
-                    onSlotSelect={handleSlotSelection}
-                    errors={errors.selected_slot || ""}
-                    slotError={slotError}
-                    fetchingSlots={fetchingSlots}
-                    selectedDate={
-                        formData.select_date
-                            ? dayjs(formData.select_date).format("YYYY-MM-DD")
-                            : undefined
-                    }
-                    volunteerTimezone={profileTimeZone}
-                />
-
+                {selectedVolunteerId !== "" && (
+                    <AvailabilityField
+                        slots={upcoming.slots}
+                        value={formData.selected_slot || ""}
+                        onChange={handleSlotSelection}
+                        isLoading={upcoming.isLoading}
+                        isError={upcoming.isError}
+                        onRetry={() => upcoming.refetch()}
+                        timeZoneLabel={profileTimeZone}
+                        error={errors.selected_slot || errors.select_date}
+                    />
+                )}
             </div>
         </SideModal>
     );
