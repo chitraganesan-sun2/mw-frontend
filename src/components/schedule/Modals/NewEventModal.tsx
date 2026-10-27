@@ -662,7 +662,6 @@ export default function NewEventModal({
                                             },
                                         } as any,
                                         textField: {
-                                            placeholder: "Select time",
                                             sx: {
                                                 width: "100%",
                                                 "& .MuiOutlinedInput-root": {

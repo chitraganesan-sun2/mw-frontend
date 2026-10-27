@@ -283,7 +283,6 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                     } as any,
                                     textField: {
                                         id: "request-session-time",
-                                        placeholder: "Select time",
                                         fullWidth: true,
                                         error: Boolean(errors.time),
                                         inputProps: {
@@ -299,7 +298,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                                 "&.Mui-focused fieldset": { borderColor: "#000" },
                                             },
                                         },
-                                    },
+                                    } as any,
                                 }}
                             />
                         </LocalizationProvider>
