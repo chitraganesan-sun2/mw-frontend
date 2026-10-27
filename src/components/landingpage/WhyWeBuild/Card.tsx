@@ -14,7 +14,7 @@ const Card: React.FC<CardProps> = ({ index, title, description }) => {
 
     return (
         <div
-            className="min-w-0 max-w-[503px] w-full min-h-[320px] md:min-h-full h-full lg:max-h-[350px] rounded-3xl flex flex-col justify-center p-5 lg:p-6 gap-4 text-center lg:text-start md:self-stretch"
+            className="min-w-0 w-full min-h-[320px] md:min-h-full h-full lg:max-h-[350px] rounded-3xl flex flex-col justify-center p-5 lg:p-6 gap-4 text-center lg:text-start md:self-stretch"
             style={{
                 background: index % 2 === 0 ? backgroundLeft : backgroundRight,
             }}

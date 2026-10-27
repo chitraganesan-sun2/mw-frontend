@@ -15,7 +15,7 @@ const JoinUsPage = () => {
                 {/* Main Heading - Outside white background on mobile, inside on desktop */}
                 <div className="mb-5 md:hidden">
                     <h1 className="text-[24px]  text-gray-900 font-medium">
-                        Join the MelodyWings Operations Team
+                        Careers at MelodyWings
                     </h1>
                 </div>
 
@@ -27,7 +27,7 @@ const JoinUsPage = () => {
                     {/* Main Heading - Inside white background on desktop only */}
                     <div className="hidden md:block mb-8 px-10">
                         <h1 className="text-[24px] lg:text-[32px] font-semibold text-gray-900">
-                            Join the MelodyWings Operations Team
+                            Careers at MelodyWings
                         </h1>
                     </div>
 

@@ -16,7 +16,7 @@ const Hero = () => {
     return (
         <div className="w-full h-full bg-[#F4F7FB] md:bg-white">
             <Header />
-            <div className={`w-full md:h-[80vh] md:bg-white relative`}>
+            <div className={`w-full md:h-[80vh] md:min-h-[480px] md:max-h-[760px] md:bg-white relative`}>
                 <div className="w-full !h-[300px] md:!h-full md:!relative">
                     <Image src={HeroBannerImg} alt="Students learning together with technology support" fill className="h-full object-cover object-top hidden md:block" />
                     <Image src={HeroBannerMobileImg} alt="Students learning together with technology support" fill className="!h-[300px] md:hidden object-cover object-top" />
