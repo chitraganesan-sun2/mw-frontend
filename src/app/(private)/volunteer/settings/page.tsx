@@ -225,8 +225,8 @@ const Settings = () => {
                                 </div>
                             );
                         }}
-                        popupClassName="session-match-dropdown"
-                        dropdownAlign={{ points: ["tc", "bc"] }}
+                        classNames={{ popup: { root: "session-match-dropdown" } }}
+                        popupAlign={{ points: ["tc", "bc"] }}
                         className="session-match-select w-full md:w-[400px] [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-300 [&_.ant-select-selector]:!h-auto [&_.ant-select-selector]:!min-h-10"
                     />
                 </div>

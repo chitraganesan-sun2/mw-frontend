@@ -102,7 +102,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 open={isOpen}
                 onCancel={onClose}
                 className='w-full max-md:!max-w-[100%] px-4 absolute right-0 md:right-10 top-[25%] md:top-20'
-                classNames={{ content: '!rounded-3xl !p-5' }}
+                classNames={{ container: '!rounded-3xl !p-5' }}
                 closable={false}
                 footer={false}
             >

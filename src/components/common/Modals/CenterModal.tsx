@@ -97,7 +97,7 @@ const CenterModal: React.FC<CenterModalProps> = ({
     const classNames: ModalProps["classNames"] = {
         footer: "!hidden",
         mask: "!bg-[#00000099]",
-        content: cn("flex flex-col !rounded-none md:!rounded-2xl !p-0 !m-0", mobileContentClass),
+        container: cn("flex flex-col !rounded-none md:!rounded-2xl !p-0 !m-0", mobileContentClass),
     };
 
     return (

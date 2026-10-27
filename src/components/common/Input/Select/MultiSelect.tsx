@@ -33,7 +33,7 @@ const MultiSelect: React.FC<MultiSelectInputProps> = ({
                 tagRender={() => <div className="hidden" />}
                 listHeight={300}
                 menuItemSelectedIcon={null}
-                popupClassName='!bg-background-input'
+                classNames={{ popup: { root: '!bg-background-input' } }}
                 options={options.filter(option => !value?.includes(option?.value))}
                 loading={isLoading}
             />

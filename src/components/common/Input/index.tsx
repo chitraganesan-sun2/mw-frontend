@@ -391,7 +391,7 @@ export const Input: React.FC<InputProps> = (props) => {
                 const parseBirthDate = (date: any) =>
                     date && dayjs(date, format).isValid() ? dayjs(date, format) : null;
 
-                const handleDateChange = (date: any, dateString: string | string[]) => {
+                const handleDateChange = (date: any, _dateString?: string | string[] | null) => {
                     // Pass the raw date object to the parent component
                     const formattedDate = dayjs(date).format("DD-MM-YYYY");
                     onChange(formattedDate);

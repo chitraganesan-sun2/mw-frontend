@@ -248,7 +248,7 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 open={isOpen}
                 onCancel={onClose}
                 className="max-w-[90%] h-full top-0 flex-center"
-                classNames={{ content: "!rounded-3xl !p-6" }}
+                classNames={{ container: "!rounded-3xl !p-6" }}
                 closable={false}
                 footer={false}
             >

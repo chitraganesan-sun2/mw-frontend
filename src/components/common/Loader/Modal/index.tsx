@@ -21,7 +21,7 @@ function ModalLoader({ isLoading, title }: { isLoading: boolean, title?: string 
         closable={false}
         centered
         zIndex={2000}
-        classNames={{ content: "!bg-transparent !shadow-none" }}
+        classNames={{ container: "!bg-transparent !shadow-none" }}
     >
         <div className="w-full h-full flex-center flex-col gap-4">
             <Spin size="large" className="[&_.ant-spin-dot-item]:!bg-white" />

@@ -42,7 +42,7 @@ const ViewModal: React.FC<ViewModalProps> = ({
                 wrapper: {
                     zIndex: 1000,
                 },
-                content: {
+                container: {
                     padding: 0,
                     borderRadius: isMobile ? 0 : borderRadius || "1rem",
                 },

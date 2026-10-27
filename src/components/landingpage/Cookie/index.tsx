@@ -34,7 +34,7 @@ export default function CookieConsent() {
     <Modal
       open={showBanner}
       className='!w-auto max-w-[90%] absolute right-10 top-20'
-      classNames={{ content: '!p-0' }}
+      classNames={{ container: '!p-0' }}
       transitionName=""
       closable={false}
       footer={false}
