@@ -60,13 +60,6 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // ESLint now has a config in the repo, but the codebase predates it and a
-    // first run surfaces a backlog. Keep `next build` (and Vercel) green off
-    // typecheck; lint runs separately in CI (informational) until the backlog
-    // is cleared, then flip this back.
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
     images: {
         remotePatterns: [
             {
@@ -75,10 +68,6 @@ const nextConfig = {
                 pathname: "/**",
             },
         ],
-    },
-    webpack: (config) => {
-        config.resolve.alias["@"] = path.resolve(__dirname, "src");
-        return config;
     },
     async headers() {
         return [

@@ -11,8 +11,8 @@ const backupConfig = path.join(root, 'next.config.web-backup.mjs');
 const backupConfigJs = path.join(root, 'next.config.web-backup.js');
 const layoutFile = path.join(root, 'src', 'app', 'layout.tsx');
 const layoutBackup = path.join(root, 'src', 'app', 'layout.tsx.web-backup');
-const middlewareFile = path.join(root, 'src', 'middleware.ts');
-const middlewareBackup = path.join(root, 'src', 'middleware.ts.web-backup');
+const middlewareFile = path.join(root, 'src', 'proxy.ts');
+const middlewareBackup = path.join(root, 'src', 'proxy.ts.web-backup');
 const devLoginDir = path.join(root, 'src', 'app', 'dev-login');
 const devLoginBackup = path.join(root, '.dev-login.web-backup');
 const envLocal = path.join(root, '.env.local');
@@ -43,10 +43,10 @@ if (fs.existsSync(layoutBackup)) {
   console.warn('⚠ No layout backup found');
 }
 
-// Restore middleware.ts from backup
+// Restore proxy.ts from backup
 if (fs.existsSync(middlewareBackup)) {
   fs.renameSync(middlewareBackup, middlewareFile);
-  console.log('✓ Restored middleware.ts from backup');
+  console.log('✓ Restored proxy.ts from backup');
 } else {
   console.warn('⚠ No middleware backup found');
 }

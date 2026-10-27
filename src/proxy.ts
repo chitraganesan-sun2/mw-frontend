@@ -36,7 +36,7 @@ function isSearchEngineBot(userAgent: string | null): boolean {
   return SEARCH_ENGINE_BOTS.some((bot) => ua.includes(bot));
 }
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const { pathname, origin } = req.nextUrl;
   const userAgent = req.headers.get("user-agent");
 

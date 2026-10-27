@@ -7,10 +7,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
-  eslint: {
-    // Lint runs in CI (informational); keep the mobile build green off typecheck.
-    ignoreDuringBuilds: true,
-  },
   images: {
     unoptimized: true, // Required for static export
     remotePatterns: [
@@ -20,10 +16,6 @@ const nextConfig = {
         pathname: "/dxezkqczp/**",
       },
     ],
-  },
-  webpack: (config) => {
-    config.resolve.alias["@"] = path.resolve(__dirname, "src");
-    return config;
   },
   // No server-side redirects for mobile - handled client-side via RouteGuard
 };

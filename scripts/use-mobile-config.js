@@ -19,8 +19,8 @@ const backupConfig = path.join(root, 'next.config.web-backup.mjs');
 const backupConfigJs = path.join(root, 'next.config.web-backup.js');
 const layoutFile = path.join(root, 'src', 'app', 'layout.tsx');
 const layoutBackup = path.join(root, 'src', 'app', 'layout.tsx.web-backup');
-const middlewareFile = path.join(root, 'src', 'middleware.ts');
-const middlewareBackup = path.join(root, 'src', 'middleware.ts.web-backup');
+const middlewareFile = path.join(root, 'src', 'proxy.ts');
+const middlewareBackup = path.join(root, 'src', 'proxy.ts.web-backup');
 const devLoginDir = path.join(root, 'src', 'app', 'dev-login');
 // Keep the backup OUTSIDE src/app/ — anything under src/app/ becomes a route,
 // so `src/app/dev-login.web-backup` would ship as `/dev-login.web-backup`.
@@ -61,10 +61,10 @@ if (fs.existsSync(layoutFile)) {
   console.log('✓ Removed force-dynamic from layout.tsx for static export');
 }
 
-// Temporarily rename middleware.ts (incompatible with static export)
+// Temporarily rename proxy.ts (incompatible with static export)
 if (fs.existsSync(middlewareFile)) {
   fs.renameSync(middlewareFile, middlewareBackup);
-  console.log('✓ Disabled middleware.ts for static export (moved to .web-backup)');
+  console.log('✓ Disabled proxy.ts for static export (moved to .web-backup)');
 }
 
 // Exclude the /dev-login helper route from the mobile export. It is only meant
