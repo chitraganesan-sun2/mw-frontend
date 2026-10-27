@@ -11,8 +11,9 @@ const ForVolunteer = () => {
     const handleSignUp = () => setParamMode("volunteer");
 
     return (
-        <ContainerWrapper id="for-volunteers" className="bg-white py-10 px-5">
+        <ContainerWrapper id="for-volunteers" className="bg-white py-10 px-5 h-full lg:justify-start">
             <ContainerHeader
+                compact
                 title="For Volunteers"
                 subTitle="You'll find more than a volunteer role—you'll find a purpose that uplifts"
                 description="Have a passion for teaching and helping others? Join our community where your efforts can make a world of difference!"
@@ -20,7 +21,7 @@ const ForVolunteer = () => {
             />
 
             <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">
-                <div className="flex flex-col lg:flex-row gap-1">
+                <div className="flex flex-col gap-1">
                     {volunteerData.map((item, index) => (
                         <StepsChart
                             key={index}
@@ -28,6 +29,7 @@ const ForVolunteer = () => {
                             icon={item.icon}
                             iconMobile={item.iconMobile}
                             index={index}
+                            vertical
                         />
                     ))}
                 </div>

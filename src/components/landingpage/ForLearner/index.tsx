@@ -11,15 +11,16 @@ const ForLearner = () => {
     const handleSignUp = () => setParamMode("learner");
 
     return (
-        <ContainerWrapper id="for-learners" className="bg-white py-10 px-5">
+        <ContainerWrapper id="for-learners" className="bg-white py-10 px-5 h-full lg:justify-start">
             <ContainerHeader
+                compact
                 title="For Learners"
                 subTitle="Explore new horizons in learning and foster growth"
                 description="Search for a champion your learner deserves and connect with a volunteer to teach for free"
                 titleColor="!text-learner-dark"
             />
             <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">
-                <div className="flex flex-col lg:flex-row gap-1">
+                <div className="flex flex-col gap-1">
                     {learnerData.map((item, index) => (
                         <StepsChart
                             key={index}
@@ -27,6 +28,7 @@ const ForLearner = () => {
                             icon={item.icon}
                             iconMobile={item.iconMobile}
                             index={index}
+                            vertical
                         />
                     ))}
                 </div>

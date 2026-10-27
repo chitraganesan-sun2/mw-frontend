@@ -25,7 +25,7 @@ const Footer = (props: Props) => {
     const policyLinks: PolicyLink[] = [
         { href: "/privacy-policy", target: "_blank", label: "Privacy Policy" },
         { href: "/terms-and-conditions", target: "_blank", label: "Terms and Conditions" },
-        { href: "/join-us", label: "Join Us" },
+        { href: "/join-us", label: "Careers" },
         { href: "/contact", label: `Contact Us - ${SUPPORT_EMAIL}` },
     ];
 

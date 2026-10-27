@@ -1,14 +1,17 @@
 import React from "react";
+import type { IconType } from "react-icons";
 
 interface SkillsToLearnCardProps {
     title: string;
     skills: string[];
+    icon?: IconType;
 }
 
-const SkillsToLearnCard: React.FC<SkillsToLearnCardProps> = ({ title, skills }) => {
+const SkillsToLearnCard: React.FC<SkillsToLearnCardProps> = ({ title, skills, icon: Icon }) => {
     return (
-        <div className="bg-white lg:bg-[#f4f7fb] shadow-inner rounded-3xl p-[40px] w-full flex flex-col gap-5">
-            <div>
+        <div className="bg-white lg:bg-[#f4f7fb] shadow-inner rounded-3xl p-6 md:p-8 w-full flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+                {Icon && <Icon size={22} aria-hidden="true" className="shrink-0 text-[#121212]" />}
                 <p className="font-semibold text-[18px] md:text-[24px] font-poppins text-[#121212] leading-normal">{title}</p>
             </div>
             <div className="flex flex-wrap  gap-3">

@@ -250,7 +250,7 @@ const JoinUsStep3Page = () => {
             <section className="w-full flex flex-col items-center justify-center pt-10 md:pt-16">
                 <div className="max-w-5xl flex flex-col gap-[12px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h1 className="text-[20px] md:text-[32px] font-medium text-gray-900">
-                        We&apos;re excited that you want to join us! 😊
+                        We&apos;re excited that you want to join us!
                     </h1>
                     <p className="text-[16px] md:text-[20px] text-[#121212] italic">
                         Fill in the details below so we can get to know you better. Once submitted, our team will

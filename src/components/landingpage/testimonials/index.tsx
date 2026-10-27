@@ -16,7 +16,7 @@ export interface TestimonialData {
 }
 
 const TestimonialMarqueeCard = ({ testimonial }: { testimonial: TestimonialData }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 w-[340px] md:w-[380px] flex-shrink-0 mx-3 flex flex-col justify-between min-h-[220px]">
+    <div className="bg-white lg:bg-[#f4f7fb] rounded-2xl p-6 shadow-sm border border-gray-100 w-[340px] md:w-[380px] flex-shrink-0 mx-3 flex flex-col justify-between min-h-[220px]">
         {/* Category badge */}
         <div>
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
@@ -64,20 +64,20 @@ const Testimonials = () => {
     const marqueeItems = [...allTestimonials, ...allTestimonials];
 
     return (
-        <div className="w-full">
-            <ContainerWrapper>
+        <ContainerWrapper className="!px-0 lg:!px-0 overflow-hidden">
+            <div className="px-2 lg:px-10">
                 <ContainerHeader
                     title="Testimonials"
                     subTitle="What Our Community Says"
                     description="Heartwarming stories from volunteers and families who've experienced the joy of learning together."
                 />
-            </ContainerWrapper>
+            </div>
 
-            {/* Marquee container - full-bleed, runs edge-to-edge of the screen */}
-            <div className="relative mt-10 group w-full">
+            {/* Marquee scrolls edge-to-edge inside the white card */}
+            <div className="relative mt-10 lg:mt-0 group w-full">
                 {/* Fade edges */}
-                <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-background-input to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-background-input to-transparent z-10 pointer-events-none" />
+                <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#f4f7fb] lg:from-white to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#f4f7fb] lg:from-white to-transparent z-10 pointer-events-none" />
 
                 {/* Scrolling track */}
                 <div className="overflow-hidden">
@@ -88,7 +88,7 @@ const Testimonials = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </ContainerWrapper>
     );
 };
 

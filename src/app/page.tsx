@@ -19,34 +19,36 @@ export default function Page() {
             <div className="w-full overflow-x-hidden bg-background-input relative">
                 <HomeClientEffects />
                 <Hero />
-                <div className="flex flex-col gap-20 lg:gap-[7rem] py-[7rem]">
-                    <div className="reveal px-[9%]" id="about-us">
+                <div className="flex flex-col gap-10 lg:gap-12 py-10 lg:py-14">
+                    <div className="reveal px-[5%] lg:px-[9%]" id="about-us">
                         <WhyWeBuild />
                     </div>
-                    <div className="reveal px-[9%]" id="our-impact">
+                    <div className="reveal px-[5%] lg:px-[9%]" id="our-impact">
                         <Impact />
                     </div>
-                    <div className="flex flex-col lg:gap-20">
-                        <div className="reveal lg:px-[9%]">
-                            <ForLearner />
-                        </div>
-                        <div className="reveal lg:px-[9%]">
-                            <ForVolunteer />
+                    <div className="px-[5%] lg:px-[9%]">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 max-w-[1400px] w-full mx-auto">
+                            <div className="reveal">
+                                <ForLearner />
+                            </div>
+                            <div className="reveal">
+                                <ForVolunteer />
+                            </div>
                         </div>
                     </div>
-                    <div className="reveal px-[9%]">
+                    <div className="reveal px-[5%] lg:px-[9%]">
                         <SkillsToLearn />
                     </div>
-                    <div className="reveal px-[9%]">
+                    <div className="reveal px-[5%] lg:px-[9%]">
                         <InstantSessions />
                     </div>
-                    <div className="reveal px-[7%]">
+                    <div className="reveal px-[5%] lg:px-[9%]">
                         <Community />
                     </div>
-                    <div className="reveal">
+                    <div className="reveal px-[5%] lg:px-[9%]">
                         <Testimonials />
                     </div>
-                    <div className="reveal px-[4%] lg:px-[9%]">
+                    <div className="reveal px-[5%] lg:px-[9%]">
                         <Celebrate />
                     </div>
                 </div>

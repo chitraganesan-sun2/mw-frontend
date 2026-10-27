@@ -1,18 +1,18 @@
 import React from "react";
 import type { Metadata } from "next";
 import { SHARE_IMAGES } from "@/constants/seo";
-import { FiMail, FiPhone } from "react-icons/fi";
-import { SUPPORT_EMAIL, SUPPORT_PHONE, hasSupportPhone, phoneToTelHref } from "@/constants/contact";
+import { FiMail } from "react-icons/fi";
+import { SUPPORT_EMAIL } from "@/constants/contact";
 
 export const metadata: Metadata = {
     title: "Contact Us",
-    description: "Get in touch with MelodyWings by phone or email.",
+    description: "Get in touch with MelodyWings by email.",
     alternates: {
         canonical: "/contact",
     },
     openGraph: {
         title: "Contact Us | MelodyWings",
-        description: "Get in touch with MelodyWings by phone or email.",
+        description: "Get in touch with MelodyWings by email.",
         url: "/contact",
         images: SHARE_IMAGES,
     },
@@ -48,26 +48,15 @@ const ContactCard = ({
 );
 
 const ContactPage = () => {
-    const showPhone = hasSupportPhone(SUPPORT_PHONE);
-
     return (
         <div className="w-full bg-background-input min-h-[60vh]">
-            <div className="mx-auto w-full max-w-[1000px] px-4 sm:px-6 md:px-8 py-10 md:py-16">
+            <div className="mx-auto w-full max-w-[1000px] px-4 sm:px-6 md:px-8 py-8 md:py-12">
                 <h1 className="text-[24px] lg:text-[32px] font-semibold text-gray-900">Contact Us</h1>
                 <p className="mt-3 max-w-2xl text-[14px] md:text-lg text-gray-800">
                     We&apos;d love to hear from you. Reach the MelodyWings team directly using the details below.
                 </p>
 
-                <div className={`mt-8 grid grid-cols-1 gap-4 md:gap-6 ${showPhone ? "md:grid-cols-2" : "md:max-w-md"}`}>
-                    {showPhone && (
-                        <ContactCard
-                            href={phoneToTelHref(SUPPORT_PHONE)}
-                            icon={<FiPhone size={22} />}
-                            label="Phone"
-                            value={SUPPORT_PHONE}
-                            hint="Call us at"
-                        />
-                    )}
+                <div className="mt-6 grid grid-cols-1 gap-4 md:max-w-md">
                     <ContactCard
                         href={`mailto:${SUPPORT_EMAIL}`}
                         icon={<FiMail size={22} />}
@@ -77,12 +66,6 @@ const ContactPage = () => {
                     />
                 </div>
 
-                {!showPhone && process.env.NODE_ENV !== "production" && (
-                    <p className="mt-6 rounded-xl border border-dashed border-gray-400 p-3 text-sm text-gray-700">
-                        Dev note: set <code>NEXT_PUBLIC_SUPPORT_PHONE</code> to show the official phone number here. It is a
-                        required configuration value and is deliberately not hardcoded.
-                    </p>
-                )}
             </div>
         </div>
     );
