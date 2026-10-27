@@ -29,7 +29,7 @@ const SideModal: React.FC<SideModalProps> = ({
                 closable={false}
                 onClose={onClose}
                 open={isOpen}
-                width={modalWidth}
+                size={modalWidth}
                 styles={{ body: { padding: 0 } }}
             >
                 <div

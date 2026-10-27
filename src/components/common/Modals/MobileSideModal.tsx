@@ -16,7 +16,7 @@ const MobileSideModal: React.FC<SideNavBarProps> = ({ children, isOpen, onClose,
                 closable={false}
                 onClose={onClose}
                 open={isOpen}
-                width={"100%"}
+                size={"100%"}
                 styles={{ body: { padding: 0 } }}
             >
                 {children}
