@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import OpenOnFieldClick from "@/components/common/Input/Picker/OpenOnFieldClick";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CommitActionBar from "@/components/common/Input/Picker/CommitActionBar";
@@ -258,7 +259,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                             {SESSION_FIELD_LABELS.startTime}{tzAbbr ? ` (${shortTimeZone(tzLabel, date)})` : ""} <span aria-hidden="true">*</span>
                         </label>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <MobileTimePicker
+                            <OpenOnFieldClick><MobileTimePicker
                                 format="h:mm A"
                                 minutesStep={5}
                                 timezone={learnerTz || undefined}
@@ -300,7 +301,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                         },
                                     } as any,
                                 }}
-                            />
+                            /></OpenOnFieldClick>
                         </LocalizationProvider>
                         {errors.time && (
                             <p id="request-session-time-error" role="alert" className="text-sm text-red-700">

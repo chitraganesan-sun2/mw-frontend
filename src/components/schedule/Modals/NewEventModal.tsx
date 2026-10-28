@@ -14,6 +14,7 @@ import {
     type PickedSkill,
     type SessionCategory,
 } from "@/components/schedule/forms/SessionFormFields";
+import OpenOnFieldClick from "@/components/common/Input/Picker/OpenOnFieldClick";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // Commits the displayed time on OK - see CommitActionBar for the MUI onAccept quirk.
@@ -588,7 +589,7 @@ export default function NewEventModal({
                         </label>
                         <div className="w-full">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <MobileTimePicker
+                                <OpenOnFieldClick><MobileTimePicker
                                     format="h:mm A"
                                     minutesStep={5}
                                     timezone={volunteerTimezone || "UTC"}
@@ -702,7 +703,7 @@ export default function NewEventModal({
                                             },
                                         },
                                     }}
-                                />
+                                /></OpenOnFieldClick>
                             </LocalizationProvider>
                         </div>
                     </div>

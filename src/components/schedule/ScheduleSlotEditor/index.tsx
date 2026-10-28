@@ -7,6 +7,7 @@ import AddSlotIcon from "@/assets/icons/AddSlotIcon";
 import ChevronRightIcon from "@/assets/icons/ChevronRightIcon";
 import CheckIcon from "@/assets/icons/CheckIcon";
 import CustomRecurrenceModal from "@/components/schedule/Modals/CustomRecurrenceModal";
+import OpenOnFieldClick from "@/components/common/Input/Picker/OpenOnFieldClick";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import type { TimeSlot, UseScheduleSlotsResult } from "@/hooks/schedule/useScheduleSlots";
@@ -49,7 +50,7 @@ const TimePickerComponent = ({
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <MobileTimePicker
+            <OpenOnFieldClick><MobileTimePicker
                 format="h:mm A"
                 value={tempTime}
                 onChange={(time) => setTempTime(time)}
@@ -71,7 +72,7 @@ const TimePickerComponent = ({
                     timePickerClass,
                     errors[day]?.some((error) => error.includes(`Time slot ${slotIndex + 1}`)) && "border-red-500"
                 )}
-            />
+            /></OpenOnFieldClick>
         </LocalizationProvider>
     );
 };

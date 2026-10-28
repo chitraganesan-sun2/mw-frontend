@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import OpenOnFieldClick from "@/components/common/Input/Picker/OpenOnFieldClick";
 import { LocalizationProvider, MobileTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // Commits the displayed time on OK - see CommitActionBar for the MUI onAccept quirk.
@@ -87,7 +88,7 @@ const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <MobileTimePicker
+            <OpenOnFieldClick><MobileTimePicker
                 format="h:mm A"
                 minutesStep={1}
                 timezone={volunteerTimezone || "UTC"}
@@ -156,7 +157,7 @@ const TimePickerComponent: React.FC<TimePickerComponentProps> = ({
                         },
                     },
                 }}
-            />
+            /></OpenOnFieldClick>
         </LocalizationProvider>
     );
 };
