@@ -125,7 +125,11 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const learnerId = getCookie("learner_id");
     const selectedVolunteerId = formData.select_volunteer;
-    const upcoming = useUpcomingSlots(isOpen ? selectedVolunteerId || undefined : undefined, profileTimeZone);
+    const upcoming = useUpcomingSlots(
+        isOpen ? selectedVolunteerId || undefined : undefined,
+        profileTimeZone,
+        rescheduleId
+    );
 
     // Deep link (?volunteerId=): preselect that volunteer, label included.
     useEffect(() => {
@@ -215,7 +219,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
     useEffect(() => {
         if (presetApplied.current || !initialDate || !selectedVolunteerId || upcoming.isLoading) return;
         presetApplied.current = true;
-        const first = upcoming.slots.find((s) => s.date === initialDate);
+        const first = upcoming.slots.find((s) => s.date === initialDate && !s.conflicts_with_my_schedule);
         if (first) handleSlotSelection(first);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- applied once per open, when the times arrive
     }, [isOpen, initialDate, selectedVolunteerId, upcoming.isLoading, upcoming.slots]);

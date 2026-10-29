@@ -400,6 +400,8 @@ export function AvailabilityField({
     if (isLoading) status = "Loading available times...";
     else if (isError) status = "Couldn't load available times.";
     else if (slots.length === 0) status = "This volunteer has no open times in the next few weeks.";
+    else if (slots.every((s) => s.conflicts_with_my_schedule))
+        status = "All of this volunteer's open times overlap sessions you already have.";
 
     return (
         <div className="flex flex-col gap-2">
@@ -423,8 +425,9 @@ export function AvailabilityField({
                     {isLoading ? "Loading..." : "Select a time"}
                 </option>
                 {slots.map((slot) => (
-                    <option key={slotOptionKey(slot)} value={slotOptionKey(slot)}>
+                    <option key={slotOptionKey(slot)} value={slotOptionKey(slot)} disabled={Boolean(slot.conflicts_with_my_schedule)}>
                         {formatSlotOption(slot, timeZoneLabel)}
+                        {slot.conflicts_with_my_schedule ? " (you have a session then)" : ""}
                     </option>
                 ))}
             </select>

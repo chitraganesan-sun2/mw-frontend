@@ -82,7 +82,8 @@ export const endpoints: EndpointProps = {
         availableDays: (id: string, month: string) =>
             `volunteer_slots/available_days/${id}/${month}`,
         /** GET every bookable slot of a volunteer over the next days, flat and sorted. */
-        upcomingSlots: (id: string) => `volunteer_slots/upcoming_slots/${id}`,
+        upcomingSlots: (id: string, excludeSessionId?: string | null) =>
+            `volunteer_slots/upcoming_slots/${id}${excludeSessionId ? `?exclude_session_id=${encodeURIComponent(excludeSessionId)}` : ""}`,
         getAllSlotsForMonth: (month: string) => `volunteer_slots/slots_and_sessions/${month}`,
         deleteParticularSlot: `volunteer_slots/add_unavailable_slots`,
         getAvailableDaysForDate: (date: string) => `volunteer_slots/get_slots_by_date/${date}`,
