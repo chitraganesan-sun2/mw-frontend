@@ -11,6 +11,7 @@ import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
+import BlockedMembersSection from "@/components/common/BlockedMembersSection";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { showToast } from "@/components/common/Toast";
@@ -265,6 +266,8 @@ const Settings = () => {
                 </div>
 
                 </section>
+
+                <BlockedMembersSection />
 
                 <DonationHistorySection />
                 <ExportDataSection role="learner" />

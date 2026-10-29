@@ -584,6 +584,7 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
                     <ReportProfileLink
                         userId={volunteerId}
                         roleLabel="volunteer"
+                        onBlocked={handleClose}
                         name={joinNames(volunteerData?.volunteer_first_name, volunteerData?.volunteer_last_name)}
                     />
                     <Divider className="max-md:hidden" />

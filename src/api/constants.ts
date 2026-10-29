@@ -210,6 +210,11 @@ export const endpoints: EndpointProps = {
     report: {
         create: "report",
     },
+    blocks: {
+        list: "blocks",
+        create: "blocks",
+        remove: (userId: string) => `blocks/${encodeURIComponent(userId)}`,
+    },
     media_uploader: {
         image: "common/media_uploader/image",
         video: "common/media_uploader/video",

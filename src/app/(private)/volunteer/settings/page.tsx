@@ -11,6 +11,7 @@ import DropDown from "@/assets/icons/DropDown";
 import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
+import BlockedMembersSection from "@/components/common/BlockedMembersSection";
 import VolunteerCertificateSection from "@/components/common/VolunteerCertificateSection";
 import RequestPreferencesSection from "@/components/volunteers/RequestPreferencesSection";
 import { getApiErrorMessage } from "@/utils/apiError";
@@ -235,6 +236,8 @@ const Settings = () => {
                 </section>
 
                 <RequestPreferencesSection volunteerId={volunteerId as string} />
+
+                <BlockedMembersSection />
 
                 <DonationHistorySection />
                 <VolunteerCertificateSection />

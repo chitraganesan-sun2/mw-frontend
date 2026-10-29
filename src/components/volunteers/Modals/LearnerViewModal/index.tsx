@@ -690,6 +690,7 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
                     <ReportProfileLink
                         userId={learnerId}
                         roleLabel="learner"
+                        onBlocked={onClose}
                         name={joinNames(
                             learnerData?.learner_personal_info?.learner_first_name,
                             learnerData?.learner_personal_info?.learner_last_name
