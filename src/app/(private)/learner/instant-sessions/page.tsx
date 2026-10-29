@@ -661,7 +661,7 @@ export default function InstantSessionsPage() {
                     </div>
                 )}
 
-                {availableSessions.length === 0 && claimedSessions.length === 0 && (
+                {!isPageLoading && availableSessions.length === 0 && claimedSessions.length === 0 && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                         <div className="text-5xl mb-4">🕒</div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">

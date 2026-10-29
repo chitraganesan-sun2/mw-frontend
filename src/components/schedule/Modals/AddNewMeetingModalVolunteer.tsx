@@ -401,6 +401,7 @@ export default function AddNewMeetingModalVolunteer({
                 <AvailabilityField
                     slots={upcoming.slots}
                     value={formData.selected_slot || ""}
+                    selectedDate={formData.select_date}
                     onChange={handleSlotSelection}
                     isLoading={upcoming.isLoading}
                     isError={upcoming.isError}
