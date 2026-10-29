@@ -135,6 +135,7 @@ export const endpoints: EndpointProps = {
             `session/unread_count?user_type=${userType}`,
         updateReadsNotifications: `session/mark_as_read`,
         markAllNotificationsRead: `session/mark_all_as_read`,
+        getRecentSessionOutcomes: `session/notifications/recent`,
         createLearnerInstantSessionRequest: "session/learner/request_instant_session",
         getLearnerRequests: (page?: number, size?: number, query?: string, requestStatus?: string) =>
             `session/learner/my_requests?page=${page ?? 1}&size=${size ?? 20}${query ? `&query=${encodeURIComponent(query)}` : ""}${requestStatus ? `&request_status=${requestStatus}` : ""}`,

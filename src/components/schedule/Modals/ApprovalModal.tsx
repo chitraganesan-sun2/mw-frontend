@@ -41,6 +41,21 @@ interface NotificationData {
     sessions: SessionsData[];
 }
 
+// An accepted / declined / cancelled notice (GET session/notifications/recent). The title is
+// ready-to-display text, e.g. "Val Completed declined your session request".
+type OutcomeNotice = {
+    notification_id: string;
+    notification_type: "session_accepted" | "session_rejected" | "session_cancelled" | string;
+    title: string;
+    created_at: string | null;
+};
+
+const OUTCOME_DOT: Record<string, string> = {
+    session_accepted: "bg-green-500",
+    session_rejected: "bg-red-500",
+    session_cancelled: "bg-amber-500",
+};
+
 const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "volunteer" }) => {
     const [notificationsData, setNotificationsData] = useState<NotificationData[]>([]);
     const isLearner = role === "learner";
@@ -64,6 +79,18 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
         queryFn: () => getNotifications(),
         enabled: isOpen,
     });
+
+    // What happened to the user's own sessions. The bell badge counts these, so they are listed
+    // here too; before, opening the panel marked them read without ever showing them.
+    const outcomes = useQuery({
+        queryKey: ["session-outcome-notifications", role, isOpen],
+        queryFn: async (): Promise<OutcomeNotice[]> => {
+            const res: any = await GET_API(endpoints.session.getRecentSessionOutcomes);
+            return res?.data?.items ?? [];
+        },
+        enabled: isOpen,
+    });
+    const outcomeItems = outcomes.data ?? [];
 
     const handleUpdateReadsNotifications = async () => {
         // Opening the bell = "seen". Clear every unread session notification for this user,
@@ -125,13 +152,44 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
                             </div>
                         </div>
                     ))
-                ) : (
+                ) : !outcomes.isPending && outcomeItems.length === 0 && !outcomes.isError ? (
                     <div className="flex flex-col gap-4 border rounded-xl p-4 border-[#E0E0E0] h-fit lg:w-[360px] items-center justify-center">
                         <p className="text-gray-light text-sm font-medium">
                             No Notifications Available
                         </p>
                     </div>
-                )}
+                ) : null}
+
+                {outcomes.isError && !outcomes.data ? (
+                    <QueryErrorNotice message="Couldn't load your recent updates." onRetry={() => outcomes.refetch()} />
+                ) : outcomeItems.length > 0 ? (
+                    <section aria-labelledby="recent-updates-heading">
+                        <h3 id="recent-updates-heading" className="text-sm font-semibold mb-2">
+                            Recent updates
+                        </h3>
+                        <ul className="flex flex-col gap-2">
+                            {outcomeItems.map((n) => (
+                                <li
+                                    key={n.notification_id}
+                                    className="flex items-start gap-3 border rounded-xl p-3 border-[#E0E0E0] text-sm"
+                                >
+                                    <span
+                                        aria-hidden="true"
+                                        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${OUTCOME_DOT[n.notification_type] ?? "bg-gray-400"}`}
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-medium text-gray-900">{n.title}</p>
+                                        {n.created_at && (
+                                            <p className="text-xs text-gray-600">
+                                                {new Date(n.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                                            </p>
+                                        )}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                ) : null}
             </div>
         </SideModal>
     );

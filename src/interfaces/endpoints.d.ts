@@ -102,6 +102,7 @@ export type EndpointProps = {
         getUnreadCount: (userType?: "volunteer" | "learner") => string;
         updateReadsNotifications: string;
         markAllNotificationsRead: string;
+        getRecentSessionOutcomes: string;
         createLearnerInstantSessionRequest: string;
         getLearnerRequests: (page?: number, size?: number, query?: string, requestStatus?: string) => string;
         cancelLearnerRequest: (id: string) => string;
