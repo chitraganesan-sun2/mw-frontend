@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FaLinkedin, FaInstagram, FaWhatsapp, FaFacebook, FaGoogle } from "react-icons/fa";
+import { FaLinkedin, FaInstagram, FaWhatsapp, FaFacebook, FaGoogle, FaGooglePlay } from "react-icons/fa";
 import { IconType } from "react-icons";
 import Logo from "@/components/common/Logo";
 import { SUPPORT_EMAIL } from "@/constants/contact";
 // import { FaSquareXTwitter } from "react-icons/fa6";
+
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=org.melodywings.app";
 
 type Props = {};
 
@@ -97,6 +99,16 @@ const Footer = (props: Props) => {
                                 &copy; {new Date().getFullYear()} MelodyWings
                             </p>
                         </div>
+
+                        <Link
+                            href={PLAY_STORE_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            <FaGooglePlay size={18} aria-hidden="true" />
+                            <span>This app is available on Google Play</span>
+                        </Link>
 
                         <div className="lg:hidden">{renderSocialLinks()}</div>
                         {/* Center - Terms of Use and Privacy Policy text */}
