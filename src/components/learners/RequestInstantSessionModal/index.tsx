@@ -286,17 +286,21 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                                         id: "request-session-time",
                                         fullWidth: true,
                                         error: Boolean(errors.time),
-                                        inputProps: {
-                                            "aria-describedby": errors.time ? "request-session-time-error" : undefined,
-                                        },
-                                        InputProps: {
-                                            sx: {
-                                                height: 48,
-                                                borderRadius: "0.75rem",
-                                                fontSize: "1rem",
-                                                "& fieldset": { borderColor: "#e5e7eb" },
-                                                "&:hover fieldset": { borderColor: "#9ca3af" },
-                                                "&.Mui-focused fieldset": { borderColor: "#000" },
+                                        // MUI X v9: InputProps/inputProps are dropped; they live under the
+                                        // text field's own slotProps.input / slotProps.htmlInput.
+                                        slotProps: {
+                                            htmlInput: {
+                                                "aria-describedby": errors.time ? "request-session-time-error" : undefined,
+                                            },
+                                            input: {
+                                                sx: {
+                                                    height: 48,
+                                                    borderRadius: "0.75rem",
+                                                    fontSize: "1rem",
+                                                    "& fieldset": { borderColor: "#e5e7eb" },
+                                                    "&:hover fieldset": { borderColor: "#9ca3af" },
+                                                    "&.Mui-focused fieldset": { borderColor: "#000" },
+                                                },
                                             },
                                         },
                                     } as any,
