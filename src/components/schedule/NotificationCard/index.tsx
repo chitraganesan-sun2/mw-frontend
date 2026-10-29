@@ -46,6 +46,8 @@ interface NotificationCardProps {
         academic_skills?: string[];
         non_academic_skills?: string[];
         session_description?: string | null;
+        /** Short summary of the learner's onboarding goals - sent only on the volunteer's own invite list. */
+        learner_goals_summary?: string | null;
         /** The learner's optional "what should the volunteer know or prepare?" note. */
         preparation_details?: string | null;
     };
@@ -164,6 +166,12 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                 <div className="flex flex-col gap-1">
                     <p className="text-[0.75rem] font-medium text-gray-light">Details</p>
                     <p className="text-sm whitespace-pre-line break-words">{data.session_description}</p>
+                </div>
+            )}
+            {!isLearnerViewer && data?.learner_goals_summary && (
+                <div className="flex flex-col gap-1">
+                    <p className="text-[0.75rem] font-medium text-gray-light">Learner&apos;s goals</p>
+                    <p className="text-sm whitespace-pre-line break-words">{data.learner_goals_summary}</p>
                 </div>
             )}
             {data?.preparation_details && (
