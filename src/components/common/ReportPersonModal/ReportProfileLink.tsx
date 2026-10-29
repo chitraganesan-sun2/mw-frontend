@@ -7,7 +7,8 @@ import { useConfirm } from "@/hooks/useConfirm";
 import { getApiErrorMessage } from "@/utils/apiError";
 import ReportPersonModal from "./index";
 
-const linkClass = "text-sm text-gray-600 underline bg-transparent border-0 p-0 cursor-pointer hover:text-black";
+// py-2 gives a phone-sized tap target (the text alone is ~20px tall).
+const linkClass = "text-sm text-gray-600 underline bg-transparent border-0 px-0 py-2 cursor-pointer hover:text-black";
 
 /** "Report" and "Block" for the bottom of a profile, with their dialogs. */
 const ReportProfileLink = ({
