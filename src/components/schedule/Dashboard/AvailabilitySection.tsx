@@ -250,7 +250,14 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
     const hasError = weekly.isError || (isVolunteer && oneTime.isError);
     const nothingScheduled = weeklyRows.length === 0 && (oneTime.data?.length ?? 0) === 0;
 
-    const renderSessionGroup = (title: string, sessions: ScheduleSession[], empty: string) => (
+    // Requests waiting on this user come first (stable sort keeps date order within each tier),
+    // so they are never hidden behind "Show all".
+    const awaitingFirst = (list: ScheduleSession[]) =>
+        [...list].sort((a, b) => Number(isAwaitingMyResponse(b, role)) - Number(isAwaitingMyResponse(a, role)));
+
+    const renderSessionGroup = (title: string, rawSessions: ScheduleSession[], empty: string) => {
+        const sessions = awaitingFirst(rawSessions);
+        return (
         <div className="flex flex-col gap-2">
             <h3 className="text-sm font-semibold">
                 {title} <span className="font-normal text-gray-500">({upcoming.data ? sessions.length : "…"})</span>
@@ -290,7 +297,8 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                 </>
             )}
         </div>
-    );
+        );
+    };
 
     return (
         <section aria-labelledby="availability-heading" className="bg-white rounded-xl p-4 flex flex-col gap-4 min-w-0">
