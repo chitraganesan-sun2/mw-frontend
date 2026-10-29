@@ -21,6 +21,8 @@ interface Props {
     date: string;
     /** The host's profile time zone - the time is entered and read in it. */
     tzIana: string | null;
+    /** The picker opens no earlier than this many hours from now. */
+    minNoticeHours: number;
     /** "HH:mm" (24h) or "" when nothing is chosen yet. */
     value: string;
     onChange: (time: string) => void;
@@ -32,18 +34,19 @@ interface Props {
  * Cancel/OK bar as the Instant Session request form (see CommitActionBar for why), so it opens on
  * a sensible time, OK always commits, and a click anywhere on the field opens it.
  */
-export default function WingTimeStartTimeField({ id, label, date, tzIana, value, onChange, error }: Props) {
+export default function WingTimeStartTimeField({ id, label, date, tzIana, minNoticeHours, value, onChange, error }: Props) {
     const [open, setOpen] = useState(false);
     const [draft, setDraft] = useState<dayjs.Dayjs | null>(null);
 
     const at = (isoish: string) => (tzIana ? dayjs.tz(isoish, tzIana) : dayjs(isoish));
     const committed = value && date ? at(`${date}T${value}`) : null;
-    // Opens on the current time of day (next 5 minutes), in the host's zone, on the chosen date -
-    // rather than an empty "-- : --" header with OK doing nothing.
+    // Opens on the earliest allowed time (now + the notice period, rounded up to 5 minutes), in the host's
+    // zone, rather than an empty "-- : --" header with OK doing nothing. On a later date it is that same
+    // time of day.
     const defaultDraft = () => {
-        const now = tzIana ? dayjs().tz(tzIana) : dayjs();
-        const rounded = now.add(5 - (now.minute() % 5), "minute").startOf("minute");
-        return at(`${date || now.format("YYYY-MM-DD")}T${rounded.format("HH:mm")}`);
+        const soonest = (tzIana ? dayjs().tz(tzIana) : dayjs()).add(minNoticeHours, "hour");
+        const rounded = soonest.add((5 - (soonest.minute() % 5)) % 5, "minute").startOf("minute");
+        return at(`${date || soonest.format("YYYY-MM-DD")}T${rounded.format("HH:mm")}`);
     };
 
     const commit = () => {

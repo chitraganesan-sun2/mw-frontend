@@ -23,7 +23,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const MAX_TAGS = 5;
-const MIN_NOTICE_HOURS = 24;
+const MIN_NOTICE_HOURS = 3;
 const MAX_DAYS_AHEAD = 60;
 
 // Same field styling as the other session forms (SessionFormFields).
@@ -45,14 +45,15 @@ type Errors = Partial<Record<"topic" | "description" | "date" | "time" | "materi
 export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLabel }: Props) {
     const tzIana = profileTimeZoneIana(tzLabel) || null;
     const nowInTz = tzIana ? dayjs().tz(tzIana) : dayjs();
-    const tomorrow = nowInTz.add(1, "day").format("YYYY-MM-DD");
+    // The earliest date a WingTime can start on: 3 hours from now (so late in the evening that is already tomorrow).
+    const earliestDate = nowInTz.add(MIN_NOTICE_HOURS, "hour").format("YYYY-MM-DD");
 
     const [topic, setTopic] = useState("");
     const [description, setDescription] = useState("");
-    // Opens on the earliest date a WingTime can be proposed for. Today never works (24 hours' notice),
-    // so that is tomorrow. Derived rather than stored so it is right whenever the form is opened.
+    // Opens on the earliest date a WingTime can be proposed for (normally today). Derived rather than
+    // stored so it is right whenever the form is opened.
     const [pickedDate, setDate] = useState("");
-    const date = pickedDate || tomorrow;
+    const date = pickedDate || earliestDate;
     const [time, setTime] = useState("");
     const [materialsChoice, setMaterialsChoice] = useState<"none" | "needed">("none");
     const [materials, setMaterials] = useState("");
@@ -85,13 +86,13 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         if (!topic.trim()) e.topic = "Please enter a topic.";
         if (!description.trim()) e.description = "Please describe the session.";
         if (!date) e.date = "Please choose a date.";
-        else if (date < tomorrow) e.date = "Please choose tomorrow or a later date.";
+        else if (date < earliestDate) e.date = "That date has passed. Please choose today or a later date.";
         if (!time) e.time = "Please choose a start time.";
         if (date && time && !e.date) {
-            // The same 24-hour / 60-day rule the server enforces, so the host hears it here first.
+            // The same 3-hour / 60-day rule the server enforces, so the host hears it here first.
             const start = tzIana ? dayjs.tz(`${date}T${time}`, tzIana) : dayjs(`${date}T${time}`);
             if (start.isBefore(dayjs().add(MIN_NOTICE_HOURS, "hour"))) {
-                e.time = "A WingTime needs at least 24 hours' notice. Please pick a later time.";
+                e.time = "A WingTime needs at least 3 hours' notice. Please pick a later time.";
             } else if (start.isAfter(dayjs().add(MAX_DAYS_AHEAD, "day"))) {
                 e.date = "A WingTime can be scheduled up to 60 days ahead. Please pick an earlier date.";
             }
@@ -130,7 +131,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         }
     };
 
-    const zone = tzLabel ? ` (${shortTimeZone(tzLabel, date || tomorrow)})` : "";
+    const zone = tzLabel ? ` (${shortTimeZone(tzLabel, date || earliestDate)})` : "";
 
     return (
         <CenterModal
@@ -190,7 +191,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                         id="wingtime-date"
                         type="date"
                         value={date}
-                        min={tomorrow}
+                        min={earliestDate}
                         required
                         aria-required="true"
                         aria-invalid={Boolean(errors.date)}
@@ -209,6 +210,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                     label={`${SESSION_FIELD_LABELS.startTime}${zone}`}
                     date={date}
                     tzIana={tzIana}
+                    minNoticeHours={MIN_NOTICE_HOURS}
                     value={time}
                     error={errors.time}
                     onChange={(value) => {
