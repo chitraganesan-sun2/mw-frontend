@@ -10,6 +10,11 @@ export const DECLINE_REASONS: { value: DeclineReasonCode; pickerLabel: string; s
     { value: "other", pickerLabel: "Something else", shownLabel: "Another reason" },
 ];
 
+// Reasons the system records itself (never sent by a person), shown the same way.
+const SYSTEM_REASON_LABELS: Record<string, string> = {
+    no_response: "No answer in time",
+};
+
 /** The body fields for declining: nothing when no reason was picked, and a note only with a reason. */
 export function buildDeclinePayload(reason: string, note: string): { decline_reason?: DeclineReasonCode; decline_note?: string } {
     const match = DECLINE_REASONS.find((r) => r.value === reason);
@@ -21,8 +26,8 @@ export function buildDeclinePayload(reason: string, note: string): { decline_rea
 /** "Scheduling conflict - back next week" for a declined session, or null when nothing was said
  *  (or the code is one this version doesn't know). */
 export function declineReasonText(code?: string | null, note?: string | null): string | null {
-    const match = DECLINE_REASONS.find((r) => r.value === code);
-    if (!match) return null;
+    const label = DECLINE_REASONS.find((r) => r.value === code)?.shownLabel ?? (code && Object.hasOwn(SYSTEM_REASON_LABELS, code) ? SYSTEM_REASON_LABELS[code] : undefined);
+    if (!label) return null;
     const extra = (note ?? "").trim();
-    return extra ? `${match.shownLabel} - ${extra}` : match.shownLabel;
+    return extra ? `${label} - ${extra}` : label;
 }
