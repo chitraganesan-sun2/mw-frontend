@@ -1,3 +1,34 @@
+# Release notes — v1.6.0 (versionCode 11)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.6.0
+
+• Volunteers can pause new requests or limit how many wait at once
+• Add a reason when declining a request; the other person sees it
+• Booking greys out times that overlap your own sessions
+• Block or report a person, message or session
+• Quicker, optional feedback questions after a session
+• Faster, smoother screens and stability improvements
+```
+
+---
+
+## Internal changelog — what 1.6.0 contains
+
+Covers everything since 1.5.0, built from `main@4c227163`.
+
+- Decline reason, request pause/cap, "No answer in time" notices, goals in the approval drawer, "no open times" note
+- Block a member (Settings to manage), report a person / message / session
+- Feedback v2 (one-tap questions), bell panel outcomes, wrong-date booking fix
+- Big dependency upgrade: Next 16, React 19, MUI 9, antd 6 - **smoke-test on a device** (login, booking, pickers, modals)
+- WingTime screens exist but stay hidden (flag off)
+- Needs the matching backend live (deployed 2026-10-29)
+- Version bumped: `android/app/build.gradle` versionCode 11 / versionName 1.6.0, `.env.mobile` 1.6.0
+
+---
+
 # Release notes — v1.5.0 (versionCode 10)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
