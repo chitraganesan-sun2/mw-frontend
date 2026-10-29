@@ -531,6 +531,7 @@ const Messages = () => {
                                             })}
                                             date={message.created_at}
                                             isOwnMessage={message.sender_id === volunteerId}
+                                            messageId={message.message_id}
                                             userImage={
                                                 message.sender_id === volunteerId
                                                     ? message.volunteer_profile_picture

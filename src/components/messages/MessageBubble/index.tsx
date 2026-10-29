@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { safeImageSrc } from "@/utils/safeHref";
 import { useAppStore } from "@/store/useAppStore";
 import { formatProfileTimestamp } from "@/utils/sessionDisplay";
+import ReportPersonModal from "@/components/common/ReportPersonModal";
 
 interface MessageBubbleProps {
     message: string;
@@ -11,6 +12,8 @@ interface MessageBubbleProps {
     date: string;
     isOwnMessage: boolean;
     userImage?: string;
+    /** The saved message's id. Incoming messages that have one can be reported. */
+    messageId?: string;
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
@@ -19,8 +22,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     date,
     isOwnMessage,
     userImage: rawUserImage,
+    messageId,
 }) => {
     const { volunteerDetails, learnerDetails } = useAppStore();
+    const [isReportOpen, setIsReportOpen] = useState(false);
     // Only render avatars next/image can load - a bad URL would throw and crash the chat.
     const userImage = safeImageSrc(rawUserImage);
 
@@ -71,6 +76,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                                 : "text-[#4F4F4F] md:text-gray-500"
                         }`}
                     >
+                        {!isOwnMessage && messageId && (
+                            <button
+                                type="button"
+                                onClick={() => setIsReportOpen(true)}
+                                aria-label="Report this message"
+                                className="underline bg-transparent border-0 p-0 cursor-pointer"
+                            >
+                                Report
+                            </button>
+                        )}
                         <span>{formattedMessageTime}</span>
                     </div>
                 </div>
@@ -82,6 +97,14 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                     </div>
                 )}
             </div>
+            {messageId && !isOwnMessage && (
+                <ReportPersonModal
+                    isOpen={isReportOpen}
+                    onClose={() => setIsReportOpen(false)}
+                    reportType="message"
+                    targetId={messageId}
+                />
+            )}
         </div>
     );
 };

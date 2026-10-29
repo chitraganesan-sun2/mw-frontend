@@ -1,6 +1,8 @@
 "use client";
+import { useState } from "react";
 import dayjs from "dayjs";
 import { HiOutlineArrowDownTray } from "react-icons/hi2";
+import ReportPersonModal from "@/components/common/ReportPersonModal";
 import { endpoints } from "@/api/constants";
 import { downloadFile } from "@/utils/downloadFile";
 import { isNativePlatform } from "@/utils/platform";
@@ -73,6 +75,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     onReschedule,
     now = dayjs(),
 }) => {
+    const [isReportOpen, setIsReportOpen] = useState(false);
     const { date, start, end } = localTimes(session, role);
     // Absolute instants (from the UTC fields) for the Join decision - the local fields are in
     // the PROFILE timezone, which can differ from the browser's.
@@ -101,6 +104,8 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
         session.status === "accepted" &&
         !session.reschedule_pending &&
         Boolean(bounds && bounds.start.isAfter(now));
+    // Only a session that was actually arranged has another person to report.
+    const canReport = Boolean(session.session_id) && (session.status === "accepted" || session.status === "completed");
     const isRescheduleRequest = session.status === "pending" && Boolean(session.reschedules_session_id);
     // A request nobody answered before its time passed is "Expired", not still "Pending".
     const statusKey = session.status === "pending" && bounds && !bounds.end.isAfter(now) ? "expired" : session.status;
@@ -189,8 +194,18 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 </p>
             )}
 
-            {(joinStatus !== "none" || showRespond || canReschedule || (!isNativePlatform() && session.status === "accepted")) && (
+            {(joinStatus !== "none" || showRespond || canReschedule || canReport || (!isNativePlatform() && session.status === "accepted")) && (
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pt-0.5">
+                    {canReport && (
+                        <button
+                            type="button"
+                            onClick={() => setIsReportOpen(true)}
+                            aria-label={`Report a problem with ${session.session_title || "this session"}`}
+                            className="text-xs font-medium text-gray-600 underline-offset-2 hover:underline hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
+                        >
+                            Report a problem
+                        </button>
+                    )}
                     {canReschedule && (
                         <button
                             type="button"
@@ -232,6 +247,14 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                     )}
                     <JoinButton state={joinStatus} href={joinHref} contextLabel={session.session_title || "session"} />
                 </div>
+            )}
+            {isReportOpen && (
+                <ReportPersonModal
+                    isOpen
+                    onClose={() => setIsReportOpen(false)}
+                    reportType="session"
+                    targetId={session.session_id}
+                />
             )}
         </article>
     );

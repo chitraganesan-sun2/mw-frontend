@@ -28,6 +28,7 @@ import { safeImageSrc } from "@/utils/safeHref";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 import { joinNames } from "@/utils/joinNames";
+import ReportProfileLink from "@/components/common/ReportPersonModal/ReportProfileLink";
 
 const ProfileHeader = ({
     text,
@@ -686,6 +687,14 @@ const LearnerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose }
                     />
                     <Divider className="max-md:hidden" />
                     <ProfileInfo text={text} learnerData={learnerData} />
+                    <ReportProfileLink
+                        userId={learnerId}
+                        roleLabel="learner"
+                        name={joinNames(
+                            learnerData?.learner_personal_info?.learner_first_name,
+                            learnerData?.learner_personal_info?.learner_last_name
+                        )}
+                    />
                     <Divider className="max-md:hidden" />
                     <TabButtons
                         activeTab={activeTab}

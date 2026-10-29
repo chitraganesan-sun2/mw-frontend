@@ -29,6 +29,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosArrowBack } from "react-icons/io";
 import { joinNames } from "@/utils/joinNames";
+import ReportProfileLink from "@/components/common/ReportPersonModal/ReportProfileLink";
 import { safeImageSrc } from "@/utils/safeHref";
 import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
@@ -580,6 +581,11 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
                     />
                     <Divider className="max-md:hidden" />
                     <ProfileInfo text={text} volunteerData={volunteerData} />
+                    <ReportProfileLink
+                        userId={volunteerId}
+                        roleLabel="volunteer"
+                        name={joinNames(volunteerData?.volunteer_first_name, volunteerData?.volunteer_last_name)}
+                    />
                     <Divider className="max-md:hidden" />
                     <TabButtons
                         activeTab={activeTab}
