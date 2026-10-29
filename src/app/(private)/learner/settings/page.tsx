@@ -12,6 +12,7 @@ import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { showToast } from "@/components/common/Toast";
 
 const SESSION_MATCH_OPTIONS = [
@@ -55,6 +56,8 @@ const Settings = () => {
         useState<SessionMatchValue>("all_sessions");
     const [pushEnabled, setPushEnabled] = useState(true);
     const [isPushLoading, setIsPushLoading] = useState(false);
+    // WingTime announcements are opt-in: off until the learner (or their guardian) turns them on.
+    const [wingTimeEnabled, setWingTimeEnabled] = useState(false);
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
     const learnerId = getCookie("learner_id");
@@ -96,6 +99,17 @@ const Settings = () => {
         });
     };
 
+    const handleWingTimePreferenceChange = (value: boolean) => {
+        const previous = wingTimeEnabled;
+        setWingTimeEnabled(value);
+        PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
+            wingtime_notifications_enabled: value,
+        }).catch((err) => {
+            setWingTimeEnabled(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
+        });
+    };
+
     useEffect(() => {
         setHeaderOptions({
             title: "Settings",
@@ -118,6 +132,7 @@ const Settings = () => {
                 if (typeof res.data?.push_notifications_enabled === "boolean") {
                     setPushEnabled(res.data.push_notifications_enabled);
                 }
+                setWingTimeEnabled(res.data?.wingtime_notifications_enabled === true);
             })
             .catch((err) => {
                 showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't load your settings. Please try again.") });
@@ -179,6 +194,26 @@ const Settings = () => {
                         className="w-fit [&.ant-switch-checked]:bg-action"
                     />
                 </div>
+
+                {WINGTIME_ENABLED && (
+                    <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full md:border-t md:border-gray-100 md:pt-5">
+                        <div className="flex flex-col gap-2">
+                            <p id="wingtime-notifications-label" className="md:text-base text-[14px] font-medium">
+                                WingTime Announcements
+                            </p>
+                            <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
+                                Get a notification when a volunteer opens a new WingTime group session in your country. Off unless you turn it on.
+                            </p>
+                        </div>
+                        <Switch
+                            aria-labelledby="wingtime-notifications-label"
+                            checked={wingTimeEnabled}
+                            loading={isLoading}
+                            onChange={(value) => handleWingTimePreferenceChange(value)}
+                            className="w-fit [&.ant-switch-checked]:bg-action"
+                        />
+                    </div>
+                )}
 
                 <div className="flex flex-col md:flex-row bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full md:border-t md:border-gray-100 md:pt-5">
                     <div className="flex flex-col gap-2">

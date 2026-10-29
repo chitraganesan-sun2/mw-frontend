@@ -115,6 +115,7 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
             case "wingtime_rejected":
             case "wingtime_cancelled":
             case "wingtime_reminder":
+            case "wingtime_announced":
                 router.push(`/${role}/wingtime`);
                 break;
             default:
