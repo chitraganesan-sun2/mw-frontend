@@ -39,7 +39,9 @@ const TutorialLinks = () => {
         setRole(getCookie("role"));
     }, []);
 
-    const { data: links = [], isLoading } = useQuery<TutorialLink[]>({
+    // isPending (not isLoading): the server never fetches, so isLoading is false there and the
+    // server would render nothing while the client's first render shows the skeleton.
+    const { data: links = [], isPending } = useQuery<TutorialLink[]>({
         queryKey: ["tutorial-links"],
         queryFn: async () => {
             const res = await GET_API(endpoints.tutorialLinks.getAll);
@@ -59,7 +61,7 @@ const TutorialLinks = () => {
         };
     }, [links, role]);
 
-    if (isLoading) return (
+    if (isPending) return (
         <div className="bg-white rounded-2xl p-5 shadow-sm animate-pulse">
             <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
             <div className="h-10 bg-gray-100 rounded-xl" />

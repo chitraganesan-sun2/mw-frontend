@@ -472,6 +472,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     <AvailabilityField
                         slots={upcoming.slots}
                         value={formData.selected_slot || ""}
+                        selectedDate={formData.select_date}
                         onChange={handleSlotSelection}
                         isLoading={upcoming.isLoading}
                         isError={upcoming.isError}

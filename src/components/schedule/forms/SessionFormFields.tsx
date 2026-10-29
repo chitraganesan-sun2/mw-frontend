@@ -17,6 +17,7 @@ import { endpoints } from "@/api/constants";
 import { Input } from "@/components/common/Input";
 import { showToast } from "@/components/common/Toast";
 import { formatSessionDate, formatSessionTime, shortTimeZone } from "@/utils/sessionDisplay";
+import { selectedSlotKey, slotOptionKey } from "@/utils/slotOptionKey";
 import type { UpcomingSlot } from "@/hooks/schedule/useUpcomingSlots";
 
 export type SessionCategory = "academic" | "non_academic";
@@ -376,6 +377,7 @@ export function formatSlotOption(slot: UpcomingSlot, timeZoneLabel?: string): st
 export function AvailabilityField({
     slots,
     value,
+    selectedDate,
     onChange,
     isLoading,
     isError,
@@ -384,7 +386,9 @@ export function AvailabilityField({
     error,
 }: {
     slots: UpcomingSlot[];
+    /** volunteer_slot_id of the pick - shared by every date of a weekly slot, so pair it with selectedDate. */
     value: string;
+    selectedDate?: string;
     onChange: (slot: UpcomingSlot | null) => void;
     isLoading: boolean;
     isError: boolean;
@@ -404,13 +408,13 @@ export function AvailabilityField({
             </label>
             <select
                 id="session-availability"
-                value={value}
+                value={selectedSlotKey(selectedDate, value)}
                 required
                 aria-required="true"
                 aria-invalid={Boolean(error)}
                 aria-describedby={error ? "session-availability-error" : status ? "session-availability-status" : undefined}
                 disabled={isLoading || isError || slots.length === 0}
-                onChange={(e) => onChange(slots.find((s) => s.volunteer_slot_id === e.target.value) ?? null)}
+                onChange={(e) => onChange(slots.find((s) => slotOptionKey(s) === e.target.value) ?? null)}
                 className={`w-full h-12 px-4 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 ${
                     error ? "border-red-600" : "border-gray-200"
                 }`}
@@ -419,7 +423,7 @@ export function AvailabilityField({
                     {isLoading ? "Loading..." : "Select a time"}
                 </option>
                 {slots.map((slot) => (
-                    <option key={`${slot.date}-${slot.volunteer_slot_id}`} value={slot.volunteer_slot_id}>
+                    <option key={slotOptionKey(slot)} value={slotOptionKey(slot)}>
                         {formatSlotOption(slot, timeZoneLabel)}
                     </option>
                 ))}
