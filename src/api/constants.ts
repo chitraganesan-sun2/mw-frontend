@@ -68,6 +68,7 @@ export const endpoints: EndpointProps = {
         getConnectedLearners: (id: string) => `volunteers/${id}/connected_learners`,
         getTotalVolunteersHours: "volunteers/total_volunteered_hours",
         emailPreference: (id: string) => `volunteers/${id}/email_preference`,
+        requestPreferences: (id: string) => `volunteers/${id}/request_preferences`,
         matchTrigger: "volunteers/match/trigger",
         matchHistory: "volunteers/match",
         matchWithLearner: (learnerId: string) => `volunteers/match/with/${learnerId}`,

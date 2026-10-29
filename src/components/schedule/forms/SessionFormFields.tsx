@@ -384,6 +384,7 @@ export function AvailabilityField({
     onRetry,
     timeZoneLabel,
     error,
+    unavailableReason,
 }: {
     slots: UpcomingSlot[];
     /** volunteer_slot_id of the pick - shared by every date of a weekly slot, so pair it with selectedDate. */
@@ -395,10 +396,13 @@ export function AvailabilityField({
     onRetry: () => void;
     timeZoneLabel?: string;
     error?: string | null;
+    /** Set when the volunteer has paused new requests or is at their limit - shown instead of the times. */
+    unavailableReason?: string | null;
 }) {
     let status: string | null = null;
     if (isLoading) status = "Loading available times...";
     else if (isError) status = "Couldn't load available times.";
+    else if (unavailableReason) status = unavailableReason;
     else if (slots.length === 0) status = "This volunteer has no open times in the next few weeks.";
     else if (slots.every((s) => s.conflicts_with_my_schedule))
         status = "All of this volunteer's open times overlap sessions you already have.";

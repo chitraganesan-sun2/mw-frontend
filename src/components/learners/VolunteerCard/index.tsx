@@ -26,6 +26,7 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
     overallRating,
     chatPermission,
     hasTimeSlots,
+    acceptingRequests,
     skillsToLearn,
 }) => {
     const router = useRouter();
@@ -115,7 +116,11 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                 (hasTimeSlots). An explicit false replaces it with a note saying why there is no
                 button; undefined callers keep both buttons. */}
             <div className="flex items-center gap-2">
-                {hasTimeSlots !== false ? (
+                {acceptingRequests === false ? (
+                    <p className="flex-1 text-center text-xs text-gray-600" title="This volunteer isn't taking new requests right now. You can still message them.">
+                        Not taking new requests right now
+                    </p>
+                ) : hasTimeSlots !== false ? (
                     <div className="flex-1">
                         <Button
                             onClick={handleScheduleMeeting}

@@ -481,6 +481,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                         isLoading={upcoming.isLoading}
                         isError={upcoming.isError}
                         onRetry={() => upcoming.refetch()}
+                        unavailableReason={upcoming.unavailableReason}
                         timeZoneLabel={profileTimeZone}
                         error={errors.selected_slot || errors.select_date}
                     />

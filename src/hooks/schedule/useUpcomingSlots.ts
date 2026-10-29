@@ -30,7 +30,14 @@ export function useUpcomingSlots(
         queryKey: ["available-slots", "upcoming", volunteerId, excludeSessionId ?? null],
         queryFn: async () => {
             const res: any = await GET_API(endpoints.volunteer_slot.upcomingSlots(volunteerId as string, excludeSessionId));
-            return (Array.isArray(res?.data?.slots) ? res.data.slots : []) as UpcomingSlot[];
+            return {
+                slots: (Array.isArray(res?.data?.slots) ? res.data.slots : []) as UpcomingSlot[],
+                // Set only when the volunteer has paused new requests or is at their limit.
+                unavailableReason:
+                    res?.data?.accepting_requests === false && typeof res?.data?.unavailable_reason === "string"
+                        ? (res.data.unavailable_reason as string)
+                        : null,
+            };
         },
         enabled: Boolean(volunteerId),
         staleTime: 30 * 1000,
@@ -38,8 +45,8 @@ export function useUpcomingSlots(
 
     const slots = useMemo(() => {
         const now = profileNow(profileTimeZone).format("YYYY-MM-DD HH:mm");
-        return (query.data ?? []).filter((s) => `${s.date} ${s.start_time}` > now);
+        return (query.data?.slots ?? []).filter((s) => `${s.date} ${s.start_time}` > now);
     }, [query.data, profileTimeZone]);
 
-    return { ...query, slots };
+    return { ...query, slots, unavailableReason: query.data?.unavailableReason ?? null };
 }

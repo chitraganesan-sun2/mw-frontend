@@ -50,6 +50,7 @@ export type EndpointProps = {
         getConnectedLearners: (id: string) => string;
         getTotalVolunteersHours: string;
         emailPreference: (id: string) => string;
+        requestPreferences: (id: string) => string;
         matchTrigger: string;
         matchHistory: string;
         matchWithLearner: (learnerId: string) => string;
