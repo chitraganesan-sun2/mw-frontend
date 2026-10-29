@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { buildFeedbackPayload } from "@/utils/feedbackForm";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import FeedbackModal from "@/components/schedule/Modals/FeedbackModal";
 import LearnerScheduleModal from "@/components/schedule/Modals/LearnerScheduleModal";
@@ -92,11 +93,7 @@ export default function LearnerSchedulePage() {
     };
 
     const handleSubmitFeedback = async (formData: any) => {
-        const payload = {
-            comment: formData?.notes,
-            volunteer_commitment_level: formData?.rating || 0,
-            ...eventDetails,
-        };
+        const payload = buildFeedbackPayload("learner", formData, eventDetails);
         return await POST_API(endpoints.learnerFeedback.create, payload);
     };
 

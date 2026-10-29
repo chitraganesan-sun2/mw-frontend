@@ -8,17 +8,6 @@ export const alertModalConstants = {
 
 export const LearnerFeedbackFormConstants: FormField[] = [
     {
-        name: "classDuration",
-        label: "How long was the session?",
-        inputType: "number",
-        contentType: "number",
-        placeholder: "Enter the duration of the session",
-        sublabel: "(In hrs)",
-        sublabelAlignment: "right",
-        min: 0,
-        inputClassName: "!bg-white",
-    },
-    {
         name: "rating",
         label: "Focus / interest level of the learner",
         inputType: "radio",
