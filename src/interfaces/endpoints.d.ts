@@ -166,6 +166,11 @@ export type EndpointProps = {
     report: {
         create: string;
     };
+    blocks: {
+        list: string;
+        create: string;
+        remove: (userId: string) => string;
+    };
     media_uploader: {
         image: string;
         video: string;
