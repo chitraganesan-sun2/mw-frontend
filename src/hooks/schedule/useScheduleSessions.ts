@@ -40,6 +40,9 @@ export interface ScheduleSession {
     reschedules_session_id?: string | null;
     /** This accepted session already has a reschedule request waiting for an answer. */
     reschedule_pending?: boolean | null;
+    /** Why the other person declined, when they said (preset code + optional short note). */
+    decline_reason?: string | null;
+    decline_note?: string | null;
     /** Participants' profile time zone labels (e.g. "PST - Pacific Standard Time (UTC-08:00)"). */
     learner_timezone?: string | null;
     volunteer_timezone?: string | null;

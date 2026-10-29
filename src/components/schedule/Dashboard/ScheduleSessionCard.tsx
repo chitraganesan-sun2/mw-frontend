@@ -3,6 +3,7 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { HiOutlineArrowDownTray } from "react-icons/hi2";
 import ReportPersonModal from "@/components/common/ReportPersonModal";
+import { declineReasonText } from "@/utils/declineReason";
 import { endpoints } from "@/api/constants";
 import { downloadFile } from "@/utils/downloadFile";
 import { isNativePlatform } from "@/utils/platform";
@@ -106,6 +107,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
         Boolean(bounds && bounds.start.isAfter(now));
     // Only a session that was actually arranged has another person to report.
     const canReport = Boolean(session.session_id) && (session.status === "accepted" || session.status === "completed");
+    const declinedBecause = declineReasonText(session.decline_reason, session.decline_note);
     const isRescheduleRequest = session.status === "pending" && Boolean(session.reschedules_session_id);
     // A request nobody answered before its time passed is "Expired", not still "Pending".
     const statusKey = session.status === "pending" && bounds && !bounds.end.isAfter(now) ? "expired" : session.status;
@@ -176,6 +178,12 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
             )}
             {session.status === "accepted" && session.reschedule_pending && (
                 <p className="text-xs font-medium text-amber-700">Reschedule requested – waiting for an answer</p>
+            )}
+            {session.status === "rejected" && declinedBecause && (
+                <p className="text-xs text-gray-700 break-words">
+                    <span className="font-medium">Reason: </span>
+                    {declinedBecause}
+                </p>
             )}
 
             {showDescription && (
