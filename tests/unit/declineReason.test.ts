@@ -43,3 +43,15 @@ test("every preset has both a picker label and a reader label", () => {
     }
     assert.equal(new Set(DECLINE_REASONS.map((r) => r.value)).size, DECLINE_REASONS.length);
 });
+
+test("a request that expired without an answer reads as such, and is not a choice in the picker", () => {
+    assert.equal(declineReasonText("no_response", null), "No answer in time");
+    assert.ok(!DECLINE_REASONS.some((r) => r.value === ("no_response" as never)));
+    assert.deepEqual(buildDeclinePayload("no_response", "x"), {});   // a client can't send it
+});
+
+test("object-prototype names are not treated as known reasons", () => {
+    for (const code of ["constructor", "toString", "__proto__", "hasOwnProperty"]) {
+        assert.equal(declineReasonText(code, "x"), null);
+    }
+});
