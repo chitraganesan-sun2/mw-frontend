@@ -14,6 +14,8 @@ import {
     SettingIcon,
     InstantSessionIcon,
 } from "@/assets/icons";
+import { MdOutlineGroups } from "react-icons/md";
+import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { getCookie } from "@/utils/auth";
 import Link from "next/link";
 import InnerWidth from "@/utils/innerWidth";
@@ -39,6 +41,11 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
         text: "Instant Sessions",
         icon: <InstantSessionIcon />,
     };
+
+    // WingTime - volunteer-led group sessions; only shown where the feature is switched on.
+    const wingTimeLinks = WINGTIME_ENABLED
+        ? [{ href: "/wingtime", text: "WingTime", icon: <MdOutlineGroups size={22} /> }]
+        : [];
 
     const baseLinksData = [
         {
@@ -89,7 +96,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     // Combine all links in the desired order
     // For both roles: My Schedule (the landing dashboard), Instant Sessions, Role-based link,
     // Resources, Community, Messages, Settings
-    const linksData = [...baseLinksData, instantSessionsLink, roleBasedLink, ...remainingLinks];
+    const linksData = [...baseLinksData, instantSessionsLink, ...wingTimeLinks, roleBasedLink, ...remainingLinks];
 
     const handleSignOut = () => signOut();
 

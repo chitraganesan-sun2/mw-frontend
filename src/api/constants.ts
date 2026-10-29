@@ -16,6 +16,16 @@ type CommonPath =
     | (string & {});
 
 export const endpoints: EndpointProps = {
+    // The collection route has a trailing slash on purpose: without it the backend answers with a
+    // redirect to an http:// URL, which a browser on an https page refuses to follow.
+    wingtime: {
+        base: "wingtime/",
+        hosted: "wingtime/hosted",
+        myRegistrations: "wingtime/my-registrations",
+        item: (id: string) => `wingtime/${id}`,
+        register: (id: string) => `wingtime/${id}/register`,
+        cancel: (id: string) => `wingtime/${id}/cancel`,
+    },
     profileChanges: {
         mine: "profile-changes/mine",
         submit: (role: "volunteer" | "learner") => `profile-changes/${role}`,

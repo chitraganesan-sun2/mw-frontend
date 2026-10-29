@@ -1,6 +1,14 @@
 import { create } from "zustand";
 
 export type EndpointProps = {
+    wingtime: {
+        base: string;
+        hosted: string;
+        myRegistrations: string;
+        item: (id: string) => string;
+        register: (id: string) => string;
+        cancel: (id: string) => string;
+    };
     profileChanges: {
         mine: string;
         submit: (role: "volunteer" | "learner") => string;
