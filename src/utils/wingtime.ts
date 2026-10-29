@@ -1,7 +1,14 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { formatSessionWhen, joinState, profileTimeZoneIana, zoneAbbreviation } from "@/utils/sessionDisplay";
+import {
+    formatSessionWhen,
+    getStatusLabel,
+    getStatusPillClass,
+    joinState,
+    profileTimeZoneIana,
+    zoneAbbreviation,
+} from "@/utils/sessionDisplay";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -41,16 +48,17 @@ export interface WingTimePage {
     size: number;
 }
 
+// Same words as the session status pills (sessionDisplay): Pending, Declined, Cancelled, Completed.
 export const WINGTIME_STATUS_LABEL: Record<WingTimeStatus, string> = {
-    pending_approval: "Pending approval",
+    pending_approval: "Pending",
     approved: "Approved",
-    rejected: "Not approved",
+    rejected: "Declined",
     cancelled: "Cancelled",
     completed: "Completed",
 };
 
 // Same palette rules as the session status pills: no blue or orange (those mean Learner and
-// Volunteer), and not-approved / cancelled use a muted rose rather than the error red.
+// Volunteer), and declined / cancelled use a muted rose rather than the error red.
 export const WINGTIME_STATUS_PILL: Record<WingTimeStatus, string> = {
     pending_approval: "!bg-yellow-100 !text-yellow-900",
     approved: "!bg-emerald-100 !text-emerald-800",
@@ -92,4 +100,21 @@ export function wingtimeJoinState(w: WingTime, now?: dayjs.Dayjs) {
 export function spotsText(w: Pick<WingTime, "spots_left" | "capacity">): string {
     if (w.spots_left <= 0) return "Full";
     return w.spots_left === 1 ? "1 spot left" : `${w.spots_left} spots left`;
+}
+
+/**
+ * The status pill a viewer sees, in the app's one status vocabulary (sessionDisplay): a host sees
+ * where their proposal stands; a learner sees Available / Booked / Cancelled (or Full).
+ */
+export function wingtimePill(w: WingTime): { label: string; className: string } {
+    if (w.status === "cancelled") return { label: "Cancelled", className: getStatusPillClass("cancelled") };
+    if (w.is_host) return { label: WINGTIME_STATUS_LABEL[w.status], className: WINGTIME_STATUS_PILL[w.status] };
+    if (w.is_registered) return { label: getStatusLabel("booked"), className: getStatusPillClass("booked") };
+    if (w.spots_left <= 0) return { label: "Full", className: getStatusPillClass("expired") };
+    return { label: getStatusLabel("available"), className: getStatusPillClass("available") };
+}
+
+/** Can the host still cancel it? (proposed or approved, and not started yet) */
+export function canHostCancel(w: Pick<WingTime, "status" | "start_utc">, now: dayjs.Dayjs = dayjs()): boolean {
+    return (w.status === "pending_approval" || w.status === "approved") && dayjs.utc(w.start_utc).isAfter(now);
 }

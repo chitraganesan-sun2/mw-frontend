@@ -2,17 +2,35 @@
 
 import React, { useState } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { showToast } from "@/components/common/Toast";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { shortTimeZone } from "@/utils/sessionDisplay";
-import { useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
+import { profileTimeZoneIana, shortTimeZone } from "@/utils/sessionDisplay";
+import {
+    FieldError,
+    PillGroup,
+    SESSION_FIELD_LABELS,
+    SessionDetailsField,
+    labelClass,
+} from "@/components/schedule/forms/SessionFormFields";
+import WingTimeStartTimeField from "@/components/wingtime/WingTimeStartTimeField";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const MAX_TAGS = 5;
-const inputClass =
-    "w-full rounded-xl border border-gray-300 px-3 py-3 text-base text-gray-900 outline-none focus:border-black";
+const MIN_NOTICE_HOURS = 24;
+const MAX_DAYS_AHEAD = 60;
+
+// Same field styling as the other session forms (SessionFormFields).
+const inputClass = (error?: string) =>
+    `w-full h-12 px-4 border rounded-xl outline-none hover:border-gray-400 focus:border-black transition-colors bg-white text-base text-[#121212] ${
+        error ? "border-red-600" : "border-gray-200"
+    }`;
 
 interface Props {
     isOpen: boolean;
@@ -24,48 +42,16 @@ interface Props {
 
 type Errors = Partial<Record<"topic" | "description" | "date" | "time" | "materials" | "capacity" | "tags", string>>;
 
-function Field({
-    id,
-    label,
-    error,
-    hint,
-    children,
-}: {
-    id: string;
-    label: string;
-    error?: string;
-    hint?: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex flex-col gap-2">
-            <label htmlFor={id} className="text-base font-medium text-[#121212]">
-                {label}
-            </label>
-            {children}
-            {hint && !error && (
-                <p id={`${id}-hint`} className="text-xs text-gray-600">
-                    {hint}
-                </p>
-            )}
-            {error && (
-                <p id={`${id}-error`} role="alert" className="text-sm text-red-700">
-                    {error}
-                </p>
-            )}
-        </div>
-    );
-}
-
 export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLabel }: Props) {
-    const today = useProfileToday("volunteer");
-    const tomorrow = dayjs(today).add(1, "day").format("YYYY-MM-DD");
+    const tzIana = profileTimeZoneIana(tzLabel) || null;
+    const nowInTz = tzIana ? dayjs().tz(tzIana) : dayjs();
+    const tomorrow = nowInTz.add(1, "day").format("YYYY-MM-DD");
 
     const [topic, setTopic] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
-    const [needsMaterials, setNeedsMaterials] = useState(false);
+    const [materialsChoice, setMaterialsChoice] = useState<"none" | "needed">("none");
     const [materials, setMaterials] = useState("");
     const [capacity, setCapacity] = useState("10");
     const [tagsText, setTagsText] = useState("");
@@ -77,7 +63,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         setDescription("");
         setDate("");
         setTime("");
-        setNeedsMaterials(false);
+        setMaterialsChoice("none");
         setMaterials("");
         setCapacity("10");
         setTagsText("");
@@ -93,16 +79,25 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
 
     const validate = (): Errors => {
         const e: Errors = {};
-        if (!topic.trim()) e.topic = "Enter a topic.";
-        if (!description.trim()) e.description = "Describe what you'll do.";
-        if (!date) e.date = "Choose a date.";
-        else if (date < tomorrow) e.date = "Choose tomorrow or a later date - a WingTime needs at least 24 hours' notice.";
-        if (!time) e.time = "Choose a start time.";
-        if (needsMaterials && !materials.trim()) e.materials = "List the materials, or choose “No materials needed”.";
+        if (!topic.trim()) e.topic = "Please enter a topic.";
+        if (!description.trim()) e.description = "Please describe the session.";
+        if (!date) e.date = "Please choose a date.";
+        else if (date < tomorrow) e.date = "Please choose tomorrow or a later date.";
+        if (!time) e.time = "Please choose a start time.";
+        if (date && time && !e.date) {
+            // The same 24-hour / 60-day rule the server enforces, so the host hears it here first.
+            const start = tzIana ? dayjs.tz(`${date}T${time}`, tzIana) : dayjs(`${date}T${time}`);
+            if (start.isBefore(dayjs().add(MIN_NOTICE_HOURS, "hour"))) {
+                e.time = "A WingTime needs at least 24 hours' notice. Please pick a later time.";
+            } else if (start.isAfter(dayjs().add(MAX_DAYS_AHEAD, "day"))) {
+                e.date = "A WingTime can be scheduled up to 60 days ahead. Please pick an earlier date.";
+            }
+        }
+        if (materialsChoice === "needed" && !materials.trim()) e.materials = "Please list the materials.";
         const cap = Number(capacity);
-        if (!Number.isInteger(cap) || cap < 1 || cap > 50) e.capacity = "Enter a whole number from 1 to 50.";
-        if (tags.length > MAX_TAGS) e.tags = `Use at most ${MAX_TAGS} topics.`;
-        if (tags.some((t) => t.length > 30)) e.tags = "Each topic must be 30 characters or fewer.";
+        if (!Number.isInteger(cap) || cap < 1 || cap > 50) e.capacity = "Please enter a number from 1 to 50.";
+        if (tags.length > MAX_TAGS) e.tags = `Please use at most ${MAX_TAGS} topics.`;
+        else if (tags.some((t) => t.length > 30)) e.tags = "Each topic must be 30 characters or fewer.";
         return e;
     };
 
@@ -117,7 +112,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                 description: description.trim(),
                 date,
                 start_time: time,
-                materials: needsMaterials ? materials.trim() : "None",
+                materials: materialsChoice === "needed" ? materials.trim() : "None",
                 capacity: Number(capacity),
                 tags,
             });
@@ -132,9 +127,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         }
     };
 
-    const described = (id: string, hasHint = false) =>
-        errors[id as keyof Errors] ? `${id}-error` : hasHint ? `${id}-hint` : undefined;
-    const zoneNote = tzLabel ? ` (${shortTimeZone(tzLabel, date || tomorrow)})` : "";
+    const zone = tzLabel ? ` (${shortTimeZone(tzLabel, date || tomorrow)})` : "";
 
     return (
         <CenterModal
@@ -153,121 +146,158 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
             bodyClassName="!px-6 !py-[20px]"
         >
             <div className="flex flex-col gap-5">
-                <Field id="wt-topic" label="Topic *" error={errors.topic}>
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="wingtime-topic" className={labelClass}>
+                        Topic <span aria-hidden="true">*</span>
+                    </label>
                     <input
-                        id="wt-topic"
+                        id="wingtime-topic"
                         value={topic}
                         maxLength={120}
-                        onChange={(e) => setTopic(e.target.value)}
-                        placeholder="e.g. Make pancakes together"
+                        required
+                        aria-required="true"
                         aria-invalid={Boolean(errors.topic)}
-                        aria-describedby={described("topic")}
-                        className={inputClass}
+                        aria-describedby={errors.topic ? "wingtime-topic-error" : undefined}
+                        onChange={(e) => {
+                            setTopic(e.target.value);
+                            if (e.target.value.trim()) setErrors((x) => ({ ...x, topic: undefined }));
+                        }}
+                        placeholder="e.g. Make pancakes together"
+                        className={inputClass(errors.topic)}
                     />
-                </Field>
-
-                <Field id="wt-description" label="Session description *" error={errors.description} hint={`${description.length}/2000`}>
-                    <textarea
-                        id="wt-description"
-                        value={description}
-                        maxLength={2000}
-                        rows={4}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="What will you do? What should learners expect?"
-                        aria-invalid={Boolean(errors.description)}
-                        aria-describedby={described("description", true)}
-                        className={inputClass}
-                    />
-                </Field>
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                    <Field id="wt-date" label="Date *" error={errors.date}>
-                        <input
-                            id="wt-date"
-                            type="date"
-                            value={date}
-                            min={tomorrow}
-                            onChange={(e) => setDate(e.target.value)}
-                            aria-invalid={Boolean(errors.date)}
-                            aria-describedby={described("date")}
-                            className={inputClass}
-                        />
-                    </Field>
-                    <Field id="wt-time" label={`Start time${zoneNote} *`} error={errors.time} hint="Sessions last 30 minutes.">
-                        <input
-                            id="wt-time"
-                            type="time"
-                            step={300}
-                            value={time}
-                            onChange={(e) => setTime(e.target.value)}
-                            aria-invalid={Boolean(errors.time)}
-                            aria-describedby={described("time", true)}
-                            className={inputClass}
-                        />
-                    </Field>
+                    <FieldError id="wingtime-topic-error" message={errors.topic} />
                 </div>
 
-                <fieldset className="flex flex-col gap-2">
-                    <legend className="text-base font-medium text-[#121212] mb-1">Materials</legend>
-                    <label className="flex items-center gap-2 text-sm text-gray-800">
-                        <input type="radio" name="wt-materials" checked={!needsMaterials} onChange={() => setNeedsMaterials(false)} />
-                        No materials needed
+                <SessionDetailsField
+                    label="Session Description"
+                    value={description}
+                    error={errors.description}
+                    placeholder="What will you do? What should learners expect?"
+                    onChange={(value) => {
+                        setDescription(value);
+                        if (value.trim()) setErrors((x) => ({ ...x, description: undefined }));
+                    }}
+                />
+
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="wingtime-date" className={labelClass}>
+                        {SESSION_FIELD_LABELS.date} <span aria-hidden="true">*</span>
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-gray-800">
-                        <input type="radio" name="wt-materials" checked={needsMaterials} onChange={() => setNeedsMaterials(true)} />
-                        Materials needed
+                    <input
+                        id="wingtime-date"
+                        type="date"
+                        value={date}
+                        min={tomorrow}
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.date)}
+                        aria-describedby={errors.date ? "wingtime-date-error" : undefined}
+                        onChange={(e) => {
+                            setDate(e.target.value);
+                            setErrors((x) => ({ ...x, date: undefined, time: undefined }));
+                        }}
+                        className={inputClass(errors.date)}
+                    />
+                    <FieldError id="wingtime-date-error" message={errors.date} />
+                </div>
+
+                <WingTimeStartTimeField
+                    id="wingtime-start-time"
+                    label={`${SESSION_FIELD_LABELS.startTime}${zone}`}
+                    date={date}
+                    tzIana={tzIana}
+                    value={time}
+                    error={errors.time}
+                    onChange={(value) => {
+                        setTime(value);
+                        setErrors((x) => ({ ...x, time: undefined }));
+                    }}
+                />
+                <p className="-mt-3 text-xs text-gray-500">Sessions last 30 minutes.</p>
+
+                <PillGroup
+                    name="wingtime-materials"
+                    label="Materials"
+                    columns={2}
+                    value={materialsChoice}
+                    onChange={(value) => {
+                        setMaterialsChoice(value);
+                        setErrors((x) => ({ ...x, materials: undefined }));
+                    }}
+                    options={[
+                        { value: "none", label: "None Needed" },
+                        { value: "needed", label: "Materials Needed" },
+                    ]}
+                />
+                {materialsChoice === "needed" && (
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="wingtime-materials-list" className={labelClass}>
+                            List the Materials <span aria-hidden="true">*</span>
+                        </label>
+                        <input
+                            id="wingtime-materials-list"
+                            value={materials}
+                            maxLength={500}
+                            required
+                            aria-required="true"
+                            aria-invalid={Boolean(errors.materials)}
+                            aria-describedby={errors.materials ? "wingtime-materials-error" : undefined}
+                            onChange={(e) => {
+                                setMaterials(e.target.value);
+                                if (e.target.value.trim()) setErrors((x) => ({ ...x, materials: undefined }));
+                            }}
+                            placeholder="e.g. A pan, flour, eggs"
+                            className={inputClass(errors.materials)}
+                        />
+                        <FieldError id="wingtime-materials-error" message={errors.materials} />
+                    </div>
+                )}
+
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="wingtime-capacity" className={labelClass}>
+                        Maximum Learners <span aria-hidden="true">*</span>
                     </label>
-                    {needsMaterials && (
-                        <>
-                            <input
-                                id="wt-materials"
-                                aria-label="Materials needed"
-                                value={materials}
-                                maxLength={500}
-                                onChange={(e) => setMaterials(e.target.value)}
-                                placeholder="e.g. A pan, flour, eggs"
-                                aria-invalid={Boolean(errors.materials)}
-                                aria-describedby={described("materials")}
-                                className={inputClass}
-                            />
-                            {errors.materials && (
-                                <p id="materials-error" role="alert" className="text-sm text-red-700">
-                                    {errors.materials}
-                                </p>
-                            )}
-                        </>
+                    <input
+                        id="wingtime-capacity"
+                        type="number"
+                        min={1}
+                        max={50}
+                        value={capacity}
+                        required
+                        aria-required="true"
+                        aria-invalid={Boolean(errors.capacity)}
+                        aria-describedby={errors.capacity ? "wingtime-capacity-error" : undefined}
+                        onChange={(e) => setCapacity(e.target.value)}
+                        className={inputClass(errors.capacity)}
+                    />
+                    <FieldError id="wingtime-capacity-error" message={errors.capacity} />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="wingtime-tags" className={labelClass}>
+                        Topics (Optional)
+                    </label>
+                    <input
+                        id="wingtime-tags"
+                        value={tagsText}
+                        onChange={(e) => setTagsText(e.target.value)}
+                        placeholder="e.g. music, cooking, dance"
+                        aria-invalid={Boolean(errors.tags)}
+                        aria-describedby={errors.tags ? "wingtime-tags-error" : "wingtime-tags-hint"}
+                        className={inputClass(errors.tags)}
+                    />
+                    {errors.tags ? (
+                        <FieldError id="wingtime-tags-error" message={errors.tags} />
+                    ) : (
+                        <p id="wingtime-tags-hint" className="text-xs text-gray-500">
+                            Separate with commas. Up to {MAX_TAGS}.
+                        </p>
                     )}
-                </fieldset>
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                    <Field id="wt-capacity" label="Maximum learners" error={errors.capacity}>
-                        <input
-                            id="wt-capacity"
-                            type="number"
-                            min={1}
-                            max={50}
-                            value={capacity}
-                            onChange={(e) => setCapacity(e.target.value)}
-                            aria-invalid={Boolean(errors.capacity)}
-                            aria-describedby={described("capacity")}
-                            className={inputClass}
-                        />
-                    </Field>
-                    <Field id="wt-tags" label="Topics (optional)" error={errors.tags} hint="Separate with commas, e.g. music, cooking">
-                        <input
-                            id="wt-tags"
-                            value={tagsText}
-                            onChange={(e) => setTagsText(e.target.value)}
-                            aria-invalid={Boolean(errors.tags)}
-                            aria-describedby={described("tags", true)}
-                            className={inputClass}
-                        />
-                    </Field>
                 </div>
 
-                <div className="flex gap-3 pt-2">
+                {/* Actions - same buttons and spacing as the Request an Instant Session form */}
+                <div className="flex gap-3 pt-5 border-t border-gray-100">
                     <button
-                        type="button"
                         onClick={close}
                         disabled={submitting}
                         className="btn-secondary-outline flex-1 py-3 rounded-2xl font-medium transition-colors disabled:opacity-50"
@@ -275,12 +305,11 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                         Cancel
                     </button>
                     <button
-                        type="button"
                         onClick={submit}
                         disabled={submitting}
                         className="btn-primary-fill flex-1 py-3 rounded-2xl font-medium transition-colors disabled:opacity-50"
                     >
-                        {submitting ? "Sending..." : "Send for approval"}
+                        {submitting ? "Sending..." : "Send for Approval"}
                     </button>
                 </div>
             </div>

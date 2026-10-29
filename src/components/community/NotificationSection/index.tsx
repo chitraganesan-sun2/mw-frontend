@@ -111,6 +111,12 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
             case "match_found":
                 router.push(role === "volunteer" ? "/volunteer/learners?tab=matches" : "/learner/volunteer?tab=matches");
                 break;
+            case "wingtime_approved":
+            case "wingtime_rejected":
+            case "wingtime_cancelled":
+            case "wingtime_reminder":
+                router.push(`/${role}/wingtime`);
+                break;
             default:
                 if (notification.post_id) {
                     setPostId(notification.post_id);

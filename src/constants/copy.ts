@@ -13,6 +13,8 @@ export const TERMS = {
     requestInstantSession: "Request an Instant Session",
     /** Volunteer opens a session today/tomorrow; any learner can join. */
     postInstantSession: "Post an Instant Session",
+    /** Volunteer proposes a 30-minute group session; an admin approves it before learners see it. */
+    proposeWingTime: "Propose a WingTime",
 } as const;
 
 export const HELP = {
