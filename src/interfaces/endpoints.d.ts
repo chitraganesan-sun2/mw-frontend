@@ -61,7 +61,7 @@ export type EndpointProps = {
         get: string;
         availableSlots: (id: string, date: string) => string;
         availableDays: (id: string, month: string) => string;
-        upcomingSlots: (id: string) => string;
+        upcomingSlots: (id: string, excludeSessionId?: string | null) => string;
         getAllSlotsForMonth: (month: string) => string;
         deleteParticularSlot: string;
         getAvailableDaysForDate: (date: string) => string;
