@@ -16,6 +16,11 @@ import { joinNames } from "@/utils/joinNames";
 import { useAppStore } from "@/store/useAppStore";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { formatSessionDate, formatSessionTime, shortTimeZone } from "@/utils/sessionDisplay";
+import {
+    DECLINE_NOTE_MAX_LENGTH,
+    DECLINE_REASONS,
+    buildDeclinePayload,
+} from "@/utils/declineReason";
 
 interface NotificationCardProps {
     data: {
@@ -71,6 +76,10 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
     const queryClient = useQueryClient();
     const [loadingAccept, setLoadingAccept] = useState(false);
     const [loadingDecline, setLoadingDecline] = useState(false);
+    // Declining first asks (optionally) why; the reason is shown to the other person.
+    const [choosingReason, setChoosingReason] = useState(false);
+    const [declineReason, setDeclineReason] = useState("");
+    const [declineNote, setDeclineNote] = useState("");
     const { learnerTimeZone, volunteerTimeZone } = useAppStore();
     const timeZoneLabel = isLearnerViewer ? learnerTimeZone : volunteerTimeZone;
 
@@ -80,7 +89,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
         return `${formatSessionTime(start)} – ${formatSessionTime(end)}${tz ? ` ${tz}` : ""}`;
     };
 
-    const handleNotificationStatus = async (status: string, sessionId: string) => {
+    type SaveArgs = { status: "accepted" | "rejected"; reason?: string; note?: string };
+
+    const handleNotificationStatus = async ({ status, reason, note }: SaveArgs, sessionId: string) => {
         if (status === "accepted") {
             setLoadingAccept(true);
         } else {
@@ -88,6 +99,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
         }
         return await PUT_API(endpoints.session.updateNotificationStatus(sessionId), {
             status: status,
+            ...(status === "rejected" ? buildDeclinePayload(reason ?? "", note ?? "") : {}),
         }).then(() => {
             if (status === "accepted") {
                 showToast({ type: "success", message: "Session request accepted" });
@@ -99,7 +111,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
 
     const { mutate: onSave, isPending } = useSendData({
         // @ts-ignore
-        fn: (status: string) => handleNotificationStatus(status, data?.session_id),
+        fn: (args: SaveArgs) => handleNotificationStatus(args, data?.session_id),
         invalidateKey: [isLearnerViewer ? "learner-accepted-sessions" : "volunteer-accepted-sessions"],
         success: () => {
             // Bell list, calendar AND the Schedule dashboard (it used to stay "Pending" until
@@ -188,11 +200,65 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                     </p>
                 </div>
              }
+            {choosingReason ? (
+                <div className="flex flex-col gap-3" role="group" aria-label="Why are you declining? (optional)">
+                    <p className="text-sm font-medium">Why are you declining? <span className="font-normal text-gray-600">(optional)</span></p>
+                    <div className="flex flex-col gap-1">
+                        {DECLINE_REASONS.map((r) => (
+                            <label key={r.value} className="flex items-center gap-2 text-sm cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name={`decline-reason-${data?.session_id}`}
+                                    value={r.value}
+                                    checked={declineReason === r.value}
+                                    onChange={() => setDeclineReason(r.value)}
+                                />
+                                {r.pickerLabel}
+                            </label>
+                        ))}
+                    </div>
+                    {declineReason && (
+                        <div className="flex flex-col gap-1">
+                            <label htmlFor={`decline-note-${data?.session_id}`} className="text-xs text-gray-600">
+                                Add a short note (optional). {isLearnerViewer ? "The volunteer" : "The learner"} will see it.
+                            </label>
+                            <textarea
+                                id={`decline-note-${data?.session_id}`}
+                                value={declineNote}
+                                maxLength={DECLINE_NOTE_MAX_LENGTH}
+                                onChange={(e) => setDeclineNote(e.target.value)}
+                                rows={2}
+                                className="w-full rounded-lg border border-[#E0E0E0] p-2 text-sm"
+                            />
+                        </div>
+                    )}
+                    <div className="flex items-center gap-2 w-full">
+                        <Button
+                            disabled={loadingDecline}
+                            onClick={() => setChoosingReason(false)}
+                            btnVariant="outline"
+                            className="w-full text-sm h-9 rounded-xl py-2"
+                        >
+                            Back
+                        </Button>
+                        <Button
+                            disabled={loadingDecline}
+                            loading={loadingDecline}
+                            onClick={() => onSave({ status: "rejected", reason: declineReason, note: declineNote })}
+                            btnVariant="error"
+                            icon={<MdClose className="text-[1.1rem]" />}
+                            className="w-full text-sm h-9 !bg-error-light !border-error-light rounded-xl py-2 hover:!text-error"
+                        >
+                            Confirm decline
+                        </Button>
+                    </div>
+                </div>
+            ) : (
             <div className="flex items-center gap-2 w-full">
                 <Button
                     disabled={loadingAccept || loadingDecline}
                     loading={loadingDecline}
-                    onClick={() => onSave("rejected")}
+                    onClick={() => setChoosingReason(true)}
                     btnVariant="error"
                     icon={<MdClose className="text-[1.1rem]" />}
                     className={cn(
@@ -205,7 +271,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                 <Button
                     disabled={loadingAccept || loadingDecline}
                     loading={loadingAccept}
-                    onClick={() => onSave("accepted")}
+                    onClick={() => onSave({ status: "accepted" })}
                     btnVariant="success"
                     icon={<IoMdCheckmark className="text-[1.1rem]" />}
                     className={cn(
@@ -217,6 +283,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                     Accept
                 </Button>
             </div>
+            )}
         </div>
     );
 };
