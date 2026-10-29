@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { buildFeedbackPayload } from "@/utils/feedbackForm";
 import MyScheduleModal from "@/components/schedule/Modals/MyScheduleModal";
 import AddNewMeetingModalVolunteer from "@/components/schedule/Modals/AddNewMeetingModalVolunteer";
 import ScheduleDashboardLayout from "@/components/schedule/Dashboard/ScheduleDashboardLayout";
@@ -94,11 +95,7 @@ export default function SchedulePage() {
     };
 
     const handleSubmitFeedback = async (formData: any) => {
-        const payload = {
-            comment: formData?.notes,
-            learner_interest_level: formData?.rating || 0,
-            ...eventDetails,
-        };
+        const payload = buildFeedbackPayload("volunteer", formData, eventDetails);
         return await POST_API(endpoints.volunterFeedback.create, payload);
     };
 

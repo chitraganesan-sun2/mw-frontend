@@ -16,6 +16,8 @@ import { getCookie } from "@/utils/auth";
 import { useEffect, useState } from "react";
 import { FeedbackModalProps } from "./index.type.d";
 import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import FeedbackQuickQuestions from "./FeedbackQuickQuestions";
+import { ratingQuestion, validateFeedback, type FeedbackRole } from "@/utils/feedbackForm";
 
 const FeedbackModal = ({
     isOpen,
@@ -32,6 +34,11 @@ const FeedbackModal = ({
     const { eventDetails } = useAppStore();
     const feedbackTitle = mode === "edit" ? "Edit Feedback" : "Share Your Feedback";
     const role = getCookie("role");
+    const feedbackRole: FeedbackRole = role === "volunteer" ? "volunteer" : "learner";
+    // Same fields for both roles, with the rating worded for whoever is giving it.
+    const fields = LearnerFeedbackFormConstants.map((f: any) =>
+        f.name === "rating" ? { ...f, label: ratingQuestion(feedbackRole) } : f
+    );
 
     const feedBackEventDetails = {
         Name: role === "volunteer" ? eventDetails?.learner_name : eventDetails?.volunteer_name,
@@ -73,8 +80,9 @@ const FeedbackModal = ({
                 },
             ],
         };
-        if (!submissionData?.notes || !submissionData?.rating || !submissionData?.classDuration) {
-            showToast({ message: "Please enter your feedback.", type: "error" });
+        const problem = validateFeedback(submissionData);
+        if (problem) {
+            showToast({ message: problem, type: "error" });
             return;
         }
 
@@ -130,7 +138,7 @@ const FeedbackModal = ({
                     <h6 className="text-xl font-medium">Share Your Feedback</h6>
                     {/* <DetailsSection data={feedBackEventDetails} /> */}
                     <div className="flex flex-col gap-4 mt-3">
-                        {LearnerFeedbackFormConstants.map((field: any) => (
+                        {fields.map((field: any) => (
                             <Input
                                 key={field.name}
                                 {...field}
@@ -138,6 +146,11 @@ const FeedbackModal = ({
                                 onChange={(value: any) => handleChange(field.name, value)}
                             />
                         ))}
+                        <FeedbackQuickQuestions
+                            role={feedbackRole}
+                            value={formData}
+                            onChange={(key, next) => handleChange(key, next)}
+                        />
                     </div>
                 </div>
             </div>
@@ -159,7 +172,7 @@ const FeedbackModal = ({
             loading={Loading}
         >
             <div className="flex flex-col max-lg:gap-2">
-                {LearnerFeedbackFormConstants.map((field: any) => (
+                {fields.map((field: any) => (
                     <Input
                         key={field.name}
                         {...field}
@@ -167,6 +180,11 @@ const FeedbackModal = ({
                         onChange={(value: any) => handleChange(field.name, value)}
                     />
                 ))}
+                <FeedbackQuickQuestions
+                    role={feedbackRole}
+                    value={formData}
+                    onChange={(key, next) => handleChange(key, next)}
+                />
             </div>
         </CenterModal>
     );
