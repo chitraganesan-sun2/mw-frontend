@@ -49,7 +49,10 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
 
     const [topic, setTopic] = useState("");
     const [description, setDescription] = useState("");
-    const [date, setDate] = useState("");
+    // Opens on the earliest date a WingTime can be proposed for. Today never works (24 hours' notice),
+    // so that is tomorrow. Derived rather than stored so it is right whenever the form is opened.
+    const [pickedDate, setDate] = useState("");
+    const date = pickedDate || tomorrow;
     const [time, setTime] = useState("");
     const [materialsChoice, setMaterialsChoice] = useState<"none" | "needed">("none");
     const [materials, setMaterials] = useState("");

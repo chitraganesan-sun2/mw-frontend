@@ -38,8 +38,13 @@ export default function WingTimeStartTimeField({ id, label, date, tzIana, value,
 
     const at = (isoish: string) => (tzIana ? dayjs.tz(isoish, tzIana) : dayjs(isoish));
     const committed = value && date ? at(`${date}T${value}`) : null;
-    // Opens on 9:00 AM that day rather than an empty "-- : --" header with OK doing nothing.
-    const defaultDraft = () => at(`${date || dayjs().format("YYYY-MM-DD")}T09:00`);
+    // Opens on the current time of day (next 5 minutes), in the host's zone, on the chosen date -
+    // rather than an empty "-- : --" header with OK doing nothing.
+    const defaultDraft = () => {
+        const now = tzIana ? dayjs().tz(tzIana) : dayjs();
+        const rounded = now.add(5 - (now.minute() % 5), "minute").startOf("minute");
+        return at(`${date || now.format("YYYY-MM-DD")}T${rounded.format("HH:mm")}`);
+    };
 
     const commit = () => {
         setOpen(false);
