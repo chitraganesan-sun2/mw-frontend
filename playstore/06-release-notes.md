@@ -1,3 +1,55 @@
+# Release notes — v1.6.2 (versionCode 13)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.6.2
+
+• WingTime: volunteers can host short 30-minute group sessions and learners can sign up
+• Volunteers can pause new requests or limit how many wait at once
+• Add a reason when declining a request; the other person sees it
+• Booking greys out times that overlap your own sessions
+• Block or report a person, message or session
+• Quicker, optional feedback questions after a session
+• Stability improvements
+```
+
+---
+
+## Internal changelog — v1.6.2 (versionCode 13)
+
+Identical code to 1.6.1 (versionCode 12). Re-versioned only because Play Console would not let
+12 be re-attached after its production submission was cancelled. Contains WingTime
+(`NEXT_PUBLIC_ENABLE_WINGTIME=true` in `.env.mobile`). Do not upload 12 and 13 together.
+
+---
+
+# Release notes — v1.6.1 (versionCode 12)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.6.1
+
+• WingTime: volunteers can host short 30-minute group sessions and learners can sign up
+• Volunteers can pause new requests or limit how many wait at once
+• Add a reason when declining a request; the other person sees it
+• Booking greys out times that overlap your own sessions
+• Block or report a person, message or session
+• Quicker, optional feedback questions after a session
+• Stability improvements
+```
+
+---
+
+## Internal changelog — what 1.6.1 contains
+
+Everything in 1.6.0 (below) plus WingTime: `NEXT_PUBLIC_ENABLE_WINGTIME=true` in `.env.mobile`
+(backend `WINGTIME_ENABLED` is already on in production). Version: versionCode 12 / 1.6.1.
+Supersedes 1.6.0 (versionCode 11), which did not include WingTime - do not upload both.
+
+---
+
 # Release notes — v1.6.0 (versionCode 11)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
