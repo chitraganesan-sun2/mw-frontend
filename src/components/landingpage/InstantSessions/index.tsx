@@ -144,15 +144,19 @@ const InstantSessions = () => {
         staleTime: 30000,
     });
 
+    // Note: Upcoming sessions fallback disabled until API endpoint is available
+    // TODO: Enable once backend implements: endpoints.publicSessions.getUpcomingSessions(3)
+    const SHOW_UPCOMING_FALLBACK = false;
+    
     // Fetch upcoming scheduled sessions as fallback
     const { data: upcomingSessions = [] } = useQuery<PublicSession[]>({
         queryKey: ["public-upcoming-sessions"],
         queryFn: async () => {
-            const res = await GET_API((endpoints as any).publicSessions.getUpcomingSessions?.(3));
-            return Array.isArray(res?.data) ? res.data : [];
+            // Placeholder - endpoint not yet implemented
+            return [];
         },
-        enabled: !isLoading && sessions.length === 0, // Only fetch if no live sessions
-        refetchInterval: 300000, // refresh every 5 minutes
+        enabled: SHOW_UPCOMING_FALLBACK && !isLoading && sessions.length === 0,
+        refetchInterval: 300000,
         staleTime: 120000,
     });
 
