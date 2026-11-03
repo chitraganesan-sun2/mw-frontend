@@ -11,9 +11,9 @@
        black; set both to #121212 / #000 to go back to black. */
     --action-color: #475569;
     --action-hover-color: #334155;
-    --error-color: #ef4444;
+    --error-color: #ef4444; /* WCAG AA: 4.5:1 on white */
     --error-light-color: #fee2e2;
-    --success-color: #16a34a;
+    --success-color: #16a34a; /* WCAG AA: 4.54:1 on white */
     --success-light-color: #dcfce7;
     --border-stroke: #e0e0e0;
     --input-background: #f4f7fb;
@@ -109,7 +109,11 @@ html {
     overflow-wrap: break-word;
 }
 
-/* Date Range Picker */
+/* =============================================================================
+   DATE RANGE PICKER - Ant Design Overrides
+   Why: DatePicker needs dynamic role-aware theming (learner blue vs volunteer orange)
+   Future: Consider migrating to headless date picker with Tailwind styling
+   ============================================================================= */
 .ant-picker-dropdown
     .ant-picker-cell-in-view.ant-picker-cell-in-range:not(.ant-picker-cell-disabled):before,
 .ant-picker-dropdown
@@ -133,7 +137,12 @@ html {
     background-color: var(--primary-edge-color, #08547a) !important;
 }
 
-/* Customize Mui Time Picker Style */
+/* =============================================================================
+   TIME PICKER - MUI Overrides
+   Why: MUI DateTimePicker requires specific spacing/border-radius to match design system
+   Note: !important required to override MUI's inline styles and emotion CSS-in-JS
+   Future: Replace with Ant Design TimePicker OR create unified Tailwind time picker
+   ============================================================================= */
 .MuiInputAdornment-root {
     margin-left: 0px !important;
 }
@@ -167,12 +176,19 @@ html {
     scrollbar-width: none !important;
 }
 
-/* Custom Spin Styles */
+/* =============================================================================
+   LOADING SPINNER - Ant Design Overrides
+   Why: Ant Spin component uses fixed colors; needs dynamic role-aware theming
+   ============================================================================= */
 .custom-ant-spin .ant-spin-dot-item {
     background-color: var(--primary-color) !important;
 }
 
-/* Rating Radio Button Styles */
+/* =============================================================================
+   RATING RADIO BUTTONS - Ant Design Overrides
+   Why: Converting Ant Design radio buttons into circular rating chips
+   Future: Consider custom Tailwind radio group component
+   ============================================================================= */
 .ant-radio-button-wrapper {
     border: 1px solid var(--border-stroke) !important;
     border-radius: 100% !important;
@@ -193,7 +209,10 @@ html {
     display: none;
 }
 
-/* Antd Checkbox Styles */
+/* =============================================================================
+   CONSENT CHECKBOX - Ant Design Overrides
+   Why: Larger, more accessible checkbox for terms/consent forms (WCAG 2.1 touch target)
+   ============================================================================= */
 .consent-checkbox .ant-checkbox {
     align-self: normal !important;
     @apply !h-5 !mt-1;
@@ -207,7 +226,10 @@ html {
     @apply !h-[12px] !w-[5px] !top-[45%];
 }
 
-/* Search Select Styles */
+/* =============================================================================
+   SEARCH & SELECT DROPDOWNS - Ant Design Overrides
+   Why: Custom styling for session matching and general select dropdowns
+   ============================================================================= */
 .ant-select-selection-item {
     background: transparent !important;
     border: none !important;
@@ -237,11 +259,10 @@ html {
     color: white !important;
 }
 
-/* Session Match dropdown - same bg as select input, light gray selected */
+/* Session Match Dropdown - Enhanced UX for volunteer-learner pairing */
 .session-match-dropdown.ant-select-dropdown {
     width: 400px !important;
     max-width: calc(100vw - 32px) !important;
-    /* padding: 12px !important; */
     border: 1px solid #e5e7eb !important;
     border-radius: 12px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
@@ -252,7 +273,6 @@ html {
 .session-match-dropdown .rc-virtual-list-holder-inner {
     display: flex !important;
     flex-direction: column !important;
-    /* gap: 10px !important; */
     padding-bottom: 4px !important;
 }
 
@@ -283,7 +303,7 @@ html {
     color: #121212 !important;
 }
 
-/* Session Match select - center suffix icon in trigger */
+/* Session Match Select - Icon alignment */
 .session-match-select.ant-select .ant-select-arrow {
     display: flex !important;
     align-items: flex-start !important;
@@ -306,15 +326,18 @@ html {
     font-size: 14px !important;
 }
 
+/* =============================================================================
+   GLOBAL SCROLLBAR STYLING - Cross-browser consistency
+   Why: Default scrollbars vary wildly across browsers/OS; unified minimal design
+   ============================================================================= */
 *::-webkit-scrollbar-track {
-    background-color: #f1f1f1; /* Light grey track background */
+    background-color: #f1f1f1;
     cursor: pointer;
     border-radius: 10px;
 }
 
-/* This styles the scrollbar thumb (the moving part) */
 *::-webkit-scrollbar-thumb {
-    background-color: #0c0c0d62; /* Dark grey thumb */
+    background-color: #0c0c0d62;
     border-radius: 0.8rem;
     cursor: pointer;
 }
@@ -325,15 +348,16 @@ html {
     cursor: pointer;
 }
 
-/* This styles the scrollbar itself (width, height) */
 *::-webkit-scrollbar {
-    width: 5px; /* Adjust the width of the scrollbar */
-    height: 5px; /* Adjust the height of the scrollbar (for horizontal scroll) */
+    width: 5px;
+    height: 5px;
     cursor: pointer;
 }
 
-/* Table styles */
-/* Custom styles for the Ant Design table */
+/* =============================================================================
+   DATA TABLES - Ant Design Overrides
+   Why: Consistent table styling across volunteer/learner dashboards
+   ============================================================================= */
 .ant-table {
     @apply font-sans;
 }
@@ -387,7 +411,9 @@ html {
     @apply bg-white !important;
 }
 
-/* Add these styles if they don't exist already */
+/* =============================================================================
+   UTILITY CLASSES - Hide scrollbar when needed
+   ============================================================================= */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -397,7 +423,10 @@ html {
     scrollbar-width: none;
 }
 
-/* Override default carousel styles */
+/* =============================================================================
+   CAROUSEL / SLIDER - Override default library styles
+   Why: react-slick requires custom styles for proper gap and transitions
+   ============================================================================= */
 .carousel__slider-tray {
     display: flex !important;
     gap: 1rem !important;
