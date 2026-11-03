@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import AboutUsImg from '@/assets/images/our-team/AboutUs.png';
 import AboutMe from '@/assets/images/AboutMe.png';
 function AboutSectionCard() {
   return (

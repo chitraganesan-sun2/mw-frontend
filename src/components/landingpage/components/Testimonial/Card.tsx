@@ -11,7 +11,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: TestimonialData }) => {
                     <TagComponent
                         className={`${testimonial.category === "Learners"
                             ? "!bg-learner-light !text-learner-dark"
-                            : "!text-volunteer !bg-volunteer-light"
+                            : "!text-volunteer-dark !bg-volunteer-light"
                             } py-1 !text-sm px-4 border-none`}
                         text={testimonial.category}
                     />

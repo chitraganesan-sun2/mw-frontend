@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useQueryState } from "nuqs";
 import { FiBookOpen, FiPenTool, FiMusic, FiMonitor, FiCoffee, FiHeart, FiUsers, FiGrid, FiChevronDown } from "react-icons/fi";
 import ContainerWrapper from "../components/ContainerWrapper";
 import ContainerHeader from "../components/ContainerHeader";
@@ -10,6 +11,7 @@ const INITIAL_VISIBLE = 4;
 
 const SkillsToLearn = () => {
     const [showAll, setShowAll] = useState(false);
+    const [, setParamMode] = useQueryState("signup_as");
     const skillsData = [
         {
             title: "Academic Enrichment",
@@ -115,6 +117,7 @@ const SkillsToLearn = () => {
                             title={skillCategory.title}
                             skills={skillCategory.skills}
                             icon={skillCategory.icon}
+                            onSkillClick={() => setParamMode("learner")}
                         />
                     ))}
                 </div>

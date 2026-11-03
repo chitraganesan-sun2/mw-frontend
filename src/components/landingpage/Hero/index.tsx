@@ -1,7 +1,7 @@
 "use client";
 
-import HeroBannerImg from "@/assets/images/HeroBannerImg.png";
-import HeroBannerMobileImg from "@/assets/images/HeroBannerMobileImg.png";
+import HeroBannerImg from "@/assets/images/HeroBannerImg.webp";
+import HeroBannerMobileImg from "@/assets/images/HeroBannerMobileImg.webp";
 import Image from "next/image";
 import { useState } from "react";
 import Button from "@/components/common/Button";
@@ -18,8 +18,8 @@ const Hero = () => {
             <Header />
             <div className={`w-full md:h-[80vh] md:min-h-[480px] md:max-h-[760px] md:bg-white relative`}>
                 <div className="w-full !h-[300px] md:!h-full md:!relative">
-                    <Image src={HeroBannerImg} alt="Students learning together with technology support" fill className="h-full object-cover object-top hidden md:block" />
-                    <Image src={HeroBannerMobileImg} alt="Students learning together with technology support" fill className="!h-[300px] md:hidden object-cover object-top" />
+                    <Image src={HeroBannerImg} alt="Students learning together with technology support" fill priority className="h-full object-cover object-top hidden md:block" />
+                    <Image src={HeroBannerMobileImg} alt="Students learning together with technology support" fill priority className="!h-[300px] md:hidden object-cover object-top" />
                 </div>
                 <div className="relative md:!w-[40%] md:!h-[30%] md:!absolute md:!top-[35%] md:!left-[10%] z-10 flex-center flex-col md:items-start md:justify-start gap-6">
                     <div className="absolute top-[-20%] md:top-[-50%] lg:top-[-70%] left-0 w-full h-[150px] md:h-[250px] md:w-[250px] lg:w-[350px] lg:h-[350px] z-5 max-md:flex-center">
@@ -45,7 +45,19 @@ const Hero = () => {
                             customClassName="w-full md:w-auto"
                         />
                     </div>
-                    <p className="text-base font-bold text-gray-600">COPPA & HIPAA Compliant</p>
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs md:text-sm font-medium text-gray-700">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 shadow-xs">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            501(c)(3) Nonprofit
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 shadow-xs">
+                            <span className="w-2 h-2 rounded-full bg-primary"></span>
+                            COPPA & HIPAA Compliant
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 shadow-xs">
+                            100% Free Tutoring
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
