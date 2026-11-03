@@ -4,7 +4,7 @@ import React from "react";
 import { FiVideo, FiCalendar, FiClock } from "react-icons/fi";
 import ContainerWrapper from "../components/ContainerWrapper";
 import ContainerHeader from "../components/ContainerHeader";
-import { useQuery } from "@tantml:invokestack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { TimeIcon } from "@/assets/icons";
