@@ -12,6 +12,14 @@ const INITIAL_VISIBLE = 4;
 const SkillsToLearn = () => {
     const [showAll, setShowAll] = useState(false);
     const [, setParamMode] = useQueryState("signup_as");
+    const [, setSelectedSkill] = useQueryState("skill");
+    
+    // When a skill chip is clicked, open learner signup AND pre-select that skill
+    const handleSkillClick = (skill: string) => {
+        setSelectedSkill(skill);
+        setParamMode("learner");
+    };
+    
     const skillsData = [
         {
             title: "Academic Enrichment",
@@ -108,7 +116,7 @@ const SkillsToLearn = () => {
                 <ContainerHeader
                     title="Skills to Learn"
                     subTitle="Discover Your Potential Through Learning"
-                    description="Explore a wide range of skills and subjects designed to nurture growth, creativity, and development for learners of all abilities."
+                    description="Click any skill below to find a volunteer tutor specializing in that subject. All sessions are 100% free."
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {(showAll ? skillsData : skillsData.slice(0, INITIAL_VISIBLE)).map((skillCategory) => (
@@ -117,7 +125,7 @@ const SkillsToLearn = () => {
                             title={skillCategory.title}
                             skills={skillCategory.skills}
                             icon={skillCategory.icon}
-                            onSkillClick={() => setParamMode("learner")}
+                            onSkillClick={handleSkillClick}
                         />
                     ))}
                 </div>

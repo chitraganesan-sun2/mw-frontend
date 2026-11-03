@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { FiVideo } from "react-icons/fi";
+import { FiVideo, FiCalendar, FiClock } from "react-icons/fi";
 import ContainerWrapper from "../components/ContainerWrapper";
 import ContainerHeader from "../components/ContainerHeader";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tantml:invokestack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { TimeIcon } from "@/assets/icons";
@@ -12,10 +12,12 @@ import { useQueryState } from "nuqs";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { formatSessionDate, formatSessionTime, zoneAbbreviation } from "@/utils/sessionDisplay";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 
 interface PublicSession {
     volunteer_slot_id: string;
@@ -62,11 +64,23 @@ function describeWhen(session: PublicSession): string {
     return `${dayLabel}, ${formatSessionTime(session.start_time)}`;
 }
 
+/** Calculate time until session starts - "Starts in 2 hours" */
+function timeUntilStart(session: PublicSession): string {
+    const viewerTz = dayjs.tz.guess();
+    const instant =
+        session.utc_start_date && session.utc_start_time
+            ? dayjs.utc(`${session.utc_start_date} ${session.utc_start_time.slice(0, 5)}`, "YYYY-MM-DD HH:mm", true)
+            : null;
+    
+    if (instant?.isValid()) {
+        return instant.tz(viewerTz).fromNow();
+    }
+    return "";
+}
+
 // High-level preview row for the public landing page - just when it is and what it's
 // about (timestamp + subject), not the full detail the in-app session card shows.
 const SessionPill = ({ session }: { session: PublicSession }) => {
-
-    // Both CTAs open the LEARNER sign-up, so they carry the learner colour (blue = Learner).
     return (
         <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-2 text-sm text-gray-700 flex-shrink-0">
@@ -78,6 +92,28 @@ const SessionPill = ({ session }: { session: PublicSession }) => {
             <h3 className="text-base font-semibold text-gray-900 line-clamp-1 flex-1 text-right">
                 {session.title}
             </h3>
+        </div>
+    );
+};
+
+const UpcomingSessionCard = ({ session }: { session: PublicSession }) => {
+    const countdown = timeUntilStart(session);
+    
+    return (
+        <div className="bg-gradient-to-br from-learner-light to-white rounded-2xl px-5 py-4 border border-learner-dark/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all">
+            <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2 text-sm text-learner-dark">
+                    <FiCalendar size={16} aria-hidden="true" />
+                    <span className="font-medium">{describeWhen(session)}</span>
+                </div>
+                <h3 className="text-base font-semibold text-gray-900">{session.title}</h3>
+            </div>
+            {countdown && (
+                <div className="flex items-center gap-2 text-xs font-medium text-learner-dark bg-white/80 px-3 py-1.5 rounded-full w-fit">
+                    <FiClock size={14} aria-hidden="true" />
+                    {countdown}
+                </div>
+            )}
         </div>
     );
 };
@@ -94,23 +130,63 @@ const InstantSessionsSkeleton = () => (
 );
 
 const InstantSessions = () => {
-    // Opens the learner sign-up in place (same as the Hero / For Learners buttons). The links
-    // used to go to /join-us, which is the staff recruiting page.
     const [, setParamMode] = useQueryState("signup_as");
     const openLearnerSignUp = () => setParamMode("learner");
 
+    // Fetch live instant sessions
     const { data: sessions = [], isLoading } = useQuery<PublicSession[]>({
         queryKey: ["public-instant-sessions"],
         queryFn: async () => {
             const res = await GET_API((endpoints as any).publicSessions.getInstantSessions(6));
             return Array.isArray(res?.data) ? res.data : [];
         },
-        refetchInterval: 60000, // refresh every 60 seconds
+        refetchInterval: 60000,
         staleTime: 30000,
     });
 
-    // Don't render the list if no sessions and not loading: a compact notice with the sign-up CTA.
-    if (!isLoading && sessions.length === 0) {
+    // Fetch upcoming scheduled sessions as fallback
+    const { data: upcomingSessions = [] } = useQuery<PublicSession[]>({
+        queryKey: ["public-upcoming-sessions"],
+        queryFn: async () => {
+            const res = await GET_API((endpoints as any).publicSessions.getUpcomingSessions?.(3));
+            return Array.isArray(res?.data) ? res.data : [];
+        },
+        enabled: !isLoading && sessions.length === 0, // Only fetch if no live sessions
+        refetchInterval: 300000, // refresh every 5 minutes
+        staleTime: 120000,
+    });
+
+    // Show upcoming sessions fallback when no live sessions
+    if (!isLoading && sessions.length === 0 && upcomingSessions.length > 0) {
+        return (
+            <ContainerWrapper>
+                <div className="flex flex-col gap-10 w-full">
+                    <ContainerHeader
+                        title="Coming Up Soon"
+                        subTitle="Upcoming Sessions"
+                        description="No live sessions right now, but here are upcoming sessions you can join after signing up."
+                    />
+                    <div className="flex flex-col gap-3 w-full">
+                        {upcomingSessions.map((session) => (
+                            <UpcomingSessionCard key={session.volunteer_slot_id} session={session} />
+                        ))}
+                    </div>
+                    <div className="flex justify-center">
+                        <button
+                            type="button"
+                            onClick={openLearnerSignUp}
+                            className="btn-learner-fill px-8 py-3 rounded-full font-medium transition-colors text-sm cursor-pointer"
+                        >
+                            Sign up to join these sessions
+                        </button>
+                    </div>
+                </div>
+            </ContainerWrapper>
+        );
+    }
+
+    // Complete empty state - no live AND no upcoming
+    if (!isLoading && sessions.length === 0 && upcomingSessions.length === 0) {
         return (
             <ContainerWrapper>
                 <div className="flex flex-col gap-6 w-full">
@@ -138,6 +214,7 @@ const InstantSessions = () => {
         );
     }
 
+    // Happy path: live sessions available
     return (
         <ContainerWrapper>
             <div className="flex flex-col gap-10 w-full">
