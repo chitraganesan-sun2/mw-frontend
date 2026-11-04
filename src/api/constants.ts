@@ -247,6 +247,7 @@ export const endpoints: EndpointProps = {
     },
     publicSessions: {
         getInstantSessions: (limit?: number) => `session/public/instant_sessions${limit ? `?limit=${limit}` : ""}`,
+        getWingTimes: (limit?: number) => `wingtime/public${limit ? `?limit=${limit}` : ""}`,
     },
     push_notifications: {
         registerDevice: "notifications/register-device",

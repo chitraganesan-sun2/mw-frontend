@@ -8,7 +8,7 @@ import Impact from "@/components/landingpage/Impact";
 import WhyWeBuild from "@/components/landingpage/WhyWeBuild";
 import Footer from "@/components/onboarding/Footer";
 import SkillsToLearn from "@/components/landingpage/SkillsToLearn";
-import InstantSessions from "@/components/landingpage/InstantSessions";
+import SessionOptions from "@/components/landingpage/SessionOptions";
 import HomeClientEffects from "@/components/landingpage/HomeClientEffects";
 import RoleNeutralScope from "@/components/common/RoleNeutralScope";
 
@@ -40,7 +40,7 @@ export default function Page() {
                         <SkillsToLearn />
                     </div>
                     <div className="reveal px-[5%] lg:px-[9%]">
-                        <InstantSessions />
+                        <SessionOptions />
                     </div>
                     <div className="reveal px-[5%] lg:px-[9%]">
                         <Community />
