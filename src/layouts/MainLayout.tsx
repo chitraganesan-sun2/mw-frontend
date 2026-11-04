@@ -49,16 +49,19 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     return (
         <div className='h-[100dvh] w-screen overflow-hidden flex'>
             {!isApprovalPending && <NewMessageAlert />}
+            {/* Sidebar: 1/6 of the screen, but never narrower than the logo + menu need (a fixed
+                1/6 was ~180px on smaller laptops, which wrapped "MelodyWings") nor wider than on
+                a 1920px screen, so large desktops look as before. */}
             {!isProfile && (
-                <div className='max-lg:hidden w-1/6'>
+                <div className='max-lg:hidden shrink-0 w-[clamp(224px,16.667vw,320px)]'>
                     <Sidebar />
                 </div>
             )}
 
             <div
                 className={cn(
-                    "flex flex-col w-full bg-white",
-                    isProfile ? "w-full" : "lg:w-5/6"
+                    "flex flex-col w-full min-w-0 bg-white",
+                    isProfile ? "w-full" : "lg:flex-1 lg:w-auto"
                 )}
             >
                 {!hideHeaderInLayout && (

@@ -23,10 +23,8 @@ const Logo = ({ isFooterIcon, className }: LogoProps) => {
                         <LogoIcon width={isMobileScreen ? 34 : 44} height={isMobileScreen ? 30 : 40} />
                 }
             </span>
-            <p className="md:text-xl text-base font-medium flex-1 min-w-0">
-                <span className="inline-block">Melody</span>
-                <span className="inline-block">Wings</span>
-            </p>
+            {/* One word, one line, at every screen size - never wraps into "Melody / Wings". */}
+            <p className="md:text-xl text-base font-medium whitespace-nowrap shrink-0">MelodyWings</p>
 
         </div>
     );
