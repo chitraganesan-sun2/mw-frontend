@@ -79,7 +79,7 @@ const Avatar = () => {
 
     const content = (
         <>
-            <div className="relative w-[80px] h-[80px] rounded-full bg-gray-100">
+            <div className="relative w-[56px] h-[56px] rounded-full bg-gray-100">
                 {avatarSrc && (
                     <Image src={avatarSrc} alt="avatar" fill className="object-cover rounded-full" />
                 )}
@@ -97,11 +97,11 @@ const Avatar = () => {
     // Until the role cookie is read (after mount) the profile href would be
     // "/undefined/profile" - render the same block without a link until then.
     return role ? (
-        <Link href={`/${role}/profile`} className="flex flex-col items-center gap-2 p-2">
+        <Link href={`/${role}/profile`} className="flex flex-col items-center gap-1 p-1">
             {content}
         </Link>
     ) : (
-        <div className="flex flex-col items-center gap-2 p-2">{content}</div>
+        <div className="flex flex-col items-center gap-1 p-1">{content}</div>
     );
 };
 

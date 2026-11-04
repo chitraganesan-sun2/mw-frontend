@@ -109,7 +109,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const handleSignOut = () => signOut();
 
     return (
-        <div className="bg-white w-full h-full lg:h-screen flex flex-col items-center justify-between p-4 md:p-6 overflow-y-auto">
+        <div className="bg-white w-full h-full lg:h-screen flex flex-col items-center justify-between p-3 md:p-4 overflow-y-auto">
             <div className="w-full">
                 {isMobileOrTabScreen ? (
                     <div className="shrink-0 flex items-center justify-between">
@@ -130,11 +130,11 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                         <Logo />
                     </Link>
                 )}
-                <div className="flex flex-col items-center gap-3 w-full  md:mt-[4rem]">
+                <div className="flex flex-col items-center gap-2 w-full mt-1 md:mt-3">
                     <Avatar />
                     <Divider className="max-md:!w-full" />
                 </div>
-                <div className="flex flex-col items-center gap-6 md:gap-5 lg:gap-[2.2rem] w-full mt-[1rem] md:mt-[2rem]">
+                <div className="flex flex-col items-center gap-4 lg:gap-3 w-full mt-3 md:mt-4">
                     {/* Every link is role-prefixed - until the role cookie has been read
                         (after mount) render placeholders instead of hrefs like "/schedule"
                         that 404 if clicked. */}
@@ -149,8 +149,8 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                           ))}
                 </div>
             </div>
-            <div className="w-full flex flex-col gap-3 mt-4">
-                <button onClick={handleSignOut} className="flex gap-1 mt-2 text-black">
+            <div className="w-full flex flex-col gap-2 mt-3">
+                <button onClick={handleSignOut} className="flex gap-1 text-black">
                     <span className="text-[1.25rem] transition-all duration-300 text-black">
                         <SignOutIcon />
                     </span>
