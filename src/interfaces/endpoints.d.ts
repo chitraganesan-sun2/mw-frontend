@@ -202,6 +202,7 @@ export type EndpointProps = {
     };
     publicSessions: {
         getInstantSessions: (limit?: number) => string;
+        getWingTimes: (limit?: number) => string;
     };
     push_notifications: {
         registerDevice: string;
