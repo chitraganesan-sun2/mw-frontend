@@ -10,6 +10,8 @@ import type { ScheduleRole } from "./scheduleCategories";
 
 interface ScheduleDashboardLayoutProps {
     role: ScheduleRole;
+    /** true on the Book for Later page (availability + calendar), false on My Schedule (sessions only). */
+    isPlanner: boolean;
     /** "calendar" (?view=calendar, header's "View my calendar") or the schedule view. */
     isCalendarView: boolean;
     timeZoneLabel?: string;
@@ -24,14 +26,13 @@ interface ScheduleDashboardLayoutProps {
 }
 
 /**
- * The Schedule dashboard (the signed-in landing page). Two views, switched from the header:
- * - schedule: My Sessions and Availability, stacked as full-width sections (horizontal layouts inside);
- * - calendar: the calendar on its own, full width.
- * The calendar used to sit below everything else, which made the page long and "View my
- * calendar" only scrolled to it.
+ * The Schedule dashboard (the signed-in landing page), split over two pages:
+ * - My Schedule: My Sessions only;
+ * - Book for Later: Availability, or (header's "View my calendar") the calendar on its own.
  */
 const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     role,
+    isPlanner,
     isCalendarView,
     timeZoneLabel,
     onScheduleAvailability,
@@ -74,12 +75,21 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
         );
     }
 
+    // My Schedule: just the sessions.
+    if (!isPlanner) {
+        return (
+            <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
+                <ProfileNudge role={role} />
+                <div className="min-w-0">
+                    <MyScheduleSection role={role} timeZoneLabel={tz} onOpenProfile={onOpenProfile} />
+                </div>
+            </div>
+        );
+    }
+
+    // Book for Later: availability (and the header's booking / calendar actions).
     return (
         <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
-            <ProfileNudge role={role} />
-            <div className="min-w-0">
-                <MyScheduleSection role={role} timeZoneLabel={tz} onOpenProfile={onOpenProfile} />
-            </div>
             <div className="min-w-0">
                 <AvailabilitySection
                     role={role}

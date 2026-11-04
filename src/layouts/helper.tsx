@@ -11,6 +11,7 @@ import CommonHeader from "@/components/common/Header";
 import { CalenderHeader } from "@/components/schedule";
 import { IoIosArrowBack } from "react-icons/io";
 import { MdOutlineGroups } from "react-icons/md";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
 
 export const getHeaderTitle = (pathname: string) => {
     const path = pathname.split("/")?.[2];
@@ -36,6 +37,8 @@ export const getHeaderIcon = (pathname: string) => {
             return <InstantSessionIcon />;
         case "wingtime":
             return <MdOutlineGroups />;
+        case "book-for-later":
+            return <HiOutlineCalendarDays />;
         default:
             return null;
     }
@@ -44,6 +47,7 @@ export const getHeaderIcon = (pathname: string) => {
 export const renderHeader = (pathname: string) => {
     switch (getHeaderTitle(pathname)) {
         case "schedule":
+        case "book-for-later":
             return <CalenderHeader />;
         default:
             return <CommonHeader />;

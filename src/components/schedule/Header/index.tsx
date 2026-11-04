@@ -2,7 +2,7 @@
 
 import MonthYearSlider from "./MonthYearSlider";
 import { CalendarIcon, SideMenuIcon } from "@/assets/icons";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
 import MonthYearPicker from "./MonthYearPicker";
@@ -38,8 +38,12 @@ const Header = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isVolunteer = role === "volunteer";
-    const basePath = isVolunteer ? "/volunteer/schedule" : "/learner/schedule";
-    const isCalendarView = searchParams.get("view") === CALENDAR_VIEW;
+    // Two pages share this header: My Schedule (just the sessions, kept uncluttered) and
+    // Book for Later (booking, availability and the calendar).
+    const pathname = usePathname();
+    const isPlanner = pathname?.includes("/book-for-later");
+    const basePath = `/${isVolunteer ? "volunteer" : "learner"}/${isPlanner ? "book-for-later" : "schedule"}`;
+    const isCalendarView = isPlanner && searchParams.get("view") === CALENDAR_VIEW;
 
     // Keep the current view and month when opening a modal, so closing it returns here.
     const pushWith = (changes: Record<string, string | null>) => {
@@ -73,7 +77,7 @@ const Header = () => {
                         </button>
                         <h1 className="flex items-center gap-2 text-xl font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
-                            {isCalendarView ? "My Calendar" : "My Schedule"}
+                            {isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookForLater : "My Schedule"}
                         </h1>
                         {/* The month only drives the calendar, so it only shows there. */}
                         {isCalendarView && (
@@ -97,7 +101,7 @@ const Header = () => {
                         </div>
                     )}
                 </div>
-                {role && (
+                {role && isPlanner && (
                     // Phones: two rows (calendar + availability side by side, Add below)
                     // instead of three full-width rows.
                     <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
@@ -110,7 +114,7 @@ const Header = () => {
                             {isCalendarView ? (
                                 <>
                                     <HiOutlineArrowLeft size={16} aria-hidden="true" />
-                                    Back to my schedule
+                                    Back to {TERMS.bookForLater}
                                 </>
                             ) : (
                                 <>

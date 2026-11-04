@@ -11,7 +11,7 @@ import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useAppStore } from "@/store/useAppStore";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -41,7 +41,17 @@ export default function LearnerSchedulePage() {
 
     const [modal, setModal] = useQueryState("modal");
     const [view] = useQueryState("view");
-    const isCalendarView = view === CALENDAR_VIEW;
+    // The same page backs My Schedule (sessions) and Book for Later (availability + calendar,
+    // /learner/book-for-later re-exports it); the path says which.
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const isPlanner = pathname.includes("/book-for-later");
+    const basePath = isPlanner ? "/learner/book-for-later" : "/learner/schedule";
+    const isCalendarView = isPlanner && view === CALENDAR_VIEW;
+    // Older links (?view=calendar on My Schedule) land on the calendar's new home.
+    useEffect(() => {
+        if (!isPlanner && view === CALENDAR_VIEW) router.replace(`/learner/book-for-later?${searchParams.toString()}`);
+    }, [isPlanner, view, router, searchParams]);
     const [presetDate] = useQueryState("date");
     const [volunteerId, setVolunteerId] = useQueryState("volunteerId");
     const learnerId = getCookie("learner_id");
@@ -81,7 +91,7 @@ export default function LearnerSchedulePage() {
 
     const handleNavigate = () => {
         // Return to the view the modal was opened from.
-        router.push(`/learner/schedule?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
+        router.push(`${basePath}?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
     };
 
     // Clicking a day on the calendar opens Book for Later for that date - the learner
@@ -89,7 +99,7 @@ export default function LearnerSchedulePage() {
     const handleDateSelect = (date: string) => {
         // "Today" in the learner's PROFILE timezone, not the browser's.
         if (!date || date.slice(0, 10) < profileToday(learnerTimeZone)) return;
-        router.push(`/learner/schedule?view=${CALENDAR_VIEW}&modal=add_new_meeting&date=${encodeURIComponent(date)}`);
+        router.push(`/learner/book-for-later?view=${CALENDAR_VIEW}&modal=add_new_meeting&date=${encodeURIComponent(date)}`);
     };
 
     const handleSubmitFeedback = async (formData: any) => {
@@ -117,6 +127,7 @@ export default function LearnerSchedulePage() {
         <>
             <ScheduleDashboardLayout
                 role="learner"
+                isPlanner={isPlanner}
                 isCalendarView={isCalendarView}
                 timeZoneLabel={learnerTimeZone}
                 onScheduleAvailability={() => setModal("my_availability")}

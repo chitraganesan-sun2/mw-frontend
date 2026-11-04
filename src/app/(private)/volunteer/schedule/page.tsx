@@ -10,7 +10,7 @@ import LearnerViewModal from "@/components/volunteers/Modals/LearnerViewModal";
 
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -39,7 +39,17 @@ export default function SchedulePage() {
         useAppStore();
     const [modal, setModal] = useQueryState("modal");
     const [view] = useQueryState("view");
-    const isCalendarView = view === CALENDAR_VIEW;
+    // The same page backs My Schedule (sessions) and Book for Later (availability + calendar,
+    // /volunteer/book-for-later re-exports it); the path says which.
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const isPlanner = pathname.includes("/book-for-later");
+    const basePath = isPlanner ? "/volunteer/book-for-later" : "/volunteer/schedule";
+    const isCalendarView = isPlanner && view === CALENDAR_VIEW;
+    // Older links (?view=calendar on My Schedule) land on the calendar's new home.
+    useEffect(() => {
+        if (!isPlanner && view === CALENDAR_VIEW) router.replace(`/volunteer/book-for-later?${searchParams.toString()}`);
+    }, [isPlanner, view, router, searchParams]);
     const [learnerId, setLearnerId] = useQueryState("learnerId");
     const volunteerId = getCookie("volunteer_id");
     const [isOpenOnetImeSchedule, setIsOpenOnetImeSchedule] = useState(false);
@@ -82,7 +92,7 @@ export default function SchedulePage() {
 
     const handleNavigate = () => {
         // Return to the view the modal was opened from.
-        router.push(`/volunteer/schedule?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
+        router.push(`${basePath}?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
     };
 
     const handleDateSelect = (date: string) => {
@@ -119,6 +129,7 @@ export default function SchedulePage() {
         <>
             <ScheduleDashboardLayout
                 role="volunteer"
+                isPlanner={isPlanner}
                 isCalendarView={isCalendarView}
                 timeZoneLabel={volunteerTimeZone}
                 onScheduleAvailability={() => setModal("my_schedule")}

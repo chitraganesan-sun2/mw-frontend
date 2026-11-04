@@ -15,6 +15,8 @@ import {
     InstantSessionIcon,
 } from "@/assets/icons";
 import { MdOutlineGroups } from "react-icons/md";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
+import { TERMS } from "@/constants/copy";
 import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { getCookie } from "@/utils/auth";
 import Link from "next/link";
@@ -52,6 +54,12 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
             href: "/schedule",
             text: "My Schedule",
             icon: <CalendarIcon />,
+        },
+        {
+            // Booking, availability and the calendar (kept off My Schedule so that stays sessions-only).
+            href: "/book-for-later",
+            text: TERMS.bookForLater,
+            icon: <HiOutlineCalendarDays size={22} />,
         },
     ];
 
