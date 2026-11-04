@@ -197,6 +197,9 @@ export type EndpointProps = {
     tutorialLinks: {
         getAll: string;
     };
+    publicCommunity: {
+        getPosts: (limit?: number) => string;
+    };
     publicSessions: {
         getInstantSessions: (limit?: number) => string;
     };

@@ -438,6 +438,41 @@ html {
     }
 }
 
+/* Landing page "Live from the community" strip: two identical copies side by side slide left by
+   exactly one copy's width, so the loop is seamless. Pauses on hover / keyboard focus. */
+@keyframes mwMarquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.mw-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: mwMarquee linear infinite;
+}
+
+.mw-marquee:hover .mw-marquee-track,
+.mw-marquee:focus-within .mw-marquee-track {
+    animation-play-state: paused;
+}
+
+/* Reduced motion: no sliding - the strip becomes a normal horizontally scrollable row. */
+@media (prefers-reduced-motion: reduce) {
+    .mw-marquee {
+        overflow-x: auto;
+    }
+    .mw-marquee-track {
+        animation: none;
+    }
+    .mw-marquee-copy[aria-hidden="true"] {
+        display: none;
+    }
+}
+
 @keyframes shimmer {
     0% {
         background-position: -200% 0;
