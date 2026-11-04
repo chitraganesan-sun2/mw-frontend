@@ -133,7 +133,7 @@ const WingTime = () => {
             <ContainerWrapper>
                 <div className="flex flex-col gap-6 w-full">
                     <ContainerHeader
-                        title="Coming Soon"
+                        title="Scheduled"
                         subTitle="Wing Time"
                         description="Join scheduled group learning sessions led by experienced volunteers on various topics."
                     />
@@ -160,7 +160,7 @@ const WingTime = () => {
         <ContainerWrapper>
             <div className="flex flex-col gap-10 w-full">
                 <ContainerHeader
-                    title="Coming Soon"
+                    title="Scheduled"
                     subTitle="Wing Time Available"
                     description="Register for upcoming group sessions — learn together with other students and volunteers."
                 />
