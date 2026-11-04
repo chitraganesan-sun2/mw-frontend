@@ -1,13 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { safeImageSrc } from "@/utils/safeHref";
 
 interface PublicPost {
     post_id: string;
     text: string;
-    author_first_name: string;
+    /** First image of a volunteer's post (the API never sends learners' images). */
+    image_url?: string | null;
     author_role: "learner" | "volunteer";
     created_at?: string;
 }
@@ -36,20 +39,30 @@ function timeAgo(createdAt?: string): string {
 
 const PostCard = ({ post }: { post: PublicPost }) => {
     const isVolunteer = post.author_role === "volunteer";
+    // A bad URL in API data must not reach next/image (it throws) - unsafe ones are skipped.
+    const imageSrc = safeImageSrc(post.image_url);
     return (
-        <li className="w-[280px] sm:w-[320px] shrink-0 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between gap-4">
-            <p className="text-sm lg:text-base leading-relaxed text-gray-800 line-clamp-4 break-words">{post.text}</p>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span
-                    className={`rounded-full px-2.5 py-0.5 font-medium text-black ${
-                        isVolunteer ? "bg-volunteer-light" : "bg-learner-light"
-                    }`}
-                >
-                    {isVolunteer ? "Volunteer" : "Learner"}
-                </span>
-                <span className="font-medium text-gray-700">{post.author_first_name}</span>
-                <span aria-hidden="true">·</span>
-                <span>{timeAgo(post.created_at)}</span>
+        <li className="w-[280px] sm:w-[320px] shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+            {imageSrc && (
+                <div className="relative h-40 w-full bg-gray-100">
+                    {/* Decorative: the post's text carries the meaning. */}
+                    <Image src={imageSrc} alt="" fill sizes="320px" className="object-cover" />
+                </div>
+            )}
+            <div className="p-5 flex flex-1 flex-col justify-between gap-4">
+                {post.text && (
+                    <p className="text-sm lg:text-base leading-relaxed text-gray-800 line-clamp-4 break-words">{post.text}</p>
+                )}
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <span
+                        className={`rounded-full px-2.5 py-0.5 font-medium text-black ${
+                            isVolunteer ? "bg-volunteer-light" : "bg-learner-light"
+                        }`}
+                    >
+                        {isVolunteer ? "Volunteer" : "Learner"}
+                    </span>
+                    <span>{timeAgo(post.created_at)}</span>
+                </div>
             </div>
         </li>
     );
