@@ -64,6 +64,7 @@ const Header = () => {
     };
 
     const links: { title: string; link: string; className?: string }[] = [
+        { title: "Features", link: "/features" },
         { title: "Donate", link: "/donate" },
         { title: "About Us", link: "/about-us" },
         // { title: "Blogs", link: "/blogs" },
