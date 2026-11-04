@@ -131,7 +131,7 @@ const WingTime = () => {
     if (!isLoading && wingtimes.length === 0) {
         return (
             <ContainerWrapper>
-                <div className="flex flex-col gap-6 w-full">
+                <div className="flex flex-col gap-4 w-full">
                     <ContainerHeader
                         title="Scheduled"
                         subTitle="Wing Time"
@@ -158,7 +158,7 @@ const WingTime = () => {
 
     return (
         <ContainerWrapper>
-            <div className="flex flex-col gap-10 w-full">
+            <div className="flex flex-col gap-6 w-full">
                 <ContainerHeader
                     title="Scheduled"
                     subTitle="Wing Time Available"

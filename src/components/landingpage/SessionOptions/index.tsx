@@ -15,7 +15,7 @@ import WingTime from "../WingTime";
 const SessionOptions = () => {
     return (
         <div className="w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 max-w-[1400px] w-full mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-[1400px] w-full mx-auto">
                 {/* Instant Sessions - Left Column */}
                 <div className="reveal min-w-0">
                     <InstantSessions />

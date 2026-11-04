@@ -113,7 +113,7 @@ const InstantSessions = () => {
     if (!isLoading && sessions.length === 0) {
         return (
             <ContainerWrapper>
-                <div className="flex flex-col gap-6 w-full">
+                <div className="flex flex-col gap-4 w-full">
                     <ContainerHeader
                         title="Live Now"
                         subTitle="Instant Sessions"
@@ -140,7 +140,7 @@ const InstantSessions = () => {
 
     return (
         <ContainerWrapper>
-            <div className="flex flex-col gap-10 w-full">
+            <div className="flex flex-col gap-6 w-full">
                 <ContainerHeader
                     title="Live Now"
                     subTitle="Instant Sessions Available"

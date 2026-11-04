@@ -19,7 +19,7 @@ export default function Page() {
             <div className="w-full overflow-x-hidden bg-background-input relative">
                 <HomeClientEffects />
                 <Hero />
-                <div className="flex flex-col gap-10 lg:gap-12 py-10 lg:py-14">
+                <div className="flex flex-col gap-6 lg:gap-8 py-8 lg:py-10">
                     <div className="reveal px-[5%] lg:px-[9%]" id="about-us">
                         <WhyWeBuild />
                     </div>
@@ -27,7 +27,7 @@ export default function Page() {
                         <Impact />
                     </div>
                     <div className="px-[5%] lg:px-[9%]">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 max-w-[1400px] w-full mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-6 max-w-[1400px] w-full mx-auto">
                             <div className="reveal">
                                 <ForLearner />
                             </div>
