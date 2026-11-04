@@ -43,11 +43,11 @@ const PostCard = ({ post, onClick }: { post: PublicPost; onClick: () => void }) 
     // A bad URL in API data must not reach next/image (it throws) - unsafe ones are skipped.
     const imageSrc = safeImageSrc(post.image_url);
     return (
-        <li className="w-[280px] sm:w-[320px] shrink-0">
+        <li className="w-[280px] sm:w-[320px] h-[320px] shrink-0">
             <button
                 type="button"
                 onClick={onClick}
-                className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md hover:border-gray-200 transition-all cursor-pointer text-left"
+                className="w-full h-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md hover:border-gray-200 transition-all cursor-pointer text-left"
             >
                 {imageSrc && (
                     <div className="relative h-40 w-full bg-gray-100">
