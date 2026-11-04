@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import numeral from "numeral";
-import { Spin } from "antd";
+
 
 const Impact = () => {
 
@@ -56,7 +56,7 @@ const Impact = () => {
                                 className="text-center lg:text-start text-[4rem] font-semibold tracking-tighter"
                             >
                                 {isLoadingVolunteers ? (
-                                    <Spin size="large" />
+                                    <span className="inline-block h-14 w-28 rounded-xl bg-gray-200/70 animate-pulse my-2" aria-hidden="true" />
                                 ) : (
                                     `${formatHours(totalVolunteersHours?.total_volunteered_hours || 0)}+`
                                 )}
@@ -69,7 +69,7 @@ const Impact = () => {
                                 className="text-center lg:text-start text-[4rem] font-semibold tracking-tighter"
                             >
                                 {isLoadingLearners ? (
-                                    <Spin size="large" />
+                                    <span className="inline-block h-14 w-28 rounded-xl bg-gray-200/70 animate-pulse my-2" aria-hidden="true" />
                                 ) : (
                                     formatCount(totalLearnersCount || 0)
                                 )}
@@ -83,7 +83,7 @@ const Impact = () => {
                                 className="text-center lg:text-start text-[4rem] font-semibold tracking-tighter"
                             >
                                 {isLoadingVolunteers ? (
-                                    <Spin size="large" />
+                                    <span className="inline-block h-14 w-28 rounded-xl bg-gray-200/70 animate-pulse my-2" aria-hidden="true" />
                                 ) : (
                                     formatCount(totalVolunteersHours?.verified_volunteers_count || 0)
                                 )}

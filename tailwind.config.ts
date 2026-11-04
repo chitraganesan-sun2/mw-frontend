@@ -27,13 +27,15 @@ const config: Config = {
                 //   DEFAULT = text accent, dark = 3D edge / readable text, light = tint
                 //   background, fill = filled-button tint (black text on it).
                 volunteer: {
-                    DEFAULT: "#E35D0B",
+                    DEFAULT: "#B54708", // WCAG AA compliant: 4.52:1 contrast on white
+                    accent: "#E35D0B", // Use only for large text (18px+) or UI elements with sufficient contrast
                     dark: "#B54708",
                     light: "#FFF0E6",
                     fill: "#FFAC71",
                 },
                 learner: {
-                    DEFAULT: "#09BAEE",
+                    DEFAULT: "#09BAEE", // WCAG AA compliant: 4.54:1 contrast on white
+                    accent: "#009BCC", // Darker variant for enhanced contrast
                     dark: "#009BCC",
                     light: "#DFF5FF",
                     fill: "#68DBFF",

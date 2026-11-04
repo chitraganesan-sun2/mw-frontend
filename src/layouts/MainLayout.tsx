@@ -50,7 +50,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <div className='h-[100dvh] w-screen overflow-hidden flex'>
             {!isApprovalPending && <NewMessageAlert />}
             {!isProfile && (
-                <div className='max-lg:hidden w-1/6'>
+                <div className='max-lg:hidden w-[230px] xl:w-[260px] shrink-0 border-r border-gray-100'>
                     <Sidebar />
                 </div>
             )}
@@ -58,7 +58,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             <div
                 className={cn(
                     "flex flex-col w-full bg-white",
-                    isProfile ? "w-full" : "lg:w-5/6"
+                    isProfile ? "w-full" : "flex-1 min-w-0"
                 )}
             >
                 {!hideHeaderInLayout && (
@@ -67,7 +67,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 <div
                     className={cn(
                         "flex-grow overflow-y-auto bg-background-input",
-                        isProfile ? "" : "lg:rounded-tl-[50px]"
+                        isProfile ? "" : "lg:rounded-tl-2xl"
                     )}
                 >
                     {isApprovalPending ? (
