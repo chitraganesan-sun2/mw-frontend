@@ -47,11 +47,11 @@ export default function CookieConsent() {
       <ul className="text-sm text-gray-600 space-y-2">
         <li>1. Understand and save your preferences for future visits.</li>
         <li>2. Compile aggregate data about site traffic and interactions.</li>
-        <li>3. Allow trusted third-party services to track this information.</li>
+        <li>3. Measure site use with Google Analytics and PostHog, only if you choose Allow.</li>
       </ul>
       <p className="text-sm font-normal">
-        Analytics only runs if you choose Allow. We honor Do Not Track signals and will not track or plant analytics
-        cookies if it&apos;s enabled.
+        Analytics only runs if you choose Allow. We honor Do Not Track and Global Privacy Control signals and will not
+        run analytics or plant analytics cookies if either is on.
       </p>
       <div className="flex justify-end space-x-2">
         <Button

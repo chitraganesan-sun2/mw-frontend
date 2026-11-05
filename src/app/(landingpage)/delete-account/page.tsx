@@ -32,7 +32,7 @@ const DeleteAccountPage = () => {
                     <li>Type <strong>DELETE</strong> to confirm and choose <strong>Permanently Delete</strong>.</li>
                 </ol>
                 <p className="text-gray-700">
-                    Deletion is immediate and permanent and cannot be undone. You are logged out on all devices straight away.
+                    Deleting your account is immediate and permanent and cannot be undone. You are logged out on all devices straight away. The exception is safety review records, described below.
                 </p>
             </section>
 
@@ -62,7 +62,7 @@ const DeleteAccountPage = () => {
             <section aria-labelledby="what-is-kept" className="flex flex-col gap-2">
                 <h2 id="what-is-kept" className="text-xl font-medium">What we may keep</h2>
                 <p className="text-gray-800">
-                    Donation records are kept for the period required by applicable tax and accounting law, and we keep
+                    Records of safety reviews of sessions (transcripts and findings) may be kept after an account is deleted, for child-safety purposes. Donation records are kept for the period required by applicable tax and accounting law, and we keep
                     information we are legally required to retain. Crash reports are not linked to your account. See our{" "}
                     <Link className="underline" href="/privacy-policy">Privacy Policy</Link> for details.
                 </p>

@@ -16,12 +16,12 @@ export const sectionsData = [
             "At MW, we believe that everyone should have the opportunity to pursue their passions and unlock their full potential. For individuals with diverse disabilities (“Learners”), finding the right extracurricular activities often requires a journey of exploration, which can sometimes come with financial challenges. Our mission is to empower Learners with developmental disabilities and special needs to discover and engage in activities that truly resonate with them, free from barriers of ability or cost.",
             "We connect Learners with skilled and experienced Volunteers in various extracurricular fields (“Volunteers”), who provide free online classes to help Learners achieve their goals, expand their knowledge, and build valuable skills. Through these experiences, we aim to foster joy, boost confidence, encourage self-expression, and open doors to lifelong hobbies, skills, and career opportunities. By harnessing the talents of dedicated community volunteers, we ensure that everyone, regardless of ability, has the opportunity to grow, thrive, and reach their full potential.",
             {
-                title: "Our Learners and Volunteers are categorized into the following three categories:",
+                title: "Who can use MelodyWings, by age:",
                 contextType: "list",
                 content: [
-                    "Category I: Learners under the age of 13;",
-                    "Category II: Learners and Volunteers between 13 to 15 years of age;",
-                    "Category III: Learners and Volunteers of ages 16 and above;",
+                    "Adults are people aged 18 and over;",
+                    "Learners can be any age from 5. A parent or guardian signs up a Learner who is under 13, and also a Learner who is 13 or older but has limited legal or decision-making capacity; and",
+                    "Volunteers must be 13 or older. A Volunteer under 18 needs a parent or guardian’s consent.",
                 ]
 
             },
@@ -52,7 +52,7 @@ export const sectionsData = [
             {
                 title: "a) Financial Information.",
                 content: [
-                    "We are currently using third-party payment processors such as PayPal, Stripe, Google Pay, Razorpay, and Paddle to collect and store the financial information you share with us for payment processing. However, we will update this Privacy Policy when we start using and storing such information."
+                    `Donations are processed by Stripe. When you donate, you enter your card or payment details on Stripe’s checkout page; MelodyWings does not receive or store your card number. We keep your name, email, phone number, address, donation amount, the fund you chose, and any message or dedication you enter. Donations are generally final. If you made a mistake, email us at ${supportEmailLink} and we will review it.`
                 ]
             },
             {
@@ -64,13 +64,19 @@ export const sectionsData = [
             {
                 title: "c) Disability and Special Educational Needs Information.",
                 content: [
-                    "When a learner profile is created, the learner (or their parent or guardian) provides information about the learner's disability or special educational needs, such as the type of developmental disability, the level of support needed, assistive devices used, communication style, and a description of needs. This information is required to create a learner profile. We use it to match learners with suitable volunteers and so that volunteers can prepare for sessions, and it may be shown to the volunteers a learner is matched with or has sessions with. We do not sell this information or use it for advertising."
+                    "When a learner profile is created, the learner (or their parent or guardian) provides information about the learner's disability or special educational needs, such as the type of developmental disability, the level of support needed, assistive devices used, communication style, and a description of needs. This information is required to create a learner profile. We use it to match learners with suitable volunteers and so that volunteers can prepare for sessions, and it may be shown to the learner, to volunteers who have a session with the learner, and to verified volunteers in the learner's country. Other members cannot see it. A member's email address, phone number and date of birth are never shown to other members. We do not sell this information or use it for advertising."
                 ]
             },
             {
                 title: "d) Volunteer Background Information.",
                 content: [
                     "Volunteers provide self-reported answers about their criminal history (for example, whether they have been convicted of a felony) and consent to background checks. This information is reviewed only by MelodyWings staff to help keep learners safe. It is not shown to learners and is not used for advertising."
+                ]
+            },
+            {
+                title: "e) Safety Review of Sessions.",
+                content: [
+                    "To help keep learners safe, MelodyWings may review recordings or transcripts of sessions that our staff upload or import. We use automated analysis, including an AI model, to look for safety concerns. The transcript and the findings are stored by MelodyWings, and a review can be linked to the session and the people in it. Only authorised MelodyWings staff can see these reviews. We may use Google’s Gemini service to help write summaries of the findings. Safety review records may be kept after an account is deleted, for child-safety purposes (see Section 9)."
                 ]
             }
         ]
@@ -103,10 +109,7 @@ export const sectionsData = [
                 hideNumber: true,
                 content: [
                     "a) Usage details",
-                    "b) Information obtained through browser cookies",
-                    "c) Information obtained through flash cookies",
-                    "d) Web beacons on our Website",
-                    "e) Web beacons on emails sent by us"
+                    "b) Information obtained through browser cookies"
                 ]
             }
         ]
@@ -134,8 +137,7 @@ export const sectionsData = [
                     "l) Anonymize data and aggregate data for statistics",
                     "m) Contact you about our products and services that may be of interest",
                     "n) Contact you about third parties’ goods and services",
-                    "o) Enable the display of advertisements to our advertisers’ target audiences, although personal information is not shared with advertisers without your consent",
-                    "p) Send you periodic emails, in accordance with the CAN-SPAM Act of 2003 as detailed in Section 15, via the email address provided by you to (i) send information, respond to inquiries, and/or other requests or questions; (ii) process orders and send information and updates pertaining to such orders; (iii) send additional information related to your product and/or service; and (iv) market to our mailing list or continue to send email to you after the original transaction has occurred."
+                    "o) Send you periodic emails, in accordance with the CAN-SPAM Act of 2003 as detailed in Section 15, via the email address provided by you to (i) send information, respond to inquiries, and/or other requests or questions; (ii) process orders and send information and updates pertaining to such orders; (iii) send additional information related to your product and/or service; and (iv) market to our mailing list or continue to send email to you after the original transaction has occurred."
                 ]
             }
         ]
@@ -145,15 +147,15 @@ export const sectionsData = [
         contextType: "parent",
         content: [
             "Cookies are small pieces of text used to store information on web browsers. Cookies are used to store and receive identifiers and other information on computers, phones, and other devices. Other technologies, including data we store on your web browser or device, identifiers associated with your device, and other software, are used for similar purposes. In this Privacy Policy, we refer to all of these technologies as “Cookies.” ",
-            "We use Cookies on our Website to (a) understand and save your preferences for future visits, (b) compile aggregate data about site traffic and site interactions in order to offer better site experiences and tools in the future, and (c) allow trusted third-party services that track this information on our behalf. You can set your browser to refuse all or some browser Cookies. We honor Do Not Track signals and, if one is in place, we will not track, plant cookies, or use advertising.",
-            `We allow third party behavioral tracking and links to third-party web pages. Occasionally, at our discretion, we may include or offer third-party products or services on our Website or Platform. These third-party sites have separate and independent privacy policies. We, therefore, have no responsibility or liability for the content and activities of these linked sites. Nonetheless, we seek to protect the integrity of our Website or Platform and welcome any feedback at ${supportEmailLink}.`
+            "We use Cookies on our Website to (a) keep you logged in and save your preferences, and (b) only if you click Allow on our cookie banner, measure how the Website is used with Google Analytics and PostHog. If you click Decline or ignore the banner, Google Analytics and PostHog do not run. They also do not run if your browser sends a Do Not Track or Global Privacy Control signal. Sentry error reporting is always on; it is used to find and fix errors and does not build an analytics profile of you. You can set your browser to refuse all or some browser Cookies.",
+            `Our Website and Platform may contain links to third-party web pages. Occasionally, at our discretion, we may include or offer third-party products or services on our Website or Platform. These third-party sites have separate and independent privacy policies. We, therefore, have no responsibility or liability for the content and activities of these linked sites. Nonetheless, we seek to protect the integrity of our Website or Platform and welcome any feedback at ${supportEmailLink}.`
         ]
     },
     {
         title: "HOW DO WE PROTECT INFORMATION WE COLLECT?",
         contextType: "parent",
         content: [
-            "Our Website uses an SSL certificate as an added security measure. We require username and passwords for our employees who can access your personal information that we store and/or process on our Platform and servers. In addition, we actively prevent third parties from getting access to your personal information that we store and/or process on our Platform and servers. We accept payment by credit card through a third party credit card processor on our behalf. We will implement reasonable security measures every time you (a) enter, submit, or access your information, (b) register, or (c) access our Platform, on our Website."
+            "Our Website uses an SSL certificate as an added security measure. We require username and passwords for our employees who can access your personal information that we store and/or process on our Platform and servers. In addition, we actively prevent third parties from getting access to your personal information that we store and/or process on our Platform and servers. Donations are paid through Stripe on its own checkout page. Sensitive profile information is encrypted in our database. We will implement reasonable security measures every time you (a) enter, submit, or access your information, (b) register, or (c) access our Platform, on our Website."
         ]
     },
     {
@@ -169,7 +171,7 @@ export const sectionsData = [
             {
                 title: "b) Fair Information Practice Principles:",
                 content: [
-                    "In the event of a personal data breach, we will notify you within fifteen (15) days via email. We shall also notify FTC, FCC, and/or state regulatory agency as required under law and within the time period prescribed by law. We agree to the individual redress principle, which requires that individuals have a right to pursue legally enforceable rights against data collectors and processors who fail to adhere to the law. This principle requires not only that individuals have enforceable rights against data users, but also that that individuals have recourse to courts or a government agency to investigate and/or prosecute non-compliance by data processors."
+                    "If a breach affects your personal information, we will notify you without unreasonable delay. We shall also notify FTC, FCC, and/or state regulatory agency as required under law and within the time period prescribed by law. We agree to the individual redress principle, which requires that individuals have a right to pursue legally enforceable rights against data collectors and processors who fail to adhere to the law. This principle requires not only that individuals have enforceable rights against data users, but also that that individuals have recourse to courts or a government agency to investigate and/or prosecute non-compliance by data processors."
                 ]
             },
             {
@@ -193,8 +195,8 @@ export const sectionsData = [
         contextType: "parent",
         content: [
             "We retain your personal information for as long as your account remains active, so that we can provide the matching, scheduling, and communication features of our Website and Platform.",
-            `You may delete your account and personal information at any time from your account Settings. Deletion is immediate and permanent: your profile, messages, community posts, session records, and other personal information tied to your account are removed from our systems, and this action cannot be undone. To request deletion instead by email, contact us at ${supportEmailLink}.`,
-            "Some information cannot be deleted along with your account, including donation records, which we retain for the period required by applicable tax and accounting law, and information we are required to retain to comply with a legal obligation, resolve a dispute, or enforce our agreements."
+            `You may delete your account and personal information at any time from your account Settings. When you delete your account, your profile, messages, community posts, session records, and other personal information tied to your account are removed from our systems immediately, and this action cannot be undone. The exception is safety review records, described below. To request deletion instead by email, contact us at ${supportEmailLink}.`,
+            "Some information cannot be deleted along with your account, including safety review records (the transcripts and findings described in Section 3(e)), which we may keep after an account is deleted for child-safety purposes, and donation records, which we retain for the period required by applicable tax and accounting law, and information we are required to retain to comply with a legal obligation, resolve a dispute, or enforce our agreements."
         ]
     },
     {
@@ -250,12 +252,11 @@ export const sectionsData = [
         ]
     },
     {
-        title: 'GOOGLE ADSENSE AND GOOGLE ANALYTICS',
+        title: 'GOOGLE ANALYTICS AND POSTHOG',
         contextType: "parent",
         content: [
-            `Google, as a third-party vendor, uses Cookies to serve advertisements to Users on our Website or Platform. Google uses first-party Cookies, such as Google Analytics Cookies, to compile data regarding User interactions with ad impressions and other ad service functions as they relate to our Platform. We currently use Google Analytics to collect and process certain Website usage data. To learn more about Google Analytics and how to opt-out, please visit ${createLink("https://policies.google.com/privacy/google-partners", "https://policies.google.com/privacy/google-partners")}.`,
-            "We have implemented advertising features on our Website and Platform including: (a) remarketing with Google AdSense; (b) Google Display Network Impression Reporting; (c) Google Demographics and Interests Reporting; and (d) Google’s DoubleClick platform integration.",
-            "We use these Cookies to compile data regarding User interactions with ad impressions and other ad service functions as they relate to our Website. "
+            `We use Google Analytics (Google) and PostHog to count visits and see which pages are used. They set Cookies and receive your IP address and page-view information. They run only after you click Allow on our cookie banner, and never if your browser sends a Do Not Track or Global Privacy Control signal. To learn more about Google Analytics and how to opt out, please visit ${createLink("https://policies.google.com/privacy/google-partners", "https://policies.google.com/privacy/google-partners")}.`,
+            "PostHog is set not to record your screen or capture what you type into forms, and it only builds profiles for identified users.",
         ]
     },
     {
@@ -268,7 +269,7 @@ export const sectionsData = [
                 hideNumber: true,
                 content: [
                     "<strong>1) California Civil Code:</strong> MW does not sell, trade, or otherwise transfer to outside third parties your “Personal Information” as the term is defined under the California Civil Code Section § 1798.82(h). Additionally, California Civil Code Section § 1798.83 permits Users of our Website or Platform that are California residents to request certain information regarding our disclosure of their Personal Information to third parties for their direct marketing purposes. To make a request for such disclosure, or identification and/or deletion of Personal Information in all our systems that we store on you, please send an email to support@melodywings.org or by writing to us at MelodyWings at 9852 Wesbourne Way, Granite Bay - CA 95746. Note that (i) if we delete your Personal Information as requested, we will no longer be able to provide our services to you and (ii) we may need to keep such Personal Information for a while during the shutting down and billing process. If you would like to discuss our Personal Information storage and processing process with us, please send us an email at support@melodywings.org or by writing to us at MelodyWings at 9852 Wesbourne Way, Granite Bay - CA 95746.",
-                    "<strong>2) CPRA:</strong> This Section supplements the information contained in our Privacy Policy above and applies solely to all visitors, users, and others to our Website or Platform, who reside in the State of California (“consumers” or “you”). We adopt this Section to comply with the California Privacy Rights Act that is effective from January 1, 2023 (“CPRA”) and any terms defined in the CPRA have the same meaning when used in this Section. ",
+                    "<strong>2) CPRA:</strong> This Section supplements the information contained in our Privacy Policy above and applies solely to all visitors, users, and others to our Website or Platform, who reside in the State of California (“consumers” or “you”). We adopt this Section to describe the rights California residents may have under the California Privacy Rights Act (“CPRA”) and any terms defined in the CPRA have the same meaning when used in this Section. ",
                     {
                         contextType: "list",
                         hideNumber: true,
@@ -343,63 +344,42 @@ export const sectionsData = [
         ]
     },
     {
-        title: "COPPA COMPLIANCE (FOR CHILDREN UNDER 13 USERS ONLY)",
+        title: "CHILDREN, PARENTS AND GUARDIANS",
         contextType: "parent",
         content: [
-            "The Children’s Online Privacy Protection Act (“COPPA”) is a federal legislation that applies to entities that collect and store “Personal Information,” as the term is defined under COPPA, from children under the age of 13. We are committed to ensure compliance with COPPA.",
-            "Since MW is a non-profit organization that does not collect personal information from minors under 13 for commercial purposes, it is exempt from COPPA requirements. However, MW is committed to safeguarding the privacy of minors under 13 and takes all necessary measures to ensure their privacy is protected. ",
+            "MelodyWings is for people with disabilities and the volunteers who support them. Learners can be any age from 5. Volunteers must be 13 or older. This Section explains how parents and guardians are involved.",
+            "To protect children’s information, it is encrypted in our database, and learners and volunteers are only connected with people in the same country.",
             {
                 title: "a) FOR OUR VOLUNTEERS:",
                 contextType: "list",
                 hideNumber: true,
                 content: [
-                    `To register as a Volunteer on our Website and/or Platform, you must be 13 years of age or over. If you are under 13 years of age, do not register as a Volunteer on our Website and/or Platform. Our Website and/or Platform do not target Volunteers under the age of 13. If you would like to know more about our practices and specifically our practices, please email us at ${supportEmailLink}.`,
+                    `To register as a Volunteer on our Website and/or Platform, you must be 13 years of age or over. If you are under 13 years of age, do not register as a Volunteer. Our Website and/or Platform do not target Volunteers under the age of 13. A Volunteer under 18 needs a parent or guardian’s consent: at registration we ask for the parent or guardian’s name and email address and for confirmation of their consent, and we send them an email about the registration. If you would like to know more about our practices, please email us at ${supportEmailLink}.`,
                     "IF YOU ARE A VOLUNTEER AND UNDER 13, PLEASE DO NOT ACCESS OR USE OUR WEBSITE OR PLATFORM."
                 ]
             },
             {
-                title: "b) FOR OUR CATEGORY I LEARNERS:",
+                title: "b) FOR OUR LEARNERS:",
                 contextType: "list",
                 hideNumber: true,
                 content: [
-                    "Informed consent and parental verification for children under 13",
-                    "For Category I Learners, in compliance with the COPPA, we require verified parental consent before collecting any personal information from children under the age of 13. If you are the parent or legal guardian of the Category I Learner, please verify your consent to the collection of your child's information by following the steps below.",
-                    "By putting in your email on behalf of the Learner at the registration page, you are providing informed parental consent and verifying that MW may collect, use and/or share certain personal information as listed in Section 3 of this Privacy Policy from the Learner in order to provide our services. You also acknowledge that you understand our privacy practices and that you authorize us to collect, use and/or share your child's information in accordance with our Privacy Policy.",
-                    "Steps for Parental Consent Verification:",
-                    {
-                        contextType: "list",
-                        hideNumber: true,
-                        content: [
-                            "1. Provide your name and contact information at the time of registration on our Website and/or Platform.",
-                            "2. Provide your email address as the default address for registering on our Website and/or Platform on behalf of the Learner and submit that you verify MW to collect, use and/or share certain personal information collected from the Category I Learner.",
-                            "3. Confirm that you are the parent or guardian of the child by answering knowledge-based questions at the time of registering on our Website and/or Platform.",
-                            "4. Review the information we plan to collect, use and/or share from your child through the direct notice we send you prior to collecting your child’s information."
-                        ]
-                    },
-                    "As the parent or legal guardian, you take full responsibility for the Category I Learner’s access to and use of our services and agree to ensure that the Learner complies with the terms outlined in the Privacy Policy and Terms of Service",
+                    "Learners under 13 are signed up by a parent or guardian. If the learner is 13 or older but has limited legal or decision-making capacity, a parent or guardian should complete the form.",
+                    "When a parent or guardian signs up a learner, they give their own name and email address, and they tick a consent box confirming that they are the learner’s parent and/or legal guardian and that they consent to MelodyWings collecting, using and/or sharing the learner’s personal information as listed in Section 3 of this Privacy Policy. For younger learners, we use the parent or guardian’s email address as the contact email.",
+                    "As the parent or legal guardian, you take full responsibility for the learner’s access to and use of our services and agree to ensure that the learner complies with the terms outlined in the Privacy Policy and Terms of Service.",
                     `If you have any questions or concerns, please contact us at ${supportEmailLink}. You can also request that we delete your child’s information at any time.`,
-                    "IF YOU ARE A LEARNER AND UNDER 13, PLEASE DO NOT ACCESS OR USE OUR WEBSITE OR PLATFORM WITHOUT FIRST GETTING VERIFIED PARENTAL CONSENT AS DEFINED IN SECTION 13(b) ABOVE."
+                    "IF YOU ARE A LEARNER AND UNDER 13, PLEASE DO NOT ACCESS OR USE OUR WEBSITE OR PLATFORM WITHOUT A PARENT OR GUARDIAN, AS DESCRIBED IN SECTION 13(b) ABOVE."
                 ]
             }
         ]
     },
     {
-        title: "OPT-IN FOR MINORS UNDER 16",
+        title: "VOLUNTEERS UNDER 18",
         contextType: "parent",
         content: [
-            "If you are a Category II Learner or Volunteer between 13 to 15 years of age, we are required to obtain your opt-in consent to the collection, use and/or sharing of certain personal information as listed in Section 3 of this Privacy Policy in order to provide our services.",
-            "Please verify your consent to the collection, use and/or sharing of your personal information by following the steps below.",
-            "Steps for Opt-in Consent:",
-            {
-                contextType: "list",
-                hideNumber: true,
-                content: [
-                    "1. Provide your name and contact information at the time of registration on our Website and/or Platform.",
-                    "2. Provide your email address for registering on our Website and/or Platform and submit that you consent that MW collect, use and/or share your personal information as listed in this Privacy Policy."
-                ]
-            },
+            "If you are a Volunteer who is under 18 (and at least 13 years old), a parent or guardian’s consent is needed for you to volunteer with MelodyWings.",
+            "At registration we ask for your parent or guardian’s name and email address and for confirmation that they consent. We send your parent or guardian an email about your registration.",
             `If you have any questions or concerns, please contact us at ${supportEmailLink} or by writing to us at MelodyWings at 9852 Wesbourne Way, Granite Bay - CA 95746. You can also request that we delete your personal information at any time.`,
-            `If you are a Category III Learner or Volunteer who is age 16 and above, you may withdraw your consent to the collection, use and/or sharing of your personal information at any time by contacting us at ${supportEmailLink} or by writing to us at MelodyWings at 9852 Wesbourne Way, Granite Bay - CA 95746.`
+            `Any User may withdraw their consent to the collection, use and/or sharing of their personal information at any time by contacting us at ${supportEmailLink} or by writing to us at MelodyWings at 9852 Wesbourne Way, Granite Bay - CA 95746.`
         ]
     },
     {
@@ -452,11 +432,11 @@ export const sectionsData = [
                             "Address: 88 Colin P. Kelly Jr. Street in San Francisco"
                         ],
                         [
-                            "Alphabet, Inc. (Google Sign-In, Firebase Cloud Messaging &amp; Analytics, Gemini API)",
+                            "Alphabet, Inc. (Google Sign-In, Google Calendar and Meet, Gmail email delivery, Firebase Cloud Messaging for push notifications, Google Analytics, Gemini API for matching suggestions and safety-report summaries)",
                             "Address: 1600 Amphitheatre Parkway in Mountain View, California"
                         ],
                         [
-                            "Cloudinary",
+                            "Cloudinary (photos and videos)",
                             `Email: ${emailLink("info@cloudinary.com")} <br /> Address: 6201 America Center Dr, San Jose, CA 94089, US`
                         ],
                         [
@@ -464,21 +444,15 @@ export const sectionsData = [
                             `Email: ${emailLink("support@cloudflare.com")} <br /> Address: 01 Townsend St, San Francisco, CA 94107`
                         ],
                         [
-                            "Stripe Inc.",
+                            "Stripe Inc. (donations)",
                             `Email: ${emailLink("support@stripe.com")} <br /> Address: 510 Townsend St, San Francisco, CA 94103`
                         ],
                         [
-                            "PayPal",
-                            `Website: ${createLink("https://www.paypal.com", "www.paypal.com")} <br /> Address: 2211 North First Street San Jose, CA 95131`
-                        ],
-                        [
-                            // TODO: verify current legal name/address before publishing.
-                            "PostHog Inc. (product analytics)",
+                            "PostHog Inc. (web analytics, only after you click Allow)",
                             `Email: ${emailLink("hey@posthog.com")} <br /> Address: 2261 Market Street #4008, San Francisco, CA 94114`
                         ],
                         [
-                            // TODO: verify current legal name/address before publishing.
-                            "Functional Software, Inc. dba Sentry (crash/error reporting)",
+                            "Functional Software, Inc. dba Sentry (error reporting on the website, our servers and the Android app)",
                             `Email: ${emailLink("support@sentry.io")} <br /> Address: 45 Fremont Street, 8th Floor, San Francisco, CA 94105`
                         ]
                     ]

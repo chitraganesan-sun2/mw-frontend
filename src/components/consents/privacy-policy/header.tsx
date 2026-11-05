@@ -9,7 +9,7 @@ const PrivacyPolicyHeader = () => {
             <div className="flex flex-col gap-3 text-center">
                 <h5 className="text-xl font-bold">MelodyWings</h5>
                 <h6 className="text-2xl font-bold uppercase">Privacy Policy</h6>
-                <p className="text-base text-gray-700">Last Updated: March 2025</p>
+                <p className="text-base text-gray-700">Last Updated: November 5, 2026</p>
             </div>
             <div className="flex flex-col gap-3">
                 {headerContents.map((content, index) => (

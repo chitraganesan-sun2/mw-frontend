@@ -988,6 +988,11 @@ const Donate = () => {
                             disabled={isSubmitting}
                             customClassName="!w-full !rounded-[10px] !py-3 !h-12 !text-base !font-medium !text-white !bg-action hover:!bg-action-hover"
                         />
+                        <p className="mt-4 text-sm text-gray-600 text-center">
+                            Donations are generally final. If you made a mistake, email us at{" "}
+                            <a className="underline" href="mailto:support@melodywings.org">support@melodywings.org</a>{" "}
+                            and we&apos;ll review it.
+                        </p>
                     </form>
                 </div>
             </main>

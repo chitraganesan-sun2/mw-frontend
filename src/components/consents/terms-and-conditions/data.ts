@@ -12,7 +12,7 @@ export const sectionsData = [
         content: [
             "MelodyWings is a non-profit organization. At MW, we believe that everyone should have the opportunity to pursue their passions and unlock their full potential. For individuals with diverse disabilities (‘Learners’), finding the right extracurricular activities often requires a journey of exploration, which can sometimes come with financial challenges. Our mission is to empower Learners with developmental disabilities and special needs to discover and engage in activities that truly resonate with them, free from barriers of ability or cost.",
             "We connect learners with skilled and experienced volunteers in various extracurricular fields (‘Volunteers’), who provide free online classes to help learners achieve their goals, expand their knowledge, and build valuable skills. Through these experiences, we aim to foster joy, boost confidence, encourage self-expression, and open doors to lifelong hobbies, skills, and career opportunities. By harnessing the talents of dedicated community volunteers, we ensure that everyone, regardless of ability, has the opportunity to grow, thrive, and reach their full potential.",
-            "Our Learners and Volunteers could include those who are minors and our Learners could include those who do not have a mental capacity to contract. Thus, if you are a parent or legal guardian of such minor or a person who does not have mental capacity to enter into a contract, you hereby consent on behalf of such person(s) to the terms and conditions set forth in these terms of service.",
+            "Our Learners and Volunteers could include minors, and some Learners may need support making decisions and may not be able to enter into a contract on their own. Thus, if you are a parent or legal guardian of such a minor or of a person who needs support making decisions, you hereby consent on behalf of such person(s) to the terms and conditions set forth in these terms of service.",
             {
                 title: "TERRITORIAL RESTRICTION",
                 contextType: "child",
@@ -25,14 +25,15 @@ export const sectionsData = [
     {
         title: "PRIVACY POLICY",
         content: [
-            `Our ${privacyPolicyLink} describes how we handle the personal and business information you provide to us when you register for our Website and Platform. You understand that through your use of our Website and Platform, you consent to the collection and use (as set forth in the ${privacyPolicyLink}) of this information, including the transfer of this information to the US, and/or other countries for storage, processing, and use by MW and our affiliates.`
+            `Our ${privacyPolicyLink} describes how we handle the personal and business information you provide to us when you register for our Website and Platform. You understand that through your use of our Website and Platform, you consent to the collection and use (as set forth in the ${privacyPolicyLink}) of this information, including the transfer of this information to the US, and/or other countries for storage, processing, and use by MW and our affiliates.`,
+            `SAFETY REVIEW OF SESSIONS. To help keep learners safe, MW may review recordings or transcripts of sessions that our staff upload or import. We use automated analysis, including an AI model, to look for safety concerns. The transcript and the findings are stored by MW, and only authorised MW staff can see them. MW may keep these safety review records after an account is deleted, for child-safety purposes. See our ${privacyPolicyLink} for details.`
         ]
     },
     {
         title: "ELIGIBILITY & ACCESS RESTRICTIONS",
         content: [
-            "To be eligible to use our Website or Platform, you must meet the following criteria and represent and warrant that you: (a) are 18 years of age or older; (b) are not currently restricted from accessing our Website or Platform, or not otherwise prohibited from having an account, (c) are not our competitor, or are not using our Website or Platform for reasons that are in competition with us; (d) will only maintain one registered account at any given time; (e) have full power and authority to enter into this Agreement and doing so will not violate any other agreement to which you are a party; (f) will not violate any of our rights, including intellectual property rights such as patent, copyright, and trademark rights; and (g) agree to provide at your cost all equipment, browser software, and internet access necessary to use our Website or Platform.",
-            "USE OF THE SERVICES IS RESTRICTED TO INDIVIDUALS AGED 18 AND OLDER. HOWEVER, INDIVIDUALS UNDER THE AGE OF 18 OR THOSE WITH MENTAL DEVELOPMENTAL DISABILITIES OF ANY AGE MAY ACCESS THE SERVICES ONLY WHEN ACCOMPANIED BY A PARENT OR LEGAL GUARDIAN. PARENTS OR GUARDIANS ACCOMPANYING SUCH USERS AGREE TO TAKE FULL RESPONSIBILITY FOR THEIR USE OF THE SITE AND HEREBY CONSENT ON BEHALF OF SUCH PERSON(S) TO THE TERMS AND CONDITIONS SET FORTH IN THESE TERMS OF SERVICE."
+            "To be eligible to use our Website or Platform, you must meet the following criteria and represent and warrant that you: (a) meet the age requirements set out below; (b) are not currently restricted from accessing our Website or Platform, or not otherwise prohibited from having an account, (c) are not our competitor, or are not using our Website or Platform for reasons that are in competition with us; (d) will only maintain one registered account at any given time; (e) have full power and authority to enter into this Agreement and doing so will not violate any other agreement to which you are a party; (f) will not violate any of our rights, including intellectual property rights such as patent, copyright, and trademark rights; and (g) agree to provide at your cost all equipment, browser software, and internet access necessary to use our Website or Platform.",
+            "MELODYWINGS IS FOR ADULTS AGED 18 AND OLDER, WITH THESE EXCEPTIONS. LEARNERS CAN BE ANY AGE FROM 5. A PARENT OR GUARDIAN MUST SIGN UP A LEARNER WHO IS UNDER 13, AND ALSO A LEARNER WHO IS 13 OR OLDER BUT HAS LIMITED LEGAL OR DECISION-MAKING CAPACITY (THAT IS, WHO NEEDS SUPPORT MAKING DECISIONS). VOLUNTEERS MUST BE AT LEAST 13, AND VOLUNTEERS UNDER 18 NEED THE CONSENT OF A PARENT OR GUARDIAN. PARENTS OR GUARDIANS SIGNING UP OR CONSENTING FOR SUCH USERS AGREE TO TAKE FULL RESPONSIBILITY FOR THEIR USE OF THE SITE AND HEREBY CONSENT ON BEHALF OF SUCH PERSON(S) TO THE TERMS AND CONDITIONS SET FORTH IN THESE TERMS OF SERVICE."
         ]
     },
     {
@@ -60,7 +61,7 @@ export const sectionsData = [
         title: "ACCESS RIGHTS",
         content: [
             `You can access and use our Website at ${websiteLink}. When using our Platform, you are required to provide us with registration information including personal information. You agree that we have the right to disable your access and use rights, at any time if, in our opinion, you have violated any provision of this Agreement and/or our ${privacyPolicyLink}. You agree to cooperate with us if the security of our Website or Platform is compromised by you or another person through the use of our Website or Platform. We will not be liable for any loss or damage arising from your failure to comply with this Section.`,
-            `We collect personal and business information (as set forth in our ${privacyPolicyLink}), which we need from you when you register to use our Website or Platform. This information is necessary for us to provide our Website or Platform to you and is stored on our servers to enable us to continue to provide our Website or Platform to you. Upon your written request, we will provide you with a list of all of the Personal Information that we store on you within sixty (60) days of receiving your request. Also, upon your prior written request, we will delete any such information within sixty (60) days of receiving your request. Notwithstanding, please note that, if you ask us to delete all such information, we will not be able to continue to provide our Website or Platform to you. Please send your requests to us at ${supportEmailLink}.`
+            `We collect personal and business information (as set forth in our ${privacyPolicyLink}), which we need from you when you register to use our Website or Platform. This information is necessary for us to provide our Website or Platform to you and is stored on our servers to enable us to continue to provide our Website or Platform to you. Upon your written request, we will provide you with a list of all of the Personal Information that we store on you within forty-five (45) days of receiving your request. Also, upon your prior written request, we will delete any such information within forty-five (45) days of receiving your request. Notwithstanding, please note that, if you ask us to delete all such information, we will not be able to continue to provide our Website or Platform to you. Please send your requests to us at ${supportEmailLink}.`
         ]
     },
     {
@@ -106,7 +107,7 @@ export const sectionsData = [
         title: "MW COMMUNICATIONS",
         contextType: "parent",
         content: [
-            "You understand and agree that you may receive information and push notifications from MW via email, text message on your mobile device, or calls to your mobile number. You hereby consent to receive communications via email, text message on your mobile device, or calls to your mobile number. You acknowledge that you may incur additional charges or fees from your wireless provider for these communications, including text message charges and data usage fees, and you acknowledge and agree that you are solely responsible for any such charges and fees and not MW.",
+            "You understand and agree that you may receive information and notifications from MW by email and push notification.",
             {
                 title: "a) Email Contact",
                 contextType: "child",
@@ -126,7 +127,7 @@ export const sectionsData = [
     {
         title: "PAYMENT",
         content: [
-            "Our Website and Platform are currently provided to you at no cost. In the event that we change this in the future, we will communicate such modification to you as per the procedure detailed under Section 18 or as otherwise specified in another agreement between MW and you."
+            `Our Website and Platform are currently provided to you at no cost. In the event that we change this in the future, we will communicate such modification to you as per the procedure detailed under Section 18 or as otherwise specified in another agreement between MW and you. Donations are generally final. If you made a mistake, email us at ${supportEmailLink} and we will review it.`
         ]
     },
     {
@@ -151,7 +152,6 @@ export const sectionsData = [
     {
         title: "TERMINATION",
         content: [
-            "You may terminate this binding legal Agreement with MW by providing thirty (30) days prior written notice, with a possible termination charge.",
             `We reserve the right to suspend or terminate your account or cease providing you with access to all or part of our Website or Platform at any time for any or no reason, including, but not limited to, if we reasonably believe: (i) you have violated this Agreement or our ${privacyPolicyLink}, (ii) you create risk or possible legal exposure for MW; or (iii) our provision of our Website or Platform to you is no longer commercially viable. We will make reasonable efforts to notify you of such termination by the email address associated with your account or the next time you attempt to access your account, depending on the circumstances. In all such cases, this Agreement shall terminate, including, without limitation, your license to use our Website or Platform.`,
             "All sections, which by their nature and context are intended to survive the termination of this Agreement, will survive."
         ]
@@ -266,7 +266,7 @@ export const sectionsData = [
                 title: "i) Opt-Out Right",
                 contextType: "child",
                 content: [
-                    "YOU HAVE THE RIGHT TO OPT OUT OF BINDING ARBITRATION WITHIN THIRTY (30) DAYS OF THE DATE YOU FIRST ACCEPTED THE TERMS OF THIS SECTION BY WRITING TO: MELODYWINGS, RE: OPT-OUT, 9852 WESBOURNE WAY, GRANITE BAY - CA 95746. IN ORDER TO BE EFFECTIVE, THE OPT OUT NOTICE MUST INCLUDE YOUR FULL NAME AND CLEARLY INDICATE YOUR INTENT TO OPT OUT OF BINDING ARBITRATION. BY OPTING OUT OF BINDING ARBITRATION, YOU ARE AGREEING TO RESOLVE DISPUTES IN ACCORDANCE WITH SECTION 21."
+                    "YOU HAVE THE RIGHT TO OPT OUT OF BINDING ARBITRATION WITHIN THIRTY (30) DAYS OF THE DATE YOU FIRST ACCEPTED THE TERMS OF THIS SECTION BY WRITING TO: MELODYWINGS, RE: OPT-OUT, 9852 WESBOURNE WAY, GRANITE BAY - CA 95746. IN ORDER TO BE EFFECTIVE, THE OPT OUT NOTICE MUST INCLUDE YOUR FULL NAME AND CLEARLY INDICATE YOUR INTENT TO OPT OUT OF BINDING ARBITRATION. BY OPTING OUT OF BINDING ARBITRATION, YOU ARE AGREEING TO RESOLVE DISPUTES IN ACCORDANCE WITH SECTION 20 (GOVERNING LAW)."
                 ]
             }
 
