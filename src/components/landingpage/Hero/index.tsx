@@ -30,14 +30,14 @@ const Hero = () => {
                     <div className="flex flex-col md:flex-row gap-3">
                         <Button
                             onClick={() => setParamMode("learner")}
-                            title="Enroll as Learner"
+                            title="Join as a Learner"
                             btnVariant="learner"
                             size="small"
                             customClassName="w-full md:w-auto"
                         />
                         <Button
                             onClick={() => setParamMode("volunteer")}
-                            title="Become a Volunteer"
+                            title="Join as a Volunteer"
                             btnVariant="volunteer"
                             size="small"
                             customClassName="w-full md:w-auto"

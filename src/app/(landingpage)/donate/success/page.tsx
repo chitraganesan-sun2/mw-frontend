@@ -29,7 +29,7 @@ export default function DonateSuccessPage() {
                 </h1>
                 <p className="text-gray-600 mb-8 leading-relaxed">
                     Your generous contribution helps us provide learning resources
-                    and support to children with special needs. Every donation makes
+                    and support to learners with special needs. Every donation makes
                     a difference.
                 </p>
 

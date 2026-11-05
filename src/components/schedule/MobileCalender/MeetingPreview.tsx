@@ -196,7 +196,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
 
         const feedBackStatus = {
             label: isFeedBackCompleted ? "Feedback Submitted" : "Session Completed",
-            value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Session Completed</p> : <button type="button" onClick={handleFeedBack} className="text-sm underline text-primary bg-transparent border-0 p-0 cursor-pointer">Complete Feedback</button>
+            value: isFeedBackCompleted ? <p className="text-green-700 text-sm font-semibold">Session Completed</p> : <button type="button" onClick={handleFeedBack} className="text-sm underline text-primary bg-transparent border-0 p-0 cursor-pointer">Give Feedback</button>
         }
         const statusMap = {
             // Same labels/colours as everywhere else (utils/sessionDisplay); "rejected" used
@@ -280,7 +280,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                         </div>
                         <Divider />
                         {status === "accepted" && reschedulePending && (
-                            <p className="text-xs font-medium text-amber-700">Reschedule requested – waiting for an answer</p>
+                            <p className="text-xs font-medium text-amber-700">Reschedule requested. Waiting for an answer.</p>
                         )}
                         {canReschedule && (
                             <div className="flex items-center justify-between gap-3">

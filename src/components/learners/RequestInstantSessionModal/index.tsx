@@ -127,9 +127,9 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
 
     const handleSubmit = async () => {
         const found = {
-            category: category ? undefined : "Please choose a category.",
-            skill: skill ? undefined : "Please choose a skill.",
-            level: level ? undefined : "Please choose a level.",
+            category: category ? undefined : "Category is required",
+            skill: skill ? undefined : "Skill is required",
+            level: level ? undefined : "Level is required",
             details: sessionDetails.trim() ? undefined : "Please describe the session details and expectations.",
         };
         if (found.category || found.skill || found.level || found.details) {

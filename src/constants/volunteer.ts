@@ -209,7 +209,7 @@ const EducationWorkExperienceFields: FormField[] = [
         id: "volunteer_favorite_activities",
         label: "Favorite Free-Time Activities",
         inputType: "textarea",
-        placeholder: "Enter here",
+        placeholder: "Type here",
         gridCols: 2,
         required: true,
     },
@@ -222,7 +222,7 @@ const SkillsToTeachFields: FormField[] = [
         id: "volunteer_languages",
         label: "Preferred Teaching Language(s)",
         inputType: "async-select",
-        placeholder: "Don't see your option? Type it in to add.",
+        placeholder: "Can't find your option? Type it in to add it.",
         creatable: true,
         gridCols: 1,
         endpoint: "languages",
@@ -247,7 +247,7 @@ const SkillsToTeachFields: FormField[] = [
         id: "volunteer_subjects",
         label: "Academic Subjects You're Interested in Teaching",
         inputType: "async-select",
-        placeholder: "Don't see your option? Type it in to add.",
+        placeholder: "Can't find your option? Type it in to add it.",
         creatable: true,
         variant: "multi",
         gridCols: 1,
@@ -260,14 +260,14 @@ const SkillsToTeachFields: FormField[] = [
         id: "volunteer_academic_skills_notes",
         label: "More About Your Academic Skills",
         inputType: "text",
-        placeholder: "Enter here",
+        placeholder: "Type here",
         gridCols: 1,
     },
     {
         id: "volunteer_skills",
         label: "Arts & Life Skills You're Interested in Teaching",
         inputType: "async-select",
-        placeholder: "Don't see your option? Type it in to add.",
+        placeholder: "Can't find your option? Type it in to add it.",
         creatable: true,
         gridCols: 1,
         // Arts & Life Skills only - the unfiltered catalog also listed academic skills
@@ -283,7 +283,7 @@ const SkillsToTeachFields: FormField[] = [
         id: "volunteer_arts_life_skills_notes",
         label: "More About Your Arts & Life Skills",
         inputType: "text",
-        placeholder: "Enter here",
+        placeholder: "Type here",
         gridCols: 1,
     },
     {
@@ -311,7 +311,7 @@ const SkillsToTeachFields: FormField[] = [
         label: "What are your teaching traits, preferences, and limitations?",
         sublabel: "(optional, not tied to your answer above)",
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         gridCols: 2,
     },
 ];
@@ -354,7 +354,7 @@ const CriminalBackgroundCheckFields: FormField[] = [
         id: "description",
         label: `Please describe the circumstance behind the "yes" answer above.`,
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         gridCols: 2,
     },
 ];
@@ -375,7 +375,7 @@ const SexOffenderCheckFields: FormField[] = [
         id: "description",
         label: `Please describe the circumstance behind the "yes" answer above.`,
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         gridCols: 2,
     },
 ];
@@ -418,7 +418,7 @@ const DisciplinaryCheckDetailsFields: FormField[] = [
         id: "description",
         label: `Please describe the circumstance behind the "yes" answer above.`,
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         gridCols: 2,
     },
 ];
@@ -439,7 +439,7 @@ const HealthSafetyAgreementFields: FormField[] = [
         id: "description",
         label: `Please describe the circumstance behind the "yes" answer above.`,
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         required: false,
         gridCols: 2,
     },
@@ -483,7 +483,7 @@ const OtherConsentsDetailsFields: FormField[] = [
         id: "description",
         label: `Please describe the circumstance behind the "no" answer above.`,
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         gridCols: 2,
     },
 ];
@@ -515,7 +515,7 @@ const VolunteerExperienceDetailsFields: FormField[] = [
         id: "description",
         label: `Please describe the circumstance behind the "yes" answer above.`,
         inputType: "textarea",
-        placeholder: "Describe here",
+        placeholder: "Type here",
         gridCols: 2,
     },
 ];
@@ -608,7 +608,7 @@ export const VolunteerFormSections: FormSectionConfig[] = [
                 id: "profile_video",
                 label: "Profile Video",
                 sublabel:
-                    "Record a Video summarizing your profile and qualifications. This will help the learners to get to know you better! Feel free to share your hobbies, extracurricular activities, and explain how and why you believe you're well-suited to teach the subject you've chosen to special needs learners. You can keep it casual! Speak from the heart and share what feels natural.",
+                    "Record a video summarizing your profile and qualifications. This helps learners get to know you better. Feel free to share your hobbies and extracurricular activities, and explain why you are a good fit to teach the subject you chose to learners with special needs. Keep it casual. Speak from the heart and share what feels natural.",
                 inputType: "upload",
                 gridCols: 2,
                 variant: "file",
@@ -666,17 +666,17 @@ export const VolunteerProfileFormConstants: FormSectionConfig[] = VolunteerFormS
 export const VolunteerOnboardingConstants = {
     title: "Join as a Volunteer",
     description:
-        "Flexible schedules, meaningful impact—volunteer your way to help someone with special needs to discover their potential.",
+        "Flexible schedules, meaningful impact. Volunteer your way and help someone with special needs discover their potential.",
 };
 
 export const VolunteerThankyouCardConstants = {
     title: "Thank You for Applying!",
     description:
-        "We appreciate you considering this rewarding opportunity to change lives. MelodyWings team will verify the information provided in your application and thank you for your enthusiasm and willingness to make a difference in the lives of others.",
+        "We appreciate you considering this rewarding opportunity to change lives. The MelodyWings team will verify the information in your application. Thank you for your enthusiasm and your willingness to make a difference in the lives of others.",
 };
 
 export const VolunteerRejectedMessage = {
     title: "Thank You for Your Interest!",
     description:
-        "At this time, we are unable to proceed with your application. We truly appreciate your willingness to contribute and encourage you to check back for future opportunities!",
+        "At this time, we're unable to move forward with your application. We truly appreciate your willingness to contribute and encourage you to check back for future opportunities!",
 };

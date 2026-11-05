@@ -53,7 +53,7 @@ const ReportPersonModal = ({ isOpen, onClose, reportType, targetId, subjectName 
 
     const handleSubmit = async () => {
         if (isSubmitting) return;
-        const problem = validateReport(reportType, reason, details) ?? (targetId ? null : "Something went wrong. Please try again.");
+        const problem = validateReport(reportType, reason, details) ?? (targetId ? null : "Couldn't submit your report. Please try again.");
         if (problem) {
             showToast({ type: "error", message: problem });
             return;

@@ -61,7 +61,7 @@ const Impact = () => {
                                     `${formatHours(totalVolunteersHours?.total_volunteered_hours || 0)}+`
                                 )}
                             </span>
-                            <p className="text-xl md:text-base lg:text-xl font-medium -mt-2">Total Hours</p>
+                            <p className="text-xl md:text-base lg:text-xl font-medium -mt-2">Volunteer Hours</p>
                         </div>
                         <div className="flex flex-col">
                             <span

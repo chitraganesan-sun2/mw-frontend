@@ -22,10 +22,10 @@ function AboutSectionCard() {
       <div>
         <p className="text-sm md:text-base lg:text-xl font-normal leading-8 max-md:!leading-6 text-justify tracking-wide">
           They observed that one kid, despite struggling with stress and self-regulation, loved singing and had an exceptional voice.
-          A few other children, despite having a limited attention span, enjoyed singing full rhymes with enthusiasm.
+          A few other children who found it hard to focus for long still enjoyed singing full rhymes with enthusiasm.
           Motivated by these experiences, Nithila decided to begin a research project in high school focused on the impact of music on children with special needs.
           This passion, combined with a love for music, inspired the creation of MelodyWings—a platform designed to help children explore their musical interests with the support of dedicated volunteers.
-          Over time, MelodyWings expanded to offer a wide variety of subjects and skill-building opportunities, all tailored to the unique needs of children with special needs and developmental disabilities.
+          Over time, MelodyWings expanded to offer a wide variety of subjects and skill-building opportunities, all tailored to the unique needs of learners with special needs and developmental disabilities.
         </p>
       </div>
     </div>

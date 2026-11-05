@@ -327,7 +327,7 @@ export default function VolunteerInstantSessionsPage() {
         setIsActionLoading(true);
         try {
             await POST_API(endpoints.session.acceptLearnerRequest(requestId));
-            showToast({ message: "Request accepted! A session has been created.", type: "success" });
+            showToast({ message: "Request accepted. Your session is now scheduled.", type: "success" });
             invalidateScheduleViews(queryClient, "volunteer");
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't accept the request. Please try again."), type: "error" });
@@ -424,9 +424,8 @@ export default function VolunteerInstantSessionsPage() {
             <div className="flex flex-col items-center text-center gap-2 mb-8">
                 <h1 className="text-2xl font-medium text-gray-900">Instant Sessions</h1>
                 <p className="text-sm text-gray-500 max-w-2xl">
-                    Instant Sessions are sessions available <strong>today or tomorrow.</strong> You
-                    can post an Instant Session for learners to join, or accept a session a learner
-                    has requested.
+                    Instant sessions happen <strong>today or tomorrow.</strong> Post a session for
+                    learners to join, or accept one a learner has requested.
                 </p>
             </div>
 

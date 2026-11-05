@@ -16,7 +16,7 @@ export const VolunteerFilterModalConstants = [
     },
     {
         name: "skill_ids",
-        label: "Skills and Expertise to Learn",
+        label: "Skills to Learn",
         inputType: "async-select",
         variant: "multi",
         endpoint: "skills",
@@ -84,7 +84,7 @@ export const LearnerFilterModalConstants = [
     },
     {
         name: "skill_ids",
-        label: "Skills and Expertise to Learn",
+        label: "Skills to Learn",
         inputType: "async-select",
         variant: "multi",
         endpoint: "skills",

@@ -251,7 +251,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                             onClick={handleFeedBack}
                             className="text-primary text-sm underline cursor-pointer font-medium bg-transparent border-0 p-0"
                         >
-                            Complete Feedback
+                            Give Feedback
                         </button>
                     </div>
                 </div>
@@ -260,12 +260,12 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             return (
                 <div>
                     <div className="flex items-center justify-between gap-3">
-                        <p className="font-medium text-sm text-success">Feedback Completed</p>
+                        <p className="font-medium text-sm text-success">Feedback Submitted</p>
                         {/* <p
                             onClick={handleFeedBack}
                             className="text-primary text-sm underline font-medium"
                         >
-                            See Feedback
+                            View Feedback
                         </p> */}
                     </div>
                 </div>
@@ -284,7 +284,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                             onClick={handleFeedBack}
                             className="text-primary text-sm underline cursor-pointer font-medium bg-transparent border-0 p-0"
                         >
-                            Complete Feedback
+                            Give Feedback
                         </button>
                     </div>
                 </div>
@@ -293,12 +293,12 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             return (
                 <div>
                     <div className="flex items-center justify-between gap-3">
-                        <p className="font-medium text-sm text-success">Feedback Completed</p>
+                        <p className="font-medium text-sm text-success">Feedback Submitted</p>
                         {/* <p
                             onClick={handleFeedBack}
                             className="text-primary text-sm underline font-medium"
                         >
-                            See Feedback
+                            View Feedback
                         </p> */}
                     </div>
                 </div>
@@ -483,7 +483,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                     </div>
                 )}
                 {status === "accepted" && reschedulePending && (
-                    <p className="text-xs font-medium text-amber-700">Reschedule requested – waiting for an answer</p>
+                    <p className="text-xs font-medium text-amber-700">Reschedule requested. Waiting for an answer.</p>
                 )}
                 {canReschedule && (
                     <div className="flex items-center justify-between gap-3">

@@ -84,7 +84,7 @@ const ImageUpload: React.FC<BaseUploaderProps> = ({ ...props }) => {
                         </div>
                         <Image
                             src={value?.image_url}
-                            alt="Image Broken"
+                            alt="Image couldn't load"
                             className="w-full absolute top-0 rounded-lg left-0 h-full object-cover transition-opacity duration-300 opacity-0"
                             width={400}
                             height={400}

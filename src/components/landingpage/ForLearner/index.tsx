@@ -15,8 +15,8 @@ const ForLearner = () => {
             <ContainerHeader
                 compact
                 title="For Learners"
-                subTitle="Explore new horizons in learning and foster growth"
-                description="Search for a champion your learner deserves and connect with a volunteer to teach for free"
+                subTitle="Explore new horizons in learning and growth."
+                description="Find the volunteer champion your learner deserves and connect with them for free sessions."
                 titleColor="!text-learner-dark"
             />
             <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">
@@ -34,7 +34,7 @@ const ForLearner = () => {
                 </div>
                 <div className="max-w-[300px]">
                     <Button
-                        title="Enroll as Learner"
+                        title="Join as a Learner"
                         btnVariant="learner"
                         size="small"
                         customClassName="w-full md:w-auto"

@@ -149,13 +149,13 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
             endTime = endDayjs.format("h:mm A");
         } else {
             // Fallback for invalid dates
-            startTime = "Invalid";
-            endTime = "Time";
+            startTime = "";
+            endTime = "";
         }
         return (
             <EventCard
                 title={eventInfo.event.title}
-                time={`${startTime} - ${endTime}`}
+                time={startTime && endTime ? `${startTime} - ${endTime}` : "Time not set"}
                 status={eventInfo.event._def.extendedProps.status}
             />
         );

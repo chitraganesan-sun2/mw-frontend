@@ -67,7 +67,7 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
         const remainingSlots = maxFiles - currentFileCount;
 
         if (remainingSlots <= 0) {
-            showToast({ message: `Maximum ${maxFiles} files allowed`, type: "error" });
+            showToast({ message: `You can upload up to ${maxFiles} files.`, type: "error" });
             return;
         }
 

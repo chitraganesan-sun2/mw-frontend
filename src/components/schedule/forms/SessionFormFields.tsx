@@ -361,7 +361,7 @@ export function SessionDetailsField({
 }
 
 export const LEARNER_DETAILS_PLACEHOLDER =
-    "Tell us what you want to learn, plus any topics, questions, background information, or materials the volunteer should know about or review before your session.";
+    "Tell us what you want to learn, plus any questions, background, or materials the volunteer should review before your session.";
 
 /** "October 30, 2026 · 6:00 PM – 6:45 PM EDT" - the zone is the one in effect on that date. */
 export function formatSlotOption(slot: UpcomingSlot, timeZoneLabel?: string): string {

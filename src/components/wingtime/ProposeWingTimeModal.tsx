@@ -83,9 +83,9 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
 
     const validate = (): Errors => {
         const e: Errors = {};
-        if (!topic.trim()) e.topic = "Please enter a topic.";
-        if (!description.trim()) e.description = "Please describe the session.";
-        if (!date) e.date = "Please choose a date.";
+        if (!topic.trim()) e.topic = "Topic is required";
+        if (!description.trim()) e.description = "Description is required";
+        if (!date) e.date = "Date is required";
         else if (date < earliestDate) e.date = "That date has passed. Please choose today or a later date.";
         if (!time) e.time = "Please choose a start time.";
         if (date && time && !e.date) {
@@ -97,7 +97,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                 e.date = "A WingTime can be scheduled up to 60 days ahead. Please pick an earlier date.";
             }
         }
-        if (materialsChoice === "needed" && !materials.trim()) e.materials = "Please list the materials.";
+        if (materialsChoice === "needed" && !materials.trim()) e.materials = "Materials are required";
         const cap = Number(capacity);
         if (!Number.isInteger(cap) || cap < 1 || cap > 50) e.capacity = "Please enter a number from 1 to 50.";
         if (tags.length > MAX_TAGS) e.tags = `Please use no more than ${MAX_TAGS} topics.`;

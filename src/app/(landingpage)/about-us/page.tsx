@@ -27,7 +27,7 @@ const AboutUs = () => {
                 titleStyle="!text-2xl lg:!text-[40px] max-md:!mb-3 !font-medium"
                 descriptionStyle="!text-sm md:!text-sm lg:!text-xl !font-normal !text-black !text-center !text-justify"
                 title="About Us"
-                description="MelodyWings is a heartfelt initiative created to provide free tutoring for students with disabilities and special needs. It is a platform where these students can receive personalized lessons in subjects they are passionate about or need help with, all while volunteers gain valuable experience and earn community service hours."
+                description="MelodyWings is a heartfelt initiative created to provide free learning sessions for learners with disabilities and special needs. It is a platform where these learners can receive personalized lessons in subjects they are passionate about or need help with, all while volunteers gain valuable experience and earn community service hours."
             />
             <AboutSectionCard />
             <MeetOurTeam />

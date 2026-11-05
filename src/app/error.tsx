@@ -25,7 +25,7 @@ export default function GlobalError({
             <div className="flex flex-col gap-2">
                 <h1 className="text-2xl md:text-3xl font-medium">Something went wrong</h1>
                 <p className="text-base text-gray-600">
-                    We hit an unexpected error. Please try again.
+                    Something went wrong. Please try again.
                 </p>
             </div>
             <div className="flex gap-3">

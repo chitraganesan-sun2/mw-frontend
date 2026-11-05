@@ -32,8 +32,8 @@ export default function FeaturesHero() {
 
                 {/* Description */}
                 <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto animate-fadeIn animation-delay-400">
-                    MelodyWings connects learners with disabilities to caring volunteer tutors through an intelligent platform 
-                    designed for accessibility, safety, and personalized education.
+                    MelodyWings connects learners with disabilities to caring volunteers through a platform 
+                    designed for accessibility, safety, and personal learning.
                 </p>
 
                 {/* Quick stats */}
@@ -66,13 +66,13 @@ export default function FeaturesHero() {
                         onClick={() => setParamMode("learner")}
                         className="btn-learner-fill px-8 py-4 rounded-full text-base font-semibold transition-all hover:scale-105 shadow-md"
                     >
-                        Start Learning
+                        Join as a Learner
                     </button>
                     <button
                         onClick={() => setParamMode("volunteer")}
                         className="btn-volunteer-fill px-8 py-4 rounded-full text-base font-semibold transition-all hover:scale-105 shadow-md"
                     >
-                        Become a Volunteer
+                        Join as a Volunteer
                     </button>
                 </div>
             </div>

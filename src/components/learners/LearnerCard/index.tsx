@@ -138,7 +138,7 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
                     <Button
                         disabled={!chatPermission}
                         onClick={handleChatClick}
-                        title="Start Chat"
+                        title="Message"
                         btnVariant="secondary"
                         className="!rounded-xl !text-sm !w-full !bg-white hover:!bg-action-hover hover:!text-white !text-black !border-stroke"
                     />

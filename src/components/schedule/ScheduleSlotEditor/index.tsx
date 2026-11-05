@@ -125,7 +125,7 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
             <div className="flex flex-col gap-1 px-5 py-4">
                 <p className="font-medium">Date and Time</p>
                 <p className="text-xs text-gray-light">
-                    Select the dates and times that you are available in a week.
+                    Select the days and times you are available each week.
                 </p>
             </div>
             <div>

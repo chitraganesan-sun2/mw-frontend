@@ -63,16 +63,16 @@ export const volunteerFormSchema = z
         volunteer_skills: z
             .array(
                 z.object({
-                    skill_name: z.string({ required_error: "Skill name is required" }),
-                    skill_id: z.string({ required_error: "Skill ID is required" }),
+                    skill_name: z.string({ required_error: "Please choose a skill." }),
+                    skill_id: z.string({ required_error: "Please choose a skill." }),
                 })
             )
             .optional(),
         volunteer_subjects: z
             .array(
                 z.object({
-                    subject_name: z.string({ required_error: "Subject name is required" }),
-                    subject_id: z.string({ required_error: "Subject ID is required" }),
+                    subject_name: z.string({ required_error: "Please choose a subject." }),
+                    subject_id: z.string({ required_error: "Please choose a subject." }),
                 })
             )
             .optional(),
@@ -118,13 +118,13 @@ export const volunteerFormSchema = z
             criminal_background_check_details: z
                 .object({
                     convicted_of_a_felony: z.boolean({
-                        required_error: "Please specify if you were convicted of a felony",
+                        required_error: "Please specify if you were convicted of a felony.",
                     }),
                     involved_in_criminal_activity: z.boolean({
-                        required_error: "Please specify if you were involved in criminal activity",
+                        required_error: "Please specify if you were involved in criminal activity.",
                     }),
                     convicted_of_a_crime: z.boolean({
-                        required_error: "Please specify if you were convicted of a crime",
+                        required_error: "Please specify if you were convicted of a crime.",
                     }),
                     description: z.string().or(z.null()).optional(),
                 })
@@ -147,7 +147,7 @@ export const volunteerFormSchema = z
                     },
                     {
                         message:
-                            'Description is required if any criminal conviction or activity is marked as "yes".',
+                            'Please add a description for your "Yes" answer.',
                         path: ["description"],
                     }
                 ),
@@ -168,20 +168,20 @@ export const volunteerFormSchema = z
                     },
                     {
                         message:
-                            'Description is required if sex offender registry is marked as "yes".',
+                            'Please add a description for your "Yes" answer.',
                         path: ["description"],
                     }
                 ),
             disciplinary_check_details: z
                 .object({
                     terminated_from_volunteer_position: z.boolean({
-                        required_error: "Please specify if you were terminated from a position",
+                        required_error: "Please specify if you were terminated from a position.",
                     }),
                     involved_in_disputes: z.boolean({
-                        required_error: "Please specify if you were involved in disputes",
+                        required_error: "Please specify if you were involved in disputes.",
                     }),
                     dismissed_from_institution: z.boolean({
-                        required_error: "Please specify if you were dismissed from an institution",
+                        required_error: "Please specify if you were dismissed from an institution.",
                     }),
                     description: z.string().or(z.null()).optional(),
                 })
@@ -204,14 +204,14 @@ export const volunteerFormSchema = z
                     },
                     {
                         message:
-                            'Description is required if terminated, involved in disputes, or dismissed is marked as "yes".',
+                            'Please add a description for your "Yes" answer.',
                         path: ["description"],
                     }
                 ),
             health_and_safety_check_details: z
                 .object({
                     having_health_issues: z.boolean({
-                        required_error: "Please specify if you have health issues",
+                        required_error: "Please specify if you have health issues.",
                     }),
                     description: z.string().or(z.null()).optional(),
                 })
@@ -224,7 +224,7 @@ export const volunteerFormSchema = z
                     },
                     {
                         message:
-                            'Description is required if having health issues is marked as "yes".',
+                            'Please add a description for your "Yes" answer.',
                         path: ["description"],
                     }
                 ),
@@ -258,14 +258,14 @@ export const volunteerFormSchema = z
                     },
                     {
                         message:
-                            'Description is required if any consent agreement is marked as "no".',
+                            'Please add a description for your "No" answer.',
                         path: ["description"],
                     }
                 ),
             volunteer_experience_details: z
                 .object({
                     invloved_in_complaints: z.boolean({
-                        required_error: "Please specify if you were involved in complaints",
+                        required_error: "Please specify if you were involved in complaints.",
                     }),
                     description: z.string().or(z.null()).optional(),
                 })
@@ -279,7 +279,7 @@ export const volunteerFormSchema = z
                     },
                     {
                         message:
-                            'Description is required if involved in complaints is marked as "yes".',
+                            'Please add a description for your "Yes" answer.',
                         path: ["description"],
                     }
                 ),
@@ -301,10 +301,10 @@ export const volunteerFormSchema = z
         // Profile Picture
         profile_picture: z
             .object({
-                image_url: z.string({ required_error: "Profile picture URL is required" }).min(1, {
+                image_url: z.string({ required_error: "Profile picture is required" }).min(1, {
                     message: "Profile picture is required",
                 }),
-                image_id: z.string({ required_error: "Profile picture ID is required" }).min(1, {
+                image_id: z.string({ required_error: "Profile picture is required" }).min(1, {
                     message: "Profile picture is required",
                 }),
             })
@@ -313,11 +313,11 @@ export const volunteerFormSchema = z
         // Profile Video
         profile_video: z
             .object({
-                video_url: z.string({ required_error: "Profile video URL is required" }).min(1, {
-                    message: "Profile video cannot be empty",
+                video_url: z.string({ required_error: "Profile video is required" }).min(1, {
+                    message: "Profile video is required",
                 }),
-                video_id: z.string({ required_error: "Profile video ID is required" }).min(1, {
-                    message: "Profile video cannot be empty",
+                video_id: z.string({ required_error: "Profile video is required" }).min(1, {
+                    message: "Profile video is required",
                 }),
             })
             .or(z.null())
@@ -549,24 +549,24 @@ export const learnerFormSchema = z
             skills_to_learn: z
                 .array(
                     z.object({
-                        skill_name: z.string({ required_error: "Skill name is required" }),
-                        skill_id: z.string({ required_error: "Skill ID is required" }),
+                        skill_name: z.string({ required_error: "Please choose a skill." }),
+                        skill_id: z.string({ required_error: "Please choose a skill." }),
                     })
                 )
                 .optional(),
             academic_skills_to_learn: z
                 .array(
                     z.object({
-                        skill_name: z.string({ required_error: "Skill name is required" }),
-                        skill_id: z.string({ required_error: "Skill ID is required" }),
+                        skill_name: z.string({ required_error: "Please choose a skill." }),
+                        skill_id: z.string({ required_error: "Please choose a skill." }),
                     })
                 )
                 .optional(),
             arts_life_skills_to_learn: z
                 .array(
                     z.object({
-                        skill_name: z.string({ required_error: "Skill name is required" }),
-                        skill_id: z.string({ required_error: "Skill ID is required" }),
+                        skill_name: z.string({ required_error: "Please choose a skill." }),
+                        skill_id: z.string({ required_error: "Please choose a skill." }),
                     }),
                     { required_error: "Please add at least one arts & life skill" }
                 )
@@ -605,10 +605,10 @@ export const learnerFormSchema = z
         }),
         profile_picture: z
             .object({
-                image_url: z.string({ required_error: "Profile picture URL is required" }).min(1, {
+                image_url: z.string({ required_error: "Profile picture is required" }).min(1, {
                     message: "Profile picture is required",
                 }),
-                image_id: z.string({ required_error: "Profile picture ID is required" }).min(1, {
+                image_id: z.string({ required_error: "Profile picture is required" }).min(1, {
                     message: "Profile picture is required",
                 }),
             })

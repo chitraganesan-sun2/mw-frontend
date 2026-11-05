@@ -266,7 +266,7 @@ const FormTabs = ({
             showToast({
                 type: "error",
                 message:
-                    "Phone number validation failed. Please ensure all phone numbers are exactly 10 digits before proceeding.",
+                    "Please check your phone numbers. Each must be exactly 10 digits.",
             });
             return false;
         }
@@ -357,7 +357,7 @@ const FormTabs = ({
                 showToast({
                     type: "error",
                     message:
-                        "Please fix phone number validation errors before proceeding to the next step.",
+                        "Please check your phone numbers. Each must be exactly 10 digits.",
                 });
                 return;
             }

@@ -31,7 +31,7 @@ export default function SessionExpiredNotice() {
             showToast(
                 deleted
                     ? { type: "success", message: "Your account has been deleted." }
-                    : { type: "info", message: "You were logged out because your session expired. Please log in again." }
+                    : { type: "info", message: "You were logged out because your login expired. Please log in again." }
             );
             noticeScheduled = false;
         }, 500);

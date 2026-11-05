@@ -117,7 +117,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
 
     return (
         <SideModal
-            title="Approval Notifications"
+            title="Session Requests"
             onClose={onClose}
             isOpen={isOpen}
             isNeedButton={false}
@@ -155,7 +155,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
                 ) : !outcomes.isPending && outcomeItems.length === 0 && !outcomes.isError ? (
                     <div className="flex flex-col gap-4 border rounded-xl p-4 border-[#E0E0E0] h-fit lg:w-[360px] items-center justify-center">
                         <p className="text-gray-light text-sm font-medium">
-                            No Notifications Available
+                            No notifications yet
                         </p>
                     </div>
                 ) : null}

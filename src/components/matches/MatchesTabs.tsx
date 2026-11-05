@@ -21,7 +21,7 @@ const MatchesTabs: React.FC<MatchesTabsProps> = ({ active, allLabel, onChange, d
     ];
     return (
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 pt-5 lg:px-10 lg:pt-7">
-            <div role="tablist" aria-label="Browse or see your matches" className="flex gap-2">
+            <div role="tablist" aria-label="Browse and My Matches" className="flex gap-2">
             {tabs.map((t) => {
                 const selected = t.key === active;
                 return (

@@ -19,16 +19,16 @@ const COMMON_TYPOS: Record<string, string> = {
 /** Returns an error message, or null if the address looks valid. */
 export const emailError = (raw: string): string | null => {
     const email = raw.trim().toLowerCase();
-    if (!email) return "Enter your email address.";
+    if (!email) return "Email is required";
     const parts = email.split("@");
-    if (email.length > 254 || parts.length !== 2) return "Enter a valid email address.";
+    if (email.length > 254 || parts.length !== 2) return "Enter a valid email address";
     const [local, domain] = parts;
     if (!local || local.length > 64 || !LOCAL_RE.test(local) || local.startsWith(".") || local.endsWith(".") || local.includes("..")) {
-        return "Enter a valid email address.";
+        return "Enter a valid email address";
     }
     const labels = domain.split(".");
     if (labels.length < 2 || !labels.every((l) => LABEL_RE.test(l)) || !/^[a-z]{2,63}$/.test(labels[labels.length - 1])) {
-        return "Enter a valid email address.";
+        return "Enter a valid email address";
     }
     if (GMAIL.includes(domain) && !/^[a-z0-9]{6,30}$/.test(local.split("+")[0].replace(/\./g, ""))) {
         return "Gmail usernames are 6–30 letters, numbers, or dots.";
@@ -48,7 +48,7 @@ export const PASSWORD_RULES: { label: string; test: (pw: string, email: string) 
     { label: "Contains a number", test: (pw) => /\d/.test(pw) },
     { label: "No spaces at the start or end", test: (pw) => pw === pw.trim() },
     {
-        label: "Doesn't contain your email name",
+        label: "Doesn't include the first part of your email",
         test: (pw, email) => {
             const local = email.split("@")[0].toLowerCase();
             return local.length < 4 || !pw.toLowerCase().includes(local);

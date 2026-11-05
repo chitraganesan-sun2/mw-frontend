@@ -37,7 +37,7 @@ export default function FeaturesCTA() {
                                 onClick={() => setParamMode("volunteer")}
                                 className="group bg-transparent border-2 border-white text-white px-8 py-4 rounded-full text-base font-semibold transition-all hover:bg-white hover:text-orange-600 shadow-lg flex items-center justify-center gap-2"
                             >
-                                Volunteer Today
+                                Join as a Volunteer
                                 <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>

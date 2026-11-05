@@ -177,7 +177,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 </p>
             )}
             {session.status === "accepted" && session.reschedule_pending && (
-                <p className="text-xs font-medium text-amber-700">Reschedule requested – waiting for an answer</p>
+                <p className="text-xs font-medium text-amber-700">Reschedule requested. Waiting for an answer.</p>
             )}
             {session.status === "rejected" && declinedBecause && (
                 <p className="text-xs text-gray-700 break-words">
@@ -236,11 +236,11 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             }
                             // A bare calendar icon read as "open my calendar" but downloads a file -
                             // say what it does.
-                            title="Downloads an .ics file you can open in Google Calendar, Outlook or Apple Calendar"
+                            title="Download a calendar file you can open in Google Calendar, Outlook, or Apple Calendar."
                             className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 underline-offset-2 hover:underline hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
                         >
                             <HiOutlineArrowDownTray size={14} aria-hidden="true" />
-                            Download .ics
+                            Add to Calendar
                         </button>
                     )}
                     {showRespond && (

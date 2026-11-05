@@ -15,7 +15,7 @@ const ForVolunteer = () => {
             <ContainerHeader
                 compact
                 title="For Volunteers"
-                subTitle="You'll find more than a volunteer role—you'll find a purpose that uplifts"
+                subTitle="Find more than a volunteer role. Find a purpose."
                 description="Have a passion for teaching and helping others? Join our community where your efforts can make a world of difference!"
                 titleColor="!text-volunteer"
             />
@@ -35,7 +35,7 @@ const ForVolunteer = () => {
                 </div>
                 <div className="max-w-[300px]">
                     <Button
-                        title="Become a Volunteer"
+                        title="Join as a Volunteer"
                         btnVariant="volunteer"
                         size="small"
                         customClassName="w-full md:w-auto"

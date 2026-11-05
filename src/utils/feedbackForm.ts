@@ -13,7 +13,7 @@ export interface FeedbackFormData {
 /** The same 1-5 rating, worded for whoever is giving it. A learner used to be asked about
  *  "the learner's" focus when rating their volunteer. */
 export function ratingQuestion(role: FeedbackRole): string {
-    return role === "learner" ? "How committed and prepared was your volunteer?" : "Focus / interest level of the learner";
+    return role === "learner" ? "How committed and prepared was your volunteer?" : "Learner's Focus and Interest Level";
 }
 
 export function quickQuestions(role: FeedbackRole) {

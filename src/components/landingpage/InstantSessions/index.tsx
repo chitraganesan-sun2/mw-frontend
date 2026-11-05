@@ -144,7 +144,7 @@ const InstantSessions = () => {
                 <ContainerHeader
                     title="Live Now"
                     subTitle="Instant Sessions Available"
-                    description="Join a live session right now — browse available volunteer sessions and connect instantly."
+                    description="Join a live session with a volunteer right now."
                 />
                 {isLoading ? (
                     <InstantSessionsSkeleton />

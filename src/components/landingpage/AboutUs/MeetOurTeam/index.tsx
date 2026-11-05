@@ -10,7 +10,7 @@ function MeetOurTeam() {
         titleStyle="!text-2xl lg:!text-[40px] max-md:!mb-3 !font-medium"
         descriptionStyle="!text-sm md:!text-sm lg:!text-xl !font-normal !text-black !text-center"
         title="Meet Our Team"
-        description="Together with a dedicated team, Chitra and Nithila created MelodyWings to honor their belief in the potential of every child. We invite you to join us in the mission to empower and uplift the differently abled."
+        description="Together with a dedicated team, Chitra and Nithila created MelodyWings to honor their belief in the potential of every learner. We invite you to join our mission to empower and uplift people with disabilities."
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 !items-center gap-4 mt-5">
         {meetOurTeamCardData.length === 2 ? (

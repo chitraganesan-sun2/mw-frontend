@@ -113,9 +113,9 @@ const Footer = (props: Props) => {
                         <div className="lg:hidden">{renderSocialLinks()}</div>
                         {/* Center - Terms of Use and Privacy Policy text */}
                         <p className="text-gray-500 text-center text-sm">
-                            Be sure to take a look at our Terms and Conditions
+                            Please review our Terms and Conditions
                             <br />
-                            and Privacy Policy
+                            and Privacy Policy.
                         </p>
                     </div>
 

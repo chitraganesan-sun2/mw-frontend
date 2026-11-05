@@ -66,7 +66,7 @@ export const cardData = [
     {
         title: "Our Mission",
         description:
-            "Everyone deserves the chance to pursue their passions and realize their potential. For individuals with diverse disabilities, finding the right extracurricular activities often involves a journey of discovery that can be expensive. Our mission is to harness the talents of compassionate community volunteers to offer them free sessions.",
+            "Everyone deserves the chance to pursue their passions and realize their potential. For individuals with diverse disabilities, finding the right extracurricular activities often involves a journey of discovery that can be expensive. Our mission is to bring together compassionate community volunteers to offer free sessions to learners with disabilities.",
     },
     {
         title: "Our Vision",
@@ -235,7 +235,7 @@ export const blogData = [
 export const donateCardData = [
     {
         title: "Learning Resources",
-        subtitle: "Provide tools and materials tailored to each child's unique needs.",
+        subtitle: "Provide tools and materials tailored to each learner's unique needs.",
         image: DonateImg1,
     },
     {
@@ -245,7 +245,7 @@ export const donateCardData = [
     },
     {
         title: "Maintain the Platform",
-        subtitle: "Ensure seamless connectivity and access for both volunteers and learners",
+        subtitle: "Keep the platform running smoothly and accessible for volunteers and learners.",
         image: DonateImg3,
     },
     {

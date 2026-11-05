@@ -5,14 +5,14 @@ export const CommunityFormConstants: FormField[] = [
         name: "description",
         label: "Post Description",
         inputType: "textarea",
-        placeholder: "Enter description here",
+        placeholder: "Write your post here",
         rows: 8,
     },
     {
         name: "images",
         inputType: "upload",
         fileType: "image/*",
-        label: "Do you want to upload any pictures to share in the community/forum?",
+        label: "Do you want to add pictures to share with the community?",
         maxFiles: 5,
     },
     {
@@ -20,7 +20,7 @@ export const CommunityFormConstants: FormField[] = [
         inputType: "upload",
         variant: "file",
         fileType: "video/*",
-        label: "Do you want to upload a video to share in the community/forum?",
+        label: "Do you want to add a video to share with the community?",
     },
 ];
 

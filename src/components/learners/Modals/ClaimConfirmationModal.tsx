@@ -149,7 +149,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
         try {
             const res = await DELETE_API(endpoints.session.unclaimInstantSession(successSession.id));
             if (res.status === 200 || res.status === 201) {
-                showToast({ message: "Session unclaimed successfully", type: "success" });
+                showToast({ message: "You've left this session.", type: "success" });
                 
                 // Invalidate every view of this session (instant lists, dashboard, calendar).
                 invalidateScheduleViews(queryClient, "learner");

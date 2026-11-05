@@ -97,7 +97,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
 
     return (
         <div>
-            <ModalLoader isLoading={isLoginLoading || modalLoader} title={modalLoader ? "Logging in..." : "Validating User..."} />
+            <ModalLoader isLoading={isLoginLoading || modalLoader} title={modalLoader ? "Logging in..." : "Checking your account..."} />
             <Modal
                 open={isOpen}
                 onCancel={onClose}
@@ -108,7 +108,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             >
                 <div className='w-full'>
                     <div className='flex justify-between items-center'>
-                        <span className='text-xl font-medium'>Existing User?</span>
+                        <span className='text-xl font-medium'>Already have an account?</span>
                         <button
                             type="button"
                             aria-label="Close"
@@ -136,12 +136,12 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                             />
                         </div>
                         <div className="pt-4">
-                            <span className='text-xl font-medium'>New User?</span>
+                            <span className='text-xl font-medium'>New to MelodyWings?</span>
                             <div className="flex flex-col md:flex-row gap-3 mt-3">
                                 <Button
                                     // loading={buttonLoading === "learner"}
                                     onClick={() => handleTriggerSignUp("learner")}
-                                    title="Enroll as Learner"
+                                    title="Join as a Learner"
                                     btnVariant="learner"
                                     size="small"
                                     customClassName="!w-full !text-start"
@@ -149,7 +149,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                                 <Button
                                     // loading={buttonLoading === "volunteer"}
                                     onClick={() => handleTriggerSignUp("volunteer")}
-                                    title="Become a Volunteer"
+                                    title="Join as a Volunteer"
                                     btnVariant="volunteer"
                                     size="small"
                                     customClassName="!w-full !text-start"

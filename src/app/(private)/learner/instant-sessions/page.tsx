@@ -558,9 +558,8 @@ export default function InstantSessionsPage() {
             <div className="flex flex-col items-center text-center gap-2 mb-8">
                 <h1 className="text-2xl font-medium text-gray-900">Instant Sessions</h1>
                 <p className="text-sm text-gray-500 max-w-2xl">
-                    Instant Sessions are sessions available <strong>today or tomorrow.</strong> You
-                    can browse available Instant Sessions or request a specific session based on
-                    your preferred time and subject.
+                    Instant sessions happen <strong>today or tomorrow.</strong> Browse sessions
+                    volunteers have posted, or request one at a time and subject that suit you.
                 </p>
             </div>
 

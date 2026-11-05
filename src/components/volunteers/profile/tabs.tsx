@@ -103,10 +103,10 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         { label: "Work Experience", value: data?.volunteer_work_experience },
         { label: "Favorite Free-Time Activities", value: data?.volunteer_favorite_activities },
         { label: "Description", value: data?.volunteer_description },
-        { label: "Consented from Guardian", value: showGuardian ? (data?.consented_from_parent ? "Yes" : "No") : "" },
+        { label: "Guardian Consent", value: showGuardian ? (data?.consented_from_parent ? "Yes" : "No") : "" },
         { label: "Guardian Name", value: showGuardian ? data?.volunteer_parent_name : "" },
         { label: "Guardian Email", value: showGuardian ? data?.volunteer_parent_email : "" },
-        { label: "Guardian Phone", value: showGuardian ? data?.volunteer_parent_contact_number?.number : "" },
+        { label: "Guardian Contact Number", value: showGuardian ? data?.volunteer_parent_contact_number?.number : "" },
     ].filter(detail => detail.value && Object.keys(detail.value).length);
     
     const renderAboutMeVideo = () => {

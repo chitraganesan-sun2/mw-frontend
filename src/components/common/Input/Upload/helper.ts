@@ -138,9 +138,9 @@ export const getFileData = async (
         const detail = error?.data?.detail;
 
         if (status === 413) {
-            throw new Error(detail || "File is too large for upload.");
+            throw new Error(detail || "That file is too large to upload.");
         } else if (status === 400) {
-            throw new Error(detail || "Invalid file. Please check the format.");
+            throw new Error(detail || "That file type isn't supported. Please check the format.");
         } else if (status === 401) {
             throw new Error("Session expired. Please log in again.");
         } else if (status === 403) {

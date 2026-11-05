@@ -345,9 +345,9 @@ export default function NewEventModal({
 
     const handleSubmit = async () => {
         const missing = {
-            category: category ? undefined : "Please choose a category.",
-            skill: skill ? undefined : "Please choose a skill.",
-            level: level ? undefined : "Please choose a level.",
+            category: category ? undefined : "Category is required",
+            skill: skill ? undefined : "Skill is required",
+            level: level ? undefined : "Level is required",
         };
         if (missing.category || missing.skill || missing.level || !formData.description?.trim()) {
             setFieldErrors(missing);
@@ -371,7 +371,7 @@ export default function NewEventModal({
 
         // Check if selected date is in the past
         if (dateStr < currentDateStr) {
-            showToast({ message: "Cannot create session for a past date.", type: "error" });
+            showToast({ message: "Couldn't create the session. Please choose today or a later date.", type: "error" });
             return;
         }
 
@@ -379,7 +379,7 @@ export default function NewEventModal({
         if (dateStr === currentDateStr) {
             const selectedTimeStr = formData.start_time;
             if (selectedTimeStr < currentTimeStr) {
-                showToast({ message: "Cannot create session for a past time.", type: "error" });
+                showToast({ message: "Couldn't create the session. Please choose a later time.", type: "error" });
                 return;
             }
         }
@@ -405,7 +405,7 @@ export default function NewEventModal({
 
             if (hasOverlap) {
                 showToast({
-                    message: "Time slot overlaps with an existing session.",
+                    message: "That time overlaps with one of your sessions.",
                     type: "error",
                 });
                 return;
@@ -429,7 +429,7 @@ export default function NewEventModal({
                 });
                 if (overlapsOpen) {
                     showToast({
-                        message: "You've already opened an instant session that overlaps this time.",
+                        message: "You already have an instant session that overlaps this time.",
                         type: "error",
                     });
                     return;

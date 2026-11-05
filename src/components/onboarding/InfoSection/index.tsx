@@ -14,7 +14,7 @@ const infoItems: InfoItem[] = [
     {
         title: 'Profile Details:',
         description:
-            'As part of this application, please provide your profile picture, information, including your skills, the subjects you wish to teach, your years of experience, and your educational background.',
+            'Please provide your profile picture and details, including your skills, the subjects you would like to teach, your years of experience, and your educational background.',
     },
     {
         title: 'Profile Video:',

@@ -90,10 +90,10 @@ export const ParentGuardianInformation = ({ data }: { data: Parentinfo }) => {
     const contactDetails = [
         { title: "Phone Number", value: number, icon: <FaPhoneAlt size={13} /> },
         { title: "Email", value: email, icon: <MdEmail size={15} /> },
-        { title: "Emergency Contact Number", value: emergencyNumber, icon: <FaPhoneAlt size={13} /> },
+        { title: "Guardian Contact Number", value: emergencyNumber, icon: <FaPhoneAlt size={13} /> },
     ].filter(item => item.value);
 
-    if(details.length === 0 && contactDetails.length === 0) return <div className="text-center text-base font-medium h-full flex-center">No information found</div>;
+    if(details.length === 0 && contactDetails.length === 0) return <div className="text-center text-base font-medium h-full flex-center">No information added yet</div>;
 
     return (
         <div>
@@ -136,7 +136,7 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
         {
             title: "Education and Hobbies",
             fields: [
-                { label: "Name of the Academy", value: data?.education?.current_school },
+                { label: "Current School or Program", value: data?.education?.current_school },
                 { label: "Grade or Education Level", value: data?.education?.grade_or_education_level },
                 { label: "Program, IEP, or 504 Plan", value: data?.education?.program_iep_504_plan, fullWidth: true },
                 { label: "Cultural/Religious Considerations", value: data?.education?.cultural_religious_considerations, fullWidth: true },
@@ -182,7 +182,7 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
 
 export const AdditionalInformation = ({ data }: { data: Additionalinfo }) => {
     const details = [
-        { label: "Cultural Considerations", value: data?.cultural_consideration ?? "" },
+        { label: "Cultural/Religious Considerations", value: data?.cultural_consideration ?? "" },
         { label: "Other Concerns or Requests", value: data?.other_concerns_or_requests ?? "" },
         { label: "What Motivates Them to Learn", value: data?.what_motivates_to_learn ?? "" },
     ]

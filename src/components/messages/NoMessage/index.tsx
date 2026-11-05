@@ -35,11 +35,11 @@ const NoMessage = () => {
     return (
         <div className="w-full border-[0.5px] md:border-none border-t-gray-400 h-full min-h-0 flex flex-col md:gap-4 gap-[20px] bg-white items-center justify-center animate-fadeIn">
             <div className="w-[319px] h-[259px] relative flex items-center justify-center">
-                <Image src={Nomessage} alt="No Message" fill />
+                <Image src={Nomessage} alt="No messages yet illustration" fill />
             </div>
             <p className="md:text-2xl text-[24px] font-medium">No Messages Yet</p>
             <p className="md:text-base text-[14px] text-center">
-                Looks like you haven&apos;t initiated a conversation with <br /> any of our {counterparts}.
+                You haven&apos;t started a conversation with <br /> any {counterparts} yet.
             </p>
             <Button
                 onClick={handleStartConversation}

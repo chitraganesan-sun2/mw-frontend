@@ -43,7 +43,7 @@ function startsIn(start: dayjs.Dayjs, end: dayjs.Dayjs, now: dayjs.Dayjs): strin
     if (minutes < 24 * 60) {
         const h = Math.floor(minutes / 60);
         const m = minutes % 60;
-        return `Starts in ${h} h${m ? ` ${m} min` : ""}`;
+        return `Starts in ${h} hr${m ? ` ${m} min` : ""}`;
     }
     return "";
 }

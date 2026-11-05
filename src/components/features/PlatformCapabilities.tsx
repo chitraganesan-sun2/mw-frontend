@@ -25,7 +25,7 @@ const capabilities = [
     },
     {
         icon: <FiVideo className="w-7 h-7" />,
-        title: "Integrated Video",
+        title: "Built-In Video",
         description: "Seamless Google Meet integration for all sessions. One-click join with automatic meeting links—no setup required.",
         highlights: ["Instant meeting links", "One-click join", "Session recordings", "Calendar invites"],
     },
@@ -57,7 +57,7 @@ export default function PlatformCapabilities() {
                         Built with Intelligence & Care
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        Advanced technology working behind the scenes to make learning accessible, efficient, and personalized for everyone.
+                        Helpful technology behind the scenes to make learning accessible and personal for everyone.
                     </p>
                 </div>
 

@@ -75,7 +75,7 @@ export default function VolunteerMatchesPanel() {
             if (result.status === "no_match_found") {
                 showToast({
                     type: "info",
-                    message: "No eligible learner match found right now — check back later!",
+                    message: "We couldn't find a learner match right now. Please check back later.",
                 });
             }
         },
@@ -86,7 +86,7 @@ export default function VolunteerMatchesPanel() {
         callbackToast({
             apiCall: triggerMutation.mutateAsync(),
             loadingMsg: "Finding your best learner match...",
-            successMsg: "Match complete!",
+            successMsg: "Match search complete.",
             errorMsg: "Couldn't find a match right now.",
         });
     };
@@ -120,7 +120,7 @@ export default function VolunteerMatchesPanel() {
                 </div>
             ) : latestMatch.status === "no_match_found" ? (
                 <div className="bg-white rounded-xl p-6 text-center text-gray-light">
-                    No eligible learner match was found on your last request. Try again later as more learners join!
+                    We didn&apos;t find a match this time. Please try again later as more learners join.
                 </div>
             ) : isLearnerLoading || !matchedLearner ? (
                 <LottieLoader isLoading={true} />

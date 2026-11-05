@@ -60,13 +60,13 @@ const JoinUsStep1Page = () => {
         e.preventDefault();
         if (submitting.current) return;
         const errs: Record<string, string> = {};
-        if (!fullName.trim()) errs.full_name = "Please enter your full name.";
+        if (!fullName.trim()) errs.full_name = "Full name is required";
         if (!emailRegex.test(email)) errs.email = "Please enter a valid email address.";
-        if (!phoneCountryCode || phoneNumber.trim().length === 0) errs.phone_number = "Please enter your phone number.";
+        if (!phoneCountryCode || phoneNumber.trim().length === 0) errs.phone_number = "Phone number is required";
         else if (phoneNumber.length < 4 || phoneNumber.length > 15) errs.phone_number = "Please enter a valid phone number.";
-        if (!dateOfBirth) errs.date_of_birth = "Please select your date of birth.";
-        if (!country) errs.country = "Please select your country.";
-        if (!state) errs.state = "Please select your state.";
+        if (!dateOfBirth) errs.date_of_birth = "Date of birth is required";
+        if (!country) errs.country = "Country is required";
+        if (!state) errs.state = "State is required";
         setFieldErrors(errs);
         const first = Object.keys(errs)[0];
         if (first) {
@@ -148,8 +148,7 @@ const JoinUsStep1Page = () => {
                         We&apos;re excited that you want to join us!
                     </h1>
                     <p className="text-[14px] md:text-[20px]  text-[#121212] italic">
-                        Fill in the details below so we can get to know you better. Once submitted, our team
-                        will review your information and get in touch with you soon.
+                        Fill in the details below so we can get to know you better.
                     </p>
                 </div>
             </section>
@@ -312,7 +311,7 @@ const JoinUsStep1Page = () => {
                                     label="Grade Level / Year"
                                     value={gradeLevel}
                                     onChange={(v) => setGradeLevel(typeof v === 'string' ? v : v?.[0] ?? '')}
-                                    placeholder="Enter level/year"
+                                    placeholder="Enter your grade level or year"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
                                 />
@@ -333,7 +332,7 @@ const JoinUsStep1Page = () => {
                             {/* Navigation buttons */}
                             <div className="mt-8 flex w-full  gap-3 md:flex-row md:justify-between md:items-center">
                                 <Button
-                                    title="Previous"
+                                    title="Back"
                                     disabled
                                     btnVariant="outline"
                                     customClassName="!px-6 !py-2 !w-full md:!w-auto !rounded-[10px] !h-10 md:!h-11"
@@ -341,7 +340,7 @@ const JoinUsStep1Page = () => {
                                 />
                                 <Button
                                     htmlType="submit"
-                                    title={loading ? "Loading..." : "Next Step"}
+                                    title={loading ? "Loading..." : "Next"}
                                     loading={loading}
                                     // Always clickable (only blocked while sending): a button that stays
                                     // disabled tells the user nothing - clicking now flags every missing field.

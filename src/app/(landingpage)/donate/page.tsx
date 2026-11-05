@@ -329,8 +329,8 @@ const Donate = () => {
         // Resolve amount
         const amountNumber = Number(isCustom ? customAmount : donateAmount || 0);
         if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
-            setAmountError("Please select an amount");
-            showToast({ type: "error", message: "Please select an amount" });
+            setAmountError("Select an amount to continue");
+            showToast({ type: "error", message: "Select an amount to continue" });
             return;
         }
 
@@ -478,8 +478,8 @@ const Donate = () => {
                         Support Our Mission
                     </h1>
                     <p className="text-[14px] md:text-[20px] font-regular md:font-medium text-[#4F4F4F] md:max-w-[1068px] md:leading-[28.2px] tracking-tight mx-auto">
-                        At MelodyWings, we strive to provide opportunities for differently-abled
-                        children to learn, grow, and unlock their potential. Your support helps us
+                        At MelodyWings, we strive to provide opportunities for children with disabilities
+                        to learn, grow, and unlock their potential. Your support helps us
                         sustain this mission and expand our reach to more learners in need.
                         Together, we can make a lasting impact.
                     </p>
@@ -924,7 +924,7 @@ const Donate = () => {
                                         onChange={(v) =>
                                             setFundOtherDetail(typeof v === "string" ? v : "")
                                         }
-                                        placeholder="Enter here"
+                                        placeholder="Type here"
                                         rootClassName="w-full"
                                         inputClassName="w-full rounded-xl border-gray-200"
                                     />

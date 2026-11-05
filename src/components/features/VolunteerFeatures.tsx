@@ -28,7 +28,7 @@ const volunteerFeatures = [
     {
         icon: <MdOutlineGroups className="w-6 h-6" />,
         title: "Host a WingTime",
-        description: "Lead group sessions on topics you're passionate about. Teach multiple learners simultaneously in a collaborative environment.",
+        description: "Lead group sessions on topics you're passionate about. Teach several learners at once in a friendly, collaborative setting.",
         benefits: ["Group teaching", "Set participant limits", "Topic-based sessions", "Manage registrations"],
         color: "purple",
     },

@@ -9,7 +9,7 @@ export const alertModalConstants = {
 export const LearnerFeedbackFormConstants: FormField[] = [
     {
         name: "rating",
-        label: "Focus / interest level of the learner",
+        label: "Learner's Focus and Interest Level",
         inputType: "radio",
         variant: "rating",
         options: [

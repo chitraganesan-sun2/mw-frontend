@@ -55,7 +55,7 @@ const POSITION_OPTIONS = [
             "Assisting with organizational processes",
             "Helping track sessions, volunteers, and program metrics",
             "Supporting administrative tasks",
-            "Helping ensure programs and testing the platform when new updates are pushed out",
+            "Helping programs run smoothly and testing the platform when updates are released",
         ],
     },
     {
@@ -96,7 +96,7 @@ const JoinUsStep2Page = () => {
 
     const handleNext = async () => {
         if (!applicationId) {
-            showToast({ type: 'error', message: 'Application ID missing. Please start from Step 1.' });
+            showToast({ type: 'error', message: "We couldn't find your application. Please start again from Step 1." });
             router.push('/join-us/step-1');
             return;
         }
@@ -116,7 +116,7 @@ const JoinUsStep2Page = () => {
                 description: selectedOpt.description,
                 responsibilities: selectedOpt.responsibilities
             } : (selectedPosition === OTHER_VALUE ? {
-                title: "Other (Custom Role)",
+                title: "Other (Describe Your Own Role)",
                 description: customRole,
                 responsibilities: []
             } : null)
@@ -154,8 +154,7 @@ const JoinUsStep2Page = () => {
                         We&apos;re excited that you want to join us!
                     </h1>
                     <p className="text-[14px] md:text-[20px]  italic">
-                        Fill in the details below so we can get to know you better. Once submitted,
-                        our team will review your information and get in touch with you soon.
+                        Fill in the details below so we can get to know you better.
                     </p>
                 </div>
             </section>
@@ -193,7 +192,7 @@ const JoinUsStep2Page = () => {
 
                                 {/* Other / custom role */}
                                 <PositionCard
-                                    title="Other (Custom Role)"
+                                    title="Other (Describe Your Own Role)"
                                     description="If none of these roles exactly match your interests but you believe you can contribute in another way, please describe the skills or ideas you would like to bring to MelodyWings."
                                     selected={selectedPosition === OTHER_VALUE}
                                     onSelect={() => setSelectedPosition(OTHER_VALUE)}
@@ -201,7 +200,7 @@ const JoinUsStep2Page = () => {
                                     <textarea
                                         className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0  box-border"
                                         rows={4}
-                                        placeholder="Describe here"
+                                        placeholder="Type here"
                                         value={customRole}
                                         onFocus={() => setSelectedPosition(OTHER_VALUE)}
                                         onChange={(e) => {
@@ -219,14 +218,14 @@ const JoinUsStep2Page = () => {
                             {/* Navigation buttons */}
                             <div className="mt-8 flex w-full  gap-3 md:flex-row md:justify-between md:items-center">
                                 <Button
-                                    title="Previous"
+                                    title="Back"
                                     btnVariant="outline"
                                     customClassName="!px-6 !py-2 !w-full md:!w-auto !rounded-[10px] !h-10 md:!h-11"
                                     onClick={() => router.push("/join-us/step-1")}
                                 />
                                 <Button
                                     htmlType="submit"
-                                    title={loading ? "Loading..." : "Next Step"}
+                                    title={loading ? "Loading..." : "Next"}
                                     loading={loading}
                                     disabled={!isNextEnabled}
                                     btnVariant="secondary"

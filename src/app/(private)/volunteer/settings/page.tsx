@@ -28,7 +28,7 @@ const SESSION_MATCH_OPTIONS = [
         value: "skills_to_learn",
         label: "Sessions Matching My Skills",
         description:
-            "Receive email notifications when a learner posts an instant session that matches either the exact skills posted or the broader skill match identified through sentiment analysis.",
+            "Receive email notifications when a learner posts an instant session that matches the skills posted, or closely related skills we detect automatically.",
     },
     {
         value: "none",
@@ -138,7 +138,7 @@ const Settings = () => {
                 <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
                         <p id="chat-permission-label" className="md:text-base text-[14px] font-medium">
-                            Allow messages from learners to reach you.
+                            Let learners message you.
                         </p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
                             By enabling this, you agree to receive communication from learners.

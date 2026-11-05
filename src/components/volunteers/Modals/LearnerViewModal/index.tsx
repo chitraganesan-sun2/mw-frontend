@@ -396,7 +396,7 @@ const OverviewContent = ({
                 : "",
         },
         {
-            title: "Assistive Device Used",
+            title: "Assistive Devices Used",
             description: learnerData?.learner_special_needs?.assistive_device_used || "",
         },
         {
@@ -454,7 +454,7 @@ const OverviewContent = ({
             description: learnerData?.education?.grade_or_education_level || "",
         },
         {
-            title: "IEP / 504 Plan",
+            title: "Program, IEP, or 504 Plan",
             description: learnerData?.education?.program_iep_504_plan || "",
         },
         {

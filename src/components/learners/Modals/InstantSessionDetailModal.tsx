@@ -147,13 +147,13 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
 
         if (!volunteerId || !volunteerSlotId || !sessionDate || !learnerId) {
             showToast({
-                message: "Missing session or learner details. Cannot claim.",
+                message: "Couldn't claim the session. Some details are missing. Please refresh and try again.",
                 type: "error",
             });
             return false;
         }
         if (!startTime24 || !endTime24) {
-            showToast({ message: "Missing session time. Cannot claim.", type: "error" });
+            showToast({ message: "Couldn't claim the session. The session time is missing. Please refresh and try again.", type: "error" });
             return false;
         }
 
@@ -173,7 +173,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
             });
             if (res?.status === 200 || res?.status === 201) {
                 claimSuccess = true;
-                showToast({ message: "Session claimed successfully", type: "success" });
+                showToast({ message: "Session claimed.", type: "success" });
 
                 // Invalidate every view of this session (instant lists, dashboard, calendar).
                 invalidateScheduleViews(queryClient, "learner");

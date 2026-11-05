@@ -126,7 +126,7 @@ const JoinUsStep3Page = () => {
         if (submitting.current) return;
 
         if (!applicationId) {
-            showToast({ type: 'error', message: 'Application ID missing. Please start from Step 1.' });
+            showToast({ type: 'error', message: "We couldn't find your application. Please start again from Step 1." });
             router.push('/join-us/step-1');
             return;
         }
@@ -145,32 +145,32 @@ const JoinUsStep3Page = () => {
         }
 
         if (requiresCrimDetails && !crimDetails.trim()) {
-            showToast({ type: 'error', message: 'Please describe the circumstance for the criminal background check.' });
+            showToast({ type: 'error', message: 'Please explain your "Yes" answer in the Criminal Background Check section.' });
             return;
         }
 
         if (requiresSexDetails && !sexDetails.trim()) {
-            showToast({ type: 'error', message: 'Please describe the circumstance for the sex offender registry check.' });
+            showToast({ type: 'error', message: 'Please explain your "Yes" answer in the Sex Offender Registry Check section.' });
             return;
         }
 
         if (requiresDiscDetails && !discDetails.trim()) {
-            showToast({ type: 'error', message: 'Please describe the circumstance for the disciplinary history.' });
+            showToast({ type: 'error', message: 'Please explain your "Yes" answer in the Disciplinary History section.' });
             return;
         }
 
         if (requiresHealthDetails && !healthDetails.trim()) {
-            showToast({ type: 'error', message: 'Please describe the circumstance for the health and safety question.' });
+            showToast({ type: 'error', message: 'Please explain your "Yes" answer in the Health and Safety section.' });
             return;
         }
 
         if (requiresConsentDetails && !consentDetails.trim()) {
-            showToast({ type: 'error', message: 'Please describe the circumstance for the consent (No answers).' });
+            showToast({ type: 'error', message: 'Please explain your "No" answer in the Consents section.' });
             return;
         }
 
         if (requiresPrevVolDetails && !prevVolDetails.trim()) {
-            showToast({ type: 'error', message: 'Please describe the circumstance for your previous volunteer experience.' });
+            showToast({ type: 'error', message: 'Please explain your "Yes" answer in the Previous Volunteer Experience section.' });
             return;
         }
 
@@ -234,7 +234,7 @@ const JoinUsStep3Page = () => {
             }
 
             setStep3Data(payload);
-            showToast({ type: 'success', message: 'Application submitted successfully!' });
+            showToast({ type: 'success', message: 'Application submitted.' });
 
             router.push('/join-us/success');
         } catch (err: any) {
@@ -275,11 +275,11 @@ const JoinUsStep3Page = () => {
                             <div className="space-y-4 md:space-y-5">
                                 <div className="space-y-2">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">Why are you interested in joining MelodyWings?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qMelodyWings} onChange={(e) => setQMelodyWings(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Type here" value={qMelodyWings} onChange={(e) => setQMelodyWings(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">Why are you interested in the role you selected?</label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qRole} onChange={(e) => setQRole(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Type here" value={qRole} onChange={(e) => setQRole(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="experience_and_skills" className="text-[16px] md:text-sm font-normal text-gray-800">
@@ -294,7 +294,7 @@ const JoinUsStep3Page = () => {
                                         required
                                         maxLength={4000}
                                         className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border"
-                                        placeholder="Experience: ... Skills: ..."
+                                        placeholder="Share your experience and skills"
                                         value={qExpSkills}
                                         onChange={(e) => setQExpSkills(e.target.value)}
                                     />
@@ -344,7 +344,7 @@ const JoinUsStep3Page = () => {
                                         <input
                                             type="text"
                                             className="w-full min-w-0 rounded-xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border"
-                                            placeholder="Enter here"
+                                            placeholder="Type here"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
                                         />
@@ -355,14 +355,14 @@ const JoinUsStep3Page = () => {
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">
                                         Have you previously volunteered or worked with children or neurodivergent learners? If yes, please describe.
                                     </label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qChildren} onChange={(e) => setQChildren(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Type here" value={qChildren} onChange={(e) => setQChildren(e.target.value)} />
                                 </div>
 
                                 <div className="space-y-2 w-full min-w-0">
                                     <label className="text-[16px] md:text-sm font-normal text-gray-800">
                                         Is there anything else you would like us to know about you?
                                     </label>
-                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Describe here" value={qAdditional} onChange={(e) => setQAdditional(e.target.value)} />
+                                    <textarea rows={4} className="w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border" placeholder="Type here" value={qAdditional} onChange={(e) => setQAdditional(e.target.value)} />
                                 </div>
                             </div>
                         </section>
@@ -392,12 +392,12 @@ const JoinUsStep3Page = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Please describe the circumstance behind the &quot;yes&quot; answer above.</p>
+                                    <p className="text-[16px] text-gray-800">Please explain your &quot;Yes&quot; answer above.</p>
                                     <textarea
                                         rows={3}
                                         disabled={!requiresCrimDetails}
                                         className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresCrimDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                        placeholder="Describe here"
+                                        placeholder="Type here"
                                         value={crimDetails}
                                         onChange={(e) => setCrimDetails(e.target.value)}
                                     />
@@ -411,12 +411,12 @@ const JoinUsStep3Page = () => {
                                     <RadioInput inputType="radio" name="sex_offender" value={sexOffenderCheck} onChange={(v) => setSexOffenderCheck(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Please describe the circumstance behind the &quot;yes&quot; answer above.</p>
+                                    <p className="text-[16px] text-gray-800">Please explain your &quot;Yes&quot; answer above.</p>
                                     <textarea
                                         rows={3}
                                         disabled={!requiresSexDetails}
                                         className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresSexDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                        placeholder="Describe here"
+                                        placeholder="Type here"
                                         value={sexDetails}
                                         onChange={(e) => setSexDetails(e.target.value)}
                                     />
@@ -440,12 +440,12 @@ const JoinUsStep3Page = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Please describe the circumstance behind the &quot;yes&quot; answer above.</p>
+                                    <p className="text-[16px] text-gray-800">Please explain your &quot;Yes&quot; answer above.</p>
                                     <textarea
                                         rows={3}
                                         disabled={!requiresDiscDetails}
                                         className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresDiscDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                        placeholder="Describe here"
+                                        placeholder="Type here"
                                         value={discDetails}
                                         onChange={(e) => setDiscDetails(e.target.value)}
                                     />
@@ -459,12 +459,12 @@ const JoinUsStep3Page = () => {
                                     <RadioInput inputType="radio" name="health_safety" value={healthCheck} onChange={(v) => setHealthCheck(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Please describe the circumstance behind the &quot;yes&quot; answer above.</p>
+                                    <p className="text-[16px] text-gray-800">Please explain your &quot;Yes&quot; answer above.</p>
                                     <textarea
                                         rows={3}
                                         disabled={!requiresHealthDetails}
                                         className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresHealthDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                        placeholder="Describe here"
+                                        placeholder="Type here"
                                         value={healthDetails}
                                         onChange={(e) => setHealthDetails(e.target.value)}
                                     />
@@ -486,12 +486,12 @@ const JoinUsStep3Page = () => {
                                     <RadioInput name="consent_3" value={consent3} onChange={(v) => setConsent3(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" inputType="radio" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Please describe the circumstance behind the &quot;No&quot; answer above.</p>
+                                    <p className="text-[16px] text-gray-800">Please explain your &quot;No&quot; answer above.</p>
                                     <textarea
                                         rows={3}
                                         disabled={!requiresConsentDetails}
                                         className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresConsentDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                        placeholder="Describe here"
+                                        placeholder="Type here"
                                         value={consentDetails}
                                         onChange={(e) => setConsentDetails(e.target.value)}
                                     />
@@ -505,12 +505,12 @@ const JoinUsStep3Page = () => {
                                     <RadioInput inputType="radio" name="previous_volunteer" value={previousVolunteer} onChange={(v) => setPreviousVolunteer(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" />
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Please describe the circumstance behind the &quot;yes&quot; answer above.</p>
+                                    <p className="text-[16px] text-gray-800">Please explain your &quot;Yes&quot; answer above.</p>
                                     <textarea
                                         rows={3}
                                         disabled={!requiresPrevVolDetails}
                                         className={`w-full min-w-0 rounded-2xl border border-gray-200 bg-background-input px-3 py-2.5 text-sm focus:outline-none focus:ring-0 focus:border-gray-900 box-border ${!requiresPrevVolDetails ? 'opacity-60 cursor-not-allowed' : ''}`}
-                                        placeholder="Mention here"
+                                        placeholder="Type here"
                                         value={prevVolDetails}
                                         onChange={(e) => setPrevVolDetails(e.target.value)}
                                     />
@@ -545,7 +545,7 @@ const JoinUsStep3Page = () => {
                         </section>
 
                         <div className="mt-4 flex justify-between items-center">
-                            <Button type="button" title="Previous" btnVariant="outline" customClassName="!px-6 !py-2 !h-10 md:!h-11 !rounded-[10px] disabled:opacity-50" onClick={() => router.push('/join-us/step-2')} disabled={loading} />
+                            <Button type="button" title="Back" btnVariant="outline" customClassName="!px-6 !py-2 !h-10 md:!h-11 !rounded-[10px] disabled:opacity-50" onClick={() => router.push('/join-us/step-2')} disabled={loading} />
                             <Button htmlType="submit" title={loading ? "Submitting..." : "Submit Application"} loading={loading} disabled={!isNextEnabled} btnVariant="secondary" customClassName="!px-6 !py-2 !rounded-[10px] !h-10 md:!h-11 disabled:opacity-50" />
                         </div>
                     </form>

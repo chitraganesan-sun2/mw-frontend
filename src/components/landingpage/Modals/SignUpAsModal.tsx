@@ -242,7 +242,7 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         <div>
             <ModalLoader
                 isLoading={isSignUpLoading || modalLoader}
-                title={modalLoader ? "Signing up..." : "Validating User..."}
+                title={modalLoader ? "Signing up..." : "Checking your account..."}
             />
             <Modal
                 open={isOpen}
@@ -254,7 +254,7 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             >
                 <div className="w-full md:w-[450px]">
                     <div className="flex justify-between items-center">
-                        <span className="text-xl font-medium">{role === "volunteer" ? "Become a Volunteer" : "Enroll as Learner"}</span>
+                        <span className="text-xl font-medium">{role === "volunteer" ? "Join as a Volunteer" : "Join as a Learner"}</span>
                         <button
                             type="button"
                             aria-label="Close"

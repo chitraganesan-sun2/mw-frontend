@@ -142,7 +142,7 @@ export default function VolunteerFilterModal({
                     >
                         {filterData?.available_days?.[0] && filterData?.available_days?.[1]
                             ? `${formatDisplayDate(filterData?.available_days[0])} - ${formatDisplayDate(filterData?.available_days[1])}`
-                            : "Select Available Date Range"}
+                            : "Select a Date Range"}
                     </button>
                 </div>
                 {isDateModalOpen && (
