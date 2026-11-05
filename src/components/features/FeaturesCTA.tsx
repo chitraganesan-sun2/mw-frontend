@@ -1,10 +1,10 @@
 "use client";
 
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 import { FiArrowRight } from "react-icons/fi";
 
 export default function FeaturesCTA() {
-    const [, setParamMode] = useQueryState("signup_as");
+    const [, setParamMode] = useUrlParam("signup_as");
 
     return (
         <section className="px-[5%] lg:px-[9%]">

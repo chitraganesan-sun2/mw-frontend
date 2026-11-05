@@ -3,7 +3,7 @@ import ModalCloseIcon from "@/assets/icons/ModalCloseIcon"
 import Button from "@/components/common/Button"
 import { Modal } from "antd"
 import { FcGoogle } from "react-icons/fc"
-import { useQueryState } from "nuqs"
+import { useUrlParam } from "@/hooks/useUrlParam";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useState } from "react"
 import { apiGoogleLogin } from "@/api/auth"
@@ -19,7 +19,7 @@ import EmailPasswordAuth from "./EmailPasswordAuth"
 
 export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     const router = useRouter();
-    const [_, setParamMode] = useQueryState("signup_as");
+    const [_, setParamMode] = useUrlParam("signup_as");
     const [modalLoader, setModalLoader] = useState(false);
     const [isLoginLoading, setIsLoginLoading] = useState(false);
 

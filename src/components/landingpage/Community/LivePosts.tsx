@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { safeImageSrc } from "@/utils/safeHref";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 
 interface PublicPost {
     post_id: string;
@@ -82,7 +82,7 @@ const PostCard = ({ post, onClick }: { post: PublicPost; onClick: () => void }) 
  * an empty or failed feed must not leave a hole on the page.
  */
 const LivePosts = () => {
-    const [, setParamMode] = useQueryState("signup_as");
+    const [, setParamMode] = useUrlParam("signup_as");
     
     const { data: posts = [] } = useQuery<PublicPost[]>({
         queryKey: ["public-community-posts"],

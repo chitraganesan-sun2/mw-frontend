@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 
 // Isolates the homepage's only two bits of interactivity - resetting the signup_as
 // query param on mount, and wiring up ScrollReveal - so app/page.tsx itself can stay
 // a server component instead of forcing the whole static marketing page into the
 // client bundle for these two effects.
 export default function HomeClientEffects() {
-    const [, setParamMode] = useQueryState("signup_as");
+    const [, setParamMode] = useUrlParam("signup_as");
 
     useEffect(() => {
         // Clearing signup_as rewrites the URL and drops any #hash, so read the section

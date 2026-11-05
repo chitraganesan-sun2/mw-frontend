@@ -4,7 +4,7 @@ import Modal from "antd/es/modal";
 import ModalCloseIcon from "@/assets/icons/FeedModalCloseIcon";
 import { Radio } from "antd";
 import Button from "@/components/common/Button";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 import { Input } from "@/components/common/Input";
 import { FcGoogle } from "react-icons/fc";
 import { apiGoogleSignUp } from "@/api/auth";
@@ -167,7 +167,7 @@ const VolunteerModalBody = ({
 
 const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const router = useRouter();
-    const [role] = useQueryState("signup_as");
+    const [role] = useUrlParam("signup_as");
     const [modalLoader, setModalLoader] = useState(false);
 
     const [isSignUpLoading, setIsSignUpLoading] = useState(false);

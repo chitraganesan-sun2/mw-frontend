@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { TimeIcon } from "@/assets/icons";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -114,7 +114,7 @@ const WingTimeSkeleton = () => (
 
 const WingTime = () => {
     // Opens the learner sign-up in place (same as the Hero / For Learners buttons).
-    const [, setParamMode] = useQueryState("signup_as");
+    const [, setParamMode] = useUrlParam("signup_as");
     const openLearnerSignUp = () => setParamMode("learner");
 
     const { data: wingtimes = [], isLoading } = useQuery<PublicWingTime[]>({

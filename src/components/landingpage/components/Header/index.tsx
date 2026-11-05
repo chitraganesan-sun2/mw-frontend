@@ -10,7 +10,7 @@ import { IoMdClose } from "react-icons/io";
 import { useRouter, usePathname } from "next/navigation";
 import { LoginModal } from "../../Modals/LoginModal";
 import SignUpAsModal from "../../Modals/SignUpAsModal";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { GOOGLE_WEB_CLIENT_ID } from "@/definitions";
 import { getCookie, isAuthenticated } from "@/utils/auth";
@@ -21,7 +21,7 @@ const Header = () => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const [paramMode, setParamMode] = useQueryState("signup_as");
+    const [paramMode, setParamMode] = useUrlParam("signup_as");
 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
     const [isSideNavBarOpen, setIsSideNavBarOpen] = useState<boolean>(false);

@@ -1,3 +1,4 @@
+import { NuqsAdapter } from "nuqs/adapters/next";
 import { MainLayout } from "@/layouts";
 import type { Metadata } from "next";
 import React from "react";
@@ -17,7 +18,11 @@ export const metadata: Metadata = {
 };
 
 function Layout ({ children }: { children: React.ReactNode }) {
-    return <MainLayout>{children}</MainLayout>;
+    return (
+        <NuqsAdapter>
+            <MainLayout>{children}</MainLayout>
+        </NuqsAdapter>
+    );
 }
 
 export default Layout;

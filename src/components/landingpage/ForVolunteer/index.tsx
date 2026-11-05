@@ -4,10 +4,10 @@ import ContainerHeader from "../components/ContainerHeader";
 import ContainerWrapper from "../components/ContainerWrapper";
 import StepsChart from "../components/StepsChart";
 import Button from "@/components/common/Button";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 
 const ForVolunteer = () => {
-    const [, setParamMode] = useQueryState("signup_as");
+    const [, setParamMode] = useUrlParam("signup_as");
     const handleSignUp = () => setParamMode("volunteer");
 
     return (

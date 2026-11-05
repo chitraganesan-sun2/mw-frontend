@@ -1,10 +1,10 @@
 "use client";
 
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 import { FiZap, FiCalendar, FiMessageCircle, FiUsers } from "react-icons/fi";
 
 export default function FeaturesHero() {
-    const [, setParamMode] = useQueryState("signup_as");
+    const [, setParamMode] = useUrlParam("signup_as");
 
     return (
         <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 px-[5%] lg:px-[9%] pt-24 pb-16 lg:pt-32 lg:pb-20">

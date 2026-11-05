@@ -6,11 +6,11 @@ import Image from "next/image";
 import { useState } from "react";
 import Button from "@/components/common/Button";
 import HeroBannerLogo from "@/assets/images/landingpage/hero-banner.png";
-import { useQueryState } from "nuqs";
+import { useUrlParam } from "@/hooks/useUrlParam";
 
 
 const Hero = () => {
-    const [_, setParamMode] = useQueryState("signup_as");
+    const [_, setParamMode] = useUrlParam("signup_as");
 
     return (
         <div className="w-full h-full bg-[#F4F7FB] md:bg-white">
