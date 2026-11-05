@@ -52,8 +52,9 @@ const StoryCard = ({ story }: { story: LearnerStory }) => (
 );
 
 /**
- * "Learner stories": real learners (or their guardians) who chose to share their learning goals
- * anonymously. Nothing is made up - with no consenting learners the section simply isn't there.
+ * "Learner stories": real, approved learners' anonymous learning goals (an age and the skills they chose),
+ * shown by default until a learner or guardian opts out. Nothing is made up - with no eligible learners
+ * the section simply isn't there.
  * It sits just below the fold, so the data is only requested when the visitor scrolls near it.
  */
 const LearnerStories = () => {
@@ -97,7 +98,7 @@ const LearnerStories = () => {
         <div className="text-center mb-6 flex flex-col gap-1">
             <h2 className="text-2xl lg:text-[2rem] font-medium">Learner Stories</h2>
             <p className="text-sm lg:text-base text-gray-600">
-                In their own words: what our learners want to learn next.
+                What our learners want to learn next.
             </p>
         </div>
     );

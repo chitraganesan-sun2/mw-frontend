@@ -234,8 +234,8 @@ export const sectionsData = [
                 contextType: "list",
                 hideNumber: true,
                 content: [
-                    "a) If you choose “Yes” when we ask during sign-up or in Settings (a parent or guardian answers for a learner under 18), MelodyWings may show the learner's age, the skills they want to learn and, if provided, one short sentence written for this purpose, anonymously on our public website. We never show a name, photo, email address, phone number or any other profile information.",
-                    "b) This is off unless you choose it. You can turn it off at any time in Settings and it is removed from the website right away. Deleting your account also removes it."
+                    "a) By default, MelodyWings may show an approved learner's age and the skills they want to learn, anonymously, on our public website. If a parent or guardian (or the learner, once an adult) answers “Yes” when we ask, we may also show one short sentence written for this purpose. We never show a name, photo, email address, phone number or any other profile information. A learner under 18 is only shown when a parent or guardian enrolled them.",
+                    "b) You can opt out at any time by choosing No when we ask or by turning it off in Settings, and it is removed from the website right away. Deleting your account also removes it."
                 ]
             },
             {

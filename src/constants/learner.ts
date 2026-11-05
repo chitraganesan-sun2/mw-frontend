@@ -484,12 +484,12 @@ export const LearnerFormSections: FormSectionConfig[] = [
             },
             {
                 id: "showcase_consent",
-                label: "Share Learning Goals Anonymously (optional)",
+                label: "Share Learning Goals Anonymously",
                 sublabel:
-                    "MelodyWings may show the learner's age and the skills they want to learn, anonymously, on our public website. No name, photo or contact details are ever shown. Guardians answer for a learner under 18. You can change this any time in Settings.",
+                    "By default, MelodyWings may show the learner's age and the skills they want to learn, anonymously, on our public website. No name, photo or contact details are ever shown. Choose No to opt out. Guardians answer for a learner under 18. You can change this any time in Settings.",
                 inputType: "radio",
                 options: [
-                    { label: "Yes, you may share", value: true },
+                    { label: "Yes, you may share (and add a sentence below)", value: true },
                     { label: "No", value: false },
                 ],
                 required: false,
@@ -499,7 +499,7 @@ export const LearnerFormSections: FormSectionConfig[] = [
                 // Only shown when sharing is allowed (FormTabs hideFields).
                 id: "showcase_statement",
                 label: "In One Sentence, What Would the Learner Like to Learn?",
-                sublabel: "(optional, shown publicly if you allow sharing - please don't include names or contact details)",
+                sublabel: "(optional, shown publicly because you chose Yes - please don't include names or contact details)",
                 inputType: "text",
                 placeholder: "e.g., I want to learn guitar and become a musician.",
                 gridCols: 1,
