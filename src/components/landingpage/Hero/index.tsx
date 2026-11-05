@@ -7,7 +7,6 @@ import { useState } from "react";
 import Button from "@/components/common/Button";
 import HeroBannerLogo from "@/assets/images/landingpage/hero-banner.png";
 import { useQueryState } from "nuqs";
-import Header from "../components/Header";
 
 
 const Hero = () => {
@@ -15,7 +14,6 @@ const Hero = () => {
 
     return (
         <div className="w-full h-full bg-[#F4F7FB] md:bg-white">
-            <Header />
             <div className={`w-full md:h-[80vh] md:min-h-[480px] md:max-h-[760px] md:bg-white relative`}>
                 <div className="w-full !h-[300px] md:!h-full md:!relative">
                     <Image src={HeroBannerImg} alt="Students learning together with technology support" fill className="h-full object-cover object-top hidden md:block" />

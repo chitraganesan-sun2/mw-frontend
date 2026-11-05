@@ -95,7 +95,7 @@ const Header = () => {
 
     return (
         <div
-            className="w-full mx-auto bg-white shadow-md "
+            className="sticky top-0 z-40 w-full mx-auto bg-white shadow-md"
         >
             <div className="w-full mx-auto flex justify-between items-center 2xl:px-[4%] px-[5%] py-5 ">
                 <Link

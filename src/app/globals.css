@@ -39,6 +39,8 @@ body {
 
 html {
     scroll-behavior: smooth;
+    /* Keeps in-page anchors (e.g. /#for-learners) clear of the sticky landing header. */
+    scroll-padding-top: 5.5rem;
 }
 
 @layer base {

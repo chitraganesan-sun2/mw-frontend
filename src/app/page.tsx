@@ -11,12 +11,15 @@ import SkillsToLearn from "@/components/landingpage/SkillsToLearn";
 import SessionOptions from "@/components/landingpage/SessionOptions";
 import HomeClientEffects from "@/components/landingpage/HomeClientEffects";
 import RoleNeutralScope from "@/components/common/RoleNeutralScope";
+import Header from "@/components/landingpage/components/Header";
 
 export default function Page() {
     return (
         // Logged-out landing: no role accent even with a stale role cookie.
         <RoleNeutralScope>
-            <div className="w-full overflow-x-hidden bg-background-input relative">
+            <div className="w-full overflow-x-clip bg-background-input relative">
+                {/* Sticky header lives at page level so it stays pinned for the whole scroll. */}
+                <Header />
                 <HomeClientEffects />
                 <Hero />
                 <div className="flex flex-col gap-6 lg:gap-8 py-8 lg:py-10">
