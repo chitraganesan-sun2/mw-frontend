@@ -15,6 +15,11 @@ export type EndpointProps = {
         preview: (role: "volunteer" | "learner") => string;
         withdraw: (requestId: string) => string;
     };
+    policies: {
+        versions: string;
+        status: string;
+        accept: string;
+    };
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${typeof role}`;
         getOnboardingStatus: (id: string, role: "volunteer" | "learner") => string;

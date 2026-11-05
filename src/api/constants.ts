@@ -32,6 +32,11 @@ export const endpoints: EndpointProps = {
         preview: (role: "volunteer" | "learner") => `profile-changes/${role}?preview=true`,
         withdraw: (requestId: string) => `profile-changes/${requestId}`,
     },
+    policies: {
+        versions: "policies/versions",
+        status: "policies/status",
+        accept: "policies/accept",
+    },
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${role}`,
         getOnboardingStatus: (id: string, role: "volunteer" | "learner") =>

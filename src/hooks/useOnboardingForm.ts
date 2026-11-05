@@ -4,6 +4,7 @@ import { z } from "zod";
 import { endpoints } from "@/api/constants";
 import { useSendData } from "./useReactQuery";
 import { PUT_API } from "@/api/request";
+import { acceptCurrentPolicies } from "@/services/policies";
 import Cookies from "js-cookie";
 import { getCookie } from "@/utils/auth";
 import { useRouter } from "next/navigation";
@@ -21,8 +22,12 @@ export const useOnboardingForm = (schema: any) => {
     const { setImageId, setVideoId, setDocumentId } = useAppStore();
 
     const { mutate: updateOnboarding, isPending } = useSendData({
-        fn: (data: z.infer<typeof schema>) =>
-            PUT_API(endpoints.onboarding.update(role as "volunteer" | "learner"), { ...data, step: role === "volunteer" ? 5 : 6 }),
+        fn: async (data: z.infer<typeof schema>) => {
+            // The form only gets here once the Terms / Privacy Policy boxes are ticked: record that
+            // (versions + time) before the final submit, which the server can then verify.
+            await acceptCurrentPolicies();
+            return PUT_API(endpoints.onboarding.update(role as "volunteer" | "learner"), { ...data, step: role === "volunteer" ? 5 : 6 });
+        },
         success: () => {
             showToast({ type: "success", message: "Form submitted successfully." });
             setIsRedirecting(true);

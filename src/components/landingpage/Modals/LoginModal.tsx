@@ -1,3 +1,4 @@
+import PolicyNotice from "@/components/common/PolicyNotice";
 import ModalCloseIcon from "@/assets/icons/ModalCloseIcon"
 import Button from "@/components/common/Button"
 import { Modal } from "antd"
@@ -156,6 +157,7 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                                 />
                             </div>
                         </div>
+                        <PolicyNotice className='pt-4' />
                     </div>
                 </div>
             </Modal>

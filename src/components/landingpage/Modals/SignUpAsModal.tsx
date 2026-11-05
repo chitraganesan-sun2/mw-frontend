@@ -1,3 +1,4 @@
+import PolicyNotice from "@/components/common/PolicyNotice";
 import React, { useState } from "react";
 import Modal from "antd/es/modal";
 import ModalCloseIcon from "@/assets/icons/FeedModalCloseIcon";
@@ -283,6 +284,7 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                             />
                         )}
                     </div>
+                    <PolicyNotice className="mt-4" />
                 </div>
             </Modal>
         </div>
