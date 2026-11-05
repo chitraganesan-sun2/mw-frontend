@@ -58,7 +58,7 @@ export const sectionsData = [
             {
                 title: "b) Mobile App Information.",
                 content: [
-                    "When you use our Android app, we also collect (i) device and app identifiers, namely a push-notification registration token (Firebase Cloud Messaging) and a Firebase installation ID, so that we can send you notifications about sessions, messages, and matches. You can turn push notifications off in Settings or in your device settings; and (ii) crash reports and diagnostic information, such as your device model, operating system version, app version, and the technical details of an error, which are collected by our service provider Sentry so that we can find and fix problems. This information is not used for advertising. Product analytics through PostHog are used on our Website only, not in the mobile app."
+                    "When you use our Android app, we also collect (i) device and app identifiers, namely a push-notification registration token (Firebase Cloud Messaging) and a Firebase installation ID, so that we can send you notifications about sessions, messages, and matches. You can turn push notifications off in Settings or in your device settings; and (ii) crash reports and diagnostic information, such as your device model, operating system version, app version, and the technical details of an error, which are collected by our service provider Sentry so that we can find and fix problems. This information is not used for advertising. Product analytics through PostHog are used on our Website only, not in the mobile app. The app shows the same cookie card as the Website, and Google Analytics runs in the app only if you click Allow."
                 ]
             },
             {

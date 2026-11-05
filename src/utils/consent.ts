@@ -1,5 +1,4 @@
 import { parseCookies } from "nookies";
-import { isNativePlatform } from "@/utils/platform";
 
 export const CONSENT_COOKIE = "cookieConsent";
 /** Fired on `window` whenever the visitor answers the cookie banner. */
@@ -23,11 +22,10 @@ export function doNotTrackEnabled(): boolean {
 
 /**
  * Analytics (Google Analytics, PostHog) may only run after the visitor clicked Allow and only
- * if their browser isn't asking not to be tracked. The native app has no cookie banner and
- * keeps its previous behaviour.
+ * if their browser isn't asking not to be tracked. Same rule on the website and in the Android
+ * app (the app shows the same banner; PostHog itself never runs in the app).
  */
 export function analyticsAllowed(): boolean {
     if (typeof window === "undefined") return false;
-    if (isNativePlatform()) return true;
     return getConsent() === "accepted" && !doNotTrackEnabled();
 }

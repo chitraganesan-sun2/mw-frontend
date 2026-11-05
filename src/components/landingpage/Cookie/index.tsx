@@ -5,13 +5,13 @@ import { setCookie } from "nookies";
 import { TbCookieFilled } from "react-icons/tb";
 import Button from "@/components/common/Button";
 import { CONSENT_COOKIE, CONSENT_EVENT, doNotTrackEnabled, getConsent } from "@/utils/consent";
-import { isNativePlatform } from "@/utils/platform";
 
 /**
  * Analytics cookie banner. Google Analytics and PostHog only load after "Allow"; "Decline" (or
  * ignoring the banner) keeps them off. Shown on every page until the visitor answers - as a
- * small card, not a modal, so it never blocks the page. Not shown in the native app or when the
- * browser sends Do Not Track (which we honour as a decline).
+ * small card, not a modal, so it never blocks the page. Not shown when the
+ * browser sends Do Not Track (which we honour as a decline). The Android app shows the same
+ * banner, so Google Analytics there also waits for Allow.
  */
 export default function CookieConsent() {
   // The choice lives in a cookie, which isn't readable during SSR, so start hidden and reveal
@@ -19,7 +19,7 @@ export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    if (isNativePlatform() || doNotTrackEnabled()) return;
+    if (doNotTrackEnabled()) return;
     setShowBanner(!getConsent());
   }, []);
 
