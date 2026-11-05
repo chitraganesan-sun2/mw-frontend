@@ -41,7 +41,7 @@ export default function CookieConsent() {
     > 
       <div className="max-md:mx-3 fixed bottom-4 right-0 md:right-4 z-50 bg-white shadow-lg rounded-3xl p-6 border border-gray-300 max-w-md mx-auto flex flex-col gap-5">
         <h3 className="font-semibold text-lg flex items-center gap-2">
-          <TbCookieFilled className="text-2xl" /> We use Cookies on our Website to
+          <TbCookieFilled className="text-2xl" /> We use cookies on our website to:
         </h3>
         <ul className="text-sm text-gray-600 space-y-2">
           <li>1. Understand and save your preferences for future visits.</li>

@@ -71,9 +71,9 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
             status: status,
         }).then(() => {
             if (status === "accepted") {
-                showToast({ type: "success", message: "Invitation Accepted" });
+                showToast({ type: "success", message: "Invitation accepted." });
             } else {
-                showToast({ type: "info", message: "Invitation declined" });
+                showToast({ type: "info", message: "Invitation declined." });
             }
         });
     };
@@ -181,7 +181,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
             // No catch before: any rejection (e.g. "hasn't started yet") left the button
             // spinning forever with no message - same fix as the desktop MeetingPreviewModal.
             .catch((err) => {
-                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't mark the session as completed.") });
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't mark the session as completed. Please try again.") });
             })
             .finally(() => setLoadingCompleted(false));
     };
@@ -309,7 +309,7 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
                                     <p className="text-[#DC2626] font-medium text-xs">
                                         {learner
                                             ? `${[learner.firstName, learner.lastName].filter(Boolean).join(" ") || "Guest"} completed the meeting`
-                                            : "Meeting completed"}
+                                            : "Session completed"}
                                     </p>
                                 )}
                             </div>

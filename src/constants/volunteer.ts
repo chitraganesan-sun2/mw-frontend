@@ -85,7 +85,7 @@ const VolunteerDetailsFields: FormField[] = [
     {
         parent: "volunteer_contact_details",
         id: "contact_number",
-        label: "Your contact number",
+        label: "Contact Number",
         sublabel: "(with country code)",
         inputType: "contact-input",
         placeholder: "Enter contact number",
@@ -97,9 +97,9 @@ const VolunteerDetailsFields: FormField[] = [
     {
         parent: "volunteer_contact_details",
         id: "zip_code",
-        label: "Zip Code",
+        label: "ZIP Code",
         inputType: "text",
-        placeholder: "Enter zip code",
+        placeholder: "Enter ZIP code",
         gridCols: 1,
         required: true,
     },
@@ -154,7 +154,7 @@ const ParentDetailsFields: FormField[] = [
     },
     {
         id: "consented_from_parent",
-        label: "I'm a minor and I've consent from my parent or guardian to be a volunteer.",
+        label: "I'm under 18 and I have consent from my parent or guardian to volunteer.",
         sublabel: "(Guardian details are required for minors. The age of majority is typically 18–21, depending on the U.S. state.)",
         inputType: "checkbox",
         gridCols: 2,
@@ -258,7 +258,7 @@ const SkillsToTeachFields: FormField[] = [
     },
     {
         id: "volunteer_academic_skills_notes",
-        label: "More about your academic skills",
+        label: "More About Your Academic Skills",
         inputType: "text",
         placeholder: "Enter here",
         gridCols: 1,
@@ -281,7 +281,7 @@ const SkillsToTeachFields: FormField[] = [
     },
     {
         id: "volunteer_arts_life_skills_notes",
-        label: "More about your arts/life skills",
+        label: "More About Your Arts & Life Skills",
         inputType: "text",
         placeholder: "Enter here",
         gridCols: 1,
@@ -308,7 +308,7 @@ const SkillsToTeachFields: FormField[] = [
     },
     {
         id: "volunteer_teaching_traits",
-        label: "What are your Teaching Traits, Preferences & Limitations",
+        label: "What are your teaching traits, preferences, and limitations?",
         sublabel: "(optional, not tied to your answer above)",
         inputType: "textarea",
         placeholder: "Describe here",
@@ -448,7 +448,7 @@ const HealthSafetyAgreementFields: FormField[] = [
 const OtherConsentsDetailsFields: FormField[] = [
     {
         id: "consent_to_background_checks",
-        label: "Do you consent to do child abuse registry and sex offender checks if needed?",
+        label: "Do you consent to child abuse registry and sex offender checks, if needed?",
         inputType: "radio",
         options: [
             { label: "Yes", value: true },
@@ -608,7 +608,7 @@ export const VolunteerFormSections: FormSectionConfig[] = [
                 id: "profile_video",
                 label: "Profile Video",
                 sublabel:
-                    "Record a Video summarizing your profile and qualifications. This will help the learners to get to know you better!  Feel free to share your hobbies, extracurricular activities, and explain how and why you believe you're well-suited to teach the subject you've chosen to special needs learners. You can keep it casual ! Speak from the heart and share what feels natural.",
+                    "Record a Video summarizing your profile and qualifications. This will help the learners to get to know you better! Feel free to share your hobbies, extracurricular activities, and explain how and why you believe you're well-suited to teach the subject you've chosen to special needs learners. You can keep it casual! Speak from the heart and share what feels natural.",
                 inputType: "upload",
                 gridCols: 2,
                 variant: "file",
@@ -676,7 +676,7 @@ export const VolunteerThankyouCardConstants = {
 };
 
 export const VolunteerRejectedMessage = {
-    title: "Thank you for your interest!",
+    title: "Thank You for Your Interest!",
     description:
         "At this time, we are unable to proceed with your application. We truly appreciate your willingness to contribute and encourage you to check back for future opportunities!",
 };

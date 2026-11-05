@@ -474,7 +474,7 @@ const JoinUsStep3Page = () => {
                             <div className="rounded-3xl md:border border-gray-200 md:px-6 py-4 md:py-5 space-y-4">
                                 <p className="text-[20px] font-medium text-gray-900">5. Consents</p>
                                 <div className="space-y-2">
-                                    <p className="text-[16px] text-gray-800">Do you consent to do child abuse registry and sex offender checks if needed?</p>
+                                    <p className="text-[16px] text-gray-800">Do you consent to child abuse registry and sex offender checks, if needed?</p>
                                     <RadioInput name="consent_1" value={consent1} onChange={(v) => setConsent1(v as '' | 'yes' | 'no')} options={[{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }]} inputClassName="mt-1" inputType="radio" />
                                 </div>
                                 <div className="space-y-2">

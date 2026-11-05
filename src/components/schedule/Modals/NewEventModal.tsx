@@ -356,7 +356,7 @@ export default function NewEventModal({
             return;
         }
         if (!formData.duration || !formData.start_time) {
-            showToast({ message: "Please choose a date, start time and duration", type: "error" });
+            showToast({ message: "Please choose a date, start time, and duration.", type: "error" });
             return;
         }
         // Validate that the selected time is not in the past
@@ -371,7 +371,7 @@ export default function NewEventModal({
 
         // Check if selected date is in the past
         if (dateStr < currentDateStr) {
-            showToast({ message: "Cannot create session for a past date", type: "error" });
+            showToast({ message: "Cannot create session for a past date.", type: "error" });
             return;
         }
 
@@ -379,7 +379,7 @@ export default function NewEventModal({
         if (dateStr === currentDateStr) {
             const selectedTimeStr = formData.start_time;
             if (selectedTimeStr < currentTimeStr) {
-                showToast({ message: "Cannot create session for a past time", type: "error" });
+                showToast({ message: "Cannot create session for a past time.", type: "error" });
                 return;
             }
         }
@@ -405,7 +405,7 @@ export default function NewEventModal({
 
             if (hasOverlap) {
                 showToast({
-                    message: "Time slot overlaps with an existing session",
+                    message: "Time slot overlaps with an existing session.",
                     type: "error",
                 });
                 return;
@@ -429,7 +429,7 @@ export default function NewEventModal({
                 });
                 if (overlapsOpen) {
                     showToast({
-                        message: "You've already opened an instant session that overlaps this time",
+                        message: "You've already opened an instant session that overlaps this time.",
                         type: "error",
                     });
                     return;
@@ -474,7 +474,7 @@ export default function NewEventModal({
                 setIsTimePickerOpen(false);
                 onClose();
             } else {
-                showToast({ message: "Couldn't create the instant session. Please try again.", type: "error" });
+                showToast({ message: "Couldn't post the instant session. Please try again.", type: "error" });
             }
         } catch (err) {
             showToast({ message: getApiErrorMessage(err, "Couldn't post the instant session. Please try again."), type: "error" });
@@ -522,7 +522,7 @@ export default function NewEventModal({
                 title="Post an Instant Session"
                 topContent={
                     <p className="text-sm text-gray-500 font-normal !mt-0">
-                        Post what you can teach - a learner can claim it.
+                        Post what you can teach. A learner can claim it.
                     </p>
                 }
                 headerComponent={isMobile ? mobileHeader : undefined}

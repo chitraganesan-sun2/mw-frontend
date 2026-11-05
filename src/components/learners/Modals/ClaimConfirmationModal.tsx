@@ -191,7 +191,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
                 onClick={onClose}
             />
             <Button
-                title={isClaiming ? "Claiming..." : "Yes Confirm"}
+                title={isClaiming ? "Claiming..." : "Yes, Confirm"}
                 btnVariant="primary"
                 customClassName="flex-1"
                 onClick={handleConfirm}

@@ -92,7 +92,7 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
                                 </p>
                             </>
                         ) : (
-                            <p className="text-sm font-medium ">No Reviews</p>
+                            <p className="text-sm font-medium ">No reviews yet</p>
                         )}
                     </div>
                 </div>

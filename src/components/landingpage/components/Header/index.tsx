@@ -129,7 +129,7 @@ const Header = () => {
                                         href={appHref}
                                         className="inline-flex items-center bg-action px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg"
                                     >
-                                        Back to app
+                                        Back to App
                                     </Link>
                                 ) : (
                                     <Button
@@ -198,7 +198,7 @@ const Header = () => {
                                         href={appHref}
                                         className="inline-flex items-center justify-center bg-action px-3 py-1 text-white hover:text-white text-sm font-medium rounded-lg min-w-[150px]"
                                     >
-                                        Back to app
+                                        Back to App
                                     </Link>
                                 ) : (
                                     <Button

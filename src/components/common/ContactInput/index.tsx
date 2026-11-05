@@ -75,7 +75,7 @@ const ContactInput = (props: ContactInputProps) => {
                     rc-select's source, not assumed). A real sr-only <label htmlFor> is the
                     one mechanism proven to reach it, since id demonstrably does. */}
                 <label htmlFor={`${props.name}_country_code`} className="sr-only">
-                    Country code
+                    Country Code
                 </label>
                 <Select
                     // The DOM-facing name/id is namespaced by the outer field's own name
@@ -99,7 +99,7 @@ const ContactInput = (props: ContactInputProps) => {
                     name={`${props.name}_number`}
                     ariaLabel="Phone number"
                     inputType="text"
-                    placeholder="Enter number"
+                    placeholder="Enter phone number"
                     className="!w-full !mb-0"
                     value={formData?.number || ""}
                     onChange={(e) => handleChange(e, "number")}

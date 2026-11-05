@@ -81,7 +81,7 @@ const DetailModal = ({
             setIsLiked(!status);
             setLikedCount((prev) => prev + (status ? -1 : 1));
             handleUserLikeAction(resourceId, !status);
-            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update like. Please try again.") });
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update your like. Please try again.") });
         } finally {
             isLikePending.current = false;
         }
@@ -95,7 +95,7 @@ const DetailModal = ({
         try {
             const res = await deleteResource(resourceId);
             if (res === 200) {
-                showToast({ message: "Resource Deleted" });
+                showToast({ message: "Resource deleted." });
                 setIsDeleteConfirmOpen(false);
                 triggerReload();
                 onClose();
@@ -299,8 +299,8 @@ const DetailModal = ({
             )}
             <ConfirmModal
                 isOpen={isDeleteConfirmOpen}
-                title="Delete resource"
-                description="Are you sure you want to delete this resource? This cannot be undone."
+                title="Delete Resource"
+                description="Are you sure you want to delete this resource? This can't be undone."
                 confirmText="Delete"
                 danger
                 isLoading={isDeleting}

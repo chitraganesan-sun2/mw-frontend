@@ -447,7 +447,7 @@ export function AvailabilityField({
             )}
             {!status && !error && (
                 <p className="text-xs text-gray-500">
-                    Times are shown in your profile timezone.
+                    Times are shown in your profile time zone.
                 </p>
             )}
             <FieldError id="session-availability-error" message={error} />

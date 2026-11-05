@@ -240,7 +240,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             showToast({ type: "success", message: "Availability removed" });
             refreshAvailability();
         } catch (err) {
-            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't remove this slot.") });
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't remove this slot. Please try again.") });
         } finally {
             setRemovingId(null);
         }
@@ -329,10 +329,10 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                     <button
                         type="button"
                         onClick={onScheduleAvailability}
-                        aria-label="Edit my recurring availability"
+                        aria-label="Edit My Recurring Availability"
                         className="text-xs font-medium underline bg-transparent border-0 p-0 cursor-pointer"
                     >
-                        Edit recurring
+                        Edit Recurring
                     </button>
                 </div>
                 {isLoading ? (
@@ -353,7 +353,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                             onClick={onScheduleAvailability}
                             className="rounded-full bg-action px-4 py-1.5 text-xs font-semibold text-white hover:bg-action-hover border-0 cursor-pointer"
                         >
-                            Schedule my availability
+                            Schedule My Availability
                         </button>
                     </div>
                 ) : (

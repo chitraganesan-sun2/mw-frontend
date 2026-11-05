@@ -138,7 +138,7 @@ export const LearnerInformation = ({ data }: { data: Learner }) => {
             fields: [
                 { label: "Name of the Academy", value: data?.education?.current_school },
                 { label: "Grade or Education Level", value: data?.education?.grade_or_education_level },
-                { label: "Program or IEP or 504 Plan", value: data?.education?.program_iep_504_plan, fullWidth: true },
+                { label: "Program, IEP, or 504 Plan", value: data?.education?.program_iep_504_plan, fullWidth: true },
                 { label: "Cultural/Religious Considerations", value: data?.education?.cultural_religious_considerations, fullWidth: true },
                 { label: "Academic Strengths", value: data?.education?.academic_strengths?.map(formatString) },
                 { label: "Extracurriculars / Non-Academic Skills", value: data?.education?.extracurricular_activities, fullWidth: true },

@@ -100,7 +100,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         if (materialsChoice === "needed" && !materials.trim()) e.materials = "Please list the materials.";
         const cap = Number(capacity);
         if (!Number.isInteger(cap) || cap < 1 || cap > 50) e.capacity = "Please enter a number from 1 to 50.";
-        if (tags.length > MAX_TAGS) e.tags = `Please use at most ${MAX_TAGS} topics.`;
+        if (tags.length > MAX_TAGS) e.tags = `Please use no more than ${MAX_TAGS} topics.`;
         else if (tags.some((t) => t.length > 30)) e.tags = "Each topic must be 30 characters or fewer.";
         return e;
     };
@@ -166,7 +166,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                             setTopic(e.target.value);
                             if (e.target.value.trim()) setErrors((x) => ({ ...x, topic: undefined }));
                         }}
-                        placeholder="e.g. Make pancakes together"
+                        placeholder="e.g., Make pancakes together"
                         className={inputClass(errors.topic)}
                     />
                     <FieldError id="wingtime-topic-error" message={errors.topic} />
@@ -230,7 +230,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                         setErrors((x) => ({ ...x, materials: undefined }));
                     }}
                     options={[
-                        { value: "none", label: "None Needed" },
+                        { value: "none", label: "None needed" },
                         { value: "needed", label: "Materials Needed" },
                     ]}
                 />
@@ -251,7 +251,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                                 setMaterials(e.target.value);
                                 if (e.target.value.trim()) setErrors((x) => ({ ...x, materials: undefined }));
                             }}
-                            placeholder="e.g. A pan, flour, eggs"
+                            placeholder="e.g., A pan, flour, eggs"
                             className={inputClass(errors.materials)}
                         />
                         <FieldError id="wingtime-materials-error" message={errors.materials} />
@@ -286,7 +286,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                         id="wingtime-tags"
                         value={tagsText}
                         onChange={(e) => setTagsText(e.target.value)}
-                        placeholder="e.g. music, cooking, dance"
+                        placeholder="e.g., music, cooking, dance"
                         aria-invalid={Boolean(errors.tags)}
                         aria-describedby={errors.tags ? "wingtime-tags-error" : "wingtime-tags-hint"}
                         className={inputClass(errors.tags)}

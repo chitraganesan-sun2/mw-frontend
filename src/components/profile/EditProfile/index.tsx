@@ -240,7 +240,7 @@ const EditProfileModal = ({
     />
     <ConfirmModal
       isOpen={showDiscardConfirm}
-      title="Discard changes"
+      title="Discard Changes"
       description="You have unsaved changes. Are you sure you want to close without saving?"
       confirmText="Discard"
       danger

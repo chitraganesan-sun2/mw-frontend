@@ -253,7 +253,7 @@ const FormTabs = ({
                 control._formValues.parent_info.parent_contact_number.number?.toString();
             if (parentPhone && parentPhone.length !== 10) {
                 phoneNumberErrors["parent_info.parent_contact_number"] =
-                    "Parent phone number must be exactly 10 digits";
+                    "Guardian phone number must be exactly 10 digits";
                 hasPhoneNumberErrors = true;
             }
         }

@@ -20,9 +20,9 @@ const FileUpload = ({ ...props }: FileUploadProps) => {
     };
 
     const getMaxSize = () => {
-        if (props.fileType === "video/*") return "Max: 100MB";
-        if (props.fileType === "image/*") return "Max: 10MB";
-        return "Max: 25MB";
+        if (props.fileType === "video/*") return "Max 100 MB";
+        if (props.fileType === "image/*") return "Max 10 MB";
+        return "Max 25 MB";
     };
 
     const getValue = () => {

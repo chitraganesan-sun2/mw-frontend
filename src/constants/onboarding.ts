@@ -28,7 +28,7 @@ export const HEARD_ABOUT_US_FIELDS: FormField[] = [
         id: "heard_about_us_other",
         label: "Please tell us how",
         inputType: "text",
-        placeholder: "e.g. a podcast, a flyer",
+        placeholder: "e.g., a podcast, a flyer",
         gridCols: 2,
     },
 ];

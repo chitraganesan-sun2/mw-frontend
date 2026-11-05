@@ -42,7 +42,7 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
             // Revert on error
             setIsLiked(!newLikeStatus);
             setLikesCount((prev) => (!newLikeStatus ? prev + 1 : prev - 1));
-            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update like. Please try again.") });
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update your like. Please try again.") });
         } finally {
             isLikePending.current = false;
         }

@@ -76,7 +76,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
         try {
             await callbackToast({
                 apiCall: actionFn(),
-                loadingMsg: isEditMode ? "Updating Post..." : "Creating Post...",
+                loadingMsg: isEditMode ? "Updating post..." : "Creating post...",
                 successMsg: successMessage,
                 errorMsg: errorMessage,
             });
@@ -109,7 +109,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
                 isEditMode
                     ? PUT_API(endpoints.post.updatePost(postId || ""), payload)
                     : POST_API(endpoints.post.createPost, payload),
-            isEditMode ? "Post updated successfully" : "Post created successfully",
+            isEditMode ? "Post updated." : "Post published.",
             isEditMode ? "Couldn't update the post. Please try again." : "Couldn't create the post. Please try again."
         );
     };
@@ -118,7 +118,7 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
     // instead of one generic message - the specific text was only shown far down the form.
     const onError = (errs?: Record<string, { message?: string } | undefined>) => {
         const first = errs ? Object.values(errs).find((e) => e?.message)?.message : undefined;
-        showToast({ message: first || "Please, fill all the required fields!", type: "error" });
+        showToast({ message: first || "Please fill in all required fields.", type: "error" });
     };
 
     const { width } = useWindowSize();

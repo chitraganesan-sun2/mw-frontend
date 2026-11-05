@@ -11,7 +11,7 @@ export const PERSON_REPORT_REASONS: PersonReportReason[] = [
     { value: "unsafe_behavior", label: "Unsafe or inappropriate behavior" },
     { value: "harassment", label: "Harassment or bullying" },
     { value: "personal_info", label: "Asked for personal details or to talk outside MelodyWings" },
-    { value: "no_show", label: "Didn't show up or acted unprofessionally", onlyFor: ["session"] },
+    { value: "no_show", label: "Didn't show up or behaved unprofessionally", onlyFor: ["session"] },
     { value: "other", label: "Something else" },
 ];
 

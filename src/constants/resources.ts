@@ -48,7 +48,7 @@ export const ResourceFormConstants: FormField[] = [
         name: "resource_skills",
         label: "Skills You Gain",
         inputType: "async-select",
-        placeholder: "Select the skills",
+        placeholder: "Select skills",
         endpoint: "skills",
         variant: "multi",
         responseAsLabel: "skill_name",
@@ -88,16 +88,16 @@ export const ResourceFormSchema = z.object({
         }),
     resource_title: z
         .string({ required_error: "Resource Title is required" })
-        .min(3, "Title is required")
+        .min(3, "Resource Title is required")
         .max(100, "Title cannot exceed 100 characters"),
     created_by: z
         .string({ required_error: "Description is required" })
-        .min(3, "Created By field must have a name")
+        .min(3, "Created By is required")
         .max(50, "Name cannot exceed 50 characters"),
     difficulty_level: z.string({ required_error: "Difficulty level selection is required" }),
     resource_description: z
         .string({ required_error: "Description is required" })
-        .min(10, "Description must be at least 10 characters long")
+        .min(10, "Description must be at least 10 characters long.")
         .max(500, "Description cannot exceed 500 characters"),
     resource_skills: z
         .array(

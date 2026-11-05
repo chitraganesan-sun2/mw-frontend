@@ -30,7 +30,7 @@ export function validateSlotTimes(start: string, end: string): string | null {
     if (end === start) return "Start and end time cannot be the same.";
     // An end before the start crosses midnight (11:30 PM - 12:30 AM); getDurationMinutes wraps.
     const minutes = getDurationMinutes(start, end) ?? 0;
-    if (minutes > MAX_SLOT_MINUTES) return "A slot cannot be longer than one hour.";
+    if (minutes > MAX_SLOT_MINUTES) return "A slot can't be longer than one hour.";
     return null;
 }
 
@@ -73,7 +73,7 @@ const OneTimeSlotEditModal: React.FC<Props> = ({ slot, onClose, onSaved }) => {
             onClose={onClose}
             width={400}
             hideCloseIcon
-            headerComponent={<h2 className="text-lg font-medium">Edit availability</h2>}
+            headerComponent={<h2 className="text-lg font-medium">Edit Availability</h2>}
             headerClassName="!px-6 !py-4 !border-0 !justify-start"
             bodyClassName="!px-6 !py-2"
             footerClassName="!px-6 !py-4 !border-0"

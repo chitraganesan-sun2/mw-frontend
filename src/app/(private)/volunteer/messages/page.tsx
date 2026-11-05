@@ -421,7 +421,7 @@ const Messages = () => {
                 // Restore message text so user can retry - and say so; this used to be silent,
                 // so the text just reappeared in the box with no explanation.
                 setMessage(messageText);
-                showToast({ type: "error", message: getApiErrorMessage(error, "Your message wasn't sent. Please try again.") });
+                showToast({ type: "error", message: getApiErrorMessage(error, "Couldn't send your message. Please try again.") });
             });
     };
 
@@ -559,7 +559,7 @@ const Messages = () => {
                                                 className="!bg-transparent w-full !mb-0"
                                                 onChange={handleMessageChange}
                                                 onKeyDown={handleKeyDown}
-                                                placeholder={"Type message here"}
+                                                placeholder={"Type a message"}
                                                 rows={1}
                                             />
                                         </div>

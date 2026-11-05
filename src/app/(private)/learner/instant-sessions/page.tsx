@@ -93,7 +93,7 @@ function mapItemToSession(item: any, date: string): Session {
     const timezone =
         shortTimeZone(item.volunteer_timezone ?? item.learner_timezone, item.date ?? date);
     const instructorName =
-        item.volunteer_full_name ?? item.instructor?.name ?? item.volunteer_name ?? "Instructor";
+        item.volunteer_full_name ?? item.instructor?.name ?? item.volunteer_name ?? "Volunteer";
     const rawTags = Array.isArray(item.tags)
         ? item.tags
         : Array.isArray(item.skills)
@@ -235,7 +235,7 @@ function RequestedSessionCard({
                                 disabled={isActionLoading}
                                 onClick={() => onView(request.session_id)}
                             >
-                                View / Join
+                                View or Join
                             </button>
                         ) : (
                             <button
@@ -491,12 +491,12 @@ export default function InstantSessionsPage() {
     };
 
     const handleCancelRequest = async (requestId: string) => {
-        if (!(await askConfirm({ title: "Cancel request", description: "Are you sure you want to cancel this request?", confirmText: "Cancel request", cancelText: "Keep it", danger: true }))) return;
+        if (!(await askConfirm({ title: "Cancel Request", description: "Are you sure you want to cancel this request?", confirmText: "Cancel Request", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             await DELETE_API(endpoints.session.cancelLearnerRequest(requestId));
             invalidateScheduleViews(queryClient, "learner");
-            showToast({ message: "Request cancelled successfully", type: "success" });
+            showToast({ message: "Request cancelled.", type: "success" });
         } catch (e: any) {
             showToast({ message: getApiErrorMessage(e, "Couldn't cancel the request. Please try again."), type: "error" });
         } finally {
@@ -506,7 +506,7 @@ export default function InstantSessionsPage() {
 
     const handleCancelDetail = async () => {
         if (isActionLoading || !sessionDetail?.identifier || sessionDetail.cancelAction === "none") return;
-        if (!(await askConfirm({ title: "Cancel session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel session", cancelText: "Keep it", danger: true }))) return;
+        if (!(await askConfirm({ title: "Cancel Session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel Session", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             if (sessionDetail.cancelAction === "unclaim") {
@@ -514,7 +514,7 @@ export default function InstantSessionsPage() {
             } else {
                 await PUT_API(endpoints.session.cancelSession(sessionDetail.identifier), { status: "cancelled" });
             }
-            showToast({ message: "Session cancelled successfully", type: "success" });
+            showToast({ message: "Session cancelled.", type: "success" });
             invalidateScheduleViews(queryClient, "learner");
             setSessionDetail(null);
         } catch (error: any) {
@@ -625,7 +625,7 @@ export default function InstantSessionsPage() {
                             No Requested Sessions
                         </h3>
                         <p className="text-sm text-gray-500">
-                            Requests you send will show up here
+                            Requests you send will show up here.
                         </p>
                     </div>
                 )}
@@ -634,7 +634,7 @@ export default function InstantSessionsPage() {
             {/* Available Instant Sessions (volunteer-opened slots, browse + join) */}
             <div>
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
-                    Instant Sessions posted by Volunteers
+                    Instant Sessions Posted by Volunteers
                 </h2>
 
                 {availableSessions.length > 0 && (
@@ -668,7 +668,7 @@ export default function InstantSessionsPage() {
                             No Instant Sessions
                         </h3>
                         <p className="text-sm text-gray-500">
-                            Sessions volunteers open up for this date will show up here
+                            Sessions volunteers open up for this date will show up here.
                         </p>
                     </div>
                 )}

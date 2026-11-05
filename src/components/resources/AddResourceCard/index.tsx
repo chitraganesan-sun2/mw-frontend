@@ -14,7 +14,7 @@ const AddResourceCard = ({ handleClick, className = "" }: AddResourceCardProps) 
         >
             <div className="flex flex-col items-center justify-center gap-2 py-6">
                 <IoAddCircle size={40} />
-                <span className="text-sm text-black font-medium">Add New Resource</span>
+                <span className="text-sm text-black font-medium">Add Resource</span>
             </div>
         </button>
     );

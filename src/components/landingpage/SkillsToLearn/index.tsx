@@ -54,12 +54,12 @@ const SkillsToLearn = () => {
                 "Keyboard",
                 "Violin",
                 "Ukulele",
-                "Songs / Nursery Rhymes",
+                "Songs and Nursery Rhymes",
                 "Drums",
             ],
         },
         {
-            title: "Technology and Digital Skills",
+            title: "Technology & Digital Skills",
             icon: FiMonitor,
             skills: [
                 "Computer Science",
@@ -125,7 +125,7 @@ const SkillsToLearn = () => {
                         aria-expanded={showAll}
                         className="inline-flex items-center gap-2 rounded-full border border-[#E0E0E0] bg-white px-6 py-2.5 text-sm font-medium text-[#121212] transition-colors hover:bg-[#f4f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#121212] cursor-pointer"
                     >
-                        {showAll ? "Show fewer" : `View all ${skillsData.length} categories`}
+                        {showAll ? "Show Fewer" : `View All ${skillsData.length} Categories`}
                         <FiChevronDown aria-hidden="true" className={`transition-transform ${showAll ? "rotate-180" : ""}`} />
                     </button>
                 </div>

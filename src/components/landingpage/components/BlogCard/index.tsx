@@ -27,7 +27,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ image, category, title, description
                 <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-medium text-gray-light">{date}</span>
                     <Link style={gradientTextStyle} href={href} className="text-sm underline">
-                        Read more
+                        Read More
                     </Link>
                 </div>
             </div>

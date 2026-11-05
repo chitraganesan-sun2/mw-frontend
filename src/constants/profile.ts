@@ -4,18 +4,18 @@ import nationalities from "@/data/nationalities.json";
 export const contactNumberValidation = z
     .object({
         number: z
-            .string({ required_error: "Phone Number is required" })
+            .string({ required_error: "Phone number is required" })
             .refine((num) => num.length === 10, {
                 message: "Phone number must be exactly 10 digits",
             }),
-        country_code: z.string({ required_error: "Country Code is required" }),
+        country_code: z.string({ required_error: "Country code is required" }),
     })
     .or(z.undefined())
     .refine((value) => value?.country_code, {
-        message: "Country Code is required",
+        message: "Country code is required",
     })
     .refine((value) => value?.number, {
-        message: "Phone Number is required",
+        message: "Phone number is required",
     })
     .refine((value) => value !== undefined && value?.number?.length === 10, {
         message: "Phone number must be exactly 10 digits",
@@ -25,10 +25,10 @@ export const contactNumberValidation = z
 export const VolunteerProfileFormSchema = z.object({
     volunteer_first_name: z
         .string({ required_error: "First Name is required" })
-        .min(1, "First Name  is required"),
+        .min(1, "First Name is required"),
     volunteer_last_name: z
         .string({ required_error: "Last Name is required" })
-        .min(1, "Last Name  is required"),
+        .min(1, "Last Name is required"),
     profile_picture: z
         .object({
             image_url: z.string(),
@@ -42,8 +42,8 @@ export const VolunteerProfileFormSchema = z.object({
         .string({ required_error: "Bio is required" })
         .min(1, "Bio is required"),
     country: z
-        .string({ required_error: "Country selection is required" })
-        .min(1, "Country selection is required"),
+        .string({ required_error: "Country is required" })
+        .min(1, "Country is required"),
     volunteer_subjects: z
         .array(z.any(), { required_error: "At least one subject is required" })
         .min(1, "At least one subject is required"),
@@ -73,7 +73,7 @@ export const VolunteerProfileFormConstants: FormField[] = [
     {
         name: "profile_picture",
         fileType: "image/*",
-        label: "ProfileImage",
+        label: "Profile Image",
         required: true,
         inputType: "upload",
         variant: "profile-image",
@@ -149,7 +149,7 @@ export const VolunteerProfileFormConstants: FormField[] = [
             { label: "Elementary School", value: "elementary_school" },
             { label: "Master's Degree", value: "masters" },
             { label: "PhD", value: "phd" },
-            { label: "Others", value: "others" },
+            { label: "Other", value: "others" },
             { label: "N/A", value: "N/A" },
         ],
         showSearch: true,
@@ -175,15 +175,15 @@ export const LearnerProfileFormSchema = z.object({
             message: "Please upload a single profile image.",
         }),
     learner_description: z.string({ required_error: "Bio is required" }).min(1, "Bio is required"),
-    learner_language: z.string({ required_error: "Language selection is required" }),
+    learner_language: z.string({ required_error: "Language is required" }),
     learner_subjects: z
         .array(z.any(), { required_error: "At least one subject is required" })
         .min(1, "At least one subject is required"),
     contact_number: contactNumberValidation,
-    email: z.string({ required_error: "Email address is required" }).email("Invalid email format"),
+    email: z.string({ required_error: "Email address is required" }).email("Enter a valid email address"),
     country: z
-        .string({ required_error: "Country selection is required" })
-        .min(1, "Country selection is required"),
+        .string({ required_error: "Country is required" })
+        .min(1, "Country is required"),
 });
 
 export const LearnerProfileFormConstants: FormField[] = [
@@ -204,7 +204,7 @@ export const LearnerProfileFormConstants: FormField[] = [
     {
         name: "profile_picture",
         fileType: "image/*",
-        label: "ProfileImage",
+        label: "Profile Image",
         required: true,
         inputType: "upload",
         variant: "profile-image",
@@ -241,7 +241,7 @@ export const LearnerProfileFormConstants: FormField[] = [
     },
     {
         name: "contact_number",
-        label: "Your contact number",
+        label: "Contact Number",
         inputType: "contact-input",
         placeholder: "Enter contact number",
         disabled: false,

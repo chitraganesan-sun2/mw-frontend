@@ -236,7 +236,7 @@ const JoinUsStep1Page = () => {
                                     error={fieldErrors.date_of_birth}
                                     birthDatePicker={{ minAge: 13, maxAge: 100 }}
                                     onChange={(v) => { clearError("date_of_birth"); setDateOfBirth(typeof v === 'string' ? v : ''); }}
-                                    placeholder="Select Date of Birth"
+                                    placeholder="Select date of birth"
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200"
                                 />
@@ -257,7 +257,7 @@ const JoinUsStep1Page = () => {
                                         setCountry(v ?? '');
                                         setState(''); // reset state when country changes
                                     }}
-                                    placeholder={countriesLoading ? "Loading countries..." : "Select Country"}
+                                    placeholder={countriesLoading ? "Loading countries..." : "Select country"}
                                     options={countryOptions}
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200 [&_.ant-select-selector]:!rounded-xl"
@@ -275,7 +275,7 @@ const JoinUsStep1Page = () => {
                                     value={state}
                                     error={fieldErrors.state}
                                     onChange={(v) => { clearError("state"); setState(v ?? ''); }}
-                                    placeholder={statesLoading ? "Loading states..." : "Select State"}
+                                    placeholder={statesLoading ? "Loading states..." : "Select state"}
                                     options={stateOptions}
                                     rootClassName="w-full"
                                     inputClassName="w-full !rounded-xl border-gray-200 [&_.ant-select-selector]:!rounded-xl"

@@ -83,9 +83,9 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         { label: "Languages Spoken", value: data?.volunteer_languages?.map((language) => language.language_name) },
         { label: "Preferred Learner Age Group", value: data?.preferred_learner_age_group },
         { label: "Academic Subjects", value: data?.volunteer_subjects?.map((subject) => subject.subject_name) },
-        { label: "More about your academic skills", value: data?.volunteer_academic_skills_notes },
+        { label: "More About Your Academic Skills", value: data?.volunteer_academic_skills_notes },
         { label: "Arts & Life Skills", value: data?.volunteer_skills?.map((skill) => skill.skill_name) },
-        { label: "More about your arts/life skills", value: data?.volunteer_arts_life_skills_notes },
+        { label: "More About Your Arts & Life Skills", value: data?.volunteer_arts_life_skills_notes },
         {
             label: "Support Preference",
             value: data?.support_preference,
@@ -115,7 +115,7 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
         if (!videoSrc) return null;
         return (
             <div ref={videoContainerRef} className="mb-5">
-                <p className="text-sm text-gray-light font-normal mb-2">About me</p>
+                <p className="text-sm text-gray-light font-normal mb-2">About Me</p>
                 <div className="w-full flex justify-start">
                     <video
                         ref={videoRef}
@@ -124,7 +124,7 @@ export const ProfileDetails = ({ data }: { data: Volunteer }) => {
                         preload="metadata"
                         className="w-full max-w-2xl rounded-xl shadow-lg"
                     >
-                        Your browser does not support the video tag.
+                        Your browser can&apos;t play this video.
                     </video>
                 </div>
             </div>

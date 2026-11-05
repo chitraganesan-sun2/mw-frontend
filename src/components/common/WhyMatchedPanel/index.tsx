@@ -25,7 +25,7 @@ const WhyMatchedPanel = ({
             <div className="bg-background border border-stroke rounded-xl p-4 flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                     <HiSparkles className="text-primary shrink-0" size={16} />
-                    <p className="text-sm font-semibold text-black">Why you matched</p>
+                    <p className="text-sm font-semibold text-black">Why You Matched</p>
                 </div>
                 {hasSharedSkills && (
                     <div className="flex flex-wrap items-center gap-2">

@@ -123,7 +123,7 @@ const InstantSessions = () => {
                         <div className="flex flex-col items-center gap-1">
                             <FiVideo size={28} className="mb-1 text-gray-400" aria-hidden="true" />
                             <p className="text-gray-600 font-medium">No live sessions right now</p>
-                            <p className="text-gray-400 text-sm">Volunteers host sessions throughout the week. Sign up to get notified!</p>
+                            <p className="text-gray-400 text-sm">Volunteers host sessions throughout the week. Sign up to get notified.</p>
                         </div>
                         <button
                             type="button"

@@ -236,7 +236,7 @@ const TabButtons = ({
                         >
                             {tab === "overview"
                                 ? "Overview"
-                                : `Reviews - ${rating} (${totalReviews})`}
+                                : `Reviews: ${rating} (${totalReviews})`}
                         </button>
                     ))}
                 </div>

@@ -55,7 +55,7 @@ export const TermsAndConditionElement = () => {
                 Parents or guardians accompanying such users, by accepting the <TermsAndConditionsLink />,
                 either by clicking a box indicating your acceptance or by using and navigating through our platform through our website,
                 (a) you have read and understood the agreement;
-                (b) you represent that you are at the parent or legal guardian of such individual
+                (b) you represent that you are the parent or legal guardian of such individual
                 (c) your acceptance of these terms on behalf of the individual will form a binding contract; and
                 (d) you accept this agreement on behalf of the individual and agree that the individual is legally bound by its terms”
             </p>

@@ -50,7 +50,7 @@ export const gradientTextStyle = {
 export const imapactData = [
     {
         title: "10+",
-        subTitle: "Hours Volunteers",
+        subTitle: "Volunteer Hours",
     },
     {
         title: "3",
@@ -58,7 +58,7 @@ export const imapactData = [
     },
     {
         title: "5",
-        subTitle: "Volunteer Engaged",
+        subTitle: "Volunteers Engaged",
     },
 ];
 
@@ -66,7 +66,7 @@ export const cardData = [
     {
         title: "Our Mission",
         description:
-            "Everyone deserves the chance to pursue their passions and realize their potential. For individuals with diverse disabilities, finding the right extracurricular activities often involves a journey of discovery that can be expensive. Our mission is to harness the talents of compassionate community volunteers to offer free classes to them.",
+            "Everyone deserves the chance to pursue their passions and realize their potential. For individuals with diverse disabilities, finding the right extracurricular activities often involves a journey of discovery that can be expensive. Our mission is to harness the talents of compassionate community volunteers to offer them free sessions.",
     },
     {
         title: "Our Vision",
@@ -244,7 +244,7 @@ export const donateCardData = [
         image: DonateImg2,
     },
     {
-        title: "Maintain Platform ",
+        title: "Maintain the Platform",
         subtitle: "Ensure seamless connectivity and access for both volunteers and learners",
         image: DonateImg3,
     },
@@ -282,22 +282,22 @@ export const testimonialsLearners: TestimonialData[] = [
 export const testimonialsVolunteers: TestimonialData[] = [
     {
         category: "Volunteers",
-        quote: "Sharing songs and playful moments with the kids has been such a joy. Watching their faces light up, even the shy ones joining in, is heartwarming. Music really helps their personalities shine, and those small milestones-a new word, a giggle, a high five-mean everything.",
-        author: "Aanya K",
+        quote: "Sharing songs and playful moments with the kids has been such a joy. Watching their faces light up, even the shy ones joining in, is heartwarming. Music really helps their personalities shine, and those small milestones—a new word, a giggle, a high five—mean everything.",
+        author: "Aanya K.",
         role: "Volunteer",
         image: TestimonialDummyImg,
     },
     {
         category: "Volunteers",
         quote: "I have volunteered at many places, but MelodyWings is special. The platform makes it easy to connect with learners, and the impact you see week after week keeps you coming back.",
-        author: "Ravi M",
+        author: "Ravi M.",
         role: "Volunteer",
         image: TestimonialDummyImg,
     },
     {
         category: "Volunteers",
         quote: "Teaching children with special needs has taught me more about empathy than anything else. The MelodyWings team supports volunteers brilliantly from training to scheduling.",
-        author: "Priya S",
+        author: "Priya S.",
         role: "Volunteer",
         image: TestimonialDummyImg,
     },

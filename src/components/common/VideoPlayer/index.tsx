@@ -8,7 +8,7 @@ type VideoPlayerProps = {
 const VideoPlayer = ({ src, className }: VideoPlayerProps) => {
     return (
         <video src={src} controls preload="metadata" className={className}>
-            Your browser does not support the video tag.
+            Your browser can&apos;t play this video.
         </video>
     );
 };

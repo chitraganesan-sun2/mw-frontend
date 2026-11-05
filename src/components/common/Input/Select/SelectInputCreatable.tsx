@@ -9,7 +9,7 @@ const SelectInputCreatable = ({
     onChange,
     options = [],
     disabled = false,
-    placeholder = "Search and Select",
+    placeholder = "Search and select",
     className = "",
     isLoading = false,
     variant,
@@ -74,8 +74,8 @@ const SelectInputCreatable = ({
                 isClearable
                 classNamePrefix="select"
                 isDisabled={disabled || isLoading}
-                placeholder={isLoading ? "" : (placeholder || "Search and Select")}
-                formatCreateLabel={(inputValue: string) => `Create - "${inputValue}"`}
+                placeholder={isLoading ? "" : (placeholder || "Search and select")}
+                formatCreateLabel={(inputValue: string) => `Create "${inputValue}"`}
                 loadingMessage={() => "Loading..."}
                 hideSelectedOptions={isMultiSelect}
                 components={{

@@ -190,9 +190,9 @@ const FeedViewModal = ({
         const deletedId = deleteTargetId;
         callbackToast({
             apiCall: DELETE_API(endpoints.post.deletePost(deletedId)),
-            loadingMsg: "Deleting Post",
-            errorMsg: "Post not Deleted",
-            successMsg: "Post Deleted",
+            loadingMsg: "Deleting post...",
+            errorMsg: "Couldn't delete the post. Please try again.",
+            successMsg: "Post deleted.",
         })
             .then(() => {
                 // The post is gone - don't leave the modal open on it.
@@ -247,8 +247,8 @@ const FeedViewModal = ({
         };
         await callbackToast({
             apiCall: POST_API(endpoints.comment.createComment, payload),
-            loadingMsg: "Posting Comment",
-            successMsg: "Comment Posted Successfully",
+            loadingMsg: "Posting comment...",
+            successMsg: "Comment posted.",
             errorMsg: "Couldn't post your comment. Please try again.",
         })
             .then(() => {
@@ -512,7 +512,7 @@ const FeedViewModal = ({
         <ConfirmModal
             isOpen={!!deleteTargetId}
             title="Delete post"
-            description="Are you sure you want to delete this post? This cannot be undone."
+            description="Are you sure you want to delete this post? This can't be undone."
             confirmText="Delete"
             danger
             onConfirm={confirmDeletePost}

@@ -19,9 +19,9 @@ const capabilities = [
     },
     {
         icon: <FiGlobe className="w-7 h-7" />,
-        title: "Timezone Intelligence",
-        description: "Schedule across time zones effortlessly. All times automatically adjust to your local timezone, with clear labels to avoid confusion.",
-        highlights: ["Automatic conversion", "Timezone labels", "Global coordination", "Calendar sync"],
+        title: "Time Zone Support",
+        description: "Schedule across time zones effortlessly. All times automatically adjust to your local time zone, with clear labels to avoid confusion.",
+        highlights: ["Automatic conversion", "Time zone labels", "Global coordination", "Calendar sync"],
     },
     {
         icon: <FiVideo className="w-7 h-7" />,
@@ -106,7 +106,7 @@ export default function PlatformCapabilities() {
                         <FiZap className="w-12 h-12 mx-auto mb-4" />
                         <h3 className="text-2xl font-medium mb-2">Constantly Evolving</h3>
                         <p className="text-purple-100">
-                            We're continuously improving our platform based on user feedback. Your experience and suggestions help us build better features for the entire MelodyWings community.
+                            We&apos;re continuously improving our platform based on user feedback. Your experience and suggestions help us build better features for the entire MelodyWings community.
                         </p>
                     </div>
                 </div>

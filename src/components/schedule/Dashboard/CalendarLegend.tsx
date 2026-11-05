@@ -2,7 +2,7 @@ import type { ScheduleRole } from "./scheduleCategories";
 
 // Swatches mirror Calender/EventCard.tsx's status styles.
 const ITEMS: { key: string; label: string; swatch: string; roles: ScheduleRole[] }[] = [
-    { key: "available", label: "Available (your availability)", swatch: "bg-white border border-dashed border-gray-500", roles: ["volunteer"] },
+    { key: "available", label: "Your availability", swatch: "bg-white border border-dashed border-gray-500", roles: ["volunteer"] },
     { key: "posted", label: "Posted instant session", swatch: "bg-amber-50 border border-amber-400", roles: ["volunteer"] },
     { key: "pending", label: "Pending", swatch: "bg-[#F4F7FB] border border-[#E0E0E0]", roles: ["volunteer", "learner"] },
     { key: "accepted", label: "Accepted", swatch: "bg-[#DCFCE7] border border-[#86EFAC]", roles: ["volunteer", "learner"] },

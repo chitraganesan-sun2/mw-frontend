@@ -138,11 +138,11 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             return;
         }
         if (!date || !time) {
-            showToast({ message: "Please select both date and time", type: "error" });
+            showToast({ message: "Please select both date and time.", type: "error" });
             return;
         }
         if (date !== todayStr && date !== tomorrowStr) {
-            showToast({ message: "Instant Sessions can only be requested for today or tomorrow", type: "error" });
+            showToast({ message: "Instant sessions can only be requested for today or tomorrow.", type: "error" });
             return;
         }
         // isBefore compares absolute instants, so a fresh dayjs() is correct regardless
@@ -169,7 +169,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             const res = await POST_API(endpoints.session.createLearnerInstantSessionRequest, payload);
 
             if (res.status === 201 || res.status === 200) {
-                showToast({ message: "Request posted! Volunteers will be notified.", type: "success" });
+                showToast({ message: "Request posted. Volunteers will be notified.", type: "success" });
                 onSuccess();
                 handleClose();
             } else {
@@ -189,7 +189,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             title="Request an Instant Session"
             topContent={
                 <p className="text-sm text-gray-500 font-normal !mt-0">
-                    Post what you want to learn - a volunteer can accept it.
+                    Post what you want to learn. A volunteer can accept it.
                 </p>
             }
             width={580}

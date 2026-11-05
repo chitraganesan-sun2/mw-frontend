@@ -131,7 +131,7 @@ export default function LearnerWingTimePage() {
             <div className="flex flex-col items-center text-center gap-2 mb-8">
                 <h2 className="text-2xl font-medium text-gray-900">WingTime</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
-                    WingTime sessions are fun <strong>30-minute group sessions</strong> led by volunteers - music, cooking, dance and more.
+                    WingTime sessions are fun <strong>30-minute group sessions</strong> led by volunteers: music, cooking, dance, and more.
                     Sign up for any you like.
                 </p>
             </div>
@@ -155,7 +155,7 @@ export default function LearnerWingTimePage() {
                         <Pager page={minePage} hasMore={minePage * PAGE_SIZE < (mine.data?.total ?? 0)} onChange={setMinePage} />
                     </>
                 ) : (
-                    emptyCard("No WingTimes Yet", "WingTimes you sign up for will show up here")
+                    emptyCard("No WingTimes Yet", "WingTimes you sign up for will show up here.")
                 )}
             </div>
 
@@ -178,7 +178,7 @@ export default function LearnerWingTimePage() {
                         <Pager page={browsePage} hasMore={browsePage * PAGE_SIZE < (browse.data?.total ?? 0)} onChange={setBrowsePage} />
                     </>
                 ) : (
-                    emptyCard("No WingTimes Available", "New WingTimes will show up here")
+                    emptyCard("No WingTimes Available", "New WingTimes will show up here.")
                 )}
             </div>
         </div>

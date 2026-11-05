@@ -159,7 +159,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
             {((data?.academic_skills?.length ?? 0) > 0 ||
                 (data?.non_academic_skills?.length ?? 0) > 0) && (
                 <div className="flex flex-col gap-1">
-                    <p className="text-[0.75rem] font-medium text-gray-light">Focus areas</p>
+                    <p className="text-[0.75rem] font-medium text-gray-light">Focus Areas</p>
                     <div className="flex flex-wrap gap-1">
                         {[...(data?.academic_skills || []), ...(data?.non_academic_skills || [])].map(
                             (skill) => (
@@ -249,7 +249,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
                             icon={<MdClose className="text-[1.1rem]" />}
                             className="w-full text-sm h-9 !bg-error-light !border-error-light rounded-xl py-2 hover:!text-error"
                         >
-                            Confirm decline
+                            Confirm Decline
                         </Button>
                     </div>
                 </div>
