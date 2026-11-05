@@ -51,7 +51,7 @@ export default function SafetyFeatures() {
                         <FiShield className="w-4 h-4" />
                         Safety & Trust
                     </div>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-2xl lg:text-[2rem] font-medium text-gray-900 mb-4">
                         Your Safety is Our Priority
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -72,7 +72,7 @@ export default function SafetyFeatures() {
                             </div>
 
                             {/* Title */}
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                            <h3 className="text-xl font-medium text-gray-900 mb-2">{feature.title}</h3>
 
                             {/* Description */}
                             <p className="text-gray-600 leading-relaxed">{feature.description}</p>
@@ -84,7 +84,7 @@ export default function SafetyFeatures() {
                 <div className="bg-white rounded-2xl p-8 lg:p-12 shadow-md border border-gray-200">
                     <div className="max-w-4xl mx-auto text-center">
                         <FiShield className="w-16 h-16 mx-auto mb-6 text-green-600" />
-                        <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+                        <h3 className="text-2xl lg:text-3xl font-medium text-gray-900 mb-4">
                             Built on Trust, Powered by Care
                         </h3>
                         <p className="text-lg text-gray-600 mb-6">
@@ -94,15 +94,15 @@ export default function SafetyFeatures() {
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                             <div className="flex flex-col items-center">
-                                <div className="text-3xl font-bold text-green-600 mb-2">100%</div>
+                                <div className="text-3xl font-medium text-green-600 mb-2">100%</div>
                                 <div className="text-sm text-gray-600">Volunteer Screening</div>
                             </div>
                             <div className="flex flex-col items-center">
-                                <div className="text-3xl font-bold text-green-600 mb-2">24/7</div>
+                                <div className="text-3xl font-medium text-green-600 mb-2">24/7</div>
                                 <div className="text-sm text-gray-600">Safety Monitoring</div>
                             </div>
                             <div className="flex flex-col items-center">
-                                <div className="text-3xl font-bold text-green-600 mb-2">GDPR</div>
+                                <div className="text-3xl font-medium text-green-600 mb-2">GDPR</div>
                                 <div className="text-sm text-gray-600">Compliant Platform</div>
                             </div>
                         </div>

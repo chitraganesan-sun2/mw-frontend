@@ -53,7 +53,7 @@ export default function PlatformCapabilities() {
                         <HiSparkles className="w-4 h-4" />
                         Platform Capabilities
                     </div>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-2xl lg:text-[2rem] font-medium text-gray-900 mb-4">
                         Built with Intelligence & Care
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -79,7 +79,7 @@ export default function PlatformCapabilities() {
                                 </div>
 
                                 {/* Title */}
-                                <h3 className="text-2xl font-bold text-gray-900 mb-3">{capability.title}</h3>
+                                <h3 className="text-2xl font-medium text-gray-900 mb-3">{capability.title}</h3>
 
                                 {/* Description */}
                                 <p className="text-gray-600 mb-4 leading-relaxed">{capability.description}</p>
@@ -104,7 +104,7 @@ export default function PlatformCapabilities() {
                 <div className="mt-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl p-8 text-white text-center">
                     <div className="max-w-3xl mx-auto">
                         <FiZap className="w-12 h-12 mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold mb-2">Constantly Evolving</h3>
+                        <h3 className="text-2xl font-medium mb-2">Constantly Evolving</h3>
                         <p className="text-purple-100">
                             We're continuously improving our platform based on user feedback. Your experience and suggestions help us build better features for the entire MelodyWings community.
                         </p>

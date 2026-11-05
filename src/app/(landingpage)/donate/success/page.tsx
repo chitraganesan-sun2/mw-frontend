@@ -24,7 +24,7 @@ export default function DonateSuccessPage() {
                 </div>
 
                 {/* Message */}
-                <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                <h1 className="text-[24px] md:text-[32px] font-medium text-gray-900 mb-3">
                     Thank You for Your Donation!
                 </h1>
                 <p className="text-gray-600 mb-8 leading-relaxed">

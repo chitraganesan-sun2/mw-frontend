@@ -16,7 +16,7 @@ const DeleteAccountPage = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
             <header className="flex flex-col gap-2">
-                <h1 className="text-2xl md:text-3xl font-semibold">Delete your MelodyWings account</h1>
+                <h1 className="text-[24px] md:text-[32px] font-medium">Delete your MelodyWings account</h1>
                 <p className="text-gray-700">
                     You can delete your MelodyWings account and the personal information tied to it at any time. This page
                     explains how, what is removed, and what we may keep.

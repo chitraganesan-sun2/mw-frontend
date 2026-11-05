@@ -23,7 +23,7 @@ export default function FeaturesHero() {
                 </div>
 
                 {/* Main heading */}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 animate-fadeIn animation-delay-200">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium text-gray-900 mb-6 animate-fadeIn animation-delay-200">
                     Powerful Features for
                     <span className="block mt-2 bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">
                         Meaningful Learning
@@ -40,22 +40,22 @@ export default function FeaturesHero() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-fadeIn animation-delay-600">
                     <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                         <FiCalendar className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-gray-900">3+</div>
+                        <div className="text-2xl font-medium text-gray-900">3+</div>
                         <div className="text-sm text-gray-600">Session Types</div>
                     </div>
                     <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                         <FiMessageCircle className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-gray-900">Real-Time</div>
+                        <div className="text-2xl font-medium text-gray-900">Real-Time</div>
                         <div className="text-sm text-gray-600">Messaging</div>
                     </div>
                     <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                         <FiUsers className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-gray-900">AI-Powered</div>
+                        <div className="text-2xl font-medium text-gray-900">AI-Powered</div>
                         <div className="text-sm text-gray-600">Matching</div>
                     </div>
                     <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                         <FiZap className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-gray-900">Instant</div>
+                        <div className="text-2xl font-medium text-gray-900">Instant</div>
                         <div className="text-sm text-gray-600">Sessions</div>
                     </div>
                 </div>

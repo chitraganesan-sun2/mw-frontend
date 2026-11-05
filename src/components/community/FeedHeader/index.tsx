@@ -21,7 +21,7 @@ const FeedHeader = ({ title, mode, onClose, onSave, isSubmitting = false, rootCl
             >
                 Cancel
             </button>
-            <h2 className="text-[16px] font-bold">{title}</h2>
+            <h2 className="text-[16px] font-medium">{title}</h2>
             <button
                 onClick={onSave}
                 disabled={isSubmitting}

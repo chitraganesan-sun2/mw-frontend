@@ -81,7 +81,7 @@ export default function LearnerFeatures() {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
                         For Learners
                     </div>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    <h2 className="text-2xl lg:text-[2rem] font-medium text-gray-900 mb-4">
                         Everything to Support Your Learning Journey
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -104,7 +104,7 @@ export default function LearnerFeatures() {
                                 </div>
 
                                 {/* Title */}
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                                <h3 className="text-xl font-medium text-gray-900 mb-2">{feature.title}</h3>
 
                                 {/* Description */}
                                 <p className="text-gray-600 text-sm mb-4">{feature.description}</p>

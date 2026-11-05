@@ -474,7 +474,7 @@ const Donate = () => {
         <div className="min-h-screen w-full bg-background-input flex flex-col donate-flow">
             <section className="w-full flex flex-col items-center justify-center pt-10 md:pt-16">
                 <div className={`${PAGE_GUTTER_CLASS} flex flex-col gap-[20px] text-center`}>
-                    <h1 className="text-[24px] md:text-[40px] font-medium tracking-tight text-[#121212]">
+                    <h1 className="text-[24px] md:text-[32px] font-medium tracking-tight text-[#121212]">
                         Support Our Mission
                     </h1>
                     <p className="text-[14px] md:text-[20px] font-regular md:font-medium text-[#4F4F4F] md:max-w-[1068px] md:leading-[28.2px] tracking-tight mx-auto">

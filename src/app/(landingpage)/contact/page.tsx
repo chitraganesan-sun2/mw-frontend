@@ -51,7 +51,7 @@ const ContactPage = () => {
     return (
         <div className="w-full bg-background-input min-h-[60vh]">
             <div className="mx-auto w-full max-w-[1000px] px-4 sm:px-6 md:px-8 py-8 md:py-12">
-                <h1 className="text-[24px] lg:text-[32px] font-semibold text-gray-900">Contact Us</h1>
+                <h1 className="text-[24px] md:text-[32px] font-medium text-gray-900">Contact Us</h1>
                 <p className="mt-3 max-w-2xl text-[14px] md:text-lg text-gray-800">
                     We&apos;d love to hear from you. Reach the MelodyWings team directly using the details below.
                 </p>

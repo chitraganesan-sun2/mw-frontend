@@ -129,7 +129,7 @@ export default function LearnerWingTimePage() {
             <WingTimeDetailModal item={selected} tzLabel={tzLabel} action={selected ? actionFor(selected) : null} onClose={() => setSelectedId(null)} />
 
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">WingTime</h1>
+                <h2 className="text-2xl font-medium text-gray-900">WingTime</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     WingTime sessions are fun <strong>30-minute group sessions</strong> led by volunteers - music, cooking, dance and more.
                     Sign up for any you like.

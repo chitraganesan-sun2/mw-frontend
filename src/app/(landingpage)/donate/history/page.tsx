@@ -36,7 +36,7 @@ export default function DonationHistoryPage() {
         <div className="min-h-screen bg-gray-50 px-4 py-10 md:py-16">
             <div className="max-w-2xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">Your Donation History</h1>
+                    <h1 className="text-[24px] md:text-[32px] font-medium text-gray-900">Your Donation History</h1>
                     <Link
                         href="/donate"
                         className="text-sm font-medium text-black underline-offset-2 hover:underline whitespace-nowrap"

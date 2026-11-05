@@ -16,7 +16,7 @@ export default function FeaturesCTA() {
 
                     {/* Content */}
                     <div className="relative z-10 text-center text-white">
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                        <h2 className="text-2xl lg:text-[2rem] font-medium mb-4">
                             Ready to Get Started?
                         </h2>
                         <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-2xl mx-auto">

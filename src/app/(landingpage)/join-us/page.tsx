@@ -14,7 +14,7 @@ const JoinUsPage = () => {
             <div className="max-w-[1200px] mx-auto px-6 md:px-8 lg:px-12 py-5 md:py-16 lg:py-20">
                 {/* Main Heading - Outside white background on mobile, inside on desktop */}
                 <div className="mb-5 md:hidden">
-                    <h1 className="text-[24px]  text-gray-900 font-medium">
+                    <h1 className="text-[24px] md:text-[32px] text-gray-900 font-medium">
                         Careers at MelodyWings
                     </h1>
                 </div>
@@ -26,7 +26,7 @@ const JoinUsPage = () => {
                 >
                     {/* Main Heading - Inside white background on desktop only */}
                     <div className="hidden md:block mb-8 px-10">
-                        <h1 className="text-[24px] lg:text-[32px] font-semibold text-gray-900">
+                        <h1 className="text-[24px] md:text-[32px] font-medium text-gray-900">
                             Careers at MelodyWings
                         </h1>
                     </div>
