@@ -2,7 +2,9 @@
 	"appId": "org.melodywings.app",
 	"appName": "MelodyWings",
 	"webDir": "out",
+	"backgroundColor": "#FFFFFF",
 	"android": {
+		"backgroundColor": "#FFFFFF",
 		"webContentsDebuggingEnabled": false
 	},
 	"server": {

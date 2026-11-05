@@ -4,7 +4,10 @@ const config: CapacitorConfig = {
   appId: 'org.melodywings.app',
   appName: 'MelodyWings',
   webDir: 'out',
+  // White behind the web view too, so there is never a black flash or black bars while a page loads.
+  backgroundColor: '#FFFFFF',
   android: {
+    backgroundColor: '#FFFFFF',
     // Remote WebView debugging (chrome://inspect) exposes localStorage — which
     // holds the auth token backup (mw_auth_backup) — plus the DOM and network
     // to anyone with the APK. Off by default; opt in locally with
