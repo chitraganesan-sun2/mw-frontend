@@ -125,14 +125,19 @@ const LearnerStories = () => {
         <section aria-label="Learner stories" className="w-full">
             <div ref={sentinel} aria-hidden="true" />
             {heading}
+            {/* Always auto-scrolls, like the testimonials strip (it does not switch to a scrollbar for
+                "reduce motion"); pauses on hover or keyboard focus. */}
             <div
-                className="mw-marquee overflow-hidden py-2"
+                className="group overflow-hidden py-2"
                 style={{
                     maskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
                     WebkitMaskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
                 }}
             >
-                <div className="mw-marquee-track" style={{ animationDuration: `${seconds}s` }}>
+                <div
+                    className="flex w-max group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
+                    style={{ animation: `mwMarquee ${seconds}s linear infinite` }}
+                >
                     {[false, true].map((isClone) => (
                         <ul
                             key={String(isClone)}
