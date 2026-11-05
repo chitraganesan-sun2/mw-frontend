@@ -44,7 +44,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
                     </span>
                 </div>
             </div>
-            <h2 className="text-[2rem] font-semibold leading-normal">{blogDetailsData.title}</h2>
+            <h2 className="text-[2rem] font-medium leading-normal">{blogDetailsData.title}</h2>
             <p className="text-gray-light leading-normal">{blogDetailsData.description}</p>
         </div>
     );

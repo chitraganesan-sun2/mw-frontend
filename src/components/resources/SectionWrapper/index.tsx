@@ -53,7 +53,7 @@ const SectionWrapper = ({
             <div
                 className={cn("flex items-center justify-between mb-4 px-4", title ? "" : "hidden")}
             >
-                <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+                <h2 className="text-xl font-medium text-gray-800">{title}</h2>
                 <div className="flex gap-2">
                     <Button
                         icon={<IoIosArrowBack className="text-lg" />}

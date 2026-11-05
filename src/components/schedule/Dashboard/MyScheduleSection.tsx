@@ -175,7 +175,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
             {/* Heading centered, Upcoming/Past toggle at the right (stacked and centered on phones). */}
             <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr]">
                 <span aria-hidden="true" className="hidden sm:block" />
-                <h2 id="my-schedule-heading" className="text-lg font-semibold text-center">
+                <h2 id="my-schedule-heading" className="text-lg font-medium text-center">
                     {SCHEDULE_LABELS.mySchedule}
                 </h2>
                 <div role="group" aria-label="Show sessions" className="inline-flex rounded-full border border-gray-200 p-0.5 text-xs sm:justify-self-end">

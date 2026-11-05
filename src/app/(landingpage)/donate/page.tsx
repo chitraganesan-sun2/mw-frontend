@@ -529,7 +529,7 @@ const Donate = () => {
                 <section className={`${PAGE_GUTTER_CLASS} pt-14 md:pt-20 pb-4`}>
                     <div className="flex flex-col items-center gap-[16px] text-center mb-6">
                         <HeartDivider />
-                        <h2 className="text-[24px] md:text-[30px] font-medium md:font-semibold text-[#121212]">
+                        <h2 className="text-[24px] md:text-[30px] font-medium text-[#121212]">
                             With Gratitude
                         </h2>
                         <p className="text-[14px] text-[#4F4F4F] mx-auto leading-relaxed">

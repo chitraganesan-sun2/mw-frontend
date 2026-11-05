@@ -296,7 +296,7 @@ const FormTabsSection = forwardRef(
               }`}
             >
               {section?.title && (
-                <h2 className="text-2xl lg:text-2xl font-medium lg:font-semibold mb-4 lg:mb-5">
+                <h2 className="text-2xl lg:text-2xl font-medium mb-4 lg:mb-5">
                   {section?.title}
                 </h2>
               )}

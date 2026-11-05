@@ -72,7 +72,7 @@ const TutorialLinks = () => {
 
     return (
         <section id="help" aria-labelledby="help-heading" className="bg-white rounded-2xl p-5 shadow-sm">
-            <h2 id="help-heading" className="text-lg font-semibold mb-3">Help: Tutorials, Guides &amp; Demo</h2>
+            <h2 id="help-heading" className="text-lg font-medium mb-3">Help: Tutorials, Guides &amp; Demo</h2>
             <div className="flex flex-col gap-2">
                 {demoUrl && (
                     <a

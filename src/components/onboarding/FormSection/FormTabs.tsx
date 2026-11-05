@@ -505,7 +505,7 @@ const FormTabs = ({
                         }`}
                     >
                         {section?.title && (
-                            <h2 className="text-2xl lg:text-3xl font-medium lg:font-semibold mb-4 lg:mb-6">
+                            <h2 className="text-2xl lg:text-3xl font-medium mb-4 lg:mb-6">
                                 {section?.title}
                             </h2>
                         )}

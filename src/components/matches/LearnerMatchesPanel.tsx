@@ -101,7 +101,7 @@ export default function LearnerMatchesPanel() {
         <div className="animate-fadeIn p-5 lg:p-10">
 
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <h2 className="text-lg font-semibold">Your Match</h2>
+                <h2 className="text-lg font-medium">Your Match</h2>
                 <button
                     type="button"
                     onClick={handleFindMatch}
