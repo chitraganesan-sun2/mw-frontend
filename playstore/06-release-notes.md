@@ -1,3 +1,28 @@
+# Release notes — v1.7.1 (versionCode 15)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.7.1
+
+• A fresh white app icon and a clean white look on every phone, including dark mode
+• Book for Later: schedule sessions ahead of time on its own page
+• Cookie choice: analytics in the app only runs if you tap Allow
+• Updated Terms and Privacy Policy, with a one-time prompt to review and accept them
+• Learners (or their guardians) can choose in Settings whether their age and learning goals are shown anonymously on our website
+• Clearer wording and error messages
+```
+
+---
+
+## Internal changelog — v1.7.1 (versionCode 15)
+
+1.7.0 (14) is already in Play Internal testing with the OLD black launcher icon / dark-mode-following theme, so the
+white icon + white theme (frontend main@532e3cd6) ships as 15. Same web bundle as 1.7.0 otherwise. Do not promote 14.
+Do not set `POLICY_ACCEPTANCE_ENFORCED=true` until 1.7.x is the version people are on.
+
+---
+
 # Release notes — v1.7.0 (versionCode 14)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
