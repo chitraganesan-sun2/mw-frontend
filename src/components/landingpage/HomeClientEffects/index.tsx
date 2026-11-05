@@ -23,6 +23,7 @@ export default function HomeClientEffects() {
         }
 
         let sr: any;
+        let resizeObserver: ResizeObserver | undefined;
         const setupScrollReveal = async () => {
             if (typeof window !== "undefined") {
                 const ScrollReveal = (await import("scrollreveal")).default;
@@ -32,18 +33,36 @@ export default function HomeClientEffects() {
                     duration: 800,
                     delay: 100,
                     easing: "ease-out",
-                    reset: true,
+                    // Reveal once and leave it: with `reset: true` every section was hidden again as it
+                    // left the screen, and whenever the stored positions went stale (content that loads
+                    // later pushes things down) sections stayed blank - the page "vanished" on scroll.
+                    reset: false,
                     viewFactor: 0.1,
                     viewOffset: { top: 0, right: 0, bottom: -100, left: 0 },
                 });
 
                 sr.reveal(".reveal", { interval: 100 });
+
+                // ScrollReveal measures every section once, when it starts. Content that arrives later
+                // (the Learner Stories strip, community posts, images) pushes the sections below it
+                // down, so their stored positions go stale and they stay invisible when scrolled to.
+                // Re-measure (ScrollReveal re-reads every position on a window "resize") whenever the
+                // page height changes.
+                if (typeof ResizeObserver !== "undefined") {
+                    let timer: number | undefined;
+                    resizeObserver = new ResizeObserver(() => {
+                        window.clearTimeout(timer);
+                        timer = window.setTimeout(() => window.dispatchEvent(new Event("resize")), 150);
+                    });
+                    resizeObserver.observe(document.body);
+                }
             }
         };
 
         setupScrollReveal();
 
         return () => {
+            resizeObserver?.disconnect();
             if (sr) sr.destroy();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
