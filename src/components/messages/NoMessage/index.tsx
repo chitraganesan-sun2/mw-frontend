@@ -51,15 +51,15 @@ const NoMessage = () => {
             </Button>
             <p className="flex flex-col md:flex-row md:text-base text-[12px] text-center">
                 {role === "volunteer"
-                    ? "Let learners reach out to you - turn on messages."
-                    : "Let volunteers reach out and help - turn on messages."}
+                    ? "Let learners reach out to you. Turn on messages."
+                    : "Let volunteers reach out and help. Turn on messages."}
                 {"  "}
                 <button
                     type="button"
                     className="mt-1 md:mt-0 md:text-base underline md:underline-none text-[16px] font-medium hover:underline cursor-pointer appearance-none border-0 bg-transparent p-0"
                     onClick={handleGoToSettings}
                 >
-                    Go to settings
+                    Go to Settings
                 </button>
             </p>
         </div>

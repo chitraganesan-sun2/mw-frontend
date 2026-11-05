@@ -244,7 +244,7 @@ const OnetImeScheduleModal = ({
         const hasPartiallyFilled = slots.some(slot => (slot.start_time && !slot.end_time) || (!slot.start_time && slot.end_time));
         if (hasPartiallyFilled) {
             showToast({
-                message: "Please fill both start and end times for all slots.",
+                message: "Please fill in both start and end times for every slot.",
                 type: "error",
             });
             return;
@@ -278,7 +278,7 @@ const OnetImeScheduleModal = ({
         });
         if (hasMoreThanOneHourSlot) {
             showToast({
-                message: "Each slot must be within one hour.",
+                message: "A slot can't be longer than one hour.",
                 type: "error",
             });
             return;
@@ -307,7 +307,7 @@ const OnetImeScheduleModal = ({
             .then((res) => {
                 onClose();
                 showToast({
-                    message: "Slots created successfully",
+                    message: "Slots created.",
                     type: "success",
                 });
                 setSlots([]);
@@ -449,7 +449,7 @@ const OnetImeScheduleModal = ({
                         name="selected_date"
                         onChange={() => { }}
                         key={"selected_date"}
-                        label={`Select Date ${activeAbbreviation ? ` (${activeAbbreviation})` : ""}`}
+                        label={`Select a date ${activeAbbreviation ? ` (${activeAbbreviation})` : ""}`}
                         labelClassName="!text-[1rem] !font-medium"
                         inputType="datepicker"
                         placeholder="Select a date"

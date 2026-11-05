@@ -207,7 +207,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                         type="search"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search by title, person or subject"
+                        placeholder="Search by title, person, or subject"
                         aria-label="Search sessions"
                         className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
                     />
@@ -291,7 +291,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                                     }}
                                                     className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
                                                 >
-                                                    Clear search
+                                                    Clear Search
                                                 </button>
                                             )}
                                         </div>
@@ -345,7 +345,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                 disabled={past.isFetching}
                                 className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-800 hover:bg-gray-50 cursor-pointer disabled:opacity-60"
                             >
-                                {past.isFetching ? "Loading…" : "Show more"}
+                                {past.isFetching ? "Loading…" : "Show More"}
                             </button>
                         )}
                     </div>

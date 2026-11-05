@@ -21,14 +21,14 @@ import { getDefaultRouteForRole } from "@/utils/routeGuard";
 import EmailPasswordAuth from "./EmailPasswordAuth";
 
 const learnerOptions = [
-    { label: "I am a parent filling this profile", value: "parent" },
-    { label: "I am filling this profile for myself", value: "self" },
+    { label: "I am a parent or guardian filling out this profile", value: "parent" },
+    { label: "I am filling out this profile for myself", value: "self" },
 ];
 
 const DateOfBirthInput = ({ value, onChange }: { value: any; onChange: (value: any) => void }) => (
     <Input
         name="dob"
-        label="Select your Date of Birth"
+        label="Select your date of birth"
         inputType="birthdatepicker"
         value={value}
         onChange={onChange}

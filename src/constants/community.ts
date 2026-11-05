@@ -27,10 +27,10 @@ export const CommunityFormConstants: FormField[] = [
 export const PostFormSchema = z
     .object({
         description: z
-            .string({ required_error: "Notes are required" })
-            .min(1, "Notes are required")
-            .max(1000, "Notes cannot exceed 1000 characters"),
-        images: z.array(z.any()).max(5, "Maximum 5 pictures allowed").optional(),
+            .string({ required_error: "Post Description is required" })
+            .min(1, "Post Description is required")
+            .max(1000, "Post Description cannot exceed 1,000 characters"),
+        images: z.array(z.any()).max(5, "You can add up to 5 pictures").optional(),
         video: z
             .object({ video_url: z.string(), video_id: z.string() })
             .or(z.null())

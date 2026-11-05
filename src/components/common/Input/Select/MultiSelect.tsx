@@ -11,7 +11,7 @@ const MultiSelect: React.FC<MultiSelectInputProps> = ({
     onChange,
     options = [],
     disabled = false,
-    placeholder = "Search and Select",
+    placeholder = "Search and select",
     className = "",
     isLoading = false,
 }) => {

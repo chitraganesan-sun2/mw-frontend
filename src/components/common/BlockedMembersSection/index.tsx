@@ -46,7 +46,7 @@ const BlockedMembersSection = () => {
         <section aria-labelledby="blocked-heading" className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
             <div className="flex flex-col gap-1">
                 <h2 id="blocked-heading" className="md:text-2xl text-[16px] font-medium">
-                    Blocked people
+                    Blocked People
                 </h2>
                 <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
                     People you block can&apos;t message you or send new requests, and you won&apos;t see each other in lists.

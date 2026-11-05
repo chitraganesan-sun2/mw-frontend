@@ -108,7 +108,7 @@ const LivePosts = () => {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-60 animate-ping" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
             </span>
-            Live from the community
+            Live from the Community
         </h3>
     );
 
@@ -148,7 +148,7 @@ const LivePosts = () => {
                             // The second copy only exists for the seamless loop; screen readers
                             // read the list once.
                             aria-hidden={isClone || undefined}
-                            aria-label={isClone ? undefined : "Latest community posts"}
+                            aria-label={isClone ? undefined : "Latest Community Posts"}
                         >
                             {copy.map((post, i) => (
                                 <PostCard key={`${post.post_id}-${i}`} post={post} onClick={handlePostClick} />

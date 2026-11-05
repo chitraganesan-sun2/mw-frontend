@@ -91,7 +91,7 @@ const Header = () => {
                             <button
                                 type="button"
                                 onClick={openHelp}
-                                aria-label="Help: tutorials, guides and demo"
+                                aria-label="Help: Tutorials, Guides, and Demo"
                                 className="inline-flex h-9 items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 text-sm font-medium hover:bg-gray-50"
                             >
                                 <HiOutlineQuestionMarkCircle size={18} aria-hidden="true" />

@@ -23,7 +23,7 @@ export default function DonationHistorySection() {
                 href="/donate/history"
                 className="px-4 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap"
             >
-                View history
+                View History
             </Link>
         </div>
     );

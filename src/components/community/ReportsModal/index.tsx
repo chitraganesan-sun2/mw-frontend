@@ -50,14 +50,14 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
             report_type_id: postId,
             report_status: "pending",
             report_type: "post",
-            report_description: reportType === "others" ? `Others - ${reportDescription}` : reportType,
+            report_description: reportType === "others" ? `Other - ${reportDescription}` : reportType,
         };
         
         await callbackToast({
             apiCall: POST_API(endpoints.report.create, payload),
-            loadingMsg: "Submitting Report",
-            successMsg: "Report Submitted!",
-            errorMsg: "Report Not Submitted!",
+            loadingMsg: "Submitting report...",
+            successMsg: "Report submitted. Thank you.",
+            errorMsg: "Couldn't submit your report. Please try again.",
         }).then(() => {
             onClose();
         // toast.promise already showed the (backend-specific) error; a second generic
@@ -76,7 +76,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
         },
         primary: {
             onClick: handleSubmit,
-            title: isSubmitting ? "Submiting Report" : "Submit Report",
+            title: isSubmitting ? "Submitting Report" : "Submit Report",
             btnVariant: "primary",
             customClassName: "!rounded-xl",
             disabled: isSubmitting,

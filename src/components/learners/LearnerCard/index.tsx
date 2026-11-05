@@ -100,7 +100,7 @@ const LearnerCard: React.FC<LearnerCardProps> = ({
                                 </p>
                             </>
                         ) : (
-                            <p className="text-sm font-medium ">No Reviews</p>
+                            <p className="text-sm font-medium ">No reviews yet</p>
                         )}
                     </div>
                 </div>

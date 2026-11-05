@@ -116,7 +116,7 @@ const FormSection = ({ schema, formData }: FormSectionProps) => {
                 });
                 showToast({
                     type: "error",
-                    message: "Guardian info is required when a parent enrolls the learner.",
+                    message: "Guardian information is required when a guardian enrolls the learner.",
                 });
                 hasCustomValidationErrors = true;
             }

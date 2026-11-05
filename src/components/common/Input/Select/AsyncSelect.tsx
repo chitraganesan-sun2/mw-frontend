@@ -253,7 +253,7 @@ const AsyncSelect = ({
                 isClearable
                 classNamePrefix="select"
                 isDisabled={props.disabled}
-                placeholder={props.placeholder || "Search and Select"}
+                placeholder={props.placeholder || "Search and select"}
                 formatCreateLabel={(inputValue: string) =>
                     `${creatable ? "Create" : "Not Found"} - "${inputValue}"`
                 }

@@ -76,7 +76,7 @@ const ProfileNudge: React.FC<{ role: ScheduleRole }> = ({ role }) => {
                     {missingFields.length > 0 && <>Still missing: {missingFields.slice(0, 3).join(", ")}{missingFields.length > 3 ? ` +${missingFields.length - 3} more` : ""}. </>}
                     {role === "volunteer" ? "A complete profile helps learners choose you." : "A complete profile helps us match you with the right volunteer."}{" "}
                     <Link href={`/${role}/profile`} className="font-semibold underline underline-offset-2">
-                        Complete profile
+                        Complete Profile
                     </Link>
                 </p>
             </div>

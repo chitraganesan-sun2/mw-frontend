@@ -165,13 +165,13 @@ const Settings = () => {
                             Notifications
                         </h2>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
-                            Choose how we let you know about sessions, messages and instant sessions.
+                            Choose how we let you know about sessions, messages, and instant sessions.
                         </p>
                     </div>
 
                 <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full">
                     <div className="flex flex-col gap-2">
-                        <p id="push-notifications-label" className="md:text-base text-[14px] font-medium">Push notifications</p>
+                        <p id="push-notifications-label" className="md:text-base text-[14px] font-medium">Push Notifications</p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
                             Get push notifications on your device for sessions, messages, and matches.
                         </p>

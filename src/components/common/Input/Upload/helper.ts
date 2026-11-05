@@ -147,7 +147,7 @@ export const getFileData = async (
             throw new Error("You don't have permission to upload this file.");
         } else {
             throw new Error(
-                detail || "Upload failed. Please check your connection and try again."
+                detail || "Couldn't upload the file. Check your connection and try again."
             );
         }
     }

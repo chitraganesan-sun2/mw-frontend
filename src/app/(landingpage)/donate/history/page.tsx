@@ -58,7 +58,7 @@ export default function DonationHistoryPage() {
                 ) : (
                     <>
                         <div className="bg-white rounded-2xl p-6 mb-4 flex items-center justify-between">
-                            <span className="text-sm text-gray-500">Total donated</span>
+                            <span className="text-sm text-gray-500">Total Donated</span>
                             <span className="text-xl font-bold text-gray-900">
                                 ${totalDonated.toFixed(2)}
                             </span>

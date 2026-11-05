@@ -31,7 +31,7 @@ export const emailError = (raw: string): string | null => {
         return "Enter a valid email address.";
     }
     if (GMAIL.includes(domain) && !/^[a-z0-9]{6,30}$/.test(local.split("+")[0].replace(/\./g, ""))) {
-        return "Gmail usernames are 6-30 letters, numbers or dots.";
+        return "Gmail usernames are 6–30 letters, numbers, or dots.";
     }
     return null;
 };

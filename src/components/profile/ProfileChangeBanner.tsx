@@ -90,7 +90,7 @@ const ProfileChangeBanner = () => {
                         Your profile changes ({pending.change_count}) are waiting for admin review. Your profile keeps showing the current details until they&apos;re approved.
                     </p>
                     <div className="flex gap-2">
-                        <Button title="View changes" btnVariant="outline" customClassName={SMALL_BTN} onClick={() => setShowDiff(true)} />
+                        <Button title="View Changes" btnVariant="outline" customClassName={SMALL_BTN} onClick={() => setShowDiff(true)} />
                         <Button
                             title="Withdraw"
                             btnVariant="outline"

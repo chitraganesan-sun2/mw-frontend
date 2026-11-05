@@ -24,7 +24,7 @@ const safetyFeatures = [
     {
         icon: <FiUserCheck className="w-8 h-8" />,
         title: "Chat Permissions",
-        description: "Learners and volunteers can enable or disable messaging. Parents maintain full control over minor accounts.",
+        description: "Learners and volunteers can enable or disable messaging. Guardians maintain full control over accounts for learners under 18.",
         color: "from-purple-500 to-purple-600",
     },
     {
@@ -35,8 +35,8 @@ const safetyFeatures = [
     },
     {
         icon: <FiCheckCircle className="w-8 h-8" />,
-        title: "Parent Oversight",
-        description: "For learners under 18, parents have full visibility and control over account settings and interactions.",
+        title: "Guardian Oversight",
+        description: "For learners under 18, guardians have full visibility and control over account settings and interactions.",
         color: "from-indigo-500 to-indigo-600",
     },
 ];
@@ -89,7 +89,7 @@ export default function SafetyFeatures() {
                         </h3>
                         <p className="text-lg text-gray-600 mb-6">
                             MelodyWings was created to provide a safe, supportive space where learners with disabilities can thrive. 
-                            Every feature, from volunteer verification to privacy controls, is designed with the safety and wellbeing 
+                            Every feature, from volunteer verification to privacy controls, is designed with the safety and well-being 
                             of our community at its core.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">

@@ -8,20 +8,20 @@ const learnerFeatures = [
         icon: <FiCalendar className="w-6 h-6" />,
         title: "Smart Scheduling",
         description: "Book sessions with your favorite volunteers, manage your learning calendar, and never miss a session with automatic reminders.",
-        benefits: ["Visual calendar interface", "Timezone-aware scheduling", "Download calendar invites", "Session history tracking"],
+        benefits: ["Visual calendar interface", "Time zone-aware scheduling", "Download calendar invites", "Session history tracking"],
         color: "blue",
     },
     {
         icon: <FiZap className="w-6 h-6" />,
         title: "Instant Sessions",
-        description: "Need help right now? Browse and join live sessions posted by volunteers or request instant help from specific tutors.",
+        description: "Need help right now? Browse and join live sessions posted by volunteers or request instant help from specific volunteers.",
         benefits: ["Join sessions immediately", "Request from specific volunteers", "Real-time availability", "No scheduling needed"],
         color: "orange",
     },
     {
         icon: <MdOutlineGroups className="w-6 h-6" />,
-        title: "Wing Time Groups",
-        description: "Join scheduled group learning sessions on various topics. Learn together with other students in a supportive environment.",
+        title: "WingTime Groups",
+        description: "Join scheduled group learning sessions on various topics. Learn together with other learners in a supportive environment.",
         benefits: ["Topic-based learning", "Group interaction", "Expert-led sessions", "Capacity-limited for quality"],
         color: "purple",
     },
@@ -43,7 +43,7 @@ const learnerFeatures = [
         icon: <FiBookOpen className="w-6 h-6" />,
         title: "Learning Resources",
         description: "Access a library of educational materials shared by volunteers. Videos, documents, and interactive content tailored to your needs.",
-        benefits: ["Categorized resources", "Search & filter", "Save favorites", "Like/rate content"],
+        benefits: ["Categorized resources", "Search & filter", "Save favorites", "Like and rate content"],
         color: "indigo",
     },
     {
@@ -85,7 +85,7 @@ export default function LearnerFeatures() {
                         Everything to Support Your Learning Journey
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        Designed with accessibility and personalized learning in mind. Find tutors, schedule sessions, access resources, and grow at your own pace.
+                        Designed with accessibility and personalized learning in mind. Find volunteers, schedule sessions, access resources, and grow at your own pace.
                     </p>
                 </div>
 

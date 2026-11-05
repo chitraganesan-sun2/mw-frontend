@@ -113,7 +113,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
             <div className="w-full">
                 {isMobileOrTabScreen ? (
                     <div className="shrink-0 flex items-center justify-between">
-                        <Image src="/logo.png" alt="Logo" height={44} width={50} />
+                        <Image src="/logo.png" alt="MelodyWings logo" height={44} width={50} />
                         {onClose && (
                             <button
                                 type="button"

@@ -8,7 +8,7 @@ import behaviorSupportStrategies from "@/data/techniquesThatWork.json";
 export const LEARNER_MIN_AGE = 5;
 
 export const LearnerOnboardingConstants = {
-    title: "Enroll a learner",
+    title: "Enroll a Learner",
     description:
         "Thank you for your interest in joining MelodyWings. Fill out the form below and we'll find the right fit for you.",
 };
@@ -178,9 +178,9 @@ const LearnerPersonalFields: FormField[] = [
     {
         parent: "learner_contact_details",
         id: "zip_code",
-        label: "Zip Code",
+        label: "ZIP Code",
         inputType: "text",
-        placeholder: "Enter zip code",
+        placeholder: "Enter ZIP code",
         gridCols: 1,
         required: true,
     },
@@ -312,7 +312,7 @@ const EducationAndHobbiesFields: FormField[] = [
     },
     {
         id: "program_iep_504_plan",
-        label: "Program or IEP or 504 Plan",
+        label: "Program, IEP, or 504 Plan",
         sublabel: "(if applicable, include key details or goals)",
         inputType: "text",
         placeholder: "(appropriate relative to developmental level)",
@@ -348,7 +348,7 @@ const EducationAndHobbiesFields: FormField[] = [
     {
         id: "favorite_free_time_activities",
         label: "Favorite Free-Time Activities",
-        sublabel: "(e.g., music, sports - any activity that motivates the learner)",
+        sublabel: "(for example, music or sports—any activity that motivates the learner)",
         inputType: "textarea",
         placeholder: "Enter here",
         gridCols: 2,
@@ -361,7 +361,7 @@ const SkillsToLearnFields: FormField[] = [
     {
         id: "academic_skills_to_learn",
         label: "Academic Skills",
-        sublabel: "(academic areas for tutoring or support)",
+        sublabel: "(academic areas for sessions or support)",
         inputType: "async-select",
         endpoint: "skills?category=academic",
         variant: "multi",
@@ -381,7 +381,7 @@ const SkillsToLearnFields: FormField[] = [
     {
         id: "arts_life_skills_to_learn",
         label: "Arts & Life Skills",
-        sublabel: "(non-academic areas for tutoring or support)",
+        sublabel: "(non-academic areas for sessions or support)",
         inputType: "async-select",
         endpoint: "skills?category=non_academic",
         variant: "multi",
@@ -509,7 +509,7 @@ export const LearnerThankyouCardConstants = {
 };
 
 export const LearnerRejectedMessage = {
-    title: "Thank you for your interest!",
+    title: "Thank You for Your Interest!",
     description:
         "At this time, we're unable to move forward with your enrollment. If you believe this was a mistake or have questions, please reach out to support@melodywings.org — we're happy to help.",
 };

@@ -14,7 +14,7 @@ const volunteerFeatures = [
     {
         icon: <FiCalendar className="w-6 h-6" />,
         title: "Session Management",
-        description: "Manage all your tutoring sessions in one place. Accept requests, track upcoming sessions, and review past interactions.",
+        description: "Manage all your sessions in one place. Accept requests, track upcoming sessions, and review past interactions.",
         benefits: ["Visual dashboard", "Accept/decline requests", "Session history", "Calendar integration"],
         color: "blue",
     },
@@ -27,7 +27,7 @@ const volunteerFeatures = [
     },
     {
         icon: <MdOutlineGroups className="w-6 h-6" />,
-        title: "Host Wing Time",
+        title: "Host a WingTime",
         description: "Lead group sessions on topics you're passionate about. Teach multiple learners simultaneously in a collaborative environment.",
         benefits: ["Group teaching", "Set participant limits", "Topic-based sessions", "Manage registrations"],
         color: "purple",
@@ -35,7 +35,7 @@ const volunteerFeatures = [
     {
         icon: <FiTrendingUp className="w-6 h-6" />,
         title: "Smart Matching",
-        description: "Our AI recommends learners who match your skills and availability. Focus on teaching, let us handle the matching.",
+        description: "Our AI recommends learners who match your skills and availability. Focus on teaching and let us handle the matching.",
         benefits: ["AI-powered recommendations", "Skill-based matching", "Learning needs alignment", "Match history"],
         color: "indigo",
     },
@@ -56,7 +56,7 @@ const volunteerFeatures = [
     {
         icon: <FiAward className="w-6 h-6" />,
         title: "Hours & Certificates",
-        description: "Automatically track your volunteered hours. Download certificates for school credit, programs, or personal records.",
+        description: "Automatically track your volunteer hours. Download certificates for school credit, programs, or personal records.",
         benefits: ["Automatic hour tracking", "Downloadable certificates", "Session completion records", "Total hours display"],
         color: "yellow",
     },
@@ -85,7 +85,7 @@ export default function VolunteerFeatures() {
                         Powerful Tools for Meaningful Impact
                     </h2>
                     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        Manage your availability, connect with learners, track your hours, and make a real difference in students' lives—all in one place.
+                        Manage your availability, connect with learners, track your hours, and make a real difference in learners&apos; lives—all in one place.
                     </p>
                 </div>
 

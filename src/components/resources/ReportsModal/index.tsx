@@ -50,7 +50,7 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
             report_status: "pending",
             report_type: "resource",
             report_description:
-                reportType === "others" ? `Others - ${reportDescription}` : reportType,
+                reportType === "others" ? `Other - ${reportDescription}` : reportType,
         };
 
         try {
@@ -77,7 +77,7 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
         },
         primary: {
             onClick: handleSubmit,
-            title: isSubmitting ? "Submiting Report" : "Submit Report",
+            title: isSubmitting ? "Submitting Report" : "Submit Report",
             btnVariant: "primary",
             customClassName: "!rounded-xl",
             disabled: isSubmitting,

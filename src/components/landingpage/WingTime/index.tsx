@@ -134,14 +134,14 @@ const WingTime = () => {
                 <div className="flex flex-col gap-4 w-full">
                     <ContainerHeader
                         title="Scheduled"
-                        subTitle="Wing Time"
+                        subTitle="WingTime"
                         description="Join scheduled group learning sessions led by experienced volunteers on various topics."
                     />
                     <div className="bg-gray-50 rounded-2xl px-6 py-6 flex flex-col items-center gap-4 text-center">
                         <div className="flex flex-col items-center gap-1">
                             <FiCalendar size={28} className="mb-1 text-gray-400" aria-hidden="true" />
                             <p className="text-gray-600 font-medium">No scheduled sessions right now</p>
-                            <p className="text-gray-400 text-sm">Volunteers schedule group sessions throughout the week. Sign up to get notified!</p>
+                            <p className="text-gray-400 text-sm">Volunteers schedule group sessions throughout the week. Sign up to get notified.</p>
                         </div>
                         <button
                             type="button"
@@ -161,8 +161,8 @@ const WingTime = () => {
             <div className="flex flex-col gap-6 w-full">
                 <ContainerHeader
                     title="Scheduled"
-                    subTitle="Wing Time Available"
-                    description="Register for upcoming group sessions — learn together with other students and volunteers."
+                    subTitle="WingTime Sessions Available"
+                    description="Register for upcoming group sessions — learn together with other learners and volunteers."
                 />
                 {isLoading ? (
                     <WingTimeSkeleton />

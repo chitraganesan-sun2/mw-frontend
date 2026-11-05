@@ -350,7 +350,7 @@ export default function VolunteerInstantSessionsPage() {
 
     const handleCompleteSession = async (sessionId: string) => {
         if (isActionLoading) return;
-        if (!(await askConfirm({ title: "Mark as completed", description: "Mark this session as completed? This can't be undone.", confirmText: "Mark as completed", cancelText: "Not yet" }))) return;
+        if (!(await askConfirm({ title: "Mark as Completed", description: "Mark this session as completed? This can't be undone.", confirmText: "Mark as Completed", cancelText: "Not yet" }))) return;
         setIsActionLoading(true);
         setDetailAction("complete");
         try {
@@ -367,7 +367,7 @@ export default function VolunteerInstantSessionsPage() {
     };
 
     const handleWithdrawOpenSession = async (volunteerSlotId: string) => {
-        if (!(await askConfirm({ title: "Withdraw session", description: "Withdraw this open instant session? Learners will no longer see it.", confirmText: "Withdraw", cancelText: "Keep it", danger: true }))) return;
+        if (!(await askConfirm({ title: "Withdraw Session", description: "Withdraw this open instant session? Learners will no longer see it.", confirmText: "Withdraw", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         try {
             await DELETE_API(endpoints.session.withdrawInstantSession(volunteerSlotId));
@@ -382,12 +382,12 @@ export default function VolunteerInstantSessionsPage() {
 
     const handleCancelSession = async (sessionId: string) => {
         if (isActionLoading) return;
-        if (!(await askConfirm({ title: "Cancel session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel session", cancelText: "Keep it", danger: true }))) return;
+        if (!(await askConfirm({ title: "Cancel Session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel Session", cancelText: "Keep it", danger: true }))) return;
         setIsActionLoading(true);
         setDetailAction("cancel");
         try {
             await PUT_API(endpoints.session.cancelSession(sessionId), { status: "cancelled" });
-            showToast({ message: "Session cancelled", type: "success" });
+            showToast({ message: "Session cancelled.", type: "success" });
             invalidateScheduleViews(queryClient, "volunteer");
             setSessionDetail(null);
         } catch (error: any) {
@@ -482,7 +482,7 @@ export default function VolunteerInstantSessionsPage() {
                         <div className="text-5xl mb-4">📺</div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No Instant Sessions</h3>
                         <p className="text-sm text-gray-500">
-                            Sessions you start or accept will show up here
+                            Sessions you start or accept will show up here.
                         </p>
                     </div>
                 ) : (
@@ -527,7 +527,7 @@ export default function VolunteerInstantSessionsPage() {
             {/* Instant Sessions requested by Learners (open learner requests any volunteer can accept) */}
             <div>
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
-                    Instant Sessions requested by Learners
+                    Instant Sessions Requested by Learners
                 </h2>
                 {isLearnerRequestsError && !learnerRequestsData ? (
                     <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />

@@ -79,7 +79,7 @@ const JoinUsPage = () => {
                         {/* CTA Button */}
                         <div className="flex justify-center md:justify-start mt-8">
                             <Button
-                                title={isLoading ? "Loading..." : "Apply here to Get Involved"}
+                                title={isLoading ? "Loading..." : "Apply Here to Get Involved"}
                                 btnVariant="secondary"
                                 loading={isLoading}
                                 customClassName="!w-full md:!w-auto !px-4 !py-[10px] !h-10 md:!h-12 lg:!text-[18px] !text-[14px] !font-medium !rounded-[10px] !text-white !bg-action hover:!bg-action-hover"

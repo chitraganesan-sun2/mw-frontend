@@ -50,7 +50,7 @@ const TimePickerComponent = ({ name, time, type, onTimeChange, }: TimePickerComp
       slotProps={{
         textField: {
           id: `${name}-${type}`,
-          "aria-label": type === "from" ? "Start time" : "End time",
+          "aria-label": type === "from" ? "Start Time" : "End Time",
         },
       }}
       sx={{
@@ -96,7 +96,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({ value, onChange, clea
           onTimeChange={handleTimeChange}
         />
         {clearable && (
-          <IconButton onClick={() => onChange({ from: null, to: null })} aria-label="clear time range">
+          <IconButton onClick={() => onChange({ from: null, to: null })} aria-label="Clear time range">
             <ClearIcon className="text-red-500" />
           </IconButton>
         )}

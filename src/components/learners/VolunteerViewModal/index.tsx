@@ -224,7 +224,7 @@ const TabButtons = ({
                                 : "border-2 border-transparent"
                         } transition-all duration-200 cursor-pointer`}
                     >
-                        {tab === "overview" ? "Overview" : `Reviews - ${rating} (${totalReviews})`}
+                        {tab === "overview" ? "Overview" : `Reviews: ${rating} (${totalReviews})`}
                     </button>
                 ))}
             </div>
@@ -259,7 +259,7 @@ const OverviewContent = ({
         },
         {
             type: "description" as const,
-            title: "More about their academic skills",
+            title: "More About Their Academic Skills",
             description: volunteerData?.volunteer_academic_skills_notes,
         },
         {
@@ -269,7 +269,7 @@ const OverviewContent = ({
         },
         {
             type: "description" as const,
-            title: "More about their arts/life skills",
+            title: "More About Their Arts & Life Skills",
             description: volunteerData?.volunteer_arts_life_skills_notes,
         },
         {
@@ -334,7 +334,7 @@ const OverviewContent = ({
         if (!videoSrc) return null;
         return (
             <div className="mt-3">
-                <p className="text-sm text-gray-light font-normal mb-2">About me</p>
+                <p className="text-sm text-gray-light font-normal mb-2">About Me</p>
                 <div className="w-full flex justify-start">
                     <video
                         src={videoSrc}
@@ -342,7 +342,7 @@ const OverviewContent = ({
                         preload="metadata"
                         className="w-full rounded-xl shadow-lg h-[220px] md:h-[380px] object-cover"
                     >
-                        Your browser does not support the video tag.
+                        Your browser can&apos;t play this video.
                     </video>
                 </div>
             </div>
@@ -550,7 +550,7 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
                 );
             })
             .catch((err: any) => {
-                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't start chat. Please try again.") });
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't start the chat. Please try again.") });
             });
     };
     const rating = volunteerFeedback?.overall_rating;

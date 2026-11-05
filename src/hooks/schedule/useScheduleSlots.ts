@@ -359,7 +359,7 @@ export function useScheduleSlots({
         const payload = { deleted_slots: deletedSlots, slots: formattedData };
         const res = await PUT_API(updateEndpoint, payload);
         if (res?.status === 201) {
-            showToast({ message: "Schedule updated successfully", type: "success" });
+            showToast({ message: "Schedule updated.", type: "success" });
         } else {
             showToast({ message: "Couldn't update your schedule. Please try again.", type: "error" });
         }

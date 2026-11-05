@@ -143,7 +143,7 @@ const EmailPasswordAuth = ({
                 onSubmit();
             }}
         >
-            {resetting && <span className="text-sm font-medium">Reset your password</span>}
+            {resetting && <span className="text-sm font-medium">Reset Your Password</span>}
             <div className="flex flex-col gap-1">
                 <Input
                     type="email"
@@ -191,14 +191,14 @@ const EmailPasswordAuth = ({
                         className="appearance-none border-0 bg-transparent text-sm underline"
                         onClick={startReset}
                     >
-                        Forgot password?
+                        Forgot Password?
                     </button>
                 </>
             )}
 
             {step === "email" && (
                 <Button
-                    title="Send me a code"
+                    title="Send Me a Code"
                     btnVariant="secondary"
                     className="w-full !px-3 !py-2 text-sm !rounded-xl"
                     htmlType="submit"
@@ -220,7 +220,7 @@ const EmailPasswordAuth = ({
             )}
             {step === "code" && (
                 <Button
-                    title="Verify email"
+                    title="Verify Email"
                     btnVariant="secondary"
                     className="w-full !px-3 !py-2 text-sm !rounded-xl"
                     htmlType="submit"
@@ -240,7 +240,7 @@ const EmailPasswordAuth = ({
                     />
                     <PasswordChecklist password={password} email={trimmed} />
                     <Button
-                        title={resetting ? "Set new password and log in" : "Create account"}
+                        title={resetting ? "Set New Password and Log In" : "Create Account"}
                         btnVariant="secondary"
                         className="w-full !px-3 !py-2 text-sm !rounded-xl"
                         htmlType="submit"
@@ -262,7 +262,7 @@ const EmailPasswordAuth = ({
                         setPassword("");
                     }}
                 >
-                    {mode === "login" ? "Back to log in" : "Use a different email"}
+                    {mode === "login" ? "Back to Log In" : "Use a Different Email"}
                 </button>
             )}
         </form>

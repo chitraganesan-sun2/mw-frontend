@@ -85,9 +85,9 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                 await markNotificationAsRead([sessionId]);
             }
             if (status === "accepted") {
-                showToast({ type: "success", message: "Invitation Accepted" });
+                showToast({ type: "success", message: "Invitation accepted." });
             } else {
-                showToast({ type: "info", message: "Invitation declined" });
+                showToast({ type: "info", message: "Invitation declined." });
             }
         });
     };
@@ -207,7 +207,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
             // Previously no catch: any rejection (e.g. the backend's "can't complete before
             // the session ends" gate) left the button spinning forever with no message.
             .catch((err) => {
-                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't mark the session as completed.") });
+                showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't mark the session as completed. Please try again.") });
             })
             .finally(() => setLoadingCompleted(false));
     };
@@ -366,7 +366,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                                     loading={deletingSlot}
                                     customClassName="w-fit !bg-[#DC2626] !text-white border border-[#DC2626] hover:!bg-[#B91C1C] text-sm rounded-full !py-1.5 !px-4"
                                 >
-                                    Yes, delete
+                                    Yes, Delete
                                 </Button>
                             </div>
                         ) : (
@@ -391,7 +391,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
         <div
             role="dialog"
             aria-modal="true"
-            aria-label="Meeting preview"
+            aria-label="Session preview"
             className={`meeting-preview-modal border border-stroke bg-white rounded-lg shadow-lg ${isVisible ? "modal-visible" : "modal-hidden"
                 }`}
             style={{
@@ -477,7 +477,7 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
                             />
                         ) : (
                             <p className="text-[#DC2626] font-medium text-xs">
-                                {learner ? `${learner.firstName} completed the meeting` : "Meeting completed"}
+                                {learner ? `${learner.firstName} completed the session` : "Session completed"}
                             </p>
                         )}
                     </div>

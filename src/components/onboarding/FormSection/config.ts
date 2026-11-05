@@ -15,18 +15,18 @@ dayjs.extend(customParseFormat);
 const contactNumberValidation = z
     .object({
         number: z
-            .string({ required_error: "Phone Number is required" })
+            .string({ required_error: "Phone number is required" })
             .refine((num) => num.length === 10, {
                 message: "Phone number must be exactly 10 digits",
             }),
-        country_code: z.string({ required_error: "Country Code is required" }),
+        country_code: z.string({ required_error: "Country code is required" }),
     })
     .or(z.undefined())
     .refine((value) => value?.country_code, {
-        message: "Country Code is required",
+        message: "Country code is required",
     })
     .refine((value) => value?.number, {
-        message: "Phone Number is required",
+        message: "Phone number is required",
     })
     .refine((value) => value !== undefined && value?.number?.length === 10, {
         message: "Phone number must be exactly 10 digits",
@@ -102,14 +102,14 @@ export const volunteerFormSchema = z
                 .email("Please enter a valid email address"),
             contact_number: contactNumberValidation,
             zip_code: z
-                .string({ required_error: "Zip Code is required" })
-                .min(1, { message: "Zip Code is required" }),
+                .string({ required_error: "ZIP code is required" })
+                .min(1, { message: "ZIP code is required" }),
             country: z
                 .string({ required_error: "Country is required" })
                 .min(1, { message: "Country is required" }),
             timezone: z
-                .string({ required_error: "Time Zone is required" })
-                .min(1, { message: "Time Zone is required" }),
+                .string({ required_error: "Time zone is required" })
+                .min(1, { message: "Time zone is required" }),
             utc_offset: z.string().optional(),
         }),
 
@@ -288,7 +288,7 @@ export const volunteerFormSchema = z
         // Consent and Permissions
         consent_and_permissions: z.object({
             photo_or_video_consent: z.boolean({
-                required_error: "Photo or Video Consent is required",
+                required_error: "Photo/Video Consent is required",
             }),
             heard_about_us: z
                 .string({ required_error: "Please tell us how you heard about us" })
@@ -430,14 +430,14 @@ type learnerParentSchemaType = {
 };
 
 const learnerParentSchema = z.object({
-    parent_first_name: z.string({ required_error: "Guardian's First Name is required" }).or(z.null()),
-    parent_last_name: z.string({ required_error: "Guardian's Last Name is required" }).or(z.null()),
-    parent_email: z.string({ required_error: "Guardian's Email is required" }).or(z.null()),
+    parent_first_name: z.string({ required_error: "Guardian's first name is required" }).or(z.null()),
+    parent_last_name: z.string({ required_error: "Guardian's last name is required" }).or(z.null()),
+    parent_email: z.string({ required_error: "Guardian's email is required" }).or(z.null()),
     parent_contact_number: z.any().optional().or(z.null()),
-    parent_address: z.string({ required_error: "Guardian's Address is required" }).or(z.null()),
+    parent_address: z.string({ required_error: "Guardian's address is required" }).or(z.null()),
     relationship_to_learner: z
         .string({
-            required_error: "Relationship to Learner is required",
+            required_error: "Relationship to the Learner is required",
         })
         .or(z.null()),
 });
@@ -458,7 +458,7 @@ export const learnerFormSchema = z
                 })
                 .refine(
                     (dob) => dayjs().diff(dayjs(dob, "DD-MM-YYYY"), "years") >= LEARNER_MIN_AGE,
-                    { message: `Learner must be at least ${LEARNER_MIN_AGE} years old` }
+                    { message: `Learner must be at least ${LEARNER_MIN_AGE} years old.` }
                 ),
             learner_gender: z.string({ required_error: "Learner's Gender is required" }),
             learner_preferred_pronoun: z.string({
@@ -471,14 +471,14 @@ export const learnerFormSchema = z
                 email: z.string().optional().or(z.null()),
                 contact_number: contactNumberValidation,
                 zip_code: z
-                    .string({ required_error: "Zip Code is required" })
-                    .min(1, { message: "Zip Code is required" }),
+                    .string({ required_error: "ZIP code is required" })
+                    .min(1, { message: "ZIP code is required" }),
                 country: z
                     .string({ required_error: "Country is required" })
                     .min(1, { message: "Country is required" }),
                 timezone: z
-                    .string({ required_error: "Time Zone is required" })
-                    .min(1, { message: "Time Zone is required" }),
+                    .string({ required_error: "Time zone is required" })
+                    .min(1, { message: "Time zone is required" }),
                 utc_offset: z.string().optional(),
             }),
         }),
@@ -489,18 +489,18 @@ export const learnerFormSchema = z
         // Learner special needs - Required
         learner_special_needs: z.object({
             type_of_developmental_disability: z.string({
-                required_error: "Developmental Disability is required",
+                required_error: "Type of Developmental Disability is required",
             }),
             level_of_support_needed: z.string({
                 required_error: "Level of Support Needed is required",
             }),
             assistive_device_used: z.string({
-                required_error: "Assistive Device Used is required",
+                required_error: "Assistive Devices Used is required",
             }),
             communication_style: z.string({ required_error: "Communication Style is required" }),
             description: z
-                .string({ required_error: "Description of Needs is required" })
-                .min(1, { message: "Description of Needs is required" }),
+                .string({ required_error: "Disability Details is required" })
+                .min(1, { message: "Disability Details is required" }),
             areas_of_support_needed: z.array(z.string()).optional(),
             behavioral_concerns: z.string().optional(),
             behavior_support_strategies: z.array(z.string()).optional(),
@@ -594,7 +594,7 @@ export const learnerFormSchema = z
         // Consent and permissions - Required
         consent_and_permissions: z.object({
             photo_or_video_consent: z.boolean({
-                required_error: "Photo or Video Consent is required",
+                required_error: "Photo/Video Consent is required",
             }),
             heard_about_us: z
                 .string({ required_error: "Please tell us how you heard about us" })
@@ -651,7 +651,7 @@ export const learnerFormSchema = z
         return true;
     });
 
-const emailSchema = z.string().email("Invalid email address").optional();
+const emailSchema = z.string().email("Enter a valid email address").optional();
 
 export function validateLearnerParentFields(data: any) {
     const errors: { [key: string]: string } = {};
@@ -682,7 +682,7 @@ export function validateLearnerParentFields(data: any) {
             try {
                 emailSchema.parse(field);
             } catch (e) {
-                errors[`parent_info.${key}`] = "Invalid email address";
+                errors[`parent_info.${key}`] = "Enter a valid email address";
                 isSuccess = false;
             }
         }
@@ -691,7 +691,7 @@ export function validateLearnerParentFields(data: any) {
                 contactNumberValidation.parse(field);
             } catch (e) {
                 errors[`parent_info.${key}`] =
-                    "Guardian Contact Number is required for learners under 13";
+                    "Guardian Contact Number is required for learners under 13.";
                 isSuccess = false;
             }
         }

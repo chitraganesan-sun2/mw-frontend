@@ -58,7 +58,7 @@ export const SCHEDULE_LABELS = {
     myAvailabilitySchedule: "My Availability Schedule",
     slotsOffering: "Volunteer Slots I'm Offering (accepted by learners)",
     mySchedule: "My Sessions",
-    scheduleAvailability: "Schedule my availability",
+    scheduleAvailability: "Schedule My Availability",
     viewCalendar: "View my calendar",
 } as const;
 
@@ -66,12 +66,12 @@ export const SCHEDULE_TAB_LABELS: Record<ScheduleRole, Record<ScheduleTab, strin
     volunteer: {
         posted: "My Posted Sessions (accepted by learners)",
         accepted: "My Accepted Sessions (from learner postings)",
-        direct: "My Direct Sessions (with specific learner)",
+        direct: "My Direct Sessions (with a specific learner)",
     },
     learner: {
         posted: "My Posted Sessions (accepted by volunteers)",
         accepted: "My Accepted Sessions (from volunteer postings)",
-        direct: "My Direct Sessions (with specific volunteer)",
+        direct: "My Direct Sessions (with a specific volunteer)",
     },
 };
 

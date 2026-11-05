@@ -5,7 +5,7 @@ import { AllEventsModalProps } from "./index.type.d";
 const AllEventsModal = ({ isOpen, onClose, data, onEventClick }: AllEventsModalProps) => {
     return (
         <CenterModal
-            title={`Schedule - ${data.date}`}
+            title={`Schedule: ${data.date}`}
             isOpen={isOpen}
             onClose={onClose}
             width="40%"

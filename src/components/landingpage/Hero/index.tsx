@@ -18,8 +18,8 @@ const Hero = () => {
             <Header />
             <div className={`w-full md:h-[80vh] md:min-h-[480px] md:max-h-[760px] md:bg-white relative`}>
                 <div className="w-full !h-[300px] md:!h-full md:!relative">
-                    <Image src={HeroBannerImg} alt="Students learning together with technology support" fill className="h-full object-cover object-top hidden md:block" />
-                    <Image src={HeroBannerMobileImg} alt="Students learning together with technology support" fill className="!h-[300px] md:hidden object-cover object-top" />
+                    <Image src={HeroBannerImg} alt="Learners studying together with the help of technology" fill className="h-full object-cover object-top hidden md:block" />
+                    <Image src={HeroBannerMobileImg} alt="Learners studying together with the help of technology" fill className="!h-[300px] md:hidden object-cover object-top" />
                 </div>
                 <div className="relative md:!w-[40%] md:!h-[30%] md:!absolute md:!top-[35%] md:!left-[10%] z-10 flex-center flex-col md:items-start md:justify-start gap-6">
                     <div className="absolute top-[-20%] md:top-[-50%] lg:top-[-70%] left-0 w-full h-[150px] md:h-[250px] md:w-[250px] lg:w-[350px] lg:h-[350px] z-5 max-md:flex-center">

@@ -43,7 +43,7 @@ const Uploader = ({ maxFiles = 1, ...props }: UploadProps) => {
         success: handleSuccess,
         error: (err: any) => {
             setUploadProgress(0);
-            const message = err?.message || "Upload failed. Please try again.";
+            const message = err?.message || "Couldn't upload the file. Please try again.";
             setUploadError(message);
             showToast({ message, type: "error" });
         },

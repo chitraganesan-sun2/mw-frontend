@@ -180,7 +180,7 @@ const DatePickerComponent: React.FC<{
                     // If no data provided yet, disable all dates
                     return true;
                 }}
-                placeholder={isLoading ? "Loading available dates..." : "Click to select date"}
+                placeholder={isLoading ? "Loading available dates..." : "Select date"}
                 className={cn(
                     "w-full text-sm p-2 rounded-lg border border-stroke focus:!border-stroke focus:!bg-background-input placeholder:text-sm hover:bg-background-input bg-background-input",
                     inputClassName
@@ -408,7 +408,7 @@ export const Input: React.FC<InputProps> = (props) => {
                             allowClear={false}
                             defaultPickerValue={parseBirthDate(value) || endDate}
                             disabled={props?.disabled}
-                            placeholder="Click to select date"
+                            placeholder="Select date"
                             className={cn(
                                 "w-full text-sm p-2 rounded-lg border border-stroke hover:!border-gray-400 focus:!border-stroke focus:!bg-background-input placeholder:text-sm hover:bg-background-input bg-background-input",
                                 props.inputClassName

@@ -5,7 +5,7 @@ import InstantSessions from "../InstantSessions";
 import WingTime from "../WingTime";
 
 /**
- * SessionOptions component displays both Instant Sessions and Wing Time
+ * SessionOptions component displays both Instant Sessions and WingTime
  * side by side in a responsive 2-column layout on the landing page.
  * 
  * - Desktop/Laptop: 2 columns side by side
@@ -21,7 +21,7 @@ const SessionOptions = () => {
                     <InstantSessions />
                 </div>
                 
-                {/* Wing Time - Right Column */}
+                {/* WingTime - Right Column */}
                 <div className="reveal min-w-0">
                     <WingTime />
                 </div>

@@ -28,7 +28,7 @@ const POSITION_OPTIONS = [
         value: "volunteer_outreach_intern",
         label: "Volunteer Outreach",
         description:
-            "Support the growth of our volunteer community by helping recruit and communicate with new mentors.",
+            "Support the growth of our volunteer community by helping recruit and communicate with new volunteers.",
         responsibilities: [
             "Reaching out to potential volunteers through schools, clubs, and organizations",
             "Helping onboard new volunteers to the platform",
@@ -42,7 +42,7 @@ const POSITION_OPTIONS = [
             "Help connect more learners and families to MelodyWings so they can benefit from our sessions.",
         responsibilities: [
             "Supporting outreach to schools, NGOs, and support communities",
-            "Helping parents and learners sign up and stay engaged with sessions",
+            "Helping guardians and learners sign up and stay engaged with sessions",
             "Assisting with communication for new program launches and community programs",
         ],
     },
@@ -50,7 +50,7 @@ const POSITION_OPTIONS = [
         value: "operations_intern",
         label: "Operations",
         description:
-            "Help support the behind the scenes systems that keep MelodyWings running smoothly.",
+            "Help support the behind-the-scenes systems that keep MelodyWings running smoothly.",
         responsibilities: [
             "Assisting with organizational processes",
             "Helping track sessions, volunteers, and program metrics",

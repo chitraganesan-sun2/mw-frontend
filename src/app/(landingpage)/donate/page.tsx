@@ -346,7 +346,7 @@ const Donate = () => {
         if (!country) missing.push("Country");
         if (!zip) missing.push("ZIP / Postal Code");
         if (missing.length) {
-            showToast({ type: "error", message: `Please fill required fields: ${missing.join(", ")}` });
+            showToast({ type: "error", message: `Please fill in the required fields: ${missing.join(", ")}` });
             return;
         }
 
@@ -355,7 +355,7 @@ const Donate = () => {
         // nowhere valid to go.
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            showToast({ type: "error", message: "Please enter a valid email address" });
+            showToast({ type: "error", message: "Please enter a valid email address." });
             return;
         }
 
@@ -369,7 +369,7 @@ const Donate = () => {
             fundOptions.find((o) => o.value === String(fundDesignation))?.label || "General Fund";
         const isFundOther = String(fundDesignation).toLowerCase() === "other";
         if (isFundOther && !fundOtherDetail.trim()) {
-            showToast({ type: "error", message: "Please fill details for 'Other' fund designation" });
+            showToast({ type: "error", message: "Please fill in the details for the \"Other\" fund designation." });
             return;
         }
 
@@ -419,7 +419,7 @@ const Donate = () => {
                     return;
                 }
                 setIsSubmitting(false);
-                showToast({ type: "error", message: "Unable to continue to checkout. Please try again." });
+                showToast({ type: "error", message: "Couldn't continue to checkout. Please try again." });
             })
             .catch((err) => {
                 console.error("Failed to create checkout session", err);
@@ -598,7 +598,7 @@ const Donate = () => {
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 md:px-3 py-1">
                                     <TaxDeductive className="size-4 shrink-0" aria-hidden />
-                                    Tax deductible
+                                    Tax-deductible
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 md:px-3 py-1">
                                     <NonProfit className="size-4 shrink-0" aria-hidden />
@@ -876,7 +876,7 @@ const Donate = () => {
                                 labelClassName={DONATE_LABEL_CLASS}
                                 inputType="select"
                                 name="dedication"
-                                label="Dedication (Optional)"
+                                label="Dedication (optional)"
                                 value={dedication}
                                 onChange={(v) => setDedication(v ?? "none")}
                                 options={dedicationOptions}
@@ -892,7 +892,7 @@ const Donate = () => {
                                     label=""
                                     value={dedicationName}
                                     onChange={(v) => setDedicationName(typeof v === "string" ? v : "")}
-                                    placeholder="Person name"
+                                    placeholder="Person's name"
                                     rootClassName="w-full"
                                     inputClassName="w-full rounded-xl border-gray-200"
                                 />
@@ -903,7 +903,7 @@ const Donate = () => {
                                     labelClassName={DONATE_LABEL_CLASS}
                                     inputType="select"
                                     name="fund"
-                                    label="Campaign / fund designation"
+                                    label="Campaign / Fund Designation"
                                     value={fundDesignation}
                                     onChange={(v) => {
                                         const val = v ?? "general-fund";
@@ -919,7 +919,7 @@ const Donate = () => {
                                         labelClassName={DONATE_LABEL_CLASS}
                                         inputType="text"
                                         name="fund_other"
-                                        label="Details (If Other)"
+                                        label="Details (if Other)"
                                         value={fundOtherDetail}
                                         onChange={(v) =>
                                             setFundOtherDetail(typeof v === "string" ? v : "")
@@ -957,7 +957,7 @@ const Donate = () => {
                                 labelClassName={DONATE_LABEL_CLASS}
                                 inputType="textarea"
                                 name="message"
-                                label="Leave a Message (Optional)"
+                                label="Leave a Message (optional)"
                                 value={message}
                                 onChange={(v) => setMessage(typeof v === "string" ? v : "")}
                                 placeholder="Share why you are supporting MelodyWings."
@@ -970,7 +970,7 @@ const Donate = () => {
                                 labelClassName={DONATE_LABEL_CLASS}
                                 inputType="select"
                                 name="hear_about"
-                                label="How did you hear about us? (Optional)"
+                                label="How did you hear about us? (optional)"
                                 value={hearAbout}
                                 onChange={(v) => setHearAbout(v ?? "")}
                                 placeholder="Select an option"
