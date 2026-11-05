@@ -9,7 +9,6 @@ import TitleSection from "@/components/onboarding/TitleSection";
 import { LearnerFormSections, LearnerOnboardingConstants } from "@/constants/learner";
 import { VolunteerFormSections } from "@/constants/volunteer";
 import { getCookie } from "@/utils/auth";
-import CookieConsent from "@/components/landingpage/Cookie";
 
 export default function OnboardingPage () {
     // getCookie reads document.cookie, which isn't available during SSR - reading it
@@ -37,7 +36,6 @@ export default function OnboardingPage () {
             />
             {isVolunteer && <InfoSection />}
             <FormSection schema={schema} formData={formData} />
-            <CookieConsent />
         </div>
     );
 }

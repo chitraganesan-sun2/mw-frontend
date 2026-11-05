@@ -1,11 +1,10 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Poppins } from "next/font/google";
 
 import RootLayoutClient from "./RootLayoutClient";
 import PostHogProvider from "@/providers/PostHog";
-import { GOOGLE_ANALYTICS_ID } from "@/definitions";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { SHARE_IMAGES } from "@/constants/seo";
 
 const poppins = Poppins({
@@ -106,24 +105,9 @@ export default function RootLayout({
             <head>
                 <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="any" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-                <Script
-                    src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
-                    strategy="afterInteractive"
-                />
-                <Script
-                    id="gtag-init"
-                    strategy="afterInteractive"
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            window.dataLayer = window.dataLayer || [];
-                            function gtag(){dataLayer.push(arguments);}
-                            gtag('js', new Date());
-                            gtag('config', '${GOOGLE_ANALYTICS_ID}');
-                        `,
-                    }}
-                />
             </head>
             <body className={poppins.className}>
+                <GoogleAnalytics />
                 <PostHogProvider>
                     <RootLayoutClient>{children}</RootLayoutClient>
                 </PostHogProvider>

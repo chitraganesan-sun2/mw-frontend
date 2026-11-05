@@ -12,6 +12,7 @@ import RouteGuard from "@/components/guards/RouteGuard";
 import NetworkStatus from "@/components/common/NetworkStatus";
 import SessionExpiredNotice from "@/components/common/SessionExpiredNotice";
 import { initSentry } from "@/services/sentry";
+import CookieConsent from "@/components/landingpage/Cookie";
 
 // Module scope, not component body - runs exactly once per page load rather
 // than on every render.
@@ -46,6 +47,7 @@ export default function RootLayoutClient({ children }: { children: React.ReactNo
             >
                 <NetworkStatus />
                 <SessionExpiredNotice />
+                <CookieConsent />
                 <QueryProvider>
                     <RouteGuard>{children}</RouteGuard>
                 </QueryProvider>
