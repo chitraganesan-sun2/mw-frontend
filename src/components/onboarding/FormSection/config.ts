@@ -596,6 +596,8 @@ export const learnerFormSchema = z
             photo_or_video_consent: z.boolean({
                 required_error: "Photo/Video Consent is required",
             }),
+            showcase_consent: z.boolean().optional(),
+            showcase_statement: z.string().max(140, "Please keep this under 140 characters").optional(),
             heard_about_us: z
                 .string({ required_error: "Please tell us how you heard about us" })
                 .refine((v) => HEARD_ABOUT_US_OPTIONS.includes(v), {

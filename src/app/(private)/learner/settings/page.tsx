@@ -53,6 +53,8 @@ const API_TO_UI_PREFERENCE: Record<string, SessionMatchValue> = {
 
 const Settings = () => {
     const [isEnabled, setIsEnabled] = useState(false);
+    // Anonymous "Learner stories" on the public website - off unless the learner/guardian allowed it.
+    const [showcaseEnabled, setShowcaseEnabled] = useState(false);
     const [sessionMatchPreference, setSessionMatchPreference] =
         useState<SessionMatchValue>("all_sessions");
     const [pushEnabled, setPushEnabled] = useState(true);
@@ -73,6 +75,17 @@ const Settings = () => {
             // Roll back the switch and say so - it previously stayed flipped even when the
             // save failed, which is misleading for a privacy-relevant control.
             setIsEnabled(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
+        });
+    };
+
+    const handleShowcaseChange = (value: boolean) => {
+        const previous = showcaseEnabled;
+        setShowcaseEnabled(value);
+        PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/showcase_consent`, {
+            consent: value,
+        }).catch((err) => {
+            setShowcaseEnabled(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
         });
     };
@@ -126,6 +139,7 @@ const Settings = () => {
                 // The backend treats a missing chat_permission as allowed (`is not False`),
                 // so only an explicit false means messages are blocked.
                 setIsEnabled(res.data?.chat_permission !== false);
+                setShowcaseEnabled(res.data?.consent_and_permissions?.showcase_consent === true);
                 const apiPref = res.data?.instant_session_email_preference;
                 if (apiPref && API_TO_UI_PREFERENCE[apiPref] !== undefined) {
                     setSessionMatchPreference(API_TO_UI_PREFERENCE[apiPref]);
@@ -162,6 +176,26 @@ const Settings = () => {
                         onChange={(value) => {
                             handlePermission(value);
                         }}
+                        className="w-fit [&.ant-switch-checked]:bg-action"
+                    />
+                </div>
+
+                <div className="flex items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
+                    <div className="flex flex-col gap-2">
+                        <p id="showcase-label" className="md:text-base text-[14px] font-medium">
+                            Share my learning goals anonymously.
+                        </p>
+                        <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
+                            MelodyWings may show the learner&apos;s age and the skills they want to learn on our public
+                            website. No name, photo or contact details are ever shown. For a learner under 18, a
+                            parent or guardian decides. You can turn this off at any time and it disappears right away.
+                        </p>
+                    </div>
+                    <Switch
+                        aria-labelledby="showcase-label"
+                        checked={showcaseEnabled}
+                        loading={isLoading}
+                        onChange={handleShowcaseChange}
                         className="w-fit [&.ant-switch-checked]:bg-action"
                     />
                 </div>

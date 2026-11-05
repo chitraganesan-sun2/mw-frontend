@@ -66,6 +66,7 @@ const FormTabs = ({
     const enrolled_by = useWatch({ name: "enrolled_by", control: control });
     const support_preference = useWatch({ name: "support_preference", control: control });
     const heard_about_us = useWatch({ name: "consent_and_permissions.heard_about_us", control: control });
+    const showcase_consent = useWatch({ name: "consent_and_permissions.showcase_consent", control: control });
     const [isStepUpdatePending, setIsStepUpdatePending] = useState(false);
     // Form Tabs
     const [activeTab, setActiveTab] = useState(0);
@@ -423,6 +424,8 @@ const FormTabs = ({
     const hideFields = (field: any) => {
         // The "how exactly?" box only matters when "Other" was picked as the way they heard of us.
         if (field.id === "heard_about_us_other") return heard_about_us !== HEARD_ABOUT_US_OTHER;
+        // The public-showcase sentence only matters once sharing is allowed.
+        if (field.id === "showcase_statement") return showcase_consent !== true;
         return role === "learner" ? null : fields.includes(field.id) && volunteerAge();
     };
 

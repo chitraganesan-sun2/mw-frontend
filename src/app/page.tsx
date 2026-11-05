@@ -6,6 +6,7 @@ import ForVolunteer from "@/components/landingpage/ForVolunteer";
 import Hero from "@/components/landingpage/Hero";
 import Impact from "@/components/landingpage/Impact";
 import WhyWeBuild from "@/components/landingpage/WhyWeBuild";
+import LearnerStories from "@/components/landingpage/LearnerStories";
 import Footer from "@/components/onboarding/Footer";
 import SkillsToLearn from "@/components/landingpage/SkillsToLearn";
 import SessionOptions from "@/components/landingpage/SessionOptions";
@@ -25,6 +26,10 @@ export default function Page() {
                 <div className="flex flex-col gap-6 lg:gap-8 py-8 lg:py-10">
                     <div className="reveal px-[5%] lg:px-[9%]" id="about-us">
                         <WhyWeBuild />
+                    </div>
+                    {/* Real, consented learners only; renders nothing until there are some. */}
+                    <div className="px-[5%] lg:px-[9%]">
+                        <LearnerStories />
                     </div>
                     <div className="reveal px-[5%] lg:px-[9%]" id="our-impact">
                         <Impact />

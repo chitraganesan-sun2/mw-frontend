@@ -230,6 +230,15 @@ export const sectionsData = [
                 ]
             },
             {
+                title: "Optional Learner Stories on Our Website",
+                contextType: "list",
+                hideNumber: true,
+                content: [
+                    "a) If you choose “Yes” when we ask during sign-up or in Settings (a parent or guardian answers for a learner under 18), MelodyWings may show the learner's age, the skills they want to learn and, if provided, one short sentence written for this purpose, anonymously on our public website. We never show a name, photo, email address, phone number or any other profile information.",
+                    "b) This is off unless you choose it. You can turn it off at any time in Settings and it is removed from the website right away. Deleting your account also removes it."
+                ]
+            },
+            {
                 title: 'Third Party Disclosure',
                 contextType: "list",
                 hideNumber: true,

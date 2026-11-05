@@ -205,6 +205,9 @@ export type EndpointProps = {
     publicCommunity: {
         getPosts: (limit?: number) => string;
     };
+    publicLearnerStories: {
+        get: (limit?: number) => string;
+    };
     publicSessions: {
         getInstantSessions: (limit?: number) => string;
         getWingTimes: (limit?: number) => string;
