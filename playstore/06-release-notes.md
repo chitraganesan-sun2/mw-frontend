@@ -1,3 +1,39 @@
+# Release notes — v1.7.0 (versionCode 14)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.7.0
+
+• Book for Later: schedule sessions ahead of time on its own page
+• Cookie choice: analytics in the app only runs if you tap Allow
+• Updated Terms and Privacy Policy, with a one-time prompt to review and accept them
+• Learners (or their guardians) can choose in Settings whether their age and learning goals are shown anonymously on our website
+• Clearer wording, headings and error messages throughout
+• Stability improvements
+```
+
+---
+
+## Internal changelog — v1.7.0 (versionCode 14)
+
+Built from frontend main@88b6da1e (38 commits since v1.6.2). `NEXT_PUBLIC_ENABLE_WINGTIME=true` kept.
+Needs backend master@eb6d7f8+ (already live) and Cloud Run `TERMS_VERSION`/`PRIVACY_VERSION`/`*_MIN_VERSION`=2026-11-05 (set).
+
+- Cookie card now shown in the app; Google Analytics waits for Allow (`utils/consent.ts`); PostHog never runs in the app.
+- Terms/Privacy acceptance is recorded (version + time) at the last onboarding step (`POST /policies/accept`),
+  and signed-in members get a one-time "We've updated our Terms and Privacy Policy" prompt when the required
+  version is newer than what they accepted (`GET /policies/status`).
+- Learner Settings: "Share my learning goals anonymously" switch (on by default; `PUT /learner/{id}/showcase_consent`).
+  Onboarding asks the same question plus an optional one-sentence statement.
+- Landing-page work (Learner Stories marquee, sticky header, Features page, server-rendered SEO) ships in the bundle but mainly matters on the website.
+- Book for Later page; wording/heading/error-message consistency pass; legal text rewritten.
+- Onboarding submit calls `POST /policies/accept` first. **Do not set `POLICY_ACCEPTANCE_ENFORCED=true` on Cloud Run
+  until 1.7.0 is the version people are on** - older builds (<= 1.6.2) never call it and would be blocked at the last
+  onboarding step.
+
+---
+
 # Release notes — v1.6.2 (versionCode 13)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
