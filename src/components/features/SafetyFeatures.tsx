@@ -6,7 +6,7 @@ const safetyFeatures = [
     {
         icon: <FiShield className="w-8 h-8" />,
         title: "Volunteer Verification",
-        description: "All volunteers complete background checks and safety disclosures before joining the platform.",
+        description: "All volunteers answer safety disclosure questions and are reviewed and approved by our team before they work with learners.",
         color: "from-blue-500 to-blue-600",
     },
     {
