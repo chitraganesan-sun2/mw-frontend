@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 // blogs/page.tsx is "use client", so metadata lives here instead.
 //
@@ -19,6 +20,10 @@ export const metadata: Metadata = {
     },
 };
 
+// The blog only has placeholder stub posts, so the routes are switched off: visitors get the normal
+// "page not found" instead of lorem ipsum. Delete this notFound() (and re-enable the nav link) when
+// real posts exist.
 export default function BlogsLayout({ children }: { children: React.ReactNode }) {
-    return children;
+    void children;
+    notFound();
 }
