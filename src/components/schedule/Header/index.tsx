@@ -75,7 +75,7 @@ const Header = () => {
                         >
                             <SideMenuIcon height="22px" width="22px" />
                         </button>
-                        <h1 className="flex items-center gap-2 text-xl font-medium px-2">
+                        <h1 className="flex items-center gap-2 text-[20px] md:text-lg font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
                             {isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookForLater : "My Schedule"}
                         </h1>
