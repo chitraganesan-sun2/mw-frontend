@@ -33,24 +33,13 @@ function joinSkills(skills: string[]): string {
 const StoryCard = ({ story }: { story: LearnerStory }) => (
     <li className="w-[280px] sm:w-[320px] shrink-0 list-none">
         <article className="h-full rounded-3xl border border-learner-light bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md flex flex-col gap-3">
-            <div className="flex flex-wrap gap-1.5">
-                <span className="w-fit rounded-full bg-learner-light px-3 py-0.5 text-xs font-medium text-black">
-                    Age {story.age}
-                </span>
-                {story.disability && (
-                    <span className="w-fit max-w-full break-words rounded-full bg-learner-light px-3 py-0.5 text-xs font-medium text-black">
-                        {story.disability}
-                    </span>
-                )}
-            </div>
+            {/* The whole card is one flowing sentence: no pills or labels. */}
             <p className="text-sm lg:text-base leading-relaxed text-gray-900 break-words">
-                I&apos;m {story.age} years old, and I want to learn {joinSkills(story.skills)}.
+                I&apos;m {story.age} years old
+                {story.disability ? `, I have ${story.disability.replace(/[.!\s]+$/, "")}` : ""}, and I want to learn{" "}
+                {joinSkills(story.skills)}.
+                {story.free_time ? ` In my free time, I enjoy ${story.free_time.replace(/[.!\s]+$/, "")}.` : ""}
             </p>
-            {story.free_time && (
-                <p className="text-sm leading-relaxed text-gray-900 break-words line-clamp-2">
-                    <span className="font-medium">In free time:</span> {story.free_time}
-                </p>
-            )}
             {story.statement && (
                 <p className="text-sm italic leading-relaxed text-gray-600 break-words line-clamp-3">
                     &ldquo;{story.statement}&rdquo;
