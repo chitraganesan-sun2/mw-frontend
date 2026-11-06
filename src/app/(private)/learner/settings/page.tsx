@@ -55,6 +55,8 @@ const Settings = () => {
     const [isEnabled, setIsEnabled] = useState(false);
     // Anonymous "Learner stories" on the public website - on by default, off once opted out.
     const [showcaseEnabled, setShowcaseEnabled] = useState(true);
+    // Off unless the learner/guardian turns it on - a disability is never shown by default.
+    const [showcaseDisability, setShowcaseDisability] = useState(false);
     const [sessionMatchPreference, setSessionMatchPreference] =
         useState<SessionMatchValue>("all_sessions");
     const [pushEnabled, setPushEnabled] = useState(true);
@@ -86,6 +88,17 @@ const Settings = () => {
             consent: value,
         }).catch((err) => {
             setShowcaseEnabled(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
+        });
+    };
+
+    const handleShowcaseDisabilityChange = (value: boolean) => {
+        const previous = showcaseDisability;
+        setShowcaseDisability(value);
+        PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/showcase_disability`, {
+            share: value,
+        }).catch((err) => {
+            setShowcaseDisability(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
         });
     };
@@ -140,6 +153,7 @@ const Settings = () => {
                 // so only an explicit false means messages are blocked.
                 setIsEnabled(res.data?.chat_permission !== false);
                 setShowcaseEnabled(res.data?.consent_and_permissions?.showcase_consent !== false);
+                setShowcaseDisability(res.data?.consent_and_permissions?.showcase_disability === true);
                 const apiPref = res.data?.instant_session_email_preference;
                 if (apiPref && API_TO_UI_PREFERENCE[apiPref] !== undefined) {
                     setSessionMatchPreference(API_TO_UI_PREFERENCE[apiPref]);
@@ -196,6 +210,29 @@ const Settings = () => {
                         checked={showcaseEnabled}
                         loading={isLoading}
                         onChange={handleShowcaseChange}
+                        className="w-fit [&.ant-switch-checked]:bg-action"
+                    />
+                </div>
+
+                <div className="flex items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
+                    <div className="flex flex-col gap-2">
+                        <p id="showcase-disability-label" className="md:text-base text-[14px] font-medium">
+                            Also show the type of disability.
+                        </p>
+                        <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
+                            Off unless you turn it on. When on, the learner&apos;s story card on our public website also
+                            shows the type of developmental disability entered in the profile, for example so others
+                            know they aren&apos;t alone. Only works while sharing learning goals above is on. For a
+                            learner under 18, a parent or guardian decides. Turn it off at any time and it disappears
+                            right away.
+                        </p>
+                    </div>
+                    <Switch
+                        aria-labelledby="showcase-disability-label"
+                        checked={showcaseDisability}
+                        disabled={!showcaseEnabled}
+                        loading={isLoading}
+                        onChange={handleShowcaseDisabilityChange}
                         className="w-fit [&.ant-switch-checked]:bg-action"
                     />
                 </div>

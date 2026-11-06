@@ -462,18 +462,9 @@ html {
     animation-play-state: paused;
 }
 
-/* Reduced motion: no sliding - the strip becomes a normal horizontally scrollable row. */
-@media (prefers-reduced-motion: reduce) {
-    .mw-marquee {
-        overflow-x: auto;
-    }
-    .mw-marquee-track {
-        animation: none;
-    }
-    .mw-marquee-copy[aria-hidden="true"] {
-        display: none;
-    }
-}
+/* No prefers-reduced-motion override on purpose: like the testimonials and Learner Stories strips,
+   this one always auto-scrolls (it pauses on hover / keyboard focus). Switching it to a static
+   scrollbar row made it look broken for anyone whose OS has animations turned off. */
 
 @keyframes shimmer {
     0% {

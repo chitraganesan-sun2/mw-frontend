@@ -5,12 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 
-/** One real, consented learner, anonymised by the server: an age, skills they want to learn and
- *  optionally one sentence they wrote for this purpose. Nothing else is ever sent. */
+/** One real, consented learner, anonymised by the server: an age, skills they want to learn,
+ *  optionally one sentence they wrote for this purpose and - only if they separately opted in - the
+ *  type of developmental disability they entered. Nothing else is ever sent. */
 interface LearnerStory {
     age: number;
     skills: string[];
     statement?: string;
+    disability?: string;
 }
 
 /** Fewer than this many stories look odd sliding past, so they are shown as a still row instead. */
@@ -29,9 +31,16 @@ function joinSkills(skills: string[]): string {
 const StoryCard = ({ story }: { story: LearnerStory }) => (
     <li className="w-[280px] sm:w-[320px] shrink-0 list-none">
         <article className="h-full rounded-3xl border border-learner-light bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md flex flex-col gap-3">
-            <span className="w-fit rounded-full bg-learner-light px-3 py-0.5 text-xs font-medium text-black">
-                Age {story.age}
-            </span>
+            <div className="flex flex-wrap gap-1.5">
+                <span className="w-fit rounded-full bg-learner-light px-3 py-0.5 text-xs font-medium text-black">
+                    Age {story.age}
+                </span>
+                {story.disability && (
+                    <span className="w-fit max-w-full break-words rounded-full bg-learner-light px-3 py-0.5 text-xs font-medium text-black">
+                        {story.disability}
+                    </span>
+                )}
+            </div>
             <p className="text-sm lg:text-base leading-relaxed text-gray-900 break-words">
                 I&apos;m {story.age} years old, and I want to learn {joinSkills(story.skills)}.
             </p>
