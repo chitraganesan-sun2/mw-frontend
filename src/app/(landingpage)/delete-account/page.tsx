@@ -14,7 +14,8 @@ const SUPPORT_EMAIL = "support@melodywings.org";
 
 const DeleteAccountPage = () => {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
+        <div className="w-full bg-background-input px-4 py-6 lg:px-6 lg:py-10">
+        <div className="max-w-4xl mx-auto rounded-3xl bg-white px-5 py-8 lg:p-10 flex flex-col gap-6">
             <header className="flex flex-col gap-2">
                 <h1 className="text-[24px] md:text-[32px] font-medium">Delete your MelodyWings account</h1>
                 <p className="text-gray-700">
@@ -67,6 +68,7 @@ const DeleteAccountPage = () => {
                     <Link className="underline" href="/privacy-policy">Privacy Policy</Link> for details.
                 </p>
             </section>
+        </div>
         </div>
     );
 };

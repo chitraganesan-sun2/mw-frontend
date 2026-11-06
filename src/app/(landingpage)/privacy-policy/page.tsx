@@ -13,9 +13,11 @@ export const metadata: Metadata = {
 
 const PrivacyPolicy = () => {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-5">
-            <PrivacyPolicyHeader />
-            <PrivacyPolicySections />
+        <div className="w-full bg-background-input px-4 py-6 lg:px-6 lg:py-10">
+            <div className="max-w-4xl mx-auto rounded-3xl bg-white px-5 py-8 lg:p-10 flex flex-col gap-5">
+                <PrivacyPolicyHeader />
+                <PrivacyPolicySections />
+            </div>
         </div>
     ) 
 };
