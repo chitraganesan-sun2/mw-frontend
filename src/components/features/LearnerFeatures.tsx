@@ -2,7 +2,7 @@
 
 import { FiCalendar, FiZap, FiMessageCircle, FiBookOpen, FiHeart, FiSearch, FiSettings } from "react-icons/fi";
 import { MdOutlineGroups } from "react-icons/md";
-import { FeatureCard, SectionHeader } from "./shared";
+import { FeatureCard, Panel, SectionHeader } from "./shared";
 
 const learnerFeatures = [
     {
@@ -57,8 +57,8 @@ const learnerFeatures = [
 
 export default function LearnerFeatures() {
     return (
-        <section className="bg-white px-[5%] lg:px-[9%]">
-            <div className="mx-auto max-w-7xl">
+        <Panel>
+            <div>
                 <SectionHeader
                     tone="learner"
                     eyebrow="For Learners"
@@ -78,6 +78,6 @@ export default function LearnerFeatures() {
                     ))}
                 </div>
             </div>
-        </section>
+        </Panel>
     );
 }

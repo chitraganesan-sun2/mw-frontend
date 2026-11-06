@@ -2,7 +2,7 @@
 
 import { FiBell, FiGlobe, FiVideo, FiSmartphone, FiDatabase } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
-import { FeatureCard, SectionHeader } from "./shared";
+import { FeatureCard, Panel, SectionHeader } from "./shared";
 
 const capabilities = [
     {
@@ -45,8 +45,8 @@ const capabilities = [
 
 export default function PlatformCapabilities() {
     return (
-        <section className="bg-white px-[5%] py-14 lg:px-[9%] lg:py-20">
-            <div className="mx-auto max-w-7xl">
+        <Panel>
+            <div>
                 <SectionHeader
                     tone="neutral"
                     eyebrow="Platform Capabilities"
@@ -70,6 +70,6 @@ export default function PlatformCapabilities() {
                     better features for the whole MelodyWings community.
                 </p>
             </div>
-        </section>
+        </Panel>
     );
 }

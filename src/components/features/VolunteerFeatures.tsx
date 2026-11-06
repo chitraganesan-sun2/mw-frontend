@@ -2,7 +2,7 @@
 
 import { FiCalendar, FiClock, FiUsers, FiMessageCircle, FiUpload, FiAward, FiTrendingUp } from "react-icons/fi";
 import { MdOutlineGroups } from "react-icons/md";
-import { FeatureCard, SectionHeader } from "./shared";
+import { FeatureCard, Panel, SectionHeader } from "./shared";
 
 const volunteerFeatures = [
     {
@@ -57,8 +57,8 @@ const volunteerFeatures = [
 
 export default function VolunteerFeatures() {
     return (
-        <section className="bg-background-input px-[5%] py-14 lg:px-[9%] lg:py-20">
-            <div className="mx-auto max-w-7xl">
+        <Panel>
+            <div>
                 <SectionHeader
                     tone="volunteer"
                     eyebrow="For Volunteers"
@@ -78,6 +78,6 @@ export default function VolunteerFeatures() {
                     ))}
                 </div>
             </div>
-        </section>
+        </Panel>
     );
 }

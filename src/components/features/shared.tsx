@@ -8,8 +8,17 @@ export type Tone = "learner" | "volunteer" | "neutral";
 const toneClasses: Record<Tone, { tile: string; accent: string; eyebrow: string }> = {
     learner: { tile: "bg-learner-light text-learner-dark", accent: "text-learner-dark", eyebrow: "text-learner-dark" },
     volunteer: { tile: "bg-volunteer-light text-volunteer-dark", accent: "text-volunteer-dark", eyebrow: "text-volunteer" },
-    neutral: { tile: "bg-background-input text-action", accent: "text-action", eyebrow: "" },
+    neutral: { tile: "bg-white text-action", accent: "text-action", eyebrow: "" },
 };
+
+/** White rounded panel on the grey page, like the home page sections. */
+export function Panel({ children }: { children: ReactNode }) {
+    return (
+        <section className="px-4 lg:px-6">
+            <div className="mx-auto w-full max-w-[1400px] rounded-3xl bg-white p-5 lg:p-8 xl:p-10">{children}</div>
+        </section>
+    );
+}
 
 export function SectionHeader({
     tone,
@@ -51,7 +60,7 @@ export function FeatureCard({
 }) {
     const t = toneClasses[tone];
     return (
-        <div className="flex h-full flex-col rounded-2xl border border-stroke bg-white p-6 transition-shadow duration-200 hover:shadow-md">
+        <div className="flex h-full flex-col rounded-2xl bg-background-input p-6 transition-shadow duration-200 hover:shadow-md">
             <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${t.tile}`}>{icon}</div>
             <h3 className="mb-2 text-lg font-medium">{title}</h3>
             <p className="mb-4 text-sm leading-relaxed text-gray-light">{description}</p>

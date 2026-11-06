@@ -7,7 +7,7 @@ import FeaturesCTA from "@/components/features/FeaturesCTA";
 
 export default function FeaturesPage() {
     return (
-        <div className="w-full overflow-x-hidden relative">
+        <div className="relative flex w-full flex-col gap-6 overflow-x-hidden bg-background-input pb-10 lg:gap-8 lg:pb-16">
             <FeaturesHero />
             <LearnerFeatures />
             <VolunteerFeatures />

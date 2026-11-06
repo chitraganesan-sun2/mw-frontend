@@ -1,7 +1,7 @@
 "use client";
 
 import { FiShield, FiLock, FiEyeOff, FiAlertTriangle, FiUserCheck, FiCheckCircle } from "react-icons/fi";
-import { SectionHeader } from "./shared";
+import { Panel, SectionHeader } from "./shared";
 
 const safetyFeatures = [
     {
@@ -38,8 +38,8 @@ const safetyFeatures = [
 
 export default function SafetyFeatures() {
     return (
-        <section className="bg-background-input px-[5%] py-14 lg:px-[9%] lg:py-20">
-            <div className="mx-auto max-w-7xl">
+        <Panel>
+            <div>
                 <SectionHeader
                     tone="neutral"
                     eyebrow="Safety & Trust"
@@ -50,9 +50,9 @@ export default function SafetyFeatures() {
                     {safetyFeatures.map((feature) => (
                         <div
                             key={feature.title}
-                            className="rounded-2xl border border-stroke bg-white p-6 transition-shadow duration-200 hover:shadow-md"
+                            className="rounded-2xl bg-background-input p-6 transition-shadow duration-200 hover:shadow-md"
                         >
-                            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-background-input text-action">
+                            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white text-action">
                                 {feature.icon}
                             </div>
                             <h3 className="mb-2 text-lg font-medium">{feature.title}</h3>
@@ -70,6 +70,6 @@ export default function SafetyFeatures() {
                     </p>
                 </div>
             </div>
-        </section>
+        </Panel>
     );
 }

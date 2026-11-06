@@ -14,7 +14,7 @@ export default function FeaturesHero() {
     const [, setParamMode] = useUrlParam("signup_as");
 
     return (
-        <section className="bg-white px-[5%] pb-14 pt-24 lg:px-[9%] lg:pb-20 lg:pt-32">
+        <section className="px-[5%] pb-6 pt-24 lg:px-[9%] lg:pb-8 lg:pt-32">
             <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 text-center">
                 <p className="text-base font-semibold lg:text-xl" style={gradientTextStyle}>
                     Features
