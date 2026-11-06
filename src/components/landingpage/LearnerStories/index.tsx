@@ -13,6 +13,8 @@ interface LearnerStory {
     skills: string[];
     statement?: string;
     disability?: string;
+    /** What they like to do in their free time (free text, screened by the server). */
+    free_time?: string;
 }
 
 /** Fewer than this many stories look odd sliding past, so they are shown as a still row instead. */
@@ -44,18 +46,16 @@ const StoryCard = ({ story }: { story: LearnerStory }) => (
             <p className="text-sm lg:text-base leading-relaxed text-gray-900 break-words">
                 I&apos;m {story.age} years old, and I want to learn {joinSkills(story.skills)}.
             </p>
+            {story.free_time && (
+                <p className="text-sm leading-relaxed text-gray-900 break-words line-clamp-2">
+                    <span className="font-medium">In free time:</span> {story.free_time}
+                </p>
+            )}
             {story.statement && (
                 <p className="text-sm italic leading-relaxed text-gray-600 break-words line-clamp-3">
                     &ldquo;{story.statement}&rdquo;
                 </p>
             )}
-            <ul className="mt-auto flex flex-wrap gap-1.5 pt-1" aria-label="Skills they want to learn">
-                {story.skills.map((skill) => (
-                    <li key={skill} className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-700">
-                        {skill}
-                    </li>
-                ))}
-            </ul>
         </article>
     </li>
 );
