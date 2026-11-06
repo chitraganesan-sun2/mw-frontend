@@ -9,13 +9,11 @@ export default function FeaturesPage() {
     return (
         <div className="w-full overflow-x-hidden relative">
             <FeaturesHero />
-            <div className="flex flex-col gap-16 lg:gap-20 py-10 lg:py-16">
-                <LearnerFeatures />
-                <VolunteerFeatures />
-                <PlatformCapabilities />
-                <SafetyFeatures />
-                <FeaturesCTA />
-            </div>
+            <LearnerFeatures />
+            <VolunteerFeatures />
+            <PlatformCapabilities />
+            <SafetyFeatures />
+            <FeaturesCTA />
         </div>
     );
 }
