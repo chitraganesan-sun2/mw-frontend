@@ -426,6 +426,8 @@ const FormTabs = ({
         if (field.id === "heard_about_us_other") return heard_about_us !== HEARD_ABOUT_US_OTHER;
         // The public-showcase sentence only matters once sharing is allowed.
         if (field.id === "showcase_statement") return showcase_consent !== true;
+        // The disability question only matters while the showcase itself is not switched off.
+        if (field.id === "showcase_disability") return showcase_consent === false;
         return role === "learner" ? null : fields.includes(field.id) && volunteerAge();
     };
 

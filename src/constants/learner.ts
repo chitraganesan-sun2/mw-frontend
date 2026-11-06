@@ -497,6 +497,20 @@ export const LearnerFormSections: FormSectionConfig[] = [
             },
             {
                 // Only shown when sharing is allowed (FormTabs hideFields).
+                id: "showcase_disability",
+                label: "Also Show the Type of Disability",
+                sublabel:
+                    "By default, the learner's story card also shows the type of developmental disability entered in the profile. Choose No to leave it out. Guardians answer for a learner under 18. You can change this any time in Settings.",
+                inputType: "radio",
+                options: [
+                    { label: "Yes, you may show it", value: true },
+                    { label: "No", value: false },
+                ],
+                required: false,
+                gridCols: 1,
+            },
+            {
+                // Only shown when sharing is allowed (FormTabs hideFields).
                 id: "showcase_statement",
                 label: "In One Sentence, What Would the Learner Like to Learn?",
                 sublabel: "(optional, shown publicly because you chose Yes - please don't include names or contact details)",

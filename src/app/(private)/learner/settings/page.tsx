@@ -55,8 +55,8 @@ const Settings = () => {
     const [isEnabled, setIsEnabled] = useState(false);
     // Anonymous "Learner stories" on the public website - on by default, off once opted out.
     const [showcaseEnabled, setShowcaseEnabled] = useState(true);
-    // Off unless the learner/guardian turns it on - a disability is never shown by default.
-    const [showcaseDisability, setShowcaseDisability] = useState(false);
+    // On by default (like the learning goals above); the learner/guardian can turn it off.
+    const [showcaseDisability, setShowcaseDisability] = useState(true);
     const [sessionMatchPreference, setSessionMatchPreference] =
         useState<SessionMatchValue>("all_sessions");
     const [pushEnabled, setPushEnabled] = useState(true);
@@ -153,7 +153,7 @@ const Settings = () => {
                 // so only an explicit false means messages are blocked.
                 setIsEnabled(res.data?.chat_permission !== false);
                 setShowcaseEnabled(res.data?.consent_and_permissions?.showcase_consent !== false);
-                setShowcaseDisability(res.data?.consent_and_permissions?.showcase_disability === true);
+                setShowcaseDisability(res.data?.consent_and_permissions?.showcase_disability !== false);
                 const apiPref = res.data?.instant_session_email_preference;
                 if (apiPref && API_TO_UI_PREFERENCE[apiPref] !== undefined) {
                     setSessionMatchPreference(API_TO_UI_PREFERENCE[apiPref]);
@@ -220,11 +220,11 @@ const Settings = () => {
                             Also show the type of disability.
                         </p>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
-                            Off unless you turn it on. When on, the learner&apos;s story card on our public website also
-                            shows the type of developmental disability entered in the profile, for example so others
-                            know they aren&apos;t alone. Only works while sharing learning goals above is on. For a
-                            learner under 18, a parent or guardian decides. Turn it off at any time and it disappears
-                            right away.
+                            By default, the learner&apos;s story card on our public website also shows the type of
+                            developmental disability entered in the profile, so others know they aren&apos;t alone. No
+                            name, photo or contact details are ever shown. Only applies while sharing learning goals
+                            above is on. For a learner under 18, a parent or guardian decides. Turn it off at any time
+                            and it disappears right away.
                         </p>
                     </div>
                     <Switch

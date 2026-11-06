@@ -597,6 +597,7 @@ export const learnerFormSchema = z
                 required_error: "Photo/Video Consent is required",
             }),
             showcase_consent: z.boolean().optional(),
+            showcase_disability: z.boolean().optional(),
             showcase_statement: z.string().max(140, "Please keep this under 140 characters").optional(),
             heard_about_us: z
                 .string({ required_error: "Please tell us how you heard about us" })
