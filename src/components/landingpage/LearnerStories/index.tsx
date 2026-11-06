@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -30,18 +30,38 @@ function joinSkills(skills: string[]): string {
     return `${skills.slice(0, -1).join(", ")} and ${skills[skills.length - 1]}`;
 }
 
+const trimEnd = (text: string) => text.replace(/[.!\s]+$/, "");
+
+/** The key facts inside the sentence are picked out in the learner colour, so the card has
+ *  something to read at a glance without any pills or labels. */
+const Key = ({ children }: { children: ReactNode }) => (
+    <strong className="font-semibold text-learner-dark">{children}</strong>
+);
+
 const StoryCard = ({ story }: { story: LearnerStory }) => (
-    <li className="w-[280px] sm:w-[320px] shrink-0 list-none">
-        <article className="h-full rounded-3xl border border-learner-light bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md flex flex-col gap-3">
-            {/* The whole card is one flowing sentence: no pills or labels. */}
-            <p className="text-sm lg:text-base leading-relaxed text-gray-900 break-words">
-                I&apos;m {story.age} years old
-                {story.disability ? `, I have ${story.disability.replace(/[.!\s]+$/, "")}` : ""}, and I want to learn{" "}
-                {joinSkills(story.skills)}.
-                {story.free_time ? ` In my free time, I enjoy ${story.free_time.replace(/[.!\s]+$/, "")}.` : ""}
+    <li className="w-[290px] sm:w-[340px] shrink-0 list-none">
+        <article className="relative h-full overflow-hidden rounded-3xl border border-learner-light bg-gradient-to-br from-learner-light/70 via-white to-white p-6 pt-14 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col gap-4">
+            {/* Decorative quote mark: part of the design, not a label. */}
+            <span aria-hidden="true" className="absolute left-5 top-2 font-serif text-7xl leading-none text-learner-fill">
+                &ldquo;
+            </span>
+            <p className="text-base lg:text-[1.0625rem] leading-relaxed text-gray-900 break-words">
+                I&apos;m <Key>{story.age} years old</Key>
+                {story.disability ? (
+                    <>
+                        , I have <Key>{trimEnd(story.disability)}</Key>
+                    </>
+                ) : null}
+                , and I want to learn <Key>{joinSkills(story.skills)}</Key>.
+                {story.free_time ? (
+                    <>
+                        {" "}
+                        In my free time, I enjoy <Key>{trimEnd(story.free_time)}</Key>.
+                    </>
+                ) : null}
             </p>
             {story.statement && (
-                <p className="text-sm italic leading-relaxed text-gray-600 break-words line-clamp-3">
+                <p className="mt-auto border-t border-learner-light pt-3 text-sm italic leading-relaxed text-gray-600 break-words line-clamp-3">
                     &ldquo;{story.statement}&rdquo;
                 </p>
             )}
