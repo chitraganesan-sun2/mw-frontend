@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
+import { buildStoryParts } from "@/utils/learnerStory";
 
 /** One real, consented learner, anonymised by the server: an age, skills they want to learn,
  *  optionally one sentence they wrote for this purpose and - only if they separately opted in - the
@@ -24,21 +25,15 @@ const MIN_CARDS_PER_COPY = 6;
 /** Seconds each card takes to cross - keeps the speed readable whatever the number of stories. */
 const SECONDS_PER_CARD = 8;
 
-/** "A", "A and B", "A, B and C". */
-function joinSkills(skills: string[]): string {
-    if (skills.length <= 1) return skills[0] ?? "";
-    return `${skills.slice(0, -1).join(", ")} and ${skills[skills.length - 1]}`;
-}
-
-const trimEnd = (text: string) => text.replace(/[.!\s]+$/, "");
-
 /** The key facts inside the sentence are picked out in the learner colour, so the card has
  *  something to read at a glance without any pills or labels. */
 const Key = ({ children }: { children: ReactNode }) => (
     <strong className="font-semibold text-learner-dark">{children}</strong>
 );
 
-const StoryCard = ({ story }: { story: LearnerStory }) => (
+const StoryCard = ({ story }: { story: LearnerStory }) => {
+    const parts = buildStoryParts(story);
+    return (
     <li className="w-[290px] sm:w-[340px] shrink-0 list-none">
         <article className="relative h-full overflow-hidden rounded-3xl border border-learner-light bg-gradient-to-br from-learner-light/70 via-white to-white p-6 pt-14 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col gap-4">
             {/* Decorative quote mark: part of the design, not a label. */}
@@ -46,17 +41,17 @@ const StoryCard = ({ story }: { story: LearnerStory }) => (
                 &ldquo;
             </span>
             <p className="text-base lg:text-[1.0625rem] leading-relaxed text-gray-900 break-words">
-                I&apos;m <Key>{story.age} years old</Key>
-                {story.disability ? (
+                I&apos;m <Key>{parts.age} years old</Key>
+                {parts.disability ? (
                     <>
-                        , I have <Key>{trimEnd(story.disability)}</Key>
+                        , I have <Key>{parts.disability}</Key>
                     </>
                 ) : null}
-                , and I want to learn <Key>{joinSkills(story.skills)}</Key>.
-                {story.free_time ? (
+                , and I want to learn <Key>{parts.skills}</Key>.
+                {parts.freeTime ? (
                     <>
                         {" "}
-                        In my free time, I enjoy <Key>{trimEnd(story.free_time)}</Key>.
+                        In my free time, {parts.freeTime.lead} <Key>{parts.freeTime.text}</Key>.
                     </>
                 ) : null}
             </p>
@@ -67,7 +62,8 @@ const StoryCard = ({ story }: { story: LearnerStory }) => (
             )}
         </article>
     </li>
-);
+    );
+};
 
 /**
  * "Learner stories": real, approved learners' anonymous learning goals (an age and the skills they chose),
