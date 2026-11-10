@@ -43,6 +43,13 @@ const Header = () => {
     const pathname = usePathname();
     const isPlanner = pathname?.includes("/book-for-later");
     const basePath = `/${isVolunteer ? "volunteer" : "learner"}/${isPlanner ? "book-for-later" : "schedule"}`;
+
+    // My Schedule and Book for Later share this header, so it stays mounted when the user
+    // switches between them from the mobile menu - without this the drawer stayed open
+    // (the common header does the same on every path change).
+    useEffect(() => {
+        setIsSideNavBarOpen(false);
+    }, [pathname]);
     const isCalendarView = isPlanner && searchParams.get("view") === CALENDAR_VIEW;
 
     // Keep the current view and month when opening a modal, so closing it returns here.
