@@ -410,7 +410,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                 type="button"
                                                 aria-label={post.is_liked ? "Unlike post" : "Like post"}
                                                 onClick={() => handleLikeAction(post.post_id, post.is_liked)}
-                                                className="flex items-center gap-1 cursor-pointer w-10 bg-transparent border-0 p-0"
+                                                className="flex items-center gap-1 cursor-pointer w-11 min-h-[44px] -my-2 bg-transparent border-0 p-0"
                                             >
                                                 <div>
                                                     <AnimatePresence mode="wait">
@@ -459,7 +459,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                                 type="button"
                                                 aria-label="View comments"
                                                 onClick={() => handleCommentClick(post.post_id)}
-                                                className="flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+                                                className="flex items-center gap-1 cursor-pointer min-h-[44px] min-w-[44px] -my-2 bg-transparent border-0 p-0"
                                             >
                                                 <motion.div
                                                     whileHover={{ scale: 1.1 }}
@@ -488,7 +488,7 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
                                         <button
                                             type="button"
                                             aria-label={post?.is_saved ? "Unsave post" : "Save post"}
-                                            className="cursor-pointer bg-transparent border-0 p-0"
+                                            className="cursor-pointer flex items-center justify-center min-h-[44px] min-w-[44px] -my-2 bg-transparent border-0 p-0"
                                             onClick={() =>
                                                 handleSave(post?.post_id, post?.is_saved)
                                             }
