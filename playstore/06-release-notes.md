@@ -1,3 +1,28 @@
+# Release notes — v1.7.2 (versionCode 16)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.7.2
+
+• Fixed: the menu now closes after you tap Book for Later
+• Easier-to-tap like, comment and save buttons in Community
+• Learner stories on our website are clearer and friendlier to read
+• Tidier Features, About, Privacy and Terms pages
+• Clearer wording and error messages
+```
+
+---
+
+## Internal changelog — v1.7.2 (versionCode 16)
+
+Fixes the mobile menu staying open after switching between My Schedule and Book for Later (shared header never reset its
+drawer; reproduced on a real phone on 1.7.1; fix a458c441). Also ships the 10 web commits merged to main since 1.7.1
+(Community like/comment/save buttons now 44px tap targets, learner-stories card redesign + disability shown by default with an opt-out, Features/About/Privacy/Terms layout).
+Do not set `POLICY_ACCEPTANCE_ENFORCED` changes here - it is already true.
+
+---
+
 # Release notes — v1.7.1 (versionCode 15)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
