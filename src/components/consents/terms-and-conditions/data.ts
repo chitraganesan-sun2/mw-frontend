@@ -104,6 +104,13 @@ export const sectionsData = [
         ]
     },
     {
+        title: "RECORDING OF SESSIONS",
+        contextType: "parent",
+        content: [
+            `By joining a WingTime session you agree that it may be recorded and transcribed. By taking part in a one-to-one session you agree that it may be transcribed. A parent or guardian gives this consent on behalf of a learner who uses MelodyWings with a parent or guardian under these Terms, when the account is created, and we remind you of it when you book a session. You must not record, screenshot or share a session yourself. Our ${privacyPolicyLink} explains how recordings and transcripts are used, who can see them and how long we keep them.`
+        ]
+    },
+    {
         title: "MW COMMUNICATIONS",
         contextType: "parent",
         content: [

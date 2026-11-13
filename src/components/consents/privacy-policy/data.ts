@@ -76,7 +76,17 @@ export const sectionsData = [
             {
                 title: "e) Safety Review of Sessions.",
                 content: [
-                    "To help keep learners safe, MelodyWings may review recordings or transcripts of sessions that our staff upload or import. We use automated analysis, including an AI model, to look for safety concerns. The transcript and the findings are stored by MelodyWings, and a review can be linked to the session and the people in it. Only authorised MelodyWings staff can see these reviews. We may use Google’s Gemini service to help write summaries of the findings. Safety review records may be kept after an account is deleted, for child-safety purposes (see Section 9)."
+                    "To help keep learners safe, MelodyWings may review recordings or transcripts of sessions that our staff upload or import. We use automated analysis, including an AI model, to look for safety concerns. The transcript and the findings are stored by MelodyWings, and a review can be linked to the session and the people in it. Only authorised MelodyWings staff can see these reviews. We may use Google’s Gemini service to help write summaries of the findings. Safety review records that raised a serious safety concern may be kept after an account is deleted, for child-safety purposes (see Section 9)."
+                ]
+            },
+            {
+                title: "f) Session Recordings and Transcripts.",
+                content: [
+                    "What we record. WingTime sessions are recorded on video and transcribed. One-to-one sessions between a volunteer and a learner are transcribed only; we do not record video of one-to-one sessions. A transcript is a written copy of what was said, and it shows participants' names as they appear in Google Meet.",
+                    "Why. We use transcripts for safety: they are checked automatically and may be read by authorized MelodyWings staff, for example when a safety concern is raised. A recording of a WingTime session may also be shared with MelodyWings members as a resource so that people who could not attend can watch it.",
+                    "Who can see them. Transcripts and safety reports can be seen only by authorized MelodyWings staff. A WingTime recording is not shared until a member of our team has watched it and approved it; after that it appears in Resources for people who are logged in to MelodyWings. Anyone who has the link to a shared recording can watch it, but it cannot be downloaded from the page. We can remove a shared recording at any time.",
+                    "How long we keep them. A shared WingTime recording is removed from Resources after 60 days. The original recording files are removed from our Google Drive 90 days after the session, and transcript documents after 12 months. Safety reports, including the transcript text analysed in them, are kept for 12 months, except reports that raised a serious safety concern, which we may keep longer to protect children or to meet legal obligations.",
+                    `Your choices. A parent or guardian can ask us to delete a recording or transcript involving their child, or to stop a child joining sessions that are recorded, by emailing ${supportEmailLink}.`
                 ]
             }
         ]
@@ -195,8 +205,9 @@ export const sectionsData = [
         contextType: "parent",
         content: [
             "We retain your personal information for as long as your account remains active, so that we can provide the matching, scheduling, and communication features of our Website and Platform.",
+            "Session recordings and transcripts are kept for the periods described in Section 3(f).",
             `You may delete your account and personal information at any time from your account Settings. When you delete your account, your profile, messages, community posts, session records, and other personal information tied to your account are removed from our systems immediately, and this action cannot be undone. The exception is safety review records, described below. To request deletion instead by email, contact us at ${supportEmailLink}.`,
-            "Some information cannot be deleted along with your account, including safety review records (the transcripts and findings described in Section 3(e)), which we may keep after an account is deleted for child-safety purposes, and donation records, which we retain for the period required by applicable tax and accounting law, and information we are required to retain to comply with a legal obligation, resolve a dispute, or enforce our agreements."
+            "When you delete your account, we also delete the safety review records about you (the transcripts and findings described in Section 3(e) and 3(f)). Some information cannot be deleted along with your account, including safety review records that raised a serious safety concern, which we may keep after an account is deleted for child-safety purposes, and donation records, which we retain for the period required by applicable tax and accounting law, and information we are required to retain to comply with a legal obligation, resolve a dispute, or enforce our agreements."
         ]
     },
     {
