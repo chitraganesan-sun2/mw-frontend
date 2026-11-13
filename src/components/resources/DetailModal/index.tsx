@@ -63,6 +63,12 @@ const DetailModal = ({
         enabled: Boolean(resourceId),
     });
 
+    // A recorded WingTime is published by an admin: its host can't edit or delete it (the shared
+    // Drive link is managed from the admin panel).
+    const isRecording = resource?.resource_type === "wingtime_recording";
+    const canManage = isMyResource && !isRecording;
+    const recordingLink = isRecording ? safeHref(resource?.curated_links?.[0]?.url) : null;
+
     // Optimistic like/unlike: extra clicks are ignored while a request is in flight, and
     // the heart + counts (here and in the list behind the modal) are reverted on failure.
     const handleLikeDislike = async (status: boolean) => {
@@ -177,7 +183,7 @@ const DetailModal = ({
                             <ModalCloseIcon />
                         </button>
                         <div className="flex items-center gap-4 w-fit absolute top-4 right-4">
-                            {isMyResource ? (
+                            {canManage ? (
                                 <Button
                                     onClick={() => setIsDeleteConfirmOpen(true)}
                                     loading={isDeleting}
@@ -219,7 +225,7 @@ const DetailModal = ({
                                 </div>
                             )}
                             <span className="cursor-pointer">
-                                {isMyResource ? (
+                                {canManage ? (
                                     <Button
                                         onClick={handleEdit}
                                         rootClassName="!bg-background-input !px-5 !text-sm !h-[35px]"
@@ -265,6 +271,16 @@ const DetailModal = ({
                                 Level: {resource?.difficulty_level || "N/A"}
                             </p>
                         </div>
+                        {recordingLink && (
+                            <Link
+                                href={recordingLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-fit rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white no-underline"
+                            >
+                                Watch the recording
+                            </Link>
+                        )}
                         <div className="flex flex-col gap-2">
                             <p className="font-medium text-black">Description</p>
                             <p className="text-sm text-gray-light">
