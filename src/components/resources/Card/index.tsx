@@ -6,6 +6,7 @@ import FlagIcon from "@/assets/icons/FlagIcon";
 import TrendArrow from "@/assets/icons/TrendArrow";
 import { MobileFlagIcon } from "@/assets/icons";
 import { safeImageSrc } from "@/utils/safeHref";
+import { IoPlay } from "react-icons/io5";
 type CardProps = {
     className?: string;
     imgClassName?: string;
@@ -36,6 +37,17 @@ const Card = ({ className, imgClassName, resource, onClick, handleReportClick }:
                         fill
                         className={`object-cover rounded-t-xl ${imgClassName}`}
                     />
+                )}
+                {!resourceImage && resource?.resource_type === "wingtime_recording" && (
+                    // A recorded WingTime has no picture: a play badge on a gradient says "video" at a glance.
+                    <div
+                        aria-hidden="true"
+                        className="absolute inset-0 flex items-center justify-center rounded-t-xl bg-gradient-to-br from-[#1E3A8A] via-[#4C1D95] to-[#BE185D]"
+                    >
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[rgba(255,255,255,0.95)] text-[#1E3A8A] shadow-md">
+                            <IoPlay size={20} className="ml-0.5" />
+                        </span>
+                    </div>
                 )}
             </div>
             <div className="flex flex-col p-3 gap-4 flex-grow">

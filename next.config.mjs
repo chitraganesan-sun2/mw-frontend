@@ -41,7 +41,8 @@ const csp = [
     ]
         .filter(Boolean)
         .join(" "),
-    "frame-src 'self' https://accounts.google.com",
+    // drive.google.com: the click-to-play preview of a recorded WingTime (resources/RecordingPlayer).
+    "frame-src 'self' https://accounts.google.com https://drive.google.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

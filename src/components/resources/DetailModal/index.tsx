@@ -22,6 +22,7 @@ import { safeHref, safeImageSrc } from "@/utils/safeHref";
 import { getApiErrorMessage } from "@/utils/apiError";
 import ConfirmModal from "@/components/common/Modals/ConfirmModal";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import RecordingPlayer from "@/components/resources/RecordingPlayer";
 
 type DetailModalProps = {
     isOpen: boolean;
@@ -67,7 +68,7 @@ const DetailModal = ({
     // Drive link is managed from the admin panel).
     const isRecording = resource?.resource_type === "wingtime_recording";
     const canManage = isMyResource && !isRecording;
-    const recordingLink = isRecording ? safeHref(resource?.curated_links?.[0]?.url) : null;
+    const recordingUrl: string | undefined = isRecording ? resource?.curated_links?.[0]?.url : undefined;
 
     // Optimistic like/unlike: extra clicks are ignored while a request is in flight, and
     // the heart + counts (here and in the list behind the modal) are reverted on failure.
@@ -161,7 +162,9 @@ const DetailModal = ({
             ) : (
                 <div className={`flex flex-col ${isMobile ? "h-screen" : ""}`}>
                     <div
-                        className={`relative bg-[#F4F7FB] ${isMobile ? "h-[250px] sm:h-[280px]" : "h-[300px]"} rounded-t-xl ${isMobile ? "!rounded-none" : ""
+                        className={`relative bg-[#F4F7FB] ${isRecording
+                                ? "h-[56px]" // the player below is the picture; this strip only holds the buttons
+                                : isMobile ? "h-[250px] sm:h-[280px]" : "h-[300px]"} rounded-t-xl ${isMobile ? "!rounded-none" : ""
                             }`}
                     >
                         {/* Skipped when the URL isn't one next/image can render (bad data would
@@ -271,15 +274,13 @@ const DetailModal = ({
                                 Level: {resource?.difficulty_level || "N/A"}
                             </p>
                         </div>
-                        {recordingLink && (
-                            <Link
-                                href={recordingLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-fit rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white no-underline"
-                            >
-                                Watch the recording
-                            </Link>
+                        {isRecording && (
+                            <RecordingPlayer
+                                key={resourceId}
+                                url={recordingUrl}
+                                title={resource?.resource_title}
+                                subtitle={resource?.author?.name ? `Hosted by ${resource.author.name}` : undefined}
+                            />
                         )}
                         <div className="flex flex-col gap-2">
                             <p className="font-medium text-black">Description</p>
@@ -292,17 +293,21 @@ const DetailModal = ({
                             <p className="font-medium text-black">Skills You Gain</p>
                             <div className="flex flex-wrap gap-y-2">{renderSkills()}</div>
                         </div>
-                        <Divider />
-                        <div className="flex flex-col gap-2 max-h-[150px] overflow-y-auto">
-                            <p className="font-medium text-black">Curated Links</p>
-                            {resource?.curated_links?.length > 0 ? (
-                                <div className="flex flex-col gap-2">{renderCuratedLinks()}</div>
-                            ) : (
-                                <p className="text-sm text-gray-light">
-                                    No curated links provided.
-                                </p>
-                            )}
-                        </div>
+                        {!isRecording && (
+                            <>
+                                <Divider />
+                                <div className="flex flex-col gap-2 max-h-[150px] overflow-y-auto">
+                                    <p className="font-medium text-black">Curated Links</p>
+                                    {resource?.curated_links?.length > 0 ? (
+                                        <div className="flex flex-col gap-2">{renderCuratedLinks()}</div>
+                                    ) : (
+                                        <p className="text-sm text-gray-light">
+                                            No curated links provided.
+                                        </p>
+                                    )}
+                                </div>
+                            </>
+                        )}
                         <Divider />
                         <div className="flex flex-col gap-2">
                             <p className="font-medium text-black">Notes</p>
