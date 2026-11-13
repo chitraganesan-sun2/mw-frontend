@@ -332,6 +332,8 @@ export const volunteerFormSchema = z
         cookie_consent_accepted: z.boolean({
             required_error: "Acceptance of cookie consent is required",
         }),
+        // Only asked while recording / transcription is switched on (checked in FormSection validateForm).
+        recording_consent_accepted: z.boolean().optional(),
     })
     .superRefine((data, ctx) => {
         if (

@@ -33,6 +33,7 @@ import { HELP, TERMS } from "@/constants/copy";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 import { useUpcomingSlots, type UpcomingSlot } from "@/hooks/schedule/useUpcomingSlots";
+import RecordingNotice from "@/components/common/RecordingNotice";
 
 const EMPTY_FORM = {
     title_of_the_meeting: "",
@@ -437,6 +438,7 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
                     </p>
                 )}
                 {!rescheduleId && <PageIntro className="mb-3">{HELP.bookForLater}</PageIntro>}
+                <RecordingNotice kind="oneToOne" className="mb-3" />
                 {LearnerScheduleModalConstants.map((field: any) => {
                     if (field.name === COUNTERPART_FIELD) {
                         return (

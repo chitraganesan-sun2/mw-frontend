@@ -18,6 +18,8 @@ type CommonPath =
 export const endpoints: EndpointProps = {
     // The collection route has a trailing slash on purpose: without it the backend answers with a
     // redirect to an http:// URL, which a browser on an https page refuses to follow.
+    // What is being recorded / transcribed right now (public): drives the notices and the Guardian's consent box.
+    recordingNotices: "recording-notices",
     wingtime: {
         base: "wingtime/",
         hosted: "wingtime/hosted",

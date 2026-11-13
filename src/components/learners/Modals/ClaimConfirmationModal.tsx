@@ -14,6 +14,7 @@ import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { cn } from "@/utils/merge-class";
+import RecordingNotice from "@/components/common/RecordingNotice";
 
 interface ClaimConfirmationModalProps {
     isOpen: boolean;
@@ -209,6 +210,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
                     <span className="font-medium text-[#121212]">Note:</span> The appointment, including the session link, will be added to your calendar once it&apos;s confirmed.
                 </p>
             </div>
+            <RecordingNotice kind="oneToOne" />
         </div>
     );
 

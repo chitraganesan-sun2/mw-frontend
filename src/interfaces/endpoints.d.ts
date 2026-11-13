@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export type EndpointProps = {
+    recordingNotices: string;
     wingtime: {
         base: string;
         hosted: string;

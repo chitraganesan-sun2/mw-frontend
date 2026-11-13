@@ -31,6 +31,7 @@ import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleView
 import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 import { useUpcomingSlots, type UpcomingSlot } from "@/hooks/schedule/useUpcomingSlots";
 import { TERMS } from "@/constants/copy";
+import RecordingNotice from "@/components/common/RecordingNotice";
 
 const EMPTY_FORM = {
     title_of_the_meeting: "",
@@ -363,6 +364,7 @@ export default function AddNewMeetingModalVolunteer({
                         Pick a new time with {learnerOption?.label || "the learner"}. Your current session stays booked until the new time is accepted.
                     </p>
                 )}
+                <RecordingNotice kind="oneToOne" className="mb-3" />
                 {VolunteerScheduleModalConstants.map((field: any) => {
                     if (field.name === COUNTERPART_FIELD) {
                         return (

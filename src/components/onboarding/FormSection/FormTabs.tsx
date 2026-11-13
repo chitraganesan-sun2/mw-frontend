@@ -12,6 +12,7 @@ import { UseFormSetError, UseFormClearErrors, useWatch } from "react-hook-form";
 import { calculateAge, isAgeUnder18 } from "@/utils/timeFunctions";
 import { ADULT_VOLUNTEER_AGE, SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } from "@/constants/volunteer";
 import { PrivacyPolicyElement, TermsAndConditionElement } from "./Consents";
+import { useRecordingNotices } from "@/hooks/useRecordingNotices";
 import { getCookie } from "@/utils/auth";
 import { GET_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -62,6 +63,26 @@ const FormTabs = ({
         setUserId(getCookie(r === "volunteer" ? "volunteer_id" : "learner_id") || "");
     }, []);
     const isVolunteer = role === "volunteer";
+    // Asked only while recording or transcription is really switched on; the server enforces the same rule.
+    const recordingNotices = useRecordingNotices();
+    const asksRecordingConsent = role === "learner" && recordingNotices.any;
+    const privacy_policy_accepted = useWatch({ name: "privacy_policy_accepted", control: control });
+    const terms_and_conditions_accepted = useWatch({ name: "terms_and_conditions_accepted", control: control });
+    useEffect(() => {
+        // The recording notice is part of the Privacy Policy checkbox, so that one tick is the consent. It is
+        // stored separately (recording_consent_accepted) so it is on record, and the server requires it.
+        if (asksRecordingConsent) setValue("recording_consent_accepted", privacy_policy_accepted === true);
+        // The photo/video consent is also part of the Privacy Policy tick-box (both roles).
+        if (role) setValue("consent_and_permissions.photo_or_video_consent", privacy_policy_accepted === true);
+    }, [asksRecordingConsent, privacy_policy_accepted, role, setValue]);
+    useEffect(() => {
+        // The public learner showcase (age, skills and disability type, anonymous) is part of the Terms tick-box.
+        // Opting out later is in Settings, which writes these same two fields.
+        if (role === "learner") {
+            setValue("consent_and_permissions.showcase_consent", terms_and_conditions_accepted === true);
+            setValue("consent_and_permissions.showcase_disability", terms_and_conditions_accepted === true);
+        }
+    }, [role, terms_and_conditions_accepted, setValue]);
     const volunteer_birth_date = useWatch({ name: "volunteer_birth_date", control: control });
     const enrolled_by = useWatch({ name: "enrolled_by", control: control });
     const support_preference = useWatch({ name: "support_preference", control: control });
@@ -401,7 +422,19 @@ const FormTabs = ({
             id: "privacy_policy_accepted",
             name: "privacy_policy_accepted",
             inputType: "checkbox",
-            children: <PrivacyPolicyElement enrolled_by={enrolled_by} />,
+            children: (
+                <PrivacyPolicyElement
+                    enrolled_by={enrolled_by}
+                    recording={
+                        asksRecordingConsent
+                            ? {
+                                  wingtimeRecording: recordingNotices.wingtimeRecording,
+                                  sessionTranscripts: recordingNotices.sessionTranscripts,
+                              }
+                            : undefined
+                    }
+                />
+            ),
             required: true,
             inputClassName: "text-sm lg:!text-base consent-checkbox",
         },
@@ -409,7 +442,7 @@ const FormTabs = ({
             id: "terms_and_conditions_accepted",
             name: "terms_and_conditions_accepted",
             inputType: "checkbox",
-            children: <TermsAndConditionElement />,
+            children: <TermsAndConditionElement showcase={role === "learner"} enrolled_by={enrolled_by} />,
             required: true,
             inputClassName: "text-sm lg:!text-base consent-checkbox",
         },
@@ -421,7 +454,13 @@ const FormTabs = ({
         return age >= ADULT_VOLUNTEER_AGE;
     };
 
+    // The photo/video and public-showcase questions are no longer asked one by one: their wording is part of the
+    // Privacy Policy and Terms tick-boxes (the consent step never has more than two), and the stored answers
+    // are set from those two ticks (see the effect above).
+    const FOLDED_CONSENT_FIELDS = ["photo_or_video_consent", "showcase_consent", "showcase_disability", "showcase_statement"];
+
     const hideFields = (field: any) => {
+        if (FOLDED_CONSENT_FIELDS.includes(field.id)) return true;
         // The "how exactly?" box only matters when "Other" was picked as the way they heard of us.
         if (field.id === "heard_about_us_other") return heard_about_us !== HEARD_ABOUT_US_OTHER;
         // The public-showcase sentence only matters once sharing is allowed.

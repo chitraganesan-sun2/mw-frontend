@@ -28,6 +28,7 @@ import {
 } from "@/components/schedule/forms/SessionFormFields";
 import { useAppStore } from "@/store/useAppStore";
 import { profileTimeZoneIana, shortTimeZone } from "@/utils/sessionDisplay";
+import RecordingNotice from "@/components/common/RecordingNotice";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
@@ -316,6 +317,8 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
                 </div>
 
                 <DurationField value={duration} onChange={setDuration} />
+
+                <RecordingNotice kind="oneToOne" className="mt-4" />
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-5 border-t border-gray-100">

@@ -18,6 +18,7 @@ import {
     labelClass,
 } from "@/components/schedule/forms/SessionFormFields";
 import WingTimeStartTimeField from "@/components/wingtime/WingTimeStartTimeField";
+import RecordingNotice from "@/components/common/RecordingNotice";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -299,6 +300,8 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                         </p>
                     )}
                 </div>
+
+                <RecordingNotice kind="wingtimeHost" className="mt-4" />
 
                 {/* Actions - same buttons and spacing as the Request an Instant Session form */}
                 <div className="flex gap-3 pt-5 border-t border-gray-100">

@@ -7,6 +7,7 @@ import TagComponent from "@/components/common/Tag";
 import Button from "@/components/common/Button";
 import JoinButton from "@/components/common/JoinButton";
 import JoinOpensNote from "@/components/common/JoinOpensNote";
+import RecordingNotice from "@/components/common/RecordingNotice";
 import { TimeIcon, HostedByIcon } from "@/assets/icons";
 import useInnerWidth from "@/hooks/useInnerWidth";
 import { useNow } from "@/hooks/schedule/useProfileTimeZone";
@@ -117,6 +118,8 @@ export default function WingTimeDetailModal({ item, onClose, tzLabel, action }: 
                     {item.is_host ? `${item.registered_count} of ${item.capacity}` : spotsText(item)}
                 </span>
             </div>
+
+            {!item.is_host && <RecordingNotice kind="wingtimeLearner" className="mb-3" />}
 
             {item.meeting_link && (
                 <JoinOpensNote

@@ -53,6 +53,19 @@ export const HELP = {
         "We compare your profile with learners and suggest the best fit. You can ask for a new suggestion after a short wait.",
 } as const;
 
+/**
+ * "This session is recorded / transcribed" notices. Each describes only what the system does (see
+ * RECORDING-CONSENT-AND-MEET-SETTINGS-2026-11-13.md section D) and is shown only while that capture is on
+ * (components/common/RecordingNotice). Wording is a working draft for the owner's lawyer.
+ */
+export const RECORDING_NOTICE = {
+    wingtimeLearner:
+        "This session will be recorded and transcribed for safety. A recording may be shared with MelodyWings members after our team has reviewed it.",
+    wingtimeHost:
+        "Your session will be recorded and transcribed for safety. A recording is only shared in Resources after our team has reviewed and approved it.",
+    oneToOne: "This session will be transcribed (not recorded) for safety.",
+} as const;
+
 /** Empty-state wording: say why the list is empty and what to try. */
 export const EMPTY = {
     noResultsForFilters: (things: string) => `No ${things} match your search or filters. Try removing a filter or searching for something else.`,
