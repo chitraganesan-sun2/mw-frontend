@@ -627,6 +627,10 @@ export const learnerFormSchema = z
         cookie_consent_accepted: z.boolean({
             required_error: "Acceptance of cookie consent is required",
         }),
+        // Set from the Privacy tick while recording / transcription is switched on (FormTabs). It must be declared
+        // here: the final submit sends zod's parsed output, which drops undeclared keys, and the server rejects the
+        // last step without it.
+        recording_consent_accepted: z.boolean().optional(),
     })
     .superRefine((data, ctx) => {
         if (

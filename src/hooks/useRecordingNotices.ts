@@ -35,7 +35,9 @@ export function useRecordingNotices(): RecordingNotices {
             } as RecordingNotices;
         },
         staleTime: 5 * 60 * 1000,
-        retry: false,
+        // One failed request must not mean "no recording sentence at all" - the server still requires the consent.
+        retry: 2,
+        retryDelay: 1000,
     });
     return data ?? OFF;
 }

@@ -27,19 +27,20 @@ export default function useMobileInit() {
     initialized.current = true;
 
     const init = async () => {
-      // 1. Initialize native Google Auth
-      try {
-        await initNativeGoogleAuth();
-      } catch (e) {
-        console.warn('[Mobile] Google auth init failed:', e);
-      }
-
-      // 2. Initialize app lifecycle (back button, status bar, keyboard)
+      // 1. Initialize app lifecycle (back button, status bar, keyboard) FIRST and synchronously: the back button must
+      //    work even if a later native call is slow.
       let cleanupLifecycle: () => void = () => {};
       try {
         cleanupLifecycle = initAppLifecycle(router);
       } catch (e) {
         console.warn('[Mobile] App lifecycle init failed:', e);
+      }
+
+      // 2. Initialize native Google Auth
+      try {
+        await initNativeGoogleAuth();
+      } catch (e) {
+        console.warn('[Mobile] Google auth init failed:', e);
       }
 
       // 3. Initialize push notifications (graceful — won't crash without Firebase)

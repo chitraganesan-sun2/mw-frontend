@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoPlay } from "react-icons/io5";
 import { driveEmbedUrl } from "@/utils/drivePreview";
 import { safeHref } from "@/utils/safeHref";
@@ -20,6 +20,12 @@ type Props = {
  */
 const RecordingPlayer = ({ url, title, subtitle }: Props) => {
     const [playing, setPlaying] = useState(false);
+    const frameRef = useRef<HTMLIFrameElement>(null);
+    // The Play button unmounts when playback starts; hand keyboard / screen-reader focus to the player so it isn't
+    // dropped on <body>.
+    useEffect(() => {
+        if (playing) frameRef.current?.focus();
+    }, [playing]);
     const embed = driveEmbedUrl(url);
     const link = safeHref(url);
 
@@ -42,6 +48,7 @@ const RecordingPlayer = ({ url, title, subtitle }: Props) => {
             <div className="relative w-full aspect-video overflow-hidden rounded-xl bg-[#0F172A] shadow-md">
                 {playing ? (
                     <iframe
+                        ref={frameRef}
                         src={embed}
                         title={`Recording: ${title}`}
                         className="absolute inset-0 h-full w-full border-0"
@@ -61,8 +68,8 @@ const RecordingPlayer = ({ url, title, subtitle }: Props) => {
                             <IoPlay size={30} className="ml-1" />
                         </span>
                         <span className="text-center text-base font-medium leading-snug line-clamp-2">{title}</span>
-                        {subtitle && <span className="text-xs text-[rgba(255,255,255,0.8)]">{subtitle}</span>}
-                        <span className="text-[0.7rem] text-[rgba(255,255,255,0.7)]">Plays from Google Drive</span>
+                        {subtitle && <span className="text-xs text-[rgba(255,255,255,0.92)]">{subtitle}</span>}
+                        <span className="text-xs text-[rgba(255,255,255,0.92)]">Plays from Google Drive</span>
                     </button>
                 )}
             </div>

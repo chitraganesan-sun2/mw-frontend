@@ -169,7 +169,7 @@ const DetailModal = ({
                     >
                         {/* Skipped when the URL isn't one next/image can render (bad data would
                             otherwise throw and take the page down). */}
-                        {resourceImageSrc && (
+                        {resourceImageSrc && !isRecording && (
                             <Image
                                 src={resourceImageSrc}
                                 fill
