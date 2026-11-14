@@ -1,3 +1,28 @@
+# Release notes — v1.8.0 (versionCode 17)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.0
+
+• WingTime group sessions can now be recorded and, after our team reviews them, shared in Resources
+• Sessions may be transcribed for safety. You will see a short notice before you join
+• Sign-up now has just two tick-boxes, with a link to read the Terms and Privacy Policy first
+• Clearer wording and error messages
+```
+
+---
+
+## Internal changelog — v1.8.0 (versionCode 17)
+
+Ships the recording / transcript work to the app: the recording-notice component (WingTime, 1:1 and instant sessions; renders only
+when the backend says that capture is on, so it is safe before and after the flags), the consent step folded into the two
+Privacy / Terms tick-boxes (Guardian consent included), the click-to-play WingTime recording preview in Resources, and the
+"click Agree when Google Meet asks" line (Meet only captures people who agree). Needs backend 041b9c8 or later (already live).
+`POLICY_ACCEPTANCE_ENFORCED` is already true; nothing to change there.
+
+---
+
 # Release notes — v1.7.2 (versionCode 16)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
