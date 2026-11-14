@@ -23,7 +23,7 @@ export const initAppLifecycle = (router: { back: () => void }): (() => void) => 
         App.exitApp();
       }
     });
-    cleanupFns.push(() => backListener.then((l) => l.remove()));
+    cleanupFns.push(() => backListener.then((l) => l.remove()).catch(() => {}));
   }
 
   // App state change (foreground/background)
@@ -33,7 +33,7 @@ export const initAppLifecycle = (router: { back: () => void }): (() => void) => 
     } else {
     }
   });
-  cleanupFns.push(() => stateListener.then((l) => l.remove()));
+  cleanupFns.push(() => stateListener.then((l) => l.remove()).catch(() => {}));
 
   // Configure status bar
   StatusBar.setStyle({ style: Style.Light }).catch(() => {});
@@ -43,12 +43,12 @@ export const initAppLifecycle = (router: { back: () => void }): (() => void) => 
   const keyboardShowListener = Keyboard.addListener('keyboardWillShow', (info) => {
     document.body.style.setProperty('--keyboard-height', `${info.keyboardHeight}px`);
   });
-  cleanupFns.push(() => keyboardShowListener.then((l) => l.remove()));
+  cleanupFns.push(() => keyboardShowListener.then((l) => l.remove()).catch(() => {}));
 
   const keyboardHideListener = Keyboard.addListener('keyboardWillHide', () => {
     document.body.style.setProperty('--keyboard-height', '0px');
   });
-  cleanupFns.push(() => keyboardHideListener.then((l) => l.remove()));
+  cleanupFns.push(() => keyboardHideListener.then((l) => l.remove()).catch(() => {}));
 
   // Return cleanup function
   return () => {

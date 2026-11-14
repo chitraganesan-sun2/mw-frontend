@@ -56,13 +56,13 @@ export const initPushNotifications = async (): Promise<string | null> => {
           clearTimeout(timeout);
           cachedFcmToken = token.value;
           resolve(token.value);
-        });
+        }).catch(() => resolve(null));
 
         PushNotifications.addListener('registrationError', (error) => {
           clearTimeout(timeout);
           console.error('[Push] Registration error:', error);
           resolve(null);
-        });
+        }).catch(() => resolve(null));
       });
     } else {
       console.warn('[Push] Permission denied');
@@ -95,13 +95,13 @@ export const registerPushListeners = (
           extra: notification.data,
         },
       ],
-    });
-  });
+    }).catch(() => {});
+  }).catch(() => {});
 
   // Notification tapped (app opened from notification)
   PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
     onNotificationTapped?.(action.notification);
-  });
+  }).catch(() => {});
 };
 
 /**

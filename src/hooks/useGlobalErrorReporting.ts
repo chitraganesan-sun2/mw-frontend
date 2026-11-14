@@ -2,10 +2,14 @@
 import { useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { showToast } from "@/components/common/Toast";
+import { isNativePlatform } from "@/utils/platform";
+import { isStartupQuiet } from "@/utils/startupQuiet";
 
 /** One toast per this long, however many errors fire (a failing poll must not spam). */
 const TOAST_COOLDOWN_MS = 30_000;
 let lastToastAt = 0;
+/** When this code was loaded, i.e. roughly when the app was launched. */
+const STARTED_AT = Date.now();
 
 const GENERIC_MESSAGE = "Something went wrong. Please try again.";
 
@@ -24,8 +28,17 @@ const isNoise = (reason: unknown): boolean => {
     return name === "AbortError" || /ResizeObserver loop|Script error\.?$|Load failed|Failed to fetch dynamically imported/i.test(message);
 };
 
-function notifyUser() {
+function notifyUser(reason?: unknown) {
     if (typeof document !== "undefined" && document.hidden) return;
+    if (isStartupQuiet(isNativePlatform(), STARTED_AT, Date.now())) {
+        // Nobody has tapped anything yet, so a toast would only worry them. Real Errors still reach Sentry (tagged,
+        // so these are easy to find); API failures were already reported above.
+        console.warn("[App] Error during startup (no toast shown):", reason);
+        if (reason instanceof Error) {
+            Sentry.captureException(reason, { tags: { source: "startup-quiet" } });
+        }
+        return;
+    }
     const now = Date.now();
     if (now - lastToastAt < TOAST_COOLDOWN_MS) return;
     lastToastAt = now;
@@ -56,17 +69,17 @@ export default function useGlobalErrorReporting() {
                         tags: { source: "unhandledrejection", kind: "api" },
                     });
                 }
-                if (serverSide && navigator.onLine) notifyUser();
+                if (serverSide && navigator.onLine) notifyUser(reason);
                 return;
             }
             if (!(reason instanceof Error)) return; // already reported by Sentry's own handler
-            notifyUser();
+            notifyUser(reason);
         };
 
         const onError = (event: ErrorEvent) => {
             // Cross-origin "Script error." arrives with no Error object - nothing to act on.
             if (!(event.error instanceof Error) || isNoise(event.error)) return;
-            notifyUser();
+            notifyUser(event.error);
         };
 
         window.addEventListener("unhandledrejection", onRejection);

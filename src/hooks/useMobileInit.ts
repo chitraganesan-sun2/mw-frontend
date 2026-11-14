@@ -28,10 +28,19 @@ export default function useMobileInit() {
 
     const init = async () => {
       // 1. Initialize native Google Auth
-      await initNativeGoogleAuth();
+      try {
+        await initNativeGoogleAuth();
+      } catch (e) {
+        console.warn('[Mobile] Google auth init failed:', e);
+      }
 
       // 2. Initialize app lifecycle (back button, status bar, keyboard)
-      const cleanupLifecycle = initAppLifecycle(router);
+      let cleanupLifecycle: () => void = () => {};
+      try {
+        cleanupLifecycle = initAppLifecycle(router);
+      } catch (e) {
+        console.warn('[Mobile] App lifecycle init failed:', e);
+      }
 
       // 3. Initialize push notifications (graceful — won't crash without Firebase)
       let fcmToken: string | null = null;
@@ -47,7 +56,11 @@ export default function useMobileInit() {
         // runs once at app start, typically before the user has signed in yet.
         const userId = getCookie('learner_id') || getCookie('volunteer_id');
         if (userId) {
-          await registerTokenWithBackend(fcmToken);
+          try {
+            await registerTokenWithBackend(fcmToken);
+          } catch (e) {
+            console.warn('[Mobile] Registering the push token failed:', e);
+          }
         }
       }
 
@@ -74,7 +87,9 @@ export default function useMobileInit() {
     };
 
     let cleanup: (() => void) | undefined;
-    init().then((c) => { cleanup = c; });
+    init()
+      .then((c) => { cleanup = c; })
+      .catch((e) => { console.warn('[Mobile] Startup failed:', e); });
 
     return () => {
       cleanup?.();
