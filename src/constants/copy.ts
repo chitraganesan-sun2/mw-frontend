@@ -60,10 +60,10 @@ export const HELP = {
  */
 export const RECORDING_NOTICE = {
     wingtimeLearner:
-        "This session will be recorded and transcribed for safety. A recording may be shared with MelodyWings members after our team has reviewed it.",
+        "This session will be recorded and transcribed for safety. A recording may be shared with MelodyWings members after our team has reviewed it. When Google Meet asks you to agree, please click Agree, otherwise you will not appear in the recording.",
     wingtimeHost:
-        "Your session will be recorded and transcribed for safety. A recording is only shared in Resources after our team has reviewed and approved it.",
-    oneToOne: "This session will be transcribed (not recorded) for safety.",
+        "Your session will be recorded and transcribed for safety. A recording is only shared in Resources after our team has reviewed and approved it. When Google Meet asks you to agree, please click Agree, otherwise you will not appear in the recording.",
+    oneToOne: "This session will be transcribed (not recorded) for safety. If Google Meet asks you to agree, please click Agree.",
 } as const;
 
 /** Empty-state wording: say why the list is empty and what to try. */
