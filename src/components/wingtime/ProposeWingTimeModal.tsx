@@ -19,12 +19,13 @@ import {
 } from "@/components/schedule/forms/SessionFormFields";
 import WingTimeStartTimeField from "@/components/wingtime/WingTimeStartTimeField";
 import RecordingNotice from "@/components/common/RecordingNotice";
+import { useWingTimeRules } from "@/hooks/useWingTimeRules";
+import { noticePhrase } from "@/utils/wingtimeNotice";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const MAX_TAGS = 5;
-const MIN_NOTICE_HOURS = 3;
 const MAX_DAYS_AHEAD = 60;
 
 // Same field styling as the other session forms (SessionFormFields).
@@ -46,8 +47,11 @@ type Errors = Partial<Record<"topic" | "description" | "date" | "time" | "materi
 export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLabel }: Props) {
     const tzIana = profileTimeZoneIana(tzLabel) || null;
     const nowInTz = tzIana ? dayjs().tz(tzIana) : dayjs();
-    // The earliest date a WingTime can start on: 3 hours from now (so late in the evening that is already tomorrow).
-    const earliestDate = nowInTz.add(MIN_NOTICE_HOURS, "hour").format("YYYY-MM-DD");
+    // The notice the server asks for (3 hours unless the owner has changed it).
+    const { minNoticeMinutes } = useWingTimeRules();
+    // The earliest date a WingTime can start on: the notice period from now (so late in the evening that is already
+    // tomorrow).
+    const earliestDate = nowInTz.add(minNoticeMinutes, "minute").format("YYYY-MM-DD");
 
     const [topic, setTopic] = useState("");
     const [description, setDescription] = useState("");
@@ -90,10 +94,10 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         else if (date < earliestDate) e.date = "That date has passed. Please choose today or a later date.";
         if (!time) e.time = "Please choose a start time.";
         if (date && time && !e.date) {
-            // The same 3-hour / 60-day rule the server enforces, so the host hears it here first.
+            // The same notice / 60-day rule the server enforces, so the host hears it here first.
             const start = tzIana ? dayjs.tz(`${date}T${time}`, tzIana) : dayjs(`${date}T${time}`);
-            if (start.isBefore(dayjs().add(MIN_NOTICE_HOURS, "hour"))) {
-                e.time = "A WingTime needs at least 3 hours' notice. Please pick a later time.";
+            if (start.isBefore(dayjs().add(minNoticeMinutes, "minute"))) {
+                e.time = `A WingTime needs at least ${noticePhrase(minNoticeMinutes)}. Please pick a later time.`;
             } else if (start.isAfter(dayjs().add(MAX_DAYS_AHEAD, "day"))) {
                 e.date = "A WingTime can be scheduled up to 60 days ahead. Please pick an earlier date.";
             }
@@ -211,7 +215,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
                     label={`${SESSION_FIELD_LABELS.startTime}${zone}`}
                     date={date}
                     tzIana={tzIana}
-                    minNoticeHours={MIN_NOTICE_HOURS}
+                    minNoticeMinutes={minNoticeMinutes}
                     value={time}
                     error={errors.time}
                     onChange={(value) => {

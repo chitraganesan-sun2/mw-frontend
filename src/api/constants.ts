@@ -22,6 +22,7 @@ export const endpoints: EndpointProps = {
     recordingNotices: "recording-notices",
     wingtime: {
         base: "wingtime/",
+        rules: "wingtime/rules",
         hosted: "wingtime/hosted",
         myRegistrations: "wingtime/my-registrations",
         item: (id: string) => `wingtime/${id}`,

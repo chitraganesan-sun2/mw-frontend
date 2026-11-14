@@ -4,6 +4,7 @@ export type EndpointProps = {
     recordingNotices: string;
     wingtime: {
         base: string;
+        rules: string;
         hosted: string;
         myRegistrations: string;
         item: (id: string) => string;
