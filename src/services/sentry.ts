@@ -18,7 +18,7 @@ import { isNativePlatform } from "@/utils/platform";
 export const initSentry = () => {
     Sentry.init(
         {
-            dsn: "https://787da0141334a28cf0259b60b40ffa1b@o4509625850658816.ingest.us.sentry.io/4509625854984192",
+            dsn: "https://1aeed3c9c8115c5214e7616527e8e31f@o4509546502684672.ingest.us.sentry.io/4509546506878976",
             environment: isNativePlatform() ? "mobile-native" : "mobile-web",
             release: `melodywings-frontend@${process.env.NEXT_PUBLIC_CURRENT_VERSION || "unknown"}`,
             // Request/response bodies, cookies, and IP can carry the same PII this

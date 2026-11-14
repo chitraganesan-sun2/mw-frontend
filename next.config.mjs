@@ -37,7 +37,7 @@ const csp = [
         "https://accounts.google.com",
         "https://oauth2.googleapis.com",
         "https://www.googleapis.com",
-        "https://o4509625850658816.ingest.us.sentry.io",
+        "https://o4509546502684672.ingest.us.sentry.io",
     ]
         .filter(Boolean)
         .join(" "),

@@ -19,6 +19,9 @@ uncaught client-side error from the launch. The exact error is still unknown (re
 should now have it tagged `source:startup-quiet`. Changes: no generic toast for uncaught errors in the first 8 s of a NATIVE launch
 (still reported to Sentry; web unchanged), and the mobile startup (useMobileInit, push + lifecycle listeners) can no longer
 let a rejected native call escape as an uncaught rejection. Root cause to be found from Sentry.
+ALSO: the app's Sentry DSN (and the web CSP connect-src) moved to the owner's own `melody-wings` Sentry org/project - the old DSN
+pointed at a different Sentry organization (o4509625850658816) that the owner cannot see, so no app error was ever visible.
+Events are separated by `environment` (mobile-native / mobile-web) and `release` (melodywings-frontend@1.8.1).
 
 ---
 
