@@ -1,3 +1,27 @@
+# Release notes — v1.8.1 (versionCode 18)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.1
+
+• Fixed: a short "Something went wrong" message could flash when opening the app
+• Smoother, more reliable start-up
+```
+
+---
+
+## Internal changelog — v1.8.1 (versionCode 18)
+
+On a real phone (1.7.2) a red "Something went wrong. Please try again." toast flashed ~2 s after every cold start while the page
+loaded fine and every backend call was 200. Cause: the global "uncaught error" safety net (useGlobalErrorReporting) toasted an
+uncaught client-side error from the launch. The exact error is still unknown (release builds hide the WebView console); Sentry
+should now have it tagged `source:startup-quiet`. Changes: no generic toast for uncaught errors in the first 8 s of a NATIVE launch
+(still reported to Sentry; web unchanged), and the mobile startup (useMobileInit, push + lifecycle listeners) can no longer
+let a rejected native call escape as an uncaught rejection. Root cause to be found from Sentry.
+
+---
+
 # Release notes — v1.8.0 (versionCode 17)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
