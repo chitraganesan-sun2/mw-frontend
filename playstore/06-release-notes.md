@@ -1,3 +1,28 @@
+# Release notes — v1.8.3 (versionCode 20)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.3
+
+• Learners under 18 are now guided to have a parent or guardian sign them up
+• A short one-time notice about how sessions are recorded
+• WingTime hosts see the exact notice time when proposing a session
+```
+
+---
+
+## Internal changelog — v1.8.3 (versionCode 20)
+
+Ships the web changes that went live on 2026-11-14: the sign-up form blocks a learner under 18 who picks "for myself" and
+points them to the parent / guardian option (the server enforces the same rule); the one-time recording consent prompt for
+members who onboarded before recording existed (saved with a date and version; shown only while recording is on); the
+WingTime proposal form follows the server's minimum notice (default 3 hours). Needs the backend from 2026-11-14
+(revision melodywings-backend-00243 or later) - already live. 1.8.2 keeps working without it; those members just are not
+shown the consent prompt until they update.
+
+---
+
 # Release notes — v1.8.2 (versionCode 19)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
