@@ -21,6 +21,7 @@ export type EndpointProps = {
         versions: string;
         status: string;
         accept: string;
+        recordingConsent: string;
     };
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${typeof role}`;

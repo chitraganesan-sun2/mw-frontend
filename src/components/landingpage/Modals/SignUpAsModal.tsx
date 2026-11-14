@@ -20,6 +20,7 @@ import { nativeGoogleSignIn } from "@/services/native-auth";
 import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications";
 import { getDefaultRouteForRole } from "@/utils/routeGuard";
 import EmailPasswordAuth from "./EmailPasswordAuth";
+import { GUARDIAN_REQUIRED_MESSAGE, needsGuardian } from "@/utils/guardianRule";
 
 const learnerOptions = [
     { label: "I am a parent or guardian filling out this profile", value: "parent" },
@@ -74,8 +75,12 @@ const LearnerModalBody = ({
             ? { signup_type: "learner", enrolled_by: enrolledBy, date_of_birth: dob }
             : { signup_type: "learner", enrolled_by: enrolledBy };
 
+    // Under 18 means a parent or guardian signs the learner up (the server enforces the same rule).
+    const underage = needsGuardian(enrolledBy, dob);
+    const signUpBlocked = (enrolledBy === "self" && !dob) || underage;
+
     const handleClick = () => {
-        if (enrolledBy === "self" && !dob) return;
+        if (signUpBlocked) return;
         handleSignUp(payloads);
     };
 
@@ -99,10 +104,25 @@ const LearnerModalBody = ({
 
             <div className="flex flex-col gap-3">
                 {enrolledBy === "self" && <DateOfBirthInput value={dob} onChange={setDob} />}
+                {underage && (
+                    <div role="alert" className="rounded-md p-3 text-sm bg-red-50 text-red-700 space-y-2">
+                        <p>{GUARDIAN_REQUIRED_MESSAGE}</p>
+                        <button
+                            type="button"
+                            className="appearance-none border-0 bg-transparent p-0 underline font-medium text-red-700"
+                            onClick={() => {
+                                setEnrolledBy("parent");
+                                setDob("");
+                            }}
+                        >
+                            I am a parent or guardian
+                        </button>
+                    </div>
+                )}
                 <div className="rounded-md p-3 text-xs bg-background-input text-gray-light space-y-1">
                     <p>
                         <span className="text-black font-medium mr-1">Note:</span>
-                        Learners under 13 should be onboarded by a parent.
+                        Learners under 18 should be signed up by a parent or guardian.
                     </p>
                     <p>
                         If the learner is 13 or older but has limited legal or decision-making capacity,
@@ -114,14 +134,14 @@ const LearnerModalBody = ({
 
             <GoogleSignUpButton
                 loading={isLoading}
-                disabled={enrolledBy === "self" && !dob}
+                disabled={signUpBlocked}
                 onClick={handleClick}
             />
             <EmailPasswordAuth
                 mode="signup"
                 actionLabel="Sign Up with Email"
                 loading={isLoading}
-                disabled={enrolledBy === "self" && !dob}
+                disabled={signUpBlocked}
                 signupPayload={payloads}
                 run={onEmailSignUp}
             />

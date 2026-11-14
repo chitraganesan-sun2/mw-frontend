@@ -12,6 +12,7 @@ import { ThankyouCardBase } from "@/components/landingpage/ThankyouCard";
 import { LearnerThankyouCardConstants } from "@/constants/learner";
 import { VolunteerRejectedMessage, VolunteerThankyouCardConstants } from "@/constants/volunteer";
 import PolicyUpdateGate from "@/components/common/PolicyUpdateGate";
+import RecordingConsentGate from "@/components/common/RecordingConsentGate";
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
     const pathname = usePathname();
@@ -51,6 +52,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         <div className='h-[100dvh] w-screen overflow-hidden flex'>
             {!isApprovalPending && <NewMessageAlert />}
             <PolicyUpdateGate />
+            <RecordingConsentGate />
             {/* Sidebar: 1/6 of the screen, but never narrower than the logo + menu need (a fixed
                 1/6 was ~180px on smaller laptops, which wrapped "MelodyWings") nor wider than on
                 a 1920px screen, so large desktops look as before. */}

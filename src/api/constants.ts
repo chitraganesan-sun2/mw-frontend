@@ -39,6 +39,7 @@ export const endpoints: EndpointProps = {
         versions: "policies/versions",
         status: "policies/status",
         accept: "policies/accept",
+        recordingConsent: "policies/recording-consent",
     },
     onboarding: {
         update: (role: "volunteer" | "learner") => `onboarding/${role}`,
