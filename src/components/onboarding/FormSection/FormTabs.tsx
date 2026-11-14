@@ -161,6 +161,10 @@ const FormTabs = ({
 
             if (filteredData) {
                 reset(filteredData);
+                // reset() replaces every value, including the cookie choice FormSection set when it mounted: put the
+                // current choice back, or a learner / volunteer resuming a partly finished onboarding whose saved data
+                // has no cookie_consent_accepted can never submit ("Acceptance of cookie consent is required").
+                setValue("cookie_consent_accepted", getCookie("cookieConsent") === "accepted");
 
                 // After reset, ensure critical fields like email are properly set
                 // This handles cases where the onboarding data might be incomplete

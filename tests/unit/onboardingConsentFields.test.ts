@@ -32,3 +32,15 @@ test("the volunteer schema still declares it too (one contract for both roles)",
 test("it is optional, so onboarding is unchanged while recording is switched off", () => {
     assert.doesNotMatch(learnerSchema, /recording_consent_accepted:\s*z\.boolean\(\)\s*,/);
 });
+
+// Regression: FormSection sets cookie_consent_accepted once when it mounts, and the resume-onboarding hydration then calls
+// reset(savedData), which replaces every value. Unless the saved data happened to carry the field, the form could never be
+// submitted ("Acceptance of cookie consent is required"). The value must be put back right after the reset.
+const formTabs = readFileSync(new URL("../../src/components/onboarding/FormSection/FormTabs.tsx", import.meta.url), "utf8");
+
+test("resuming a partly finished onboarding puts the cookie choice back after reset()", () => {
+    const at = formTabs.indexOf("reset(filteredData)");
+    assert.ok(at >= 0, "hydration reset not found");
+    const afterReset = formTabs.slice(at, at + 900);
+    assert.match(afterReset, /setValue\(\s*"cookie_consent_accepted"\s*,\s*getCookie\("cookieConsent"\)\s*===\s*"accepted"\s*\)/);
+});
