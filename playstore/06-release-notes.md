@@ -1,3 +1,27 @@
+# Release notes — v1.8.2 (versionCode 19)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.2
+
+• Fixed: new learners can finish signing up again
+• Recorded WingTime videos are easier to play with a keyboard or screen reader
+• Smoother, more reliable start-up
+```
+
+---
+
+## Internal changelog — v1.8.2 (versionCode 19)
+
+Audit fix: the learner onboarding form dropped `recording_consent_accepted` (zod strips undeclared keys, and the final submit
+sends the parsed output), so with recording / transcripts on the server rejected every new learner's last step. 1.8.0 and
+1.8.1 have the bug on Android (the web app was fixed by the same commit). Also: the recording notices request retries, the
+WingTime recording player moves focus to the video and has a clearer poster, the back button is registered before any slow
+native call. Needs backend with RECORDING_CONSENT_ENFORCED support only if that escape hatch is ever used.
+
+---
+
 # Release notes — v1.8.1 (versionCode 18)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
