@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import { showToast } from "@/components/common/Toast";
 import { isNativePlatform } from "@/utils/platform";
+import { isBrowserNoise } from "@/utils/errorNoise";
 import { isStartupQuiet } from "@/utils/startupQuiet";
 
 /** One toast per this long, however many errors fire (a failing poll must not spam). */
@@ -20,13 +21,6 @@ interface ApiErrorLike {
 
 const isApiErrorLike = (value: unknown): value is ApiErrorLike =>
     typeof value === "object" && value !== null && !(value instanceof Error) && typeof (value as ApiErrorLike).status === "number";
-
-/** Browser noise that says nothing about the app: cancelled requests and layout-observer chatter. */
-const isNoise = (reason: unknown): boolean => {
-    const name = (reason as { name?: string } | null)?.name;
-    const message = typeof reason === "string" ? reason : (reason as { message?: string } | null)?.message || "";
-    return name === "AbortError" || /ResizeObserver loop|Script error\.?$|Load failed|Failed to fetch dynamically imported/i.test(message);
-};
 
 function notifyUser(reason?: unknown) {
     if (typeof document !== "undefined" && document.hidden) return;
@@ -59,7 +53,7 @@ export default function useGlobalErrorReporting() {
     useEffect(() => {
         const onRejection = (event: PromiseRejectionEvent) => {
             const reason = event.reason;
-            if (isNoise(reason)) return;
+            if (isBrowserNoise(reason)) return;
             if (isApiErrorLike(reason)) {
                 const status = reason.status as number;
                 if (status === 401 || status === 403) return;
@@ -78,7 +72,7 @@ export default function useGlobalErrorReporting() {
 
         const onError = (event: ErrorEvent) => {
             // Cross-origin "Script error." arrives with no Error object - nothing to act on.
-            if (!(event.error instanceof Error) || isNoise(event.error)) return;
+            if (!(event.error instanceof Error) || isBrowserNoise(event.error)) return;
             notifyUser(event.error);
         };
 
