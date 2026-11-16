@@ -12,6 +12,7 @@ import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
 import BlockedMembersSection from "@/components/common/BlockedMembersSection";
+import RecordingConsentSection from "@/components/common/RecordingConsentSection";
 import VolunteerCertificateSection from "@/components/common/VolunteerCertificateSection";
 import RequestPreferencesSection from "@/components/volunteers/RequestPreferencesSection";
 import { getApiErrorMessage } from "@/utils/apiError";
@@ -238,6 +239,8 @@ const Settings = () => {
                 <RequestPreferencesSection volunteerId={volunteerId as string} />
 
                 <BlockedMembersSection />
+
+                <RecordingConsentSection />
 
                 <DonationHistorySection />
                 <VolunteerCertificateSection />

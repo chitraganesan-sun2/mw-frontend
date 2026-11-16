@@ -12,6 +12,7 @@ import DeleteAccountSection from "@/components/common/DeleteAccountSection";
 import ExportDataSection from "@/components/common/ExportDataSection";
 import DonationHistorySection from "@/components/common/DonationHistorySection";
 import BlockedMembersSection from "@/components/common/BlockedMembersSection";
+import RecordingConsentSection from "@/components/common/RecordingConsentSection";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { showToast } from "@/components/common/Toast";
@@ -339,6 +340,8 @@ const Settings = () => {
                 </section>
 
                 <BlockedMembersSection />
+
+                <RecordingConsentSection />
 
                 <DonationHistorySection />
                 <ExportDataSection role="learner" />
