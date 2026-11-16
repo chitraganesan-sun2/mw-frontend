@@ -1,3 +1,28 @@
+# Release notes — v1.8.4 (versionCode 21)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.4
+
+• New in Settings: see when you agreed to session recording, withdraw your consent, or give it again
+• Clearer messages when a parent or guardian signs up a learner
+• Small fixes and improvements
+```
+
+---
+
+## Internal changelog — v1.8.4 (versionCode 21)
+
+Ships the web changes that went live on 2026-11-16: the Settings "Session Recording" card (when the member agreed, Withdraw
+with a confirm step, "Give consent again", support email) for learners and volunteers, shown only while recording or
+transcription is on and the member has a consent record; and the guardian-field error text no longer says "under 13".
+The server already enforces a withdrawal for every app version (booking, inviting, claiming, accepting and requesting
+recorded sessions are refused, declining and cancelling stay open), so 1.8.3 and older keep working: those members just
+cannot withdraw from inside the app until they update. Needs the backend from 2026-11-16 (a155d0b) - already live.
+
+---
+
 # Release notes — v1.8.3 (versionCode 20)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
