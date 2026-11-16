@@ -684,7 +684,7 @@ export function validateLearnerParentFields(data: any) {
         if (!field || (typeof field === "string" && field.trim().length === 0)) {
             errors[`parent_info.${key}`] = `${key
                 .split("_")
-                .join(" ")} is required for learners under 13`;
+                .join(" ")} is required when a parent or guardian signs up the learner`;
             isSuccess = false;
         }
         if (key === "parent_email") {
@@ -700,7 +700,7 @@ export function validateLearnerParentFields(data: any) {
                 contactNumberValidation.parse(field);
             } catch (e) {
                 errors[`parent_info.${key}`] =
-                    "Guardian Contact Number is required for learners under 13.";
+                    "Guardian Contact Number is required.";
                 isSuccess = false;
             }
         }
