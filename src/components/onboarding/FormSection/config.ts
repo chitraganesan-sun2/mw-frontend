@@ -710,3 +710,54 @@ export function validateLearnerParentFields(data: any) {
 }
 
 export type LearnerFormData = z.infer<typeof learnerFormSchema>;
+
+// ---------------------------------------------------------------------------------------------
+// Edit-profile variants of the schemas above.
+//
+// The Edit Profile modal reuses the onboarding schema but only shows part of the form: the consent
+// section ("how did you hear about us", photo/video consent) and the Terms / Privacy / cookie
+// acceptances are onboarding-only and are not rendered there. Validating them made it impossible
+// to save any edit for a member whose record lacks them (F9). Only fields that are shown are
+// validated; the saved values of the hidden ones pass through untouched. The profile picture stays
+// required once the member has one (they can replace it, not remove it) but is optional while
+// there is none, so an old record can still be edited.
+// ---------------------------------------------------------------------------------------------
+const EDIT_IGNORED_ROOTS = new Set([
+    "consent_and_permissions",
+    "privacy_policy_accepted",
+    "terms_and_conditions_accepted",
+    "cookie_consent_accepted",
+]);
+
+function makeEditSchema(base: any, requirePicture: boolean) {
+    const inner = base._def.schema; // the ZodObject under the onboarding superRefine
+    const refinement = base._def.effect?.refinement as ((data: any, ctx: any) => void) | undefined;
+    const optionalPicture = z
+        .object({ image_url: z.string().optional(), image_id: z.string().optional() })
+        .passthrough()
+        .or(z.null())
+        .optional();
+    return inner
+        .extend({
+            consent_and_permissions: z.any().optional(),
+            privacy_policy_accepted: z.boolean().optional(),
+            terms_and_conditions_accepted: z.boolean().optional(),
+            cookie_consent_accepted: z.boolean().optional(),
+            ...(requirePicture ? {} : { profile_picture: optionalPicture }),
+        })
+        .superRefine((data: any, ctx: any) => {
+            // Re-use the onboarding cross-field rules, dropping the ones about hidden fields.
+            refinement?.(data, {
+                ...ctx,
+                path: ctx.path,
+                addIssue: (issue: ZodIssue) => {
+                    if (!EDIT_IGNORED_ROOTS.has(String(issue.path?.[0]))) ctx.addIssue(issue);
+                },
+            });
+        });
+}
+
+export const getVolunteerEditSchema = (requirePicture: boolean) =>
+    makeEditSchema(volunteerFormSchema, requirePicture) as unknown as typeof volunteerFormSchema;
+export const getLearnerEditSchema = (requirePicture: boolean) =>
+    makeEditSchema(learnerFormSchema, requirePicture) as unknown as typeof learnerFormSchema;

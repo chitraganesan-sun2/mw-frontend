@@ -1,7 +1,7 @@
 import { z } from "zod";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import ConfirmModal from "@/components/common/Modals/ConfirmModal";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,7 @@ import { getProfileChangeState, previewProfileChange, ProfileChangeDiffItem, sub
 import ProfileChangeReviewModal from "../ProfileChangeReviewModal";
 import { PROFILE_CHANGE_QUERY_KEY } from "../ProfileChangeBanner";
 import FormTabsSection from "./FormSection";
-import { learnerFormSchema, volunteerFormSchema } from "@/components/onboarding/FormSection/config";
+import { getLearnerEditSchema, getVolunteerEditSchema } from "@/components/onboarding/FormSection/config";
 import { LearnerProfileFormSections } from "@/constants/learner";
 import { VolunteerProfileFormConstants } from "@/constants/volunteer";
 
@@ -62,7 +62,13 @@ const EditProfileModal = ({
   const requiresReview = !!reviewState?.requires_review;
 
   const UserProfileFormConstants = isVolunteer ? VolunteerProfileFormConstants : LearnerProfileFormSections;
-  const UserProfileFormSchema = isVolunteer ? volunteerFormSchema : learnerFormSchema;
+  // Validate only what this modal shows (see getLearnerEditSchema): the onboarding-only consent /
+  // acceptance fields and, for a member with no picture yet, the picture must not block a save.
+  const hasPicture = !!data?.profile_picture?.image_url;
+  const UserProfileFormSchema = useMemo(
+    () => (isVolunteer ? getVolunteerEditSchema(hasPicture) : getLearnerEditSchema(hasPicture)),
+    [isVolunteer, hasPicture]
+  );
 
   const {
     control,
