@@ -24,7 +24,7 @@ const Logo = ({ isFooterIcon, className }: LogoProps) => {
                 }
             </span>
             {/* One word, one line, at every screen size - never wraps into "Melody / Wings". */}
-            <p className="md:text-xl text-base font-medium whitespace-nowrap shrink-0">MelodyWings<sup className="ml-0.5 text-[0.65em] font-normal align-super">®</sup></p>
+            <p className="md:text-xl text-base font-medium whitespace-nowrap shrink-0">MelodyWings<sup className="text-[0.65em] font-normal -top-[0.3em]">®</sup></p>
 
         </div>
     );
