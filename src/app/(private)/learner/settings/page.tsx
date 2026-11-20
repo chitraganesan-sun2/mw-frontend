@@ -61,19 +61,22 @@ const Settings = () => {
     const [sessionMatchPreference, setSessionMatchPreference] =
         useState<SessionMatchValue>("all_sessions");
     const [pushEnabled, setPushEnabled] = useState(true);
-    const [isPushLoading, setIsPushLoading] = useState(false);
     // WingTime announcements are opt-in: off until the learner (or their guardian) turns them on.
     const [wingTimeEnabled, setWingTimeEnabled] = useState(false);
     const { setHeaderOptions } = useComponentStore();
     const pathname = usePathname();
     const learnerId = getCookie("learner_id");
-    const [isLoading, setIsLoading] = useState(false);
+    // true until the saved settings have loaded: the switches show a spinner and cannot be
+    // flipped meanwhile, instead of flashing their defaults (chat OFF) for a second.
+    const [isLoading, setIsLoading] = useState(true);
 
     const handlePermission = (value: any) => {
         const previous = isEnabled;
         setIsEnabled(value);
         PUT_API(endpoints.chat.learnerPermission(learnerId as string), {
             chat_permission: value,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
         }).catch((err) => {
             // Roll back the switch and say so - it previously stayed flipped even when the
             // save failed, which is misleading for a privacy-relevant control.
@@ -87,6 +90,8 @@ const Settings = () => {
         setShowcaseEnabled(value);
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/showcase_consent`, {
             consent: value,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
         }).catch((err) => {
             setShowcaseEnabled(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
@@ -98,6 +103,8 @@ const Settings = () => {
         setShowcaseDisability(value);
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/showcase_disability`, {
             share: value,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
         }).catch((err) => {
             setShowcaseDisability(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
@@ -110,6 +117,8 @@ const Settings = () => {
         const apiValue = UI_TO_API_PREFERENCE[value];
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
             instant_session_email_preference: apiValue,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
         }).catch((err) => {
             setSessionMatchPreference(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
@@ -121,6 +130,8 @@ const Settings = () => {
         setPushEnabled(value);
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
             push_notifications_enabled: value,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
         }).catch((err) => {
             setPushEnabled(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
@@ -132,6 +143,8 @@ const Settings = () => {
         setWingTimeEnabled(value);
         PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
             wingtime_notifications_enabled: value,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
         }).catch((err) => {
             setWingTimeEnabled(previous);
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
@@ -262,7 +275,7 @@ const Settings = () => {
                     <Switch
                         aria-labelledby="push-notifications-label"
                         checked={pushEnabled}
-                        loading={isPushLoading}
+                        loading={isLoading}
                         onChange={(value) => handlePushPreferenceChange(value)}
                         className="w-fit [&.ant-switch-checked]:bg-action"
                     />
@@ -301,6 +314,8 @@ const Settings = () => {
                     </div>
                     <Select
                         id="instant-session-email-preference"
+                        disabled={isLoading}
+                        loading={isLoading}
                         value={sessionMatchPreference}
                         onChange={(value) => handleEmailPreferenceChange(value)}
                         virtual={false}

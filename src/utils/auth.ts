@@ -131,7 +131,7 @@ export const removeCookie = (key: string) => {
 }
 
 export const clearCookies = () => {
-    const cookies = ["token", "role", "onboarded_status", "learner_id", "volunteer_id", "cookieConsent", "lastActivity"];
+    const cookies = ["token", "role", "onboarded_status", "learner_id", "volunteer_id", "lastActivity"];
     cookies.forEach(removeCookie);
 
     if (typeof window !== "undefined") {

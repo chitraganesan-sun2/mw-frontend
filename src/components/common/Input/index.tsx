@@ -314,6 +314,7 @@ export const Input: React.FC<InputProps> = (props) => {
                         value={props.value}
                         onChange={(e) => props.onChange(e.target.value)}
                         disabled={disabled}
+                        maxLength={props?.maxLength}
                         onKeyDown={(event) => (props.onKeyDown ? props.onKeyDown(event) : event)}
                         rootClassName={cn(
                             props.inputClassName,

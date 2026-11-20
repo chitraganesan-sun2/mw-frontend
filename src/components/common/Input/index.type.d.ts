@@ -52,6 +52,7 @@ type TextAreaInputProps = BaseInputProps & {
     onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
     rows?: number;
+    maxLength?: number;
 };
 
 type SelectInputProps = BaseInputProps & {

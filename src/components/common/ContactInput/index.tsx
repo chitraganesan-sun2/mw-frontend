@@ -90,7 +90,7 @@ const ContactInput = (props: ContactInputProps) => {
                     onChange={(e) => handleChange(e, "country_code")}
                     options={mobileCountryCodes}
                     inputType="select"
-                    placeholder="+91"
+                    placeholder="Code"
                     className="!w-[35%] md:!w-[20%] mb-0 mt-0 !h-full "
                     inputClassName="!w-[35%] md:!w-[20%] mt-0 p-0 !mb-0"
                     disabled={disabled}

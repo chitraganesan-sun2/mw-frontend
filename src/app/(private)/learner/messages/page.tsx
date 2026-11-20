@@ -1,4 +1,5 @@
 "use client";
+import { MESSAGE_MAX_LENGTH, messageCounterText } from "@/utils/chatLimits";
 import React, { useEffect, useState, useRef } from "react";
 import { useComponentStore } from "@/store/useComponenetStore";
 import { getHeaderIcon } from "@/layouts/helper";
@@ -572,7 +573,13 @@ const Messages = () => {
                                                 onKeyDown={handleKeyDown}
                                                 placeholder={"Type a message"}
                                                 rows={1}
+                                                maxLength={MESSAGE_MAX_LENGTH}
                                             />
+                                            {messageCounterText(message.length) && (
+                                                <p role="status" aria-live="polite" className="text-xs text-gray-light text-right mt-1">
+                                                    {messageCounterText(message.length)} characters - messages are limited to {MESSAGE_MAX_LENGTH}.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
