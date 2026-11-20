@@ -5,7 +5,8 @@ import { POST_API, PUT_API } from "@/api/request";
 import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { CommunityFormConstants } from "@/constants/community";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useInFlight } from "@/hooks/useInFlight";
 import { getCookie } from "@/utils/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWindowSize } from "@/hooks/useWindowSize";
@@ -28,7 +29,8 @@ type CommunityPostModalProps = {
 type FormData = z.infer<typeof PostFormSchema>;
 
 const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    // Ref-backed guard: a double-click on Create/Save published the post twice.
+    const { run, pending: isSubmitting } = useInFlight();
     const role = getCookie("role");
     const queryClient = useQueryClient();
 
@@ -71,25 +73,23 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
         actionFn: () => Promise<any>,
         successMessage: string,
         errorMessage: string
-    ) => {
-        setIsSubmitting(true);
-        try {
-            await callbackToast({
-                apiCall: actionFn(),
-                loadingMsg: isEditMode ? "Updating post..." : "Creating post...",
-                successMsg: successMessage,
-                errorMsg: errorMessage,
-            });
+    ) =>
+        run(async () => {
+            try {
+                await callbackToast({
+                    apiCall: actionFn(),
+                    loadingMsg: isEditMode ? "Updating post..." : "Creating post...",
+                    successMsg: successMessage,
+                    errorMsg: errorMessage,
+                });
 
-            queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab] });
-            onClose();
-            reset({ description: "", images: [], video: null });
-        } catch (error) {
-            showToast({ message: "Couldn't save your post. Please try again.", type: "error" });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+                queryClient.invalidateQueries({ queryKey: ["get-posts", activeTab] });
+                onClose();
+                reset({ description: "", images: [], video: null });
+            } catch (error) {
+                showToast({ message: "Couldn't save your post. Please try again.", type: "error" });
+            }
+        });
 
     const onSubmit = (data: FormData) => {
         const payload = {
