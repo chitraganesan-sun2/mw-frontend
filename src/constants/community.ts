@@ -24,22 +24,19 @@ export const CommunityFormConstants: FormField[] = [
     },
 ];
 
-export const PostFormSchema = z
-    .object({
-        description: z
-            .string({ required_error: "Post Description is required" })
-            .min(1, "Post Description is required")
-            .max(1000, "Post Description cannot exceed 1,000 characters"),
-        images: z.array(z.any()).max(5, "You can add up to 5 pictures").optional(),
-        video: z
-            .object({ video_url: z.string(), video_id: z.string() })
-            .or(z.null())
-            .optional(),
-    })
-    .refine((data) => (data.images && data.images.length > 0) || !!data.video, {
-        message: "Please upload at least one picture or a video.",
-        path: ["images"],
-    });
+// Pictures and a video are optional (the prompts say "Do you want to add...?"): only the text is
+// required. The API accepts an empty `images` list and a null `video` (models/v1/post.py).
+export const PostFormSchema = z.object({
+    description: z
+        .string({ required_error: "Post Description is required" })
+        .min(1, "Post Description is required")
+        .max(1000, "Post Description cannot exceed 1,000 characters"),
+    images: z.array(z.any()).max(5, "You can add up to 5 pictures").optional(),
+    video: z
+        .object({ video_url: z.string(), video_id: z.string() })
+        .or(z.null())
+        .optional(),
+});
 
 export const CommunityTabs = [
     {

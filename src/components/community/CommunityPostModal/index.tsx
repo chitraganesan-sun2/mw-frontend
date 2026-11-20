@@ -94,7 +94,8 @@ const CommunityPostModal = ({ isOpen, onClose }: CommunityPostModalProps) => {
     const onSubmit = (data: FormData) => {
         const payload = {
             description: data.description,
-            images: data?.images?.map((image) => ({
+            // The API requires the key to be present; a text-only post sends an empty list.
+            images: (data?.images ?? []).map((image) => ({
                 image_url: image.image_url,
                 image_id: image.image_id,
             })),
