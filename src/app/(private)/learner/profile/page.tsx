@@ -12,6 +12,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { endpoints } from "@/api/constants";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
+import ProfileLoadError from "@/components/profile/ProfileLoadError";
 import MobileProfileView from "@/components/profile/MobileProfileView";
 import InnerWidth from "@/utils/innerWidth";
 import EditProfileModal from "@/components/profile/EditProfile";
@@ -39,7 +40,7 @@ export default function ProfilePage() {
     }, []);
     const [learnerData, setLearnerData] = useState({ bio: {}, overview: {} });
 
-    const { data, isLoading, refetch } = useQuery({
+    const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ["learner", learnerId],
         queryFn: () => getIndividualLearner(learnerId),
         enabled: !!learnerId
@@ -115,6 +116,10 @@ export default function ProfilePage() {
                 </div>
             </div>
         );
+    }
+
+    if (isError || !data) {
+        return <ProfileLoadError onRetry={() => void refetch()} />;
     }
 
     return (

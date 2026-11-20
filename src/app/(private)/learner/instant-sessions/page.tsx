@@ -550,13 +550,14 @@ export default function InstantSessionsPage() {
     // should update data quietly without hiding already-rendered sessions.
     const isPageLoading = isLoading || isClaimedLoading;
 
-    if (isError || isClaimedError) {
-        return (
-            <div className="p-4 md:p-6 flex items-center justify-center min-h-[400px]">
-                <p className="text-gray-500 text-lg">Couldn&apos;t load your sessions. Please try again.</p>
-            </div>
-        );
-    }
+    // A failed volunteer-posted-sessions query only affects that section: the learner's own
+    // requests (a separate query) and the "request a session" button stay usable.
+    const sectionFailed = isError || isClaimedError;
+    const retrySessions = () => {
+        [...availableQueries, ...claimedQueries].forEach((q) => {
+            if (q.isError) void q.refetch();
+        });
+    };
 
     return (
         <div className="h-full animate-fadeIn p-4 lg:p-6 overflow-y-auto relative">
@@ -649,6 +650,12 @@ export default function InstantSessionsPage() {
                     Instant Sessions Posted by Volunteers
                 </h2>
 
+                {sectionFailed && (
+                    <div className="mb-4">
+                        <QueryErrorNotice message="Couldn't load the sessions posted by volunteers." onRetry={retrySessions} />
+                    </div>
+                )}
+
                 {availableSessions.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-4">
                         {availableSessions.map((session) => (
@@ -673,7 +680,7 @@ export default function InstantSessionsPage() {
                     </div>
                 )}
 
-                {!isPageLoading && availableSessions.length === 0 && claimedSessions.length === 0 && (
+                {!isPageLoading && !sectionFailed && availableSessions.length === 0 && claimedSessions.length === 0 && (
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                         <div className="text-5xl mb-4">🕒</div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
