@@ -1,3 +1,4 @@
+import { antdPaginationItemRender } from "@/components/common/Pagination/antdItemRender";
 import Button from "@/components/common/Button";
 import { Table as AntTable } from "antd";
 import {} from "nuqs";
@@ -75,7 +76,7 @@ const VolunteersTable: React.FC<VolunteersTableProps> = ({
                 dataSource={data}
                 columns={columns as any}
                 loading={loading}
-                pagination={pagination}
+                pagination={pagination ? { itemRender: antdPaginationItemRender, ...pagination } : pagination}
                 onChange={onChange}
                 rowKey="id"
                 showSorterTooltip={false}

@@ -57,6 +57,10 @@ const SectionCard = ({ href, role, text, icon, textColor, onClick, badge }: Sect
                     </span>
                 )}
             </Link>
+            {/* The badge above is aria-hidden; this polite live region announces count changes. */}
+            <span role="status" aria-live="polite" className="sr-only">
+                {hasBadge ? `${badge} unread` : ""}
+            </span>
         </div>
     );
 };

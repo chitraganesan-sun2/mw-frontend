@@ -30,7 +30,7 @@ const BioHeader = ({ data }: any) => {
                         <p className="text-xs font-medium text-gray-light">{data?.timezone}</p>
                     </div>
                 </div>
-                <Link href={`/${role}/profile?mode=edit`}>
+                <Link href={`/${role}/profile?mode=edit`} aria-label="Edit profile">
                     <EditProfileIcon />
                 </Link>
             </div>

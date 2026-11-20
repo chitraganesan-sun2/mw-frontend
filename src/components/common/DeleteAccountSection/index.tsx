@@ -97,6 +97,7 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
                         type="text"
                         value={confirmText}
                         onChange={(e) => setConfirmText(e.target.value)}
+                        aria-label="Type DELETE to confirm deleting your account"
                         placeholder='Type "DELETE" to confirm'
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />

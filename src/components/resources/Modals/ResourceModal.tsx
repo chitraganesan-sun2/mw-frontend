@@ -112,6 +112,7 @@ const CuratedInputComponent: React.FC<Props> = ({ value, onChange, error }) => {
                             />
                             <button
                                 type="button"
+                                aria-label="Remove link"
                                 onClick={() => removeRow(index)}
                                 className="text-red-500 flex-center bg-red-100 rounded-md p-2 border hover:border-red-500"
                             >

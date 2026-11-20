@@ -80,6 +80,10 @@ const HeaderNotificationBell = () => {
                     </span>
                 )}
             </button>
+            {/* The badge is aria-hidden and a changed aria-label is not announced: say it politely. */}
+            <span role="status" aria-live="polite" className="sr-only">
+                {unreadCount > 0 ? `${unreadCount} unread notifications` : ""}
+            </span>
 
             {/* Notification toast popup */}
             {showToast && (

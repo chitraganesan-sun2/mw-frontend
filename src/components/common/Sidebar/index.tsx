@@ -150,7 +150,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                 </div>
             </div>
             <div className="w-full flex flex-col gap-2 mt-3">
-                <button onClick={handleSignOut} className="flex gap-1 text-black">
+                <button type="button" onClick={handleSignOut} className="flex gap-1 text-black">
                     <span className="text-[1.25rem] transition-all duration-300 text-black">
                         <SignOutIcon />
                     </span>
