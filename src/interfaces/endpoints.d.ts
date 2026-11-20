@@ -7,7 +7,6 @@ export type EndpointProps = {
         rules: string;
         hosted: string;
         myRegistrations: string;
-        item: (id: string) => string;
         register: (id: string) => string;
         cancel: (id: string) => string;
     };
@@ -68,8 +67,6 @@ export type EndpointProps = {
     volunteer_slot: {
         update: string;
         get: string;
-        availableSlots: (id: string, date: string) => string;
-        availableDays: (id: string, month: string) => string;
         upcomingSlots: (id: string, excludeSessionId?: string | null) => string;
         getAllSlotsForMonth: (month: string) => string;
         deleteParticularSlot: string;
@@ -119,14 +116,6 @@ export type EndpointProps = {
         acceptLearnerRequest: (id: string) => string;
         getMyInstantSessions: (page?: number, size?: number, query?: string, requestStatus?: string) => string;
         getSessionDetail: (sessionId: string) => string;
-    };
-    volunteer_chat: {
-        sendMessage: (id: string) => string;
-        getMessages: (id: string) => string;
-    };
-    learner_chat: {
-        sendMessage: (id: string) => string;
-        getMessages: (id: string) => string;
     };
     resources: {
         create: string;
