@@ -89,6 +89,7 @@ const FormTabs = ({
     const heard_about_us = useWatch({ name: "consent_and_permissions.heard_about_us", control: control });
     const showcase_consent = useWatch({ name: "consent_and_permissions.showcase_consent", control: control });
     const [isStepUpdatePending, setIsStepUpdatePending] = useState(false);
+    const isStepUpdatePendingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     // Form Tabs
     const [activeTab, setActiveTab] = useState(0);
     const [highestTab, setHighestTab] = useState(0);
@@ -399,6 +400,8 @@ const FormTabs = ({
     };
 
     const handleUpdateStepAndData = async (index: number, data: any) => {
+        if (isStepUpdatePendingInFlight.current) return;
+        isStepUpdatePendingInFlight.current = true;
         setIsStepUpdatePending(true);
         try {
             const res = await PUT_API(
@@ -409,6 +412,7 @@ const FormTabs = ({
             Cookies.set("onboarded_status", "partially_filled");
         } catch (err) {
         } finally {
+            isStepUpdatePendingInFlight.current = false;
             setIsStepUpdatePending(false);
         }
     };

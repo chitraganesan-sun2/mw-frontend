@@ -1,5 +1,5 @@
 import SideModal from "@/components/common/Modals/SideModal";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/common/Input";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
@@ -175,6 +175,7 @@ const OnetImeScheduleModal = ({
     const queryClient = useQueryClient();
     const [isAvailableDaysLoading, setIsAvailableDaysLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const isSavingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     const { volunteerDetails, volunteerUtcOffset } = useAppStore();
     const timezoneRaw =
@@ -296,6 +297,8 @@ const OnetImeScheduleModal = ({
             });
             return;
         }
+        if (isSavingInFlight.current) return;
+        isSavingInFlight.current = true;
         setIsSaving(true);
         const formattedData = finalSlots.map((slot) => ({
             date: dayjs(currentDate, "YYYY-MM-DD").format("DD-MM-YYYY"),
@@ -329,6 +332,7 @@ const OnetImeScheduleModal = ({
                 });
             })
             .finally(() => {
+                isSavingInFlight.current = false;
                 setIsSaving(false);
             });
     };

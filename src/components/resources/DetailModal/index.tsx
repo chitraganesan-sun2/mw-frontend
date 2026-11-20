@@ -44,6 +44,8 @@ const DetailModal = ({
     const [mode, setMode] = useQueryState("mode");
 
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const isDeletingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const isLikePending = useRef(false);
     const [isLiked, setIsLiked] = useState(false);
@@ -98,6 +100,8 @@ const DetailModal = ({
 
     const handleDelete = async () => {
         if (!resourceId) return;
+        if (isDeletingInFlight.current) return;
+        isDeletingInFlight.current = true;
         setIsDeleting(true);
         try {
             const res = await deleteResource(resourceId);
@@ -112,6 +116,7 @@ const DetailModal = ({
         } catch (err) {
             showToast({ message: getApiErrorMessage(err, "Couldn't delete the resource. Please try again."), type: "error" });
         } finally {
+            isDeletingInFlight.current = false;
             setIsDeleting(false);
         }
     };

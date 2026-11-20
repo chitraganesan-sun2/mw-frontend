@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Modal } from "antd";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { endpoints } from "@/api/constants";
@@ -23,6 +23,7 @@ export default function RecordingConsentSection() {
     const queryClient = useQueryClient();
     const notices = useRecordingNotices();
     const [busy, setBusy] = useState(false);
+    const busyInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     const [confirming, setConfirming] = useState(false);
 
     const { data } = useQuery<PolicyStatus | null>({
@@ -41,6 +42,8 @@ export default function RecordingConsentSection() {
     const refresh = () => queryClient.invalidateQueries({ queryKey: ["policy-status"] });
 
     const withdraw = async () => {
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await withdrawRecordingConsent();
@@ -50,11 +53,14 @@ export default function RecordingConsentSection() {
         } catch (err) {
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't withdraw your consent. Please try again.") });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
         }
     };
 
     const giveAgain = async () => {
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await acceptRecordingConsent(data?.recording_consent_version ?? "");
@@ -63,6 +69,7 @@ export default function RecordingConsentSection() {
         } catch (err) {
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save your consent. Please try again.") });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
         }
     };

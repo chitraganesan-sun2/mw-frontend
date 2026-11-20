@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
@@ -33,6 +33,7 @@ export default function VolunteerWingTimePage() {
     const [proposeOpen, setProposeOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
+    const busyInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     useEffect(() => {
         setHeaderOptions({ title: "WingTime", titleIcon: getHeaderIcon(pathname), hideSearch: true, showButton: false });
@@ -65,6 +66,8 @@ export default function VolunteerWingTimePage() {
                 ? `${item.registered_count} learner${item.registered_count === 1 ? "" : "s"} signed up and will be told it was cancelled. `
                 : "";
         if (!(await confirm({ title: "Cancel this WingTime?", description: `${warning}This can't be undone.`, confirmText: "Cancel WingTime", danger: true }))) return;
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await POST_API(endpoints.wingtime.cancel(item.wingtime_id));
@@ -72,6 +75,7 @@ export default function VolunteerWingTimePage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't cancel the WingTime. Please try again."), type: "error" });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
             await refresh();
         }

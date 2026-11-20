@@ -83,6 +83,7 @@ const Donate = () => {
     const [faqItems, setFaqItems] = useState<FaqItem[]>([]);
     const [amountError, setAmountError] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     // Mobile-only carousel state for "How Your Donation Helps" cards.
     const [topCardsIndex, setTopCardsIndex] = useState(0);
@@ -407,6 +408,10 @@ const Donate = () => {
             amount_other_description: isCustom ? "Custom amount" : "",
         };
 
+        if (isSubmittingInFlight.current) return;
+
+        isSubmittingInFlight.current = true;
+
         setIsSubmitting(true);
         createCheckoutSession(payload)
             .then((res: any) => {
@@ -418,12 +423,14 @@ const Donate = () => {
                     window.location.href = redirectUrl as string;
                     return;
                 }
+                isSubmittingInFlight.current = false;
                 setIsSubmitting(false);
                 showToast({ type: "error", message: "Couldn't continue to checkout. Please try again." });
             })
             .catch((err) => {
                 console.error("Failed to create checkout session", err);
                 showToast({ type: "error", message: "Couldn't process your donation. Please try again." });
+                isSubmittingInFlight.current = false;
                 setIsSubmitting(false);
             })
             .finally(() => {

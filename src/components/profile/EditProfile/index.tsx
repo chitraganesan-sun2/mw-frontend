@@ -36,6 +36,7 @@ const EditProfileModal = ({
   onClose,
 }: EditProfileModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   // Set while the member is looking at the before/after of what they're about to submit.
   const [pendingSubmit, setPendingSubmit] = useState<{ formData: any; diff: ProfileChangeDiffItem[] } | null>(null);
@@ -85,6 +86,8 @@ const EditProfileModal = ({
   }, [isOpen, reset, data]);
 
   const onSubmit = async (formData: FormData) => {
+    if (isSubmittingInFlight.current) return;
+    isSubmittingInFlight.current = true;
     setIsSubmitting(true);
     try {
       if (requiresReview) {
@@ -112,12 +115,15 @@ const EditProfileModal = ({
     } catch (error) {
       showToast({ message: getApiErrorMessage(error, "Couldn't update your profile. Please try again."), type: "error" });
     } finally {
+      isSubmittingInFlight.current = false;
       setIsSubmitting(false);
     }
   };
 
   const confirmSubmitForReview = async () => {
     if (!pendingSubmit) return;
+    if (isSubmittingInFlight.current) return;
+    isSubmittingInFlight.current = true;
     setIsSubmitting(true);
     try {
       await submitProfileChange(isVolunteer ? "volunteer" : "learner", pendingSubmit.formData);
@@ -129,6 +135,7 @@ const EditProfileModal = ({
     } catch (error) {
       showToast({ message: getApiErrorMessage(error, "Couldn't submit your changes. Please try again."), type: "error" });
     } finally {
+      isSubmittingInFlight.current = false;
       setIsSubmitting(false);
     }
   };

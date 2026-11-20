@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Drawer, Spin } from "antd";
 import CenterModal from "@/components/common/Modals/CenterModal";
@@ -63,6 +63,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
     const status = statusConfig[session.status] || statusConfig.available;
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
+    const claimingRef = useRef(false); // sync guard against a double-click claiming twice
     const [isValidated, setIsValidated] = useState<boolean>(true);
     // The server's reason when a claim isn't allowed (today: a time overlap with another of
     // the learner's sessions). There is no one-session-per-day limit any more.
@@ -139,6 +140,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
     };
 
     const handleConfirmClaim = async (): Promise<boolean> => {
+        if (claimingRef.current) return false;
         const volunteerId = session.volunteer_id;
         const volunteerSlotId = session.id;
         const sessionDate = session.date;
@@ -157,6 +159,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
             return false;
         }
 
+        claimingRef.current = true;
         setIsClaiming(true);
         onClaimLoadingChange?.(true);
         let claimSuccess = false;
@@ -194,6 +197,7 @@ const InstantSessionDetailModal: React.FC<InstantSessionDetailModalProps> = ({
             showToast({ message: "Couldn't claim the session. Please try again.", type: "error" });
             return false;
         } finally {
+            claimingRef.current = false;
             setIsClaiming(false);
             // Don't hide loader here if claim succeeded - let ClaimConfirmationModal hide it after fetching session details
             // Only hide if claim failed

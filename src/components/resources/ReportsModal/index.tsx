@@ -1,7 +1,7 @@
 import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { reportResource } from "@/api/resources";
 import { showToast } from "@/components/common/Toast";
@@ -23,6 +23,7 @@ const options = [
 
 const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     const [reportType, setReportType] = useState<string>("");
     const [reportDescription, setReportDescription] = useState<string>("");
@@ -44,6 +45,10 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
             return;
         }
 
+        if (isSubmittingInFlight.current) return;
+
+        isSubmittingInFlight.current = true;
+
         setIsSubmitting(true);
         const payload = {
             report_type_id: resourceId,
@@ -64,6 +69,7 @@ const ResourceReportModal = ({ resourceId, isOpen, onClose }: ResourceReportModa
         } catch (error) {
             showToast({ type: "error", message: "Couldn't submit your report. Please try again." });
         } finally {
+            isSubmittingInFlight.current = false;
             setIsSubmitting(false);
         }
     };

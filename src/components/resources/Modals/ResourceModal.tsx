@@ -139,6 +139,7 @@ const CuratedInputComponent: React.FC<Props> = ({ value, onChange, error }) => {
 const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: ResourceModalProps) => {
     const { userName } = useAppStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     const role = getCookie("role");
     const [resourceId] = useQueryState("id") || "";
@@ -191,6 +192,8 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
         successMessage,
         errorMessage,
     }: ResourceActionProps) => {
+        if (isSubmittingInFlight.current) return;
+        isSubmittingInFlight.current = true;
         setIsSubmitting(true);
         try {
             const isSuccess = await actionFn(data);
@@ -205,6 +208,7 @@ const ResourceModal = ({ triggerReload, isOpen, mode = "view", onClose }: Resour
         } catch (error) {
             showToast({ message: "Couldn't save the resource. Please try again.", type: "error" });
         } finally {
+            isSubmittingInFlight.current = false;
             setIsSubmitting(false);
         }
     };

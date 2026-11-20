@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Drawer } from "antd";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import Button from "@/components/common/Button";
@@ -59,6 +59,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [successSession, setSuccessSession] = useState<any>(session);
     const [showConfirmation, setShowConfirmation] = useState(true);
+    const unclaimingRef = useRef(false);
 
     // Reset confirmation state when modal opens
     useEffect(() => {
@@ -142,7 +143,8 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
     };
 
     const handleCancelSession = async () => {
-        if (!successSession?.id) return;
+        if (!successSession?.id || unclaimingRef.current) return;
+        unclaimingRef.current = true;
 
         // Show loader
         onClaimLoadingChange?.(true);
@@ -171,6 +173,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
             console.error("Error unclaiming session:", error);
             showToast({ message: "Couldn't unclaim the session. Please try again.", type: "error" });
         } finally {
+            unclaimingRef.current = false;
             // Hide loader after all API calls complete
             onClaimLoadingChange?.(false);
         }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { getApiErrorMessage } from "@/utils/apiError";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -257,6 +257,19 @@ export default function InstantSessionsPage() {
     const [selectedSession, setSelectedSession] = useState<Session | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
+    // `isActionLoading` is state and lags a render behind, so a double-click on Accept / Cancel /
+    // Complete fired the request twice. This ref closes that window synchronously.
+    const actionInFlight = useRef(false);
+    const beginAction = () => {
+        if (actionInFlight.current) return false;
+        actionInFlight.current = true;
+        setIsActionLoading(true);
+        return true;
+    };
+    const endAction = () => {
+        actionInFlight.current = false;
+        setIsActionLoading(false);
+    };
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [sessionDetail, setSessionDetail] = useState<any>(null);
     const [isDetailLoading, setIsDetailLoading] = useState(false);
@@ -492,7 +505,7 @@ export default function InstantSessionsPage() {
 
     const handleCancelRequest = async (requestId: string) => {
         if (!(await askConfirm({ title: "Cancel Request", description: "Are you sure you want to cancel this request?", confirmText: "Cancel Request", cancelText: "Keep it", danger: true }))) return;
-        setIsActionLoading(true);
+        if (!beginAction()) return;
         try {
             await DELETE_API(endpoints.session.cancelLearnerRequest(requestId));
             invalidateScheduleViews(queryClient, "learner");
@@ -500,14 +513,14 @@ export default function InstantSessionsPage() {
         } catch (e: any) {
             showToast({ message: getApiErrorMessage(e, "Couldn't cancel the request. Please try again."), type: "error" });
         } finally {
-            setIsActionLoading(false);
+            endAction();
         }
     };
 
     const handleCancelDetail = async () => {
         if (isActionLoading || !sessionDetail?.identifier || sessionDetail.cancelAction === "none") return;
         if (!(await askConfirm({ title: "Cancel Session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel Session", cancelText: "Keep it", danger: true }))) return;
-        setIsActionLoading(true);
+        if (!beginAction()) return;
         try {
             if (sessionDetail.cancelAction === "unclaim") {
                 await DELETE_API(endpoints.session.unclaimInstantSession(sessionDetail.identifier));
@@ -520,7 +533,7 @@ export default function InstantSessionsPage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't cancel the session. Please try again."), type: "error" });
         } finally {
-            setIsActionLoading(false);
+            endAction();
         }
     };
 

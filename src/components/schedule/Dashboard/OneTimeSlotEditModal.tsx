@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import Button from "@/components/common/Button";
 import { PUT_API } from "@/api/request";
@@ -39,6 +39,7 @@ const OneTimeSlotEditModal: React.FC<Props> = ({ slot, onClose, onSaved }) => {
     const [end, setEnd] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
+    const savingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     useEffect(() => {
         setStart(slot?.start_time ?? "");
@@ -53,6 +54,8 @@ const OneTimeSlotEditModal: React.FC<Props> = ({ slot, onClose, onSaved }) => {
             setError(problem);
             return;
         }
+        if (savingInFlight.current) return;
+        savingInFlight.current = true;
         setSaving(true);
         try {
             await PUT_API(endpoints.volunteer_slot.oneTimeSlot(slot.date, slot.volunteer_slot_id), {
@@ -63,6 +66,7 @@ const OneTimeSlotEditModal: React.FC<Props> = ({ slot, onClose, onSaved }) => {
         } catch (err) {
             setError(getApiErrorMessage(err, "Couldn't update this slot. Please try again."));
         } finally {
+            savingInFlight.current = false;
             setSaving(false);
         }
     };

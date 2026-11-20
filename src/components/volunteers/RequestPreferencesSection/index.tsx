@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Switch } from "antd";
 import { endpoints } from "@/api/constants";
 import { GET_API, PUT_API } from "@/api/request";
@@ -26,6 +26,7 @@ const RequestPreferencesSection = ({ volunteerId }: { volunteerId: string }) => 
     const [waiting, setWaiting] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const isSavingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     const [loadFailed, setLoadFailed] = useState(false);
 
     useEffect(() => {
@@ -56,6 +57,8 @@ const RequestPreferencesSection = ({ volunteerId }: { volunteerId: string }) => 
             showToast({ type: "error", message: problem });
             return;
         }
+        if (isSavingInFlight.current) return;
+        isSavingInFlight.current = true;
         setIsSaving(true);
         try {
             const res: any = await PUT_API(endpoints.volunteer.requestPreferences(volunteerId), buildRequestPreferencesPayload(form));
@@ -66,6 +69,7 @@ const RequestPreferencesSection = ({ volunteerId }: { volunteerId: string }) => 
         } catch (err) {
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save your request settings. Please try again.") });
         } finally {
+            isSavingInFlight.current = false;
             setIsSaving(false);
         }
     };
