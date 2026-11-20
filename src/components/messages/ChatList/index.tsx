@@ -62,7 +62,7 @@ const ChatList: React.FC<ChatListProps> = ({
             <div className="md:flex hidden items-center justify-between rounded-tl-[3rem] max-md:rounded-tl-none py-2">
                 <p className="text-2xl font-medium">All Chats</p>
                 <p className="text-base text-gray-500 font-medium">
-                    {filteredMessages.length} Chats
+                    {filteredMessages.length} {filteredMessages.length === 1 ? "Chat" : "Chats"}
                 </p>
             </div>
             <div className="py-4 px-4 md:px-0">

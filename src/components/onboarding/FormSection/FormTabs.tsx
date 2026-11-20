@@ -180,6 +180,22 @@ const FormTabs = ({
                         );
                     }
                 }
+
+                // The sign-up email is stored on the account itself. reset() above replaced the value
+                // FormSection pre-filled from it, so a member resuming a partly filled form whose saved
+                // steps have no email (e.g. email + password sign-up) saw an empty Email field. Put it
+                // back, without overwriting anything they typed and saved.
+                const signupEmail = onboardingData?.data?.email;
+                if (signupEmail) {
+                    const emailPath =
+                        role === "volunteer"
+                            ? "volunteer_contact_details.email"
+                            : filteredData.enrolled_by === "parent"
+                              ? "parent_info.parent_email"
+                              : "learner_personal_info.learner_contact_details.email";
+                    const savedEmail = emailPath.split(".").reduce((o: any, k) => o?.[k], filteredData);
+                    if (!savedEmail) setValue(emailPath, signupEmail);
+                }
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- form is reset when the loaded data changes; the helper is recreated every render
