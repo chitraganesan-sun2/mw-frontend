@@ -20,8 +20,8 @@ const ForVolunteer = () => {
                 titleColor="!text-volunteer"
             />
 
-            <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">
-                <div className="flex flex-col gap-1">
+            <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-auto">
+                <div className="flex flex-col gap-1 w-full max-w-[19rem]">
                     {volunteerData.map((item, index) => (
                         <StepsChart
                             key={index}

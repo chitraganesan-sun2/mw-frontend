@@ -19,8 +19,8 @@ const ForLearner = () => {
                 description="Find the volunteer champion your learner deserves and connect with them for free sessions."
                 titleColor="!text-learner-dark"
             />
-            <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-0">
-                <div className="flex flex-col gap-1">
+            <div className="flex flex-col justify-center items-center gap-1 mt-10 lg:mt-auto">
+                <div className="flex flex-col gap-1 w-full max-w-[19rem]">
                     {learnerData.map((item, index) => (
                         <StepsChart
                             key={index}
