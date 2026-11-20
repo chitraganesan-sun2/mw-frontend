@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { endpoints } from "@/api/constants";
 import { POST_API } from "@/api/request";
@@ -26,12 +26,15 @@ const ReportProfileLink = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isBlocking, setIsBlocking] = useState(false);
+    const blockingRef = useRef(false);
     const { confirm, confirmModal } = useConfirm();
     const queryClient = useQueryClient();
     if (!userId) return null;
 
     const handleBlock = async () => {
-        if (isBlocking) return;
+        if (blockingRef.current) return;
+        // Held across the confirm dialog too, so a double-click cannot open two of them.
+        blockingRef.current = true;
         const ok = await confirm({
             title: `Block ${name || `this ${roleLabel}`}?`,
             description:
@@ -41,7 +44,10 @@ const ReportProfileLink = ({
             confirmText: "Block",
             danger: true,
         });
-        if (!ok) return;
+        if (!ok) {
+            blockingRef.current = false;
+            return;
+        }
         setIsBlocking(true);
         try {
             await POST_API(endpoints.blocks.create, { user_id: userId });
@@ -52,6 +58,7 @@ const ReportProfileLink = ({
         } catch (err) {
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't block. Please try again.") });
         } finally {
+            blockingRef.current = false;
             setIsBlocking(false);
         }
     };

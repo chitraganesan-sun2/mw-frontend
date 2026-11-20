@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Radio } from "antd";
 import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
@@ -40,6 +40,8 @@ const ReportPersonModal = ({ isOpen, onClose, reportType, targetId, subjectName 
     const [reason, setReason] = useState("");
     const [details, setDetails] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    // Synchronous re-entry guard (the state above only updates after a re-render).
+    const submittingRef = useRef(false);
     const { width } = useWindowSize();
     const isMobile = width < 768;
     const isTablet = width >= 768 && width < 1024;
@@ -52,12 +54,13 @@ const ReportPersonModal = ({ isOpen, onClose, reportType, targetId, subjectName 
     }, [isOpen]);
 
     const handleSubmit = async () => {
-        if (isSubmitting) return;
+        if (submittingRef.current) return;
         const problem = validateReport(reportType, reason, details) ?? (targetId ? null : "Couldn't submit your report. Please try again.");
         if (problem) {
             showToast({ type: "error", message: problem });
             return;
         }
+        submittingRef.current = true;
         setIsSubmitting(true);
         try {
             await POST_API(endpoints.report.create, {
@@ -70,6 +73,7 @@ const ReportPersonModal = ({ isOpen, onClose, reportType, targetId, subjectName 
         } catch (error) {
             showToast({ type: "error", message: getApiErrorMessage(error, "Couldn't submit your report. Please try again.") });
         } finally {
+            submittingRef.current = false;
             setIsSubmitting(false);
         }
     };

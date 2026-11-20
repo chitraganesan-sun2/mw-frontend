@@ -2,7 +2,7 @@ import { Input } from "@/components/common/Input";
 import CenterModal from "@/components/common/Modals/CenterModal";
 
 import { cn } from "@/utils/merge-class";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { callbackToast, showToast } from "@/components/common/Toast";
 import { Radio } from "antd";
@@ -24,6 +24,8 @@ const options = [
 
 const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    // Ref guard against a double-click filing the report twice (state lags a render behind).
+    const submittingRef = useRef(false);
 
     const [reportType, setReportType] = useState<string>("");
     const [reportDescription, setReportDescription] = useState<string>("");
@@ -34,6 +36,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
     }, [isOpen]);
 
     const handleSubmit = async () => {
+        if (submittingRef.current) return;
         let message = "";
 
         if (!reportType) message = "Please select a reason for your report.";
@@ -45,6 +48,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
             return;
         }
 
+        submittingRef.current = true;
         setIsSubmitting(true);
         const payload = {
             report_type_id: postId,
@@ -63,6 +67,7 @@ const CommunityReportModal = ({ postId, isOpen, onClose }: CommunityReportModalP
         // toast.promise already showed the (backend-specific) error; a second generic
         // toast here used to dismiss and replace it.
         }).catch(() => {});
+        submittingRef.current = false;
         setIsSubmitting(false);
     };
 

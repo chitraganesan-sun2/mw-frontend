@@ -185,8 +185,11 @@ const FeedViewModal = ({
         setDeleteTargetId(postId);
     };
 
+    const isDeletePending = useRef(false);
+
     const confirmDeletePost = () => {
-        if (!deleteTargetId) return;
+        if (!deleteTargetId || isDeletePending.current) return;
+        isDeletePending.current = true;
         const deletedId = deleteTargetId;
         callbackToast({
             apiCall: DELETE_API(endpoints.post.deletePost(deletedId)),
@@ -202,7 +205,10 @@ const FeedViewModal = ({
                 queryClient.invalidateQueries({ queryKey: ["get-posts"] });
             })
             // toast.promise re-rejects on failure; the error toast is already shown.
-            .catch(() => {});
+            .catch(() => {})
+            .finally(() => {
+                isDeletePending.current = false;
+            });
         setDeleteTargetId(null);
     };
 
@@ -236,7 +242,13 @@ const FeedViewModal = ({
         }
     };
 
+    // Ref guard: `isCommentLoading` only disables the button after a re-render, so a quick
+    // double-click / double-Enter posted the comment twice.
+    const isCommentPending = useRef(false);
+
     const handleComment = async (postId: string) => {
+        if (isCommentPending.current) return;
+        isCommentPending.current = true;
         setIsCommentLoading(true);
 
         let payload = {
@@ -258,7 +270,10 @@ const FeedViewModal = ({
             // toast.promise re-rejects on failure, so the reset must not live in .then -
             // otherwise a failed post left the comment button stuck in its loading state.
             .catch(() => {})
-            .finally(() => setIsCommentLoading(false));
+            .finally(() => {
+                isCommentPending.current = false;
+                setIsCommentLoading(false);
+            });
     };
 
     const handleReplyClose = () => {

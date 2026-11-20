@@ -2,7 +2,7 @@
 
 import { DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Modal } from "antd";
 import toast from "react-hot-toast";
 import { clearCookies } from "@/utils/auth";
@@ -17,10 +17,12 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [confirmText, setConfirmText] = useState("");
+    const deletingRef = useRef(false);
 
     const handleDeleteAccount = async () => {
-        if (confirmText !== "DELETE") return;
+        if (confirmText !== "DELETE" || deletingRef.current) return;
 
+        deletingRef.current = true;
         setIsDeleting(true);
         try {
             await DELETE_API(endpoints.user.deleteAccount);
@@ -36,6 +38,7 @@ export default function DeleteAccountSection({ userId, role }: DeleteAccountSect
                 getApiErrorMessage(error, "Couldn't delete your account. Please try again or contact support.")
             );
         } finally {
+            deletingRef.current = false;
             setIsDeleting(false);
             setIsModalOpen(false);
         }

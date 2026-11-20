@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useInFlight } from "@/hooks/useInFlight";
 import Link from "next/link";
 import { Checkbox, Modal } from "antd";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +23,8 @@ export default function RecordingConsentGate() {
     const queryClient = useQueryClient();
     const notices = useRecordingNotices();
     const [agreed, setAgreed] = useState(false);
-    const [saving, setSaving] = useState(false);
+    // `saving` alone let a fast double-click POST the acceptance twice (two audit rows).
+    const { run, pending: saving } = useInFlight();
 
     const { data } = useQuery<PolicyStatus | null>({
         queryKey: ["policy-status"],
@@ -44,17 +46,15 @@ export default function RecordingConsentGate() {
               ? "WingTime sessions are recorded and transcribed"
               : "One-to-one sessions are transcribed (not recorded)";
 
-    const handleAccept = async () => {
-        setSaving(true);
-        try {
-            await acceptRecordingConsent(version);
-            await queryClient.invalidateQueries({ queryKey: ["policy-status"] });
-        } catch {
-            showToast({ type: "error", message: "Couldn't save your choice. Please try again." });
-        } finally {
-            setSaving(false);
-        }
-    };
+    const handleAccept = () =>
+        run(async () => {
+            try {
+                await acceptRecordingConsent(version);
+                await queryClient.invalidateQueries({ queryKey: ["policy-status"] });
+            } catch {
+                showToast({ type: "error", message: "Couldn't save your choice. Please try again." });
+            }
+        });
 
     return (
         <Modal open closable={false} maskClosable={false} keyboard={false} footer={false} centered>

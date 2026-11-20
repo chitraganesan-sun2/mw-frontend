@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useInFlight } from "@/hooks/useInFlight";
 import Link from "next/link";
 import { Checkbox, Modal } from "antd";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,7 +20,8 @@ import { signOut } from "@/utils/signOut";
 export default function PolicyUpdateGate() {
     const queryClient = useQueryClient();
     const [agreed, setAgreed] = useState(false);
-    const [saving, setSaving] = useState(false);
+    // `saving` alone let a fast double-click POST the acceptance twice (two audit rows).
+    const { run, pending: saving } = useInFlight();
 
     const { data } = useQuery<PolicyStatus | null>({
         queryKey: ["policy-status"],
@@ -33,17 +35,15 @@ export default function PolicyUpdateGate() {
 
     if (!data?.needs_acceptance) return null;
 
-    const handleAccept = async () => {
-        setSaving(true);
-        try {
-            await acceptPolicies(data.current);
-            await queryClient.invalidateQueries({ queryKey: ["policy-status"] });
-        } catch {
-            showToast({ type: "error", message: "Couldn't save your choice. Please try again." });
-        } finally {
-            setSaving(false);
-        }
-    };
+    const handleAccept = () =>
+        run(async () => {
+            try {
+                await acceptPolicies(data.current);
+                await queryClient.invalidateQueries({ queryKey: ["policy-status"] });
+            } catch {
+                showToast({ type: "error", message: "Couldn't save your choice. Please try again." });
+            }
+        });
 
     const link = "text-black underline font-medium";
     return (

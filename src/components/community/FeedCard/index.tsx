@@ -189,9 +189,13 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
     };
 
     // Handle Comment
+    // Ref guard: `isCommentLoading` only disables the button after a re-render, so a quick
+    // double-click / double-Enter posted the comment twice.
+    const isCommentPending = useRef(false);
     const handleComment = async (postId: string, parentId?: string) => {
         const text = (drafts[postId] ?? "").trim();
-        if (!text) return;
+        if (!text || isCommentPending.current) return;
+        isCommentPending.current = true;
         setIsCommentLoading(true);
 
         let payload = {
@@ -216,7 +220,10 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
             // toast.promise re-rejects on failure, so the reset must not live in .then -
             // otherwise a failed post left the comment button stuck in its loading state.
             .catch(() => {})
-            .finally(() => setIsCommentLoading(false));
+            .finally(() => {
+                isCommentPending.current = false;
+                setIsCommentLoading(false);
+            });
     };
 
     const toggleCommentPanel = (postId: string) => {
@@ -249,16 +256,23 @@ const FeedCard = ({ onClick, isManagePost = false, handleReportClick }: FeedCard
         setDeleteTargetId(postId);
     };
 
+    const isDeletePending = useRef(false);
     const confirmDeletePost = () => {
-        if (!deleteTargetId) return;
+        if (!deleteTargetId || isDeletePending.current) return;
+        isDeletePending.current = true;
         callbackToast({
             apiCall: DELETE_API(endpoints.post.deletePost(deleteTargetId)),
             loadingMsg: "Deleting post...",
             errorMsg: "Couldn't delete the post. Please try again.",
             successMsg: "Post deleted.",
-        }).then(() => {
-            queryClient.invalidateQueries({ queryKey: ["get-posts", "manage_your_posts"] });
-        });
+        })
+            .then(() => {
+                queryClient.invalidateQueries({ queryKey: ["get-posts", "manage_your_posts"] });
+            })
+            .catch(() => {})
+            .finally(() => {
+                isDeletePending.current = false;
+            });
         setDeleteTargetId(null);
     };
 
