@@ -64,3 +64,16 @@ test("public landing routes include the static pages", () => {
     assert.equal(isPublicLandingRoute("/donate"), true);
     assert.equal(isPublicLandingRoute("/learner/schedule"), false);
 });
+
+test("/blogs is gone: it is neither public nor gated, so it falls through to the 404 page", () => {
+    assert.equal(isPublicLandingRoute("/blogs"), false);
+    assert.equal(isPublicLandingRoute("/blogs/1"), false);
+    assert.equal(getRedirectForRoute("/blogs", signedOut), null);
+    assert.equal(getRedirectForRoute("/blogs/1", signedOut), null);
+});
+
+test("signed-out visitors of /donate/history are sent to the landing page, not left to hit a 401", () => {
+    assert.equal(getRedirectForRoute("/donate/history", signedOut), "/");
+    // signed-in members still reach it
+    assert.equal(getRedirectForRoute("/donate/history", learner("verification_completed")), null);
+});

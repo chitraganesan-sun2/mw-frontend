@@ -1,8 +1,24 @@
 "use client";
 
+import { Suspense, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { isStripeCheckoutSessionId } from "@/utils/donateUrls";
 
-export default function DonateSuccessPage() {
+// Stripe returns the donor here with ?session_id=... . Anyone arriving without it (typed URL,
+// old bookmark, shared link) has not donated, so they are sent to the donation form instead of
+// being thanked for a payment that never happened.
+function DonateSuccessContent() {
+    const router = useRouter();
+    const sessionId = useSearchParams().get("session_id");
+    const confirmed = isStripeCheckoutSessionId(sessionId);
+
+    useEffect(() => {
+        if (!confirmed) router.replace("/donate");
+    }, [confirmed, router]);
+
+    if (!confirmed) return null;
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12 max-w-md w-full text-center">
@@ -56,5 +72,13 @@ export default function DonateSuccessPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function DonateSuccessPage() {
+    return (
+        <Suspense fallback={null}>
+            <DonateSuccessContent />
+        </Suspense>
     );
 }

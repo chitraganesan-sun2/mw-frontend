@@ -9,7 +9,6 @@ import {
     SignUpIcon,
 } from "@/assets/icons";
 
-import DummyImage from "@/assets/images/BackgroundImg.jpeg";
 import DonateImg1 from "@/assets/images/DonateImg1.png";
 import DonateImg2 from "@/assets/images/DonateImg2.png";
 import DonateImg3 from "@/assets/images/DonateImg3.png";
@@ -121,116 +120,6 @@ export const learnerData = [
     },
 ];
 
-export const blogData = [
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-    {
-        image: DummyImage,
-        category: "Technology",
-        title: "The Future of AI",
-        description:
-            "Discover heartwarming stories from our community that showcase the impact of sharing knowledge and time.",
-        date: "Mar 10, 2024",
-        href: "/blogs/1",
-    },
-];
 
 export const donateCardData = [
     {

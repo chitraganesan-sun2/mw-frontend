@@ -21,3 +21,13 @@ test("only plain https checkout URLs are followed", () => {
         assert.equal(isSafeCheckoutRedirect(bad as any), false, String(bad));
     }
 });
+
+import { isStripeCheckoutSessionId } from "../../src/utils/donateUrls.ts";
+
+test("the donation success page needs a real-looking Stripe session id", () => {
+    assert.equal(isStripeCheckoutSessionId("cs_test_a1B2c3D4e5F6g7H8"), true);
+    assert.equal(isStripeCheckoutSessionId("cs_live_a1B2c3D4e5F6g7H8"), true);
+    for (const bad of [undefined, null, "", "cs_test_", "abc", "{CHECKOUT_SESSION_ID}", "cs_test_a b c d e f g h", "../x"]) {
+        assert.equal(isStripeCheckoutSessionId(bad as any), false, String(bad));
+    }
+});
