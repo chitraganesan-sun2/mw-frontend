@@ -35,7 +35,22 @@ const KNOWN_ONBOARDED_STATUSES: OnboardedStatus[] = [
 // is refuse to honour a value that isn't even a real status (treat it as
 // "not onboarded" rather than letting it fall through and grant access).
 function normalizeStatus(status: OnboardedStatus): OnboardedStatus {
-    return KNOWN_ONBOARDED_STATUSES.includes(status) ? status : "details_pending";
+    return status && KNOWN_ONBOARDED_STATUSES.includes(status) ? status : "details_pending";
+}
+
+/**
+ * Compare the (client-writable) cookie status with the status the server reports for the
+ * signed-in member. The server value is the only authoritative one: `status` is null when the
+ * server value is missing/unknown (treat as "could not verify"), `changed` is true when the
+ * cookie must be corrected and the route re-evaluated.
+ */
+export function reconcileOnboardedStatus(
+    cookieStatus: string | undefined,
+    serverStatus: unknown
+): { status: OnboardedStatus | null; changed: boolean } {
+    if (typeof serverStatus !== "string" || serverStatus === "") return { status: null, changed: false };
+    if (!KNOWN_ONBOARDED_STATUSES.includes(serverStatus as OnboardedStatus)) return { status: null, changed: false };
+    return { status: serverStatus as OnboardedStatus, changed: serverStatus !== (cookieStatus || "") };
 }
 
 export const LANDING_PAGE_ROUTES = [
