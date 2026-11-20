@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { createInFlightGuard } from "@/utils/inFlight";
 
 /**
@@ -12,12 +12,11 @@ import { createInFlightGuard } from "@/utils/inFlight";
  *   <Button disabled={pending} loading={pending} />
  */
 export function useInFlight() {
-    const guardRef = useRef<ReturnType<typeof createInFlightGuard> | null>(null);
-    if (!guardRef.current) guardRef.current = createInFlightGuard();
+    // One guard per component instance (lazy state initialiser: created once, never replaced).
+    const [guard] = useState(createInFlightGuard);
     const [pending, setPending] = useState(false);
 
     const run = useCallback(async <T,>(fn: () => Promise<T> | T): Promise<T | undefined> => {
-        const guard = guardRef.current as ReturnType<typeof createInFlightGuard>;
         if (guard.busy) return undefined;
         setPending(true);
         try {
@@ -25,7 +24,7 @@ export function useInFlight() {
         } finally {
             setPending(false);
         }
-    }, []);
+    }, [guard]);
 
     return { run, pending };
 }
