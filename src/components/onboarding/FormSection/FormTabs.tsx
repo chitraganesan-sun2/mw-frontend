@@ -14,6 +14,7 @@ import { ADULT_VOLUNTEER_AGE, SUPPORT_PREFERENCE_OPTIONS_REQUIRING_DETAILS } fro
 import { PrivacyPolicyElement, TermsAndConditionElement } from "./Consents";
 import { useRecordingNotices } from "@/hooks/useRecordingNotices";
 import { getCookie } from "@/utils/auth";
+import { getApiErrorMessage } from "@/utils/apiError";
 import { GET_API, PUT_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -391,7 +392,10 @@ const FormTabs = ({
 
             let isLastStep = role === "volunteer" ? index === 5 : index === 6;
             if (!isLastStep) {
-                await handleUpdateStepAndData(index, control._formValues);
+                // Stay on this tab when the save fails (or is already in flight): advancing on a
+                // failed PUT made the step look saved when nothing had been stored.
+                const saved = await handleUpdateStepAndData(index, control._formValues);
+                if (!saved) return;
             }
         }
 
@@ -399,8 +403,8 @@ const FormTabs = ({
         setActiveTab(index);
     };
 
-    const handleUpdateStepAndData = async (index: number, data: any) => {
-        if (isStepUpdatePendingInFlight.current) return;
+    const handleUpdateStepAndData = async (index: number, data: any): Promise<boolean> => {
+        if (isStepUpdatePendingInFlight.current) return false;
         isStepUpdatePendingInFlight.current = true;
         setIsStepUpdatePending(true);
         try {
@@ -410,7 +414,13 @@ const FormTabs = ({
             );
             queryClient.invalidateQueries({ queryKey: ["onboardingData"] });
             Cookies.set("onboarded_status", "partially_filled");
+            return true;
         } catch (err) {
+            showToast({
+                type: "error",
+                message: getApiErrorMessage(err, "Couldn't save this step. Please check your connection and try again."),
+            });
+            return false;
         } finally {
             isStepUpdatePendingInFlight.current = false;
             setIsStepUpdatePending(false);
