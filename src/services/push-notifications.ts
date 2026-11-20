@@ -18,15 +18,17 @@ export interface PushNotificationToken {
   value: string;
 }
 
-// initPushNotifications() runs once at app mount, which is usually before the user
-// has logged in - caching the token here lets a login success handler register it
-// with the backend later, once there's actually an authenticated user to attach it to.
+// The token is cached so it can be re-sent to the backend later in the session.
 let cachedFcmToken: string | null = null;
 
 /** The FCM token from the most recent initPushNotifications() call, if any. */
 export const getCachedFcmToken = (): string | null => cachedFcmToken;
 
-/** Request permission and register for push notifications */
+/**
+ * Request permission and register for push notifications.
+ * Do not call this at cold start: the OS permission prompt belongs after the member has signed in
+ * (use enablePushForSignedInUser).
+ */
 export const initPushNotifications = async (): Promise<string | null> => {
   if (!isNativePlatform()) return null;
 
@@ -72,6 +74,31 @@ export const initPushNotifications = async (): Promise<string | null> => {
     console.warn('[Push] Init failed (Firebase not configured?):', error);
     return null;
   }
+};
+
+let enablePushInFlight: Promise<void> | null = null;
+
+/**
+ * For a SIGNED-IN member only (call after login/sign-up, or at app start when a session already
+ * exists): asks for the notification permission, registers with FCM and sends the token to the
+ * backend. Asking before login showed the OS prompt to people who had not even signed in.
+ * Safe to call repeatedly; concurrent calls share one run.
+ */
+export const enablePushForSignedInUser = (): Promise<void> => {
+  if (!isNativePlatform()) return Promise.resolve();
+  if (!enablePushInFlight) {
+    enablePushInFlight = (async () => {
+      try {
+        const token = (await initPushNotifications()) ?? getCachedFcmToken();
+        if (token) await registerTokenWithBackend(token);
+      } catch (e) {
+        console.warn('[Push] Could not enable push notifications:', e);
+      } finally {
+        enablePushInFlight = null;
+      }
+    })();
+  }
+  return enablePushInFlight;
 };
 
 /** Register push notification listeners */

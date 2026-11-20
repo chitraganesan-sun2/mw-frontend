@@ -17,7 +17,7 @@ import { handleCookie } from "@/api/auth";
 import dayjs from "dayjs";
 import { isNativePlatform } from "@/utils/platform";
 import { nativeGoogleSignIn } from "@/services/native-auth";
-import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications";
+import { enablePushForSignedInUser } from "@/services/push-notifications";
 import { getDefaultRouteForRole } from "@/utils/routeGuard";
 import EmailPasswordAuth from "./EmailPasswordAuth";
 import { GUARDIAN_REQUIRED_MESSAGE, needsGuardian } from "@/utils/guardianRule";
@@ -202,10 +202,8 @@ const SignUpAsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         await call()
             .then((response: any) => {
                 setModalLoader(true);
-                if (isNativePlatform()) {
-                    const fcmToken = getCachedFcmToken();
-                    if (fcmToken) registerTokenWithBackend(fcmToken);
-                }
+                // First permission prompt happens here, after sign-in (no-op on web).
+                void enablePushForSignedInUser();
                 const { onboarded_status } = response;
                 const role = getCookie("role") as "learner" | "volunteer" | undefined;
                 const defaultRoute = getDefaultRouteForRole(role);

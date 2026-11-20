@@ -1,25 +1,29 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
 import { clearCookies, getCookie } from "@/utils/auth";
 import { unregisterTokenBeforeLogout } from "@/services/push-notifications";
+import { INACTIVITY_TIMEOUT_MS, LAST_ACTIVITY_COOKIE_DAYS, isIdleExpired } from "@/utils/inactivity";
 
-const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const COOKIE_EXPIRY_DAYS = INACTIVITY_TIMEOUT / (1000 * 60 * 60 * 24);
-const DEBOUNCE_DELAY = 10 * 1000; // 10 seconds debounce
+const WRITE_THROTTLE_MS = 10 * 1000; // don't rewrite the cookie on every mousemove
+const CHECK_INTERVAL_MS = 30 * 1000;
+const ACTIVITY_EVENTS = ["mousemove", "keydown", "click", "scroll", "touchstart"] as const;
 
+/**
+ * Signs the member out after 30 minutes without activity - including time the browser / app was
+ * closed (the timestamp lives in a cookie that outlasts the idle timeout).
+ *
+ * Unlike the first version this does not decide once at mount whether a session exists: login is a
+ * client-side navigation (no remount), so the listeners and the periodic check run for the whole
+ * app lifetime and simply do nothing until a token cookie exists.
+ */
 const useAutoLogout = (router: any) => {
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const initializedRef = useRef(false);
-
   const clearSession = useCallback(async () => {
     // Awaited (bounded) and before clearCookies() - it needs the still-valid auth
     // cookie to identify which device's token to remove.
     await unregisterTokenBeforeLogout();
     clearCookies();
     // Full reload (like Log Out) rather than router.refresh(): an SPA refresh kept the
-    // previous user's react-query cache and in-memory store alive on a shared device, and
-    // the user landed on the homepage with no idea why they'd been signed out.
+    // previous user's react-query cache and in-memory store alive on a shared device.
     if (typeof window !== "undefined") {
       window.location.href = "/?session=expired";
     } else {
@@ -27,50 +31,45 @@ const useAutoLogout = (router: any) => {
     }
   }, [router]);
 
-  const resetTimer = useCallback(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    debounceRef.current = setTimeout(() => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      Cookies.set("lastActivity", Date.now().toString(), { expires: COOKIE_EXPIRY_DAYS, path: "/" });
-      timerRef.current = setTimeout(clearSession, INACTIVITY_TIMEOUT);
-    }, DEBOUNCE_DELAY);
-
-  }, [clearSession]);
-
   useEffect(() => {
-    // Skip auto-logout if user is not logged in
-    const token = getCookie("token");
-    if (!token) {
-      initializedRef.current = true;
-      return;
-    }
+    let lastWrite = 0;
+    let signingOut = false;
 
-    const lastActivity = Cookies.get("lastActivity");
+    const stamp = () => {
+      lastWrite = Date.now();
+      Cookies.set("lastActivity", String(lastWrite), { expires: LAST_ACTIVITY_COOKIE_DAYS, path: "/" });
+    };
 
-    // Only clear if lastActivity cookie exists AND is expired
-    if (lastActivity && Date.now() - parseInt(lastActivity) > INACTIVITY_TIMEOUT) {
-      clearSession();
-    } else {
-      // Set lastActivity immediately if missing (prevents issues on next hard nav)
-      if (!lastActivity) {
-        Cookies.set("lastActivity", Date.now().toString(), { expires: COOKIE_EXPIRY_DAYS, path: "/" });
+    const onActivity = () => {
+      if (signingOut || !getCookie("token")) return;
+      if (Date.now() - lastWrite < WRITE_THROTTLE_MS) return;
+      stamp();
+    };
+
+    const check = () => {
+      if (signingOut || !getCookie("token")) return;
+      const last = Cookies.get("lastActivity");
+      if (!last) {
+        stamp(); // session without a timestamp (e.g. just logged in): start counting now
+        return;
       }
-      resetTimer();
-    }
+      if (isIdleExpired(last, Date.now(), INACTIVITY_TIMEOUT_MS)) {
+        signingOut = true;
+        void clearSession();
+      }
+    };
 
-    initializedRef.current = true;
-
-    const events = ["mousemove", "keydown", "click", "scroll"];
-    events.forEach(event => window.addEventListener(event, resetTimer));
+    ACTIVITY_EVENTS.forEach((e) => window.addEventListener(e, onActivity, { passive: true }));
+    document.addEventListener("visibilitychange", check);
+    check(); // returning to a tab / reopening the app after a long gap
+    const interval = setInterval(check, CHECK_INTERVAL_MS);
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      events.forEach(event => window.removeEventListener(event, resetTimer));
+      ACTIVITY_EVENTS.forEach((e) => window.removeEventListener(e, onActivity));
+      document.removeEventListener("visibilitychange", check);
+      clearInterval(interval);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [clearSession]);
 
   return null;
 };
