@@ -30,3 +30,9 @@ export function isSafeCheckoutRedirect(url: unknown): url is string {
         return false;
     }
 }
+
+/** Stripe appends ?session_id={CHECKOUT_SESSION_ID} to the success URL; without a real-looking id
+ *  nobody has been through checkout, so the success page must not thank them. */
+export function isStripeCheckoutSessionId(value: unknown): value is string {
+    return typeof value === "string" && /^cs_(test|live)_[A-Za-z0-9]{8,200}$/.test(value);
+}

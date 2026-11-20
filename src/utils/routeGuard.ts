@@ -69,19 +69,16 @@ export const LANDING_PAGE_ROUTES = [
     "/delete-account",
 ];
 
-// Public routes with a dynamic sub-path (e.g. /blogs/[id]) that LANDING_PAGE_ROUTES'
-// exact-match `.includes()` can never match. Before this existed, every unauthenticated
-// visitor AND search-engine bot hitting /blogs or any individual post was redirected to
-// "/" - the public blog was structurally unreachable by anyone not logged in, which is
-// the entire audience it exists for (see [[production-readiness-audit-2026-09-23]]).
-export const PUBLIC_ROUTE_PREFIXES = ["/blogs"];
-
 export function isPublicLandingRoute(pathname: string): boolean {
-    if (LANDING_PAGE_ROUTES.includes(pathname)) return true;
-    return PUBLIC_ROUTE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+    return LANDING_PAGE_ROUTES.includes(pathname);
 }
 
 const AUTH_ROUTE_PREFIXES = ["/onboarding"];
+
+// Public-looking pages that only make sense for a signed-in member (they call an authenticated
+// API). A signed-out visitor used to render them, hit a 401 and be thrown out with a "session
+// expired" message; they are sent to the landing page (where Log In is) instead.
+export const SIGNED_IN_ONLY_PUBLIC_ROUTES = ["/donate/history"];
 
 // A path under a real section of the app (protected app routes, onboarding) that an
 // unauthenticated visitor isn't allowed to see yet - as opposed to a path that isn't
@@ -129,6 +126,7 @@ export function getRedirectForRoute(pathname: string, auth: AuthState): string |
     // role-specific, and "/volunteer/..." fails the "/undefined" prefix check on the way back,
     // which redirected a page to itself forever). Treat it as signed out.
     if (!auth.isAuthenticated || !auth.role) {
+        if (SIGNED_IN_ONLY_PUBLIC_ROUTES.includes(pathname)) return "/";
         if (isPublicLandingRoute(pathname)) return null;
         return isKnownGatedRoute(pathname) ? "/" : null;
     }
