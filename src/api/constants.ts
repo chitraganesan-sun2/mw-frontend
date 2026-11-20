@@ -1,4 +1,5 @@
 import { EndpointProps } from "@/interfaces/endpoints";
+import { buildQueryString } from "@/utils/query";
 
 type UserType = "volunteer" | "learner";
 type CommonPath =
@@ -25,7 +26,6 @@ export const endpoints: EndpointProps = {
         rules: "wingtime/rules",
         hosted: "wingtime/hosted",
         myRegistrations: "wingtime/my-registrations",
-        item: (id: string) => `wingtime/${id}`,
         register: (id: string) => `wingtime/${id}/register`,
         cancel: (id: string) => `wingtime/${id}/cancel`,
     },
@@ -87,10 +87,6 @@ export const endpoints: EndpointProps = {
     volunteer_slot: {
         update: "volunteer_slots",
         get: `volunteer_slots`,
-        availableSlots: (id: string, date: string) =>
-            `volunteer_slots/available_slots/${id}/${date}`,
-        availableDays: (id: string, month: string) =>
-            `volunteer_slots/available_days/${id}/${month}`,
         /** GET every bookable slot of a volunteer over the next days, flat and sorted. */
         upcomingSlots: (id: string, excludeSessionId?: string | null) =>
             `volunteer_slots/upcoming_slots/${id}${excludeSessionId ? `?exclude_session_id=${encodeURIComponent(excludeSessionId)}` : ""}`,
@@ -137,9 +133,9 @@ export const endpoints: EndpointProps = {
         downloadIcs: (sessionId: string) => `session/${sessionId}/ics`,
         cancelSession: (id: string) => `session/${id}`,
         getApprovalNotifications: (id: string) => `session/pending_invites/${id}`,
+        // One query string: month + status together used to be glued as "?month=..?status=..".
         getCalendarEvents: (id: string, userType: UserType, month?: string, status?: string) =>
-            `session/${userType}/${id}${month ? `?month=${month}` : ""}${status ? `?status=${status}` : ""
-            }`,
+            `session/${userType}/${id}${buildQueryString({ month, status })}`,
         updateNotificationStatus: (id: string) => `session/${id}`,
         markAsCompleted: (id: string) => `session/${id}/mark_as_completed`,
         getUnreadCount: (userType: "volunteer" | "learner" = "volunteer") =>
@@ -159,14 +155,6 @@ export const endpoints: EndpointProps = {
             `session/volunteer/my_instant_sessions?page=${page ?? 1}&size=${size ?? 20}${query ? `&query=${encodeURIComponent(query)}` : ""}${requestStatus ? `&request_status=${requestStatus}` : ""}`,
         /** GET full detail for a single session by session_id (ownership-checked, works for both learner and volunteer callers) */
         getSessionDetail: (sessionId: string) => `session/${sessionId}`,
-    },
-    volunteer_chat: {
-        sendMessage: (id: string) => `chat/message/learner/${id}`,
-        getMessages: (id: string) => `chat/messages/learner/${id}`,
-    },
-    learner_chat: {
-        sendMessage: (id: string) => `chat/message/volunteer/${id}`,
-        getMessages: (id: string) => `chat/messages/volunteer/${id}`,
     },
     post: {
         createPost: "post",

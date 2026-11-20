@@ -19,7 +19,7 @@ export const initSentry = () => {
     Sentry.init(
         {
             dsn: "https://1aeed3c9c8115c5214e7616527e8e31f@o4509546502684672.ingest.us.sentry.io/4509546506878976",
-            environment: isNativePlatform() ? "mobile-native" : "mobile-web",
+            environment: isNativePlatform() ? "mobile-native" : "web",
             release: `melodywings-frontend@${process.env.NEXT_PUBLIC_CURRENT_VERSION || "unknown"}`,
             // Request/response bodies, cookies, and IP can carry the same PII this
             // app's field-level encryption is meant to protect - don't forward it

@@ -23,8 +23,6 @@ export const API_URL = typeof window !== 'undefined' && isNativePlatform()
   ? MOBILE_API_URL 
   : WEB_API_URL;
 
-export const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-
 export const GOOGLE_WEB_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 export const GOOGLE_IOS_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID;
 export const GOOGLE_IOS_URL_SCHEME = process.env.NEXT_PUBLIC_GOOGLE_IOS_URL_SCHEME;
@@ -34,4 +32,5 @@ export const POSTHOG_API_KEY = process.env.NEXT_PUBLIC_POSTHOG_API_KEY;
 export const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 export const VIEW_DEMO_LINK = process.env.NEXT_PUBLIC_VIEW_DEMO_LINK;
 export const VIEW_DEMO_LINK_FOR_VOLUNTEER = process.env.NEXT_PUBLIC_VIEW_DEMO_LINK_FOR_VOLUNTEER;
-export const PAGINATION = process.env.NEXT_PUBLIC_PAGINATION;
+// Page size for the member lists; the env var is optional (unset used to give `size=undefined`).
+export const PAGINATION = process.env.NEXT_PUBLIC_PAGINATION || "9";
