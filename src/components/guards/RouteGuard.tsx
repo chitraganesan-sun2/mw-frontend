@@ -9,11 +9,11 @@ import { getRedirectForRoute, type OnboardedStatus, type Role } from '@/utils/ro
 /**
  * Client-side Route Guard for Capacitor mobile app.
  *
- * Consumes the same routing decision logic as middleware.ts (via
- * utils/routeGuard.ts), since Next.js middleware doesn't run in static
+ * Consumes the same routing decision logic as proxy.ts (via
+ * utils/routeGuard.ts), since the Next.js proxy doesn't run in static
  * exports.
  *
- * Only activates on native platforms — web continues using server middleware.
+ * Only activates on native platforms — web continues using the server proxy.
  */
 
 export default function RouteGuard({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export default function RouteGuard({ children }: { children: React.ReactNode }) 
   const [authorized, setAuthorized] = useState(!isNativePlatform());
 
   useEffect(() => {
-    // Web uses server middleware — skip client guard
+    // Web uses the server proxy — skip client guard
     if (!isNativePlatform()) {
       setAuthorized(true);
       return;

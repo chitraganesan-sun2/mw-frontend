@@ -1,5 +1,5 @@
 // Shared, framework-agnostic routing decision logic consumed by both
-// middleware.ts (web/edge, reads req.cookies, redirects via NextResponse)
+// proxy.ts (web, reads req.cookies, redirects via NextResponse)
 // and RouteGuard.tsx (native/Capacitor, reads cookies/localStorage,
 // redirects via router.replace). Keeping this in one place means a status
 // or route change only has to be made once instead of hand-synced twice.
@@ -107,7 +107,7 @@ export const ALWAYS_ACCESSIBLE_ROUTES = [
 export const PROTECTED_ROUTES = ["/learner", "/volunteer"];
 
 // The Schedule dashboard is the signed-in landing page for both roles (the learner used to
-// land on Instant Sessions). Onboarding / verification / admin redirects are decided above
+// land on Instant Sessions). Onboarding / verification redirects (this app has no admin role) are decided above
 // this in getRedirectForRoute and are unaffected.
 export function getDefaultRouteForRole(role: Role): string {
     return role === "learner" ? "/learner/schedule" : "/volunteer/schedule";
