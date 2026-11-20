@@ -248,7 +248,15 @@ html {
     border-radius: 12px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     overflow: visible !important;
+    /* Opaque, and above the cards it overlaps: the text of the card underneath used to show
+       through the open menu (F14). Forcing opacity also skips the fade-in frame in which it did. */
     background-color: var(--input-background) !important;
+    opacity: 1 !important;
+    z-index: 1100 !important;
+}
+
+.session-match-dropdown .ant-select-item {
+    background-color: var(--input-background);
 }
 
 .session-match-dropdown .rc-virtual-list-holder-inner {
