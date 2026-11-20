@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -247,6 +247,19 @@ export default function VolunteerInstantSessionsPage() {
     const router = useRouter();
     const queryClient = useQueryClient();
     const [isActionLoading, setIsActionLoading] = useState(false);
+    // `isActionLoading` is state and lags a render behind, so a double-click on Accept / Cancel /
+    // Complete fired the request twice. This ref closes that window synchronously.
+    const actionInFlight = useRef(false);
+    const beginAction = () => {
+        if (actionInFlight.current) return false;
+        actionInFlight.current = true;
+        setIsActionLoading(true);
+        return true;
+    };
+    const endAction = () => {
+        actionInFlight.current = false;
+        setIsActionLoading(false);
+    };
     // Which detail-modal action is in flight (loading spinner on that button, both disabled).
     const [detailAction, setDetailAction] = useState<"complete" | "cancel" | null>(null);
     const timeZoneLabel = useProfileTimeZone("volunteer");
@@ -324,7 +337,7 @@ export default function VolunteerInstantSessionsPage() {
     const mySessionsHasMore = Number(sessionsPage) * 12 < mySessionsTotal;
 
     const handleAcceptRequest = async (requestId: string) => {
-        setIsActionLoading(true);
+        if (!beginAction()) return;
         try {
             await POST_API(endpoints.session.acceptLearnerRequest(requestId));
             showToast({ message: "Request accepted. Your session is now scheduled.", type: "success" });
@@ -332,7 +345,7 @@ export default function VolunteerInstantSessionsPage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't accept the request. Please try again."), type: "error" });
         } finally {
-            setIsActionLoading(false);
+            endAction();
         }
     };
 
@@ -351,7 +364,7 @@ export default function VolunteerInstantSessionsPage() {
     const handleCompleteSession = async (sessionId: string) => {
         if (isActionLoading) return;
         if (!(await askConfirm({ title: "Mark as Completed", description: "Mark this session as completed? This can't be undone.", confirmText: "Mark as Completed", cancelText: "Not yet" }))) return;
-        setIsActionLoading(true);
+        if (!beginAction()) return;
         setDetailAction("complete");
         try {
             await PUT_API(endpoints.session.markAsCompleted(sessionId), {});
@@ -361,14 +374,14 @@ export default function VolunteerInstantSessionsPage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't complete the session. Please try again."), type: "error" });
         } finally {
-            setIsActionLoading(false);
+            endAction();
             setDetailAction(null);
         }
     };
 
     const handleWithdrawOpenSession = async (volunteerSlotId: string) => {
         if (!(await askConfirm({ title: "Withdraw Session", description: "Withdraw this open instant session? Learners will no longer see it.", confirmText: "Withdraw", cancelText: "Keep it", danger: true }))) return;
-        setIsActionLoading(true);
+        if (!beginAction()) return;
         try {
             await DELETE_API(endpoints.session.withdrawInstantSession(volunteerSlotId));
             showToast({ message: "Instant session withdrawn", type: "success" });
@@ -376,14 +389,14 @@ export default function VolunteerInstantSessionsPage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't withdraw the session. Please try again."), type: "error" });
         } finally {
-            setIsActionLoading(false);
+            endAction();
         }
     };
 
     const handleCancelSession = async (sessionId: string) => {
         if (isActionLoading) return;
         if (!(await askConfirm({ title: "Cancel Session", description: "Are you sure you want to cancel this session?", confirmText: "Cancel Session", cancelText: "Keep it", danger: true }))) return;
-        setIsActionLoading(true);
+        if (!beginAction()) return;
         setDetailAction("cancel");
         try {
             await PUT_API(endpoints.session.cancelSession(sessionId), { status: "cancelled" });
@@ -393,7 +406,7 @@ export default function VolunteerInstantSessionsPage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't cancel the session. Please try again."), type: "error" });
         } finally {
-            setIsActionLoading(false);
+            endAction();
             setDetailAction(null);
         }
     };

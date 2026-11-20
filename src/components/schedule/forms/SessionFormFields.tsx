@@ -10,7 +10,7 @@
  *                                        which also covers what the volunteer should know or prepare)
  *   Date -> Start Time / Available Slots -> Duration   (learner's booking form: one Available Times dropdown)
  */
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
@@ -188,6 +188,7 @@ export function SkillField({
 }) {
     const queryClient = useQueryClient();
     const [isCreating, setIsCreating] = useState(false);
+    const isCreatingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     const catalogMode = !options;
 
     // Same key as other skills pickers, so the catalog is fetched once per category.
@@ -205,6 +206,8 @@ export function SkillField({
     const createSkill = async (name: string) => {
         const skillName = name?.trim();
         if (!skillName) return;
+        if (isCreatingInFlight.current) return;
+        isCreatingInFlight.current = true;
         setIsCreating(true);
         try {
             const res = await POST_API(endpoints.common("skills"), { skill_name: skillName, category });
@@ -215,6 +218,7 @@ export function SkillField({
         } catch {
             showToast({ message: "Couldn't add that skill. Please pick one from the list.", type: "error" });
         } finally {
+            isCreatingInFlight.current = false;
             setIsCreating(false);
         }
     };

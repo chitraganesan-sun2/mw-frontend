@@ -24,6 +24,7 @@ type Props = {
 const ResumeUpload = ({ applicationId, value, onChange, disabled }: Props) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [busy, setBusy] = useState(false);
+    const busyInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     const [error, setError] = useState("");
 
     const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +38,8 @@ const ResumeUpload = ({ applicationId, value, onChange, disabled }: Props) => {
             return;
         }
         setError("");
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             const form = new FormData();
@@ -47,6 +50,7 @@ const ResumeUpload = ({ applicationId, value, onChange, disabled }: Props) => {
         } catch (err: any) {
             setError(getApiErrorMessage(err, "Couldn't upload your resume. Please try again."));
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
         }
     };
@@ -54,6 +58,8 @@ const ResumeUpload = ({ applicationId, value, onChange, disabled }: Props) => {
     const handleRemove = async () => {
         if (busy) return;
         setError("");
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await deleteResume(applicationId);
@@ -61,6 +67,7 @@ const ResumeUpload = ({ applicationId, value, onChange, disabled }: Props) => {
         } catch (err: any) {
             setError(getApiErrorMessage(err, "Couldn't remove your resume. Please try again."));
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
         }
     };

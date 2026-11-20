@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import Button from "@/components/common/Button";
 import {
@@ -120,6 +120,8 @@ export default function NewEventModal({
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isSubmittingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     // Temporary time state for mobile time picker dialog
     const [tempTime, setTempTime] = useState<dayjs.Dayjs | null>(null);
     // Fully controlled open state, so the custom action bar (below) can close the
@@ -456,6 +458,8 @@ export default function NewEventModal({
             grade_level: category === "academic" ? level : null,
             expertise_level: category === "non_academic" ? level : null,
         };
+        if (isSubmittingInFlight.current) return;
+        isSubmittingInFlight.current = true;
         setIsSubmitting(true);
         try {
             const res = await POST_API(endpoints.session.createInstantSession, payload);
@@ -479,6 +483,7 @@ export default function NewEventModal({
         } catch (err) {
             showToast({ message: getApiErrorMessage(err, "Couldn't post the instant session. Please try again."), type: "error" });
         } finally {
+            isSubmittingInFlight.current = false;
             setIsSubmitting(false);
         }
     };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { getApiErrorMessage } from "@/utils/apiError";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { showToast } from "@/components/common/Toast";
@@ -49,6 +49,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     onSuccess,
 }) => {
     const [isLoading, setIsLoading] = useState(false);
+    const submittingRef = useRef(false); // sync guard: a double-click must not post two requests
 
     // Everything date/time is reasoned about in the learner's *profile* timezone, not
     // the browser's, so "today", the past-time guard and the picker all agree with what
@@ -127,6 +128,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
     };
 
     const handleSubmit = async () => {
+        if (submittingRef.current) return;
         const found = {
             category: category ? undefined : "Category is required",
             skill: skill ? undefined : "Skill is required",
@@ -154,6 +156,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
             return;
         }
 
+        submittingRef.current = true;
         setIsLoading(true);
         try {
             const payload = {
@@ -179,6 +182,7 @@ const RequestInstantSessionModal: React.FC<RequestInstantSessionModalProps> = ({
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Something went wrong. Please try again."), type: "error" });
         } finally {
+            submittingRef.current = false;
             setIsLoading(false);
         }
     };

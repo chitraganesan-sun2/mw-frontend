@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useJoinUsStore } from "@/store/useJoinUsStore";
 import { submitStep2, updateStep2 } from "@/api/join-us";
@@ -76,6 +76,7 @@ const JoinUsStep2Page = () => {
     const router = useRouter();
     const { applicationId, step1Submitted, step2Submitted, setStep2Submitted, step2Data, setStep2Data } = useJoinUsStore();
     const [loading, setLoading] = useState(false);
+    const loadingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [selectedPosition, setSelectedPosition] = useState<string>(step2Data?.selected_position || "");
     const [customRole, setCustomRole] = useState(step2Data?.custom_role_description || "");
@@ -122,6 +123,10 @@ const JoinUsStep2Page = () => {
             } : null)
         };
 
+        if (loadingInFlight.current) return;
+
+        loadingInFlight.current = true;
+
         setLoading(true);
         let navigated = false;
         try {
@@ -137,7 +142,10 @@ const JoinUsStep2Page = () => {
         } catch (err: any) {
             showToast({ type: 'error', message: getApiErrorMessage(err, "Couldn't save your selection. Please try again.") });
         } finally {
-            if (!navigated) setLoading(false);
+            if (!navigated) {
+                loadingInFlight.current = false;
+                setLoading(false);
+            }
         }
     };
 

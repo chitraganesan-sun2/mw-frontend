@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -66,6 +66,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
     const [tagsText, setTagsText] = useState("");
     const [errors, setErrors] = useState<Errors>({});
     const [submitting, setSubmitting] = useState(false);
+    const submittingInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     const reset = () => {
         setTopic("");
@@ -114,6 +115,8 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         const found = validate();
         setErrors(found);
         if (Object.keys(found).length) return;
+        if (submittingInFlight.current) return;
+        submittingInFlight.current = true;
         setSubmitting(true);
         try {
             await POST_API(endpoints.wingtime.base, {
@@ -132,6 +135,7 @@ export default function ProposeWingTimeModal({ isOpen, onClose, onProposed, tzLa
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't send your WingTime. Please try again."), type: "error" });
         } finally {
+            submittingInFlight.current = false;
             setSubmitting(false);
         }
     };

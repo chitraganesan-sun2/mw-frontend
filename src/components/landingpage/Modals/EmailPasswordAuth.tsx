@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input } from "antd";
 import { MdOutlineMailOutline } from "react-icons/md";
 import Button from "@/components/common/Button";
@@ -62,6 +62,7 @@ const EmailPasswordAuth = ({
     const [emailToken, setEmailToken] = useState("");
     const [touched, setTouched] = useState(false);
     const [busy, setBusy] = useState(false);
+    const busyInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     const trimmed = email.trim();
     const emailProblem = emailError(trimmed);
@@ -71,6 +72,8 @@ const EmailPasswordAuth = ({
     const sendCode = async () => {
         setTouched(true);
         if (emailProblem) return;
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await apiRequestEmailOtp(trimmed);
@@ -79,11 +82,14 @@ const EmailPasswordAuth = ({
         } catch (err) {
             showToast({ type: "error", message: detailOf(err, "Couldn't send the code. Please try again.") });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
         }
     };
 
     const verifyCode = async () => {
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             setEmailToken(await apiVerifyEmailOtp(trimmed, code.trim()));
@@ -92,6 +98,7 @@ const EmailPasswordAuth = ({
         } catch (err) {
             showToast({ type: "error", message: detailOf(err, "Couldn't verify the code. Please try again.") });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
         }
     };

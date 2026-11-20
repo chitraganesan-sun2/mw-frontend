@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { GET_API, POST_API, DELETE_API } from "@/api/request";
@@ -50,6 +50,7 @@ export default function LearnerWingTimePage() {
     const [browsePage, setBrowsePage] = useState(1);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
+    const busyInFlight = useRef(false); // synchronous re-entry guard (state lags a render behind a double-click)
 
     useEffect(() => {
         setHeaderOptions({ title: "WingTime", titleIcon: getHeaderIcon(pathname), hideSearch: true, showButton: false });
@@ -82,6 +83,8 @@ export default function LearnerWingTimePage() {
     const refresh = () => queryClient.invalidateQueries({ queryKey: ["wingtime"] });
 
     const signUp = async (item: WingTime) => {
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await POST_API(endpoints.wingtime.register(item.wingtime_id));
@@ -89,6 +92,7 @@ export default function LearnerWingTimePage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't sign you up. Please try again."), type: "error" });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
             await refresh(); // a session may have filled up or changed - always show the truth
         }
@@ -96,6 +100,8 @@ export default function LearnerWingTimePage() {
 
     const leave = async (item: WingTime) => {
         if (!(await confirm({ title: "Leave this WingTime?", description: `You can sign up again for "${item.topic}" if there's still room.`, confirmText: "Leave" }))) return;
+        if (busyInFlight.current) return;
+        busyInFlight.current = true;
         setBusy(true);
         try {
             await DELETE_API(endpoints.wingtime.register(item.wingtime_id));
@@ -103,6 +109,7 @@ export default function LearnerWingTimePage() {
         } catch (error: any) {
             showToast({ message: getApiErrorMessage(error, "Couldn't update your sign-up. Please try again."), type: "error" });
         } finally {
+            busyInFlight.current = false;
             setBusy(false);
             await refresh();
         }
