@@ -23,6 +23,9 @@ const csp = [
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://www.googletagmanager.com https://*.google-analytics.com https://lh3.googleusercontent.com",
     "font-src 'self' data: https://fonts.gstatic.com",
+    // <video src> plays the uploads (profile videos, community posts) straight from Cloudinary;
+    // without media-src, default-src 'self' blocked every one of them.
+    "media-src 'self' blob: https://res.cloudinary.com",
     [
         "connect-src 'self'",
         apiOrigin,
@@ -47,7 +50,9 @@ const csp = [
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
-    "upgrade-insecure-requests",
+    // Production only: on a plain-http dev server the browser upgraded same-origin requests (and
+    // redirects) to https://localhost, which nothing listens on (ERR_CONNECTION_RESET, F19).
+    ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
 const securityHeaders = [

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isCookiesFound, isTokenValid } from "./utils/auth";
 import { getRedirectForRoute, isPublicLandingRoute, type OnboardedStatus } from "./utils/routeGuard";
+import { resolveRequestOrigin } from "./utils/requestOrigin";
 
 const EXCLUDED_PATHS = ["/favicon.ico", "/logo.png"];
 
@@ -37,7 +38,7 @@ function isSearchEngineBot(userAgent: string | null): boolean {
 }
 
 export default function proxy(req: NextRequest) {
-  const { pathname, origin } = req.nextUrl;
+  const { pathname } = req.nextUrl;
   const userAgent = req.headers.get("user-agent");
 
   // Allow search engine bots to access public pages
@@ -70,6 +71,13 @@ export default function proxy(req: NextRequest) {
   });
 
   if (redirectTo) {
+    // Redirect to the origin the visitor actually used (scheme from x-forwarded-proto, host from the
+    // request) - never a hard-coded https - so an http dev / staging origin is not sent to https://.
+    const origin = resolveRequestOrigin({
+      forwardedProto: req.headers.get("x-forwarded-proto"),
+      host: req.headers.get("host"),
+      nextUrlOrigin: req.nextUrl.origin,
+    });
     return NextResponse.redirect(new URL(redirectTo, origin));
   }
 
