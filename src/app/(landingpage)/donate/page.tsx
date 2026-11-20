@@ -17,6 +17,9 @@ import { COUNTRY_CODE_OPTIONS } from "@/utils/countryDialCodes";
 import { cn } from "@/utils/merge-class";
 import { Input as AntInput } from "antd";
 import { showToast } from "@/components/common/Toast";
+import { getDonationReturnOrigin, isSafeCheckoutRedirect } from "@/utils/donateUrls";
+import { isNativePlatform } from "@/utils/platform";
+import { openExternalUrl } from "@/services/app-lifecycle";
 import "./donate.css";
 import { HeartDivider, NonProfit, SecureDonation, TaxDeductive } from "@/assets/icons";
 // Donor wall UI data (fetched)
@@ -322,10 +325,15 @@ const Donate = () => {
     const handleDonateSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (isSubmitting) return;
-        const successUrl =
-            typeof window !== "undefined" ? `${window.location.origin}/donate/success` : "";
-        const cancelUrl =
-            typeof window !== "undefined" ? `${window.location.origin}/donate` : "";
+        // In the Android WebView window.location.origin is https://localhost, which Stripe cannot
+        // send the donor back to (and the API would refuse it): use the public site there.
+        const returnOrigin = getDonationReturnOrigin({
+            isNative: isNativePlatform(),
+            windowOrigin: typeof window !== "undefined" ? window.location.origin : "",
+            siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+        });
+        const successUrl = `${returnOrigin}/donate/success`;
+        const cancelUrl = `${returnOrigin}/donate`;
 
         // Resolve amount
         const amountNumber = Number(isCustom ? customAmount : donateAmount || 0);
@@ -419,8 +427,16 @@ const Donate = () => {
                 const redirectUrl =
                     (data && (data.url || data.redirect_url)) ||
                     (data?.data && (data.data.url || data.data.redirect_url));
-                if (redirectUrl && typeof window !== "undefined") {
-                    window.location.href = redirectUrl as string;
+                if (isSafeCheckoutRedirect(redirectUrl) && typeof window !== "undefined") {
+                    if (isNativePlatform()) {
+                        // Open Stripe in the system browser so the app (WebView) is not navigated away.
+                        void openExternalUrl(redirectUrl).finally(() => {
+                            isSubmittingInFlight.current = false;
+                            setIsSubmitting(false);
+                        });
+                    } else {
+                        window.location.href = redirectUrl;
+                    }
                     return;
                 }
                 isSubmittingInFlight.current = false;
