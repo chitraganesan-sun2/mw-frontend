@@ -6,6 +6,8 @@ import { roleTagClass } from "@/components/common/Tag/roleTagClass";
 import { useAppStore } from "@/store/useAppStore";
 import { useQuery } from "@tanstack/react-query";
 import { getCookie } from "@/utils/auth";
+import { joinNames } from "@/utils/joinNames";
+import { NAME_FALLBACK } from "@/utils/displayName";
 import Image from "next/image";
 import { safeImageSrc } from "@/utils/safeHref";
 import Link from "next/link";
@@ -48,16 +50,16 @@ const Avatar = () => {
         if (status !== 200 || !data) return null;
         if (role === "learner") {
             setLearnerDetails(data);
-            const learnerName =
-                data?.learner_personal_info?.learner_first_name +
-                " " +
-                data?.learner_personal_info?.learner_last_name;
+            const learnerName = joinNames(
+                data?.learner_personal_info?.learner_first_name,
+                data?.learner_personal_info?.learner_last_name
+            );
             setLearnerName(learnerName);
             setUserName(learnerName);
             setUserImage(data?.profile_picture?.image_url);
         } else {
             setVolunteerDetails(data);
-            const volunteerName = data?.volunteer_first_name + " " + data?.volunteer_last_name;
+            const volunteerName = joinNames(data?.volunteer_first_name, data?.volunteer_last_name);
             setUserName(volunteerName);
             setVolunteerName(volunteerName);
             setUserImage(data?.profile_picture?.image_url);
@@ -75,6 +77,8 @@ const Avatar = () => {
         enabled: !!role,
     });
 
+    // A name persisted by an older build could still read "undefined undefined".
+    const shownName = userName && !/(undefined|null)/.test(userName) ? userName : NAME_FALLBACK;
     const avatarSrc = safeImageSrc(userImage);
 
     const content = (
@@ -84,7 +88,7 @@ const Avatar = () => {
                     <Image src={avatarSrc} alt="avatar" fill className="object-cover rounded-full" />
                 )}
             </div>
-            <p className="font-medium text-center">{userName}</p>
+            <p className="font-medium text-center">{shownName}</p>
             <TagComponent text={role || ""} tagClassName={roleTagClass(role)} />
             <p className="text-xs text-gray-light  text-center">
                 {isVolunteer
