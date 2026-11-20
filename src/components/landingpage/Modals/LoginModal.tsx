@@ -13,7 +13,7 @@ import { showToast } from "@/components/common/Toast"
 import ModalLoader from "@/components/common/Loader/Modal"
 import { isNativePlatform } from "@/utils/platform"
 import { nativeGoogleSignIn } from "@/services/native-auth"
-import { getCachedFcmToken, registerTokenWithBackend } from "@/services/push-notifications"
+import { enablePushForSignedInUser } from "@/services/push-notifications"
 import { getDefaultRouteForRole } from "@/utils/routeGuard"
 import EmailPasswordAuth from "./EmailPasswordAuth"
 
@@ -35,10 +35,8 @@ export const LoginModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
         await call()
             .then((response: any) => {
                 setModalLoader(true);
-                if (isNativePlatform()) {
-                    const fcmToken = getCachedFcmToken();
-                    if (fcmToken) registerTokenWithBackend(fcmToken);
-                }
+                // First permission prompt happens here, after sign-in (no-op on web).
+                void enablePushForSignedInUser();
                 const { onboarded_status } = response;
                 const role = getCookie("role") as "learner" | "volunteer" | undefined;
                 const defaultRoute = getDefaultRouteForRole(role);

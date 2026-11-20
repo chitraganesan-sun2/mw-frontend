@@ -110,6 +110,11 @@ export const setCookie = (cookieData: Object) => {
     entries.forEach(([key, value]) => {
         if (value) Cookies.set(key, value, COOKIE_OPTS)
     });
+    // A new session starts counting idle time from now, so a stale timestamp left over from an
+    // earlier session cannot sign the member straight back out (see useAutoLogout).
+    if (entries.some(([key, value]) => key === "token" && value)) {
+        Cookies.set("lastActivity", String(Date.now()), COOKIE_OPTS);
+    }
 
     // Persist to localStorage for native WebView resilience (source of truth on native)
     if (isNativePlatform()) {

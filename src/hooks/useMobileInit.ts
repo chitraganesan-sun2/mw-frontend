@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { isNativePlatform } from '@/utils/platform';
 import { initNativeGoogleAuth } from '@/services/native-auth';
-import { initPushNotifications, registerPushListeners, registerTokenWithBackend } from '@/services/push-notifications';
+import { enablePushForSignedInUser, registerPushListeners } from '@/services/push-notifications';
 import { initAppLifecycle } from '@/services/app-lifecycle';
 import { getCookie } from '@/utils/auth';
 
@@ -43,26 +43,11 @@ export default function useMobileInit() {
         console.warn('[Mobile] Google auth init failed:', e);
       }
 
-      // 3. Initialize push notifications (graceful — won't crash without Firebase)
-      let fcmToken: string | null = null;
-      try {
-        fcmToken = await initPushNotifications();
-      } catch (e) {
-        console.warn('[Mobile] Push notifications unavailable:', e);
-      }
-
-      if (fcmToken) {
-        // Covers app resume while already logged in - a fresh login/signup instead
-        // registers the token itself once auth succeeds, since this mount effect
-        // runs once at app start, typically before the user has signed in yet.
-        const userId = getCookie('learner_id') || getCookie('volunteer_id');
-        if (userId) {
-          try {
-            await registerTokenWithBackend(fcmToken);
-          } catch (e) {
-            console.warn('[Mobile] Registering the push token failed:', e);
-          }
-        }
+      // 3. Push notifications: only for a member who is already signed in (app resume). A fresh
+      //    login / sign-up calls enablePushForSignedInUser itself, so the OS permission prompt is
+      //    never shown to a visitor who has not logged in.
+      if (getCookie('token')) {
+        void enablePushForSignedInUser();
       }
 
       // 4. Register push notification listeners (safe even without FCM)
@@ -74,8 +59,10 @@ export default function useMobileInit() {
           // On notification tapped
           (notification) => {
             // Navigate based on notification data
-            if (notification.data?.route) {
-              router.push(notification.data.route);
+            // Only in-app paths: the payload is data, not trusted navigation.
+            const route = notification.data?.route;
+            if (typeof route === 'string' && route.startsWith('/') && !route.startsWith('//')) {
+              router.push(route);
             }
           }
         );
