@@ -96,7 +96,7 @@ const Footer = (props: Props) => {
                                 501(c)(3) | EIN: 33-3734582
                             </p>
                             <p className="text-gray-400 text-center text-xs">
-                                &copy; {new Date().getFullYear()} MelodyWings
+                                &copy; {new Date().getFullYear()} MelodyWings&reg;
                             </p>
                         </div>
 
