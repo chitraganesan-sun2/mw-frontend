@@ -9,6 +9,7 @@ import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
 import { ApprovalModalProps } from "./index.type.d";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { showToast } from "@/components/common/Toast";
 import { formatSessionDate } from "@/utils/sessionDisplay";
 
 type SessionsData = {
@@ -92,26 +93,44 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
     });
     const outcomeItems = outcomes.data ?? [];
 
-    const handleUpdateReadsNotifications = async () => {
-        // Opening the bell = "seen". Clear every unread session notification for this user,
-        // not just the pending invites listed here - otherwise session_accepted /
-        // session_rejected / session_cancelled notices never get marked read and the badge
-        // count stays > 0 with nothing left to act on.
+    // Opening the drawer no longer marks everything read (merely looking used to clear every
+    // unread notice, including ones never actually seen). Notices are marked read when the member
+    // clicks the invite, or all at once through the explicit button.
+    const handleMarkAllRead = async () => {
         try {
             await POST_API(endpoints.session.markAllNotificationsRead, {});
             queryClient.invalidateQueries({ queryKey: ["unread-count"] });
+            queryClient.invalidateQueries({ queryKey: ["session-outcome-notifications"] });
+            await refetch();
         } catch (error) {
-            console.error("Error updating unread sessions:", error);
+            showToast({ type: "error", message: "Couldn't mark your notifications as read. Please try again." });
+        }
+    };
+
+    const markInviteRead = async (session: SessionsData) => {
+        if (!session?.session_id || session.is_read) return;
+        // Optimistic: the unread dot disappears straight away.
+        setNotificationsData((prev) =>
+            prev.map((day) => ({
+                ...day,
+                sessions: day.sessions?.map((x) => (x.session_id === session.session_id ? { ...x, is_read: true } : x)),
+            }))
+        );
+        try {
+            await POST_API(endpoints.session.updateReadsNotifications, { session_ids: [session.session_id] });
+            queryClient.invalidateQueries({ queryKey: ["unread-count"] });
+        } catch (error) {
+            console.error("Error marking the notification as read:", error);
         }
     };
 
     useEffect(() => {
-        if (data) {
-            setNotificationsData(data?.items || []);
-            handleUpdateReadsNotifications();
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh the list and mark notifications read only when new data arrives
+        if (data) setNotificationsData(data?.items || []);
     }, [data]);
+
+    const hasUnreadInvites = notificationsData.some((day) => day.sessions?.some((x) => x.is_read === false));
+    const unreadCountForBell = Number(queryClient.getQueryData<any>(["unread-count", role])?.unread_count || 0);
+    const showMarkAll = hasUnreadInvites || unreadCountForBell > 0;
 
     const isMobileScreen = InnerWidth() < 768;
 
@@ -124,6 +143,15 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
             modalWidth={isMobileScreen ? "100%" : 400}
         >
             <div className="flex flex-col gap-4 px-5 mt-5">
+                {showMarkAll && (
+                    <button
+                        type="button"
+                        onClick={handleMarkAllRead}
+                        className="self-end text-sm text-primary underline font-medium bg-transparent border-0 p-0 cursor-pointer"
+                    >
+                        Mark all as read
+                    </button>
+                )}
                 {isPending ? (
                     <div className="flex flex-col gap-4">
                         {Array.from({ length: 10 }).map((_, index) => (
@@ -143,11 +171,10 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
                             </div>
                             <div className="flex flex-col gap-3">
                                 {notification?.sessions?.map((session) => (
-                                    <NotificationCard
-                                        key={session?.session_id}
-                                        data={session}
-                                        viewerRole={role}
-                                    />
+                                    // Clicking anything on an invite counts as having seen it.
+                                    <div key={session?.session_id} onClickCapture={() => markInviteRead(session)}>
+                                        <NotificationCard data={session} viewerRole={role} />
+                                    </div>
                                 ))}
                             </div>
                         </div>
