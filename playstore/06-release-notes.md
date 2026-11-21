@@ -1,3 +1,26 @@
+# Release notes — v1.8.6 (versionCode 23)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.6
+
+• Notifications now pop up on your screen so you don't miss a message or a session update
+• Small reliability improvements
+```
+
+---
+
+## Internal changelog — v1.8.6 (versionCode 23)
+
+Notification channel: pushes used Android's default FCM fallback channel (importance 3: shade + sound, no pop-up).
+The app now creates a high-importance channel `melodywings_alerts` (importance 4, private on the lock screen, vibration) at
+every start and at push registration, and the manifest sets it as `default_notification_channel_id`, so pushes that arrive
+while the app is closed use it. Pair with backend PR chitraganesan-sun2/melodywings-backend#21 (high-priority delivery);
+neither depends on the other. A user who changed the channel's settings in Android keeps their choice.
+
+---
+
 # Release notes — v1.8.5 (versionCode 22)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*

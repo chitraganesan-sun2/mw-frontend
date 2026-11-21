@@ -36,6 +36,31 @@ const tokenSync = createPushTokenSync({
 /** The FCM token from the most recent registration, if any. */
 export const getCachedFcmToken = (): string | null => tokenSync.getToken();
 
+/** Must match com.google.firebase.messaging.default_notification_channel_id in AndroidManifest.xml. */
+export const ALERTS_CHANNEL_ID = 'melodywings_alerts';
+
+/**
+ * Android only: make sure the high-importance channel pushes are delivered on exists. Importance 4
+ * ("high") is what lets a notification pop up over the current screen; the channel FCM falls back
+ * to has no pop-up. Safe to call repeatedly (an existing channel keeps the user's own settings).
+ * Content is hidden on a locked screen (visibility 0 = private): messages can be from minors.
+ */
+export const ensureAlertsChannel = async (): Promise<void> => {
+  if (!isNativePlatform() || getPlatformName() !== 'android') return;
+  try {
+    await PushNotifications.createChannel({
+      id: ALERTS_CHANNEL_ID,
+      name: 'MelodyWings alerts',
+      description: 'Messages, session updates and reminders',
+      importance: 4,
+      visibility: 0,
+      vibration: true,
+    });
+  } catch (error) {
+    console.warn('[Push] Could not create the notification channel:', error);
+  }
+};
+
 // Waiters for the FIRST token of an initPushNotifications() call; the permanent listener below
 // resolves them. The listeners are attached once - attaching again on every call stacked duplicates.
 let tokenWaiters: Array<(token: string | null) => void> = [];
@@ -72,6 +97,7 @@ export const initPushNotifications = async (): Promise<string | null> => {
   try {
     // Listen BEFORE registering so the token event can never be missed.
     attachTokenListeners();
+    void ensureAlertsChannel();
 
     // Request permission
     const permStatus = await PushNotifications.requestPermissions();
@@ -138,6 +164,9 @@ export const registerPushListeners = (
   onNotificationTapped?: (notification: any) => void
 ): void => {
   if (!isNativePlatform()) return;
+
+  // At every app start, so the channel exists before the first push after an update.
+  void ensureAlertsChannel();
 
   // Notification received while app is in foreground
   PushNotifications.addListener('pushNotificationReceived', (notification) => {

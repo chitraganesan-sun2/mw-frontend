@@ -38,6 +38,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Pushes that arrive while the app is closed use this channel (created by the app at start,
+             see ensureAlertsChannel in src/services/push-notifications.ts). Without it Android files them
+             under the default, low-prominence channel: no pop-up banner. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="melodywings_alerts" />
     </application>
 
     <!-- Permissions -->
