@@ -1,3 +1,30 @@
+# Release notes — v1.8.5 (versionCode 22)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.5
+
+• Fixed: feedback after a session could not be submitted
+• Forms no longer send twice if you tap a button quickly
+• Clearer error messages with a Try again option when a page can't load
+• Smaller improvements to accessibility and reliability
+```
+
+---
+
+## Internal changelog — v1.8.5 (versionCode 22)
+
+Ships the 2026-11-20 audit fixes to the user app (PR chitraganesan-sun2/mw-frontend#50, merged to main as ec1c07ea):
+feedback after a session was rejected with a 422 (no session id) and showed a blank volunteer name; synchronous in-flight
+guards on every submit handler; profile and instant-session pages show an error with retry instead of zeros; onboarding
+Next no longer advances when saving fails; text-only community posts; the private shell verifies the member with the
+server first; accessible names for icon-only controls; the bell drawer no longer marks everything read; Android donation
+return URLs use the public site and only follow https checkout URLs; `android:allowBackup="false"`; CSP `media-src`.
+Needs the backend from 2026-11-21 (melodywings-backend 34f9819) - already live. Older app versions keep working.
+
+---
+
 # Release notes — v1.8.4 (versionCode 21)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
