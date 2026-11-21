@@ -194,7 +194,10 @@ const MeetingPreviewModal: React.FC<MeetingPreviewModalProps> = ({
         onClose();
         // Keep the view the user is on (the calendar is ?view=calendar).
         const view = searchParams.get("view");
-        router.push(`/${role}/schedule?${view ? `view=${encodeURIComponent(view)}&` : ""}current_month=${currentMonth}&modal=feedback`);
+        // The calendar lives under Book for Later; /schedule?view=calendar only redirects there and
+        // remounts the page, so go straight to where the user already is.
+        const base = view === "calendar" ? `/${role}/book-for-later` : `/${role}/schedule`;
+        router.push(`${base}?${view ? `view=${encodeURIComponent(view)}&` : ""}current_month=${currentMonth}&modal=feedback`);
     };
 
     const handleMarkAsCompleted = () => {
