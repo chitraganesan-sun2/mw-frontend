@@ -168,7 +168,9 @@ const MobileMeetingPreviewModal: React.FC<MobileMeetingPreviewModalProps> = ({
         onClose();
         // Keep the view the user is on (the calendar is ?view=calendar).
         const view = searchParams.get("view");
-        router.push(`/${role}/schedule?${view ? `view=${encodeURIComponent(view)}&` : ""}current_month=${currentMonth}&modal=feedback`);
+        // See MeetingPreviewModal: stay on the calendar's own route instead of bouncing via /schedule.
+        const base = view === "calendar" ? `/${role}/book-for-later` : `/${role}/schedule`;
+        router.push(`${base}?${view ? `view=${encodeURIComponent(view)}&` : ""}current_month=${currentMonth}&modal=feedback`);
     };
 
     const handleMarkAsCompleted = () => {

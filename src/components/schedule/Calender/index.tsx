@@ -277,8 +277,11 @@ const Calendar: React.FC<CalendarProps> = ({ events, onDateSelect }) => {
         syncMonthTo(api.getDate());
     };
 
+    // Only ever set the event, never clear it: a freshly mounted calendar (e.g. after the page the
+    // feedback form lives on re-renders) starts with no selection, and writing that null here wiped
+    // the session/volunteer ids the open feedback form needs, so every submission failed validation.
     useEffect(() => {
-        setEventDetails(selectedEventForFeedback);
+        if (selectedEventForFeedback) setEventDetails(selectedEventForFeedback);
     }, [selectedEventForFeedback, setEventDetails]);
 
     const handleEventMouseEnter = (mouseEnterInfo: any) => {
