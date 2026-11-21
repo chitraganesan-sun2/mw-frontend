@@ -8,6 +8,7 @@ What's new in 1.8.5
 • Fixed: feedback after a session could not be submitted
 • Forms no longer send twice if you tap a button quickly
 • Clearer error messages with a Try again option when a page can't load
+• More reliable notifications on your phone
 • Smaller improvements to accessibility and reliability
 ```
 
@@ -21,7 +22,9 @@ guards on every submit handler; profile and instant-session pages show an error 
 Next no longer advances when saving fails; text-only community posts; the private shell verifies the member with the
 server first; accessible names for icon-only controls; the bell drawer no longer marks everything read; Android donation
 return URLs use the public site and only follow https checkout URLs; `android:allowBackup="false"`; CSP `media-src`.
-Needs the backend from 2026-11-21 (melodywings-backend 34f9819) - already live. Older app versions keep working.
+Also: push token sync (src/services/pushTokenSync.ts) - a device token that arrives after the 5 s wait, or that Firebase
+refreshes while the app is open, is now sent to the backend (it used to wait for the next app start); listeners attach once.
+Needs the backend from 2026-11-21 (melodywings-backend 34f9819; push for every event: 230e529) - already live. Older app versions keep working.
 
 ---
 

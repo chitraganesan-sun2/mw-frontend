@@ -3,6 +3,8 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { getPlatformName, isNativePlatform } from '@/utils/platform';
 import { DELETE_API, POST_API } from '@/api/request';
 import { endpoints } from '@/api/constants';
+import { getCookie } from '@/utils/auth';
+import { createPushTokenSync } from '@/services/pushTokenSync';
 
 /**
  * Push Notifications Service for MelodyWings Mobile App.
@@ -18,11 +20,46 @@ export interface PushNotificationToken {
   value: string;
 }
 
-// The token is cached so it can be re-sent to the backend later in the session.
-let cachedFcmToken: string | null = null;
+// Remembers the device token and keeps the backend's copy current (see pushTokenSync.ts): a token
+// that arrives after we stopped waiting, or one Firebase refreshes mid-session, is still sent.
+const tokenSync = createPushTokenSync({
+  isSignedIn: () => !!getCookie('token'),
+  send: async (token) => {
+    await POST_API(endpoints.push_notifications.registerDevice, {
+      fcm_token: token,
+      // The backend stores one token per (user, platform); it already accepts 'ios'.
+      platform: getPlatformName() === 'ios' ? 'ios' : 'android',
+    });
+  },
+});
 
-/** The FCM token from the most recent initPushNotifications() call, if any. */
-export const getCachedFcmToken = (): string | null => cachedFcmToken;
+/** The FCM token from the most recent registration, if any. */
+export const getCachedFcmToken = (): string | null => tokenSync.getToken();
+
+// Waiters for the FIRST token of an initPushNotifications() call; the permanent listener below
+// resolves them. The listeners are attached once - attaching again on every call stacked duplicates.
+let tokenWaiters: Array<(token: string | null) => void> = [];
+let tokenListenersAttached = false;
+
+const attachTokenListeners = (): void => {
+  if (tokenListenersAttached) return;
+  tokenListenersAttached = true;
+  PushNotifications.addListener('registration', (token) => {
+    const waiters = tokenWaiters;
+    tokenWaiters = [];
+    waiters.forEach((resolve) => resolve(token.value));
+    // Also covers a late first token and a token refreshed while the app is open.
+    void tokenSync.onToken(token.value);
+  }).catch(() => {
+    tokenListenersAttached = false;
+  });
+  PushNotifications.addListener('registrationError', (error) => {
+    console.error('[Push] Registration error:', error);
+    const waiters = tokenWaiters;
+    tokenWaiters = [];
+    waiters.forEach((resolve) => resolve(null));
+  }).catch(() => {});
+};
 
 /**
  * Request permission and register for push notifications.
@@ -33,39 +70,32 @@ export const initPushNotifications = async (): Promise<string | null> => {
   if (!isNativePlatform()) return null;
 
   try {
+    // Listen BEFORE registering so the token event can never be missed.
+    attachTokenListeners();
+
     // Request permission
     const permStatus = await PushNotifications.requestPermissions();
 
     if (permStatus.receive === 'granted') {
-      // Register for push notifications
       // This requires google-services.json / Firebase to be configured
       // If Firebase is not set up, this will fail gracefully
+      const firstToken = new Promise<string | null>((resolve) => {
+        const timeout = setTimeout(() => {
+          console.warn('[Push] Token registration timed out - it will still be sent if it arrives later');
+          resolve(null);
+        }, 5000);
+        tokenWaiters.push((token) => {
+          clearTimeout(timeout);
+          resolve(token);
+        });
+      });
       try {
         await PushNotifications.register();
       } catch (registerError) {
         console.warn('[Push] Registration failed (Firebase not configured?):', registerError);
         return null;
       }
-
-      // Get the FCM token
-      return new Promise((resolve) => {
-        const timeout = setTimeout(() => {
-          console.warn('[Push] Token registration timed out');
-          resolve(null);
-        }, 5000);
-
-        PushNotifications.addListener('registration', (token) => {
-          clearTimeout(timeout);
-          cachedFcmToken = token.value;
-          resolve(token.value);
-        }).catch(() => resolve(null));
-
-        PushNotifications.addListener('registrationError', (error) => {
-          clearTimeout(timeout);
-          console.error('[Push] Registration error:', error);
-          resolve(null);
-        }).catch(() => resolve(null));
-      });
+      return await firstToken;
     } else {
       console.warn('[Push] Permission denied');
       return null;
@@ -89,8 +119,9 @@ export const enablePushForSignedInUser = (): Promise<void> => {
   if (!enablePushInFlight) {
     enablePushInFlight = (async () => {
       try {
-        const token = (await initPushNotifications()) ?? getCachedFcmToken();
-        if (token) await registerTokenWithBackend(token);
+        await initPushNotifications();
+        // Sends the token if it is not on the backend yet (no-op when the listener already did).
+        await tokenSync.sync();
       } catch (e) {
         console.warn('[Push] Could not enable push notifications:', e);
       } finally {
@@ -132,22 +163,12 @@ export const registerPushListeners = (
 };
 
 /**
- * Send the FCM token to the backend for targeted notifications.
- *
- * Uses the authenticated POST_API (attaches the JWT the backend's register-device
- * route requires) rather than a raw fetch - the backend derives the recipient from
- * the token itself, not a client-supplied user id.
+ * Send the FCM token to the backend for targeted notifications (no-op if it is already there or
+ * nobody is signed in). Uses the authenticated POST_API: the backend derives the recipient from
+ * the login, not from a client-supplied user id.
  */
 export const registerTokenWithBackend = async (token: string): Promise<void> => {
-  try {
-    await POST_API(endpoints.push_notifications.registerDevice, {
-      fcm_token: token,
-      // The backend stores one token per (user, platform); it already accepts 'ios'.
-      platform: getPlatformName() === 'ios' ? 'ios' : 'android',
-    });
-  } catch (error) {
-    console.error('[Push] Failed to register token with backend:', error);
-  }
+  await tokenSync.onToken(token);
 };
 
 /**
@@ -162,6 +183,9 @@ export const unregisterTokenFromBackend = async (): Promise<void> => {
     await DELETE_API(endpoints.push_notifications.unregisterDevice);
   } catch (error) {
     console.error('[Push] Failed to unregister token with backend:', error);
+  } finally {
+    // The backend may no longer hold this device's token: whoever signs in next must resend it.
+    tokenSync.forget();
   }
 };
 
