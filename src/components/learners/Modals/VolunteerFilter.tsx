@@ -43,6 +43,8 @@ export default function VolunteerFilterModal({
     const [start_date, setStartDate] = useQueryState("start_date");
     const [end_date, setEndDate] = useQueryState("end_date");
     const [skill_ids, setSkills] = useQueryState("skill_ids");
+    // Any filter change restarts the list at page 1 (page N of the old results may not exist).
+    const [, setPage] = useQueryState("page");
     const [filterData, setFilterData] = useState<FilterData>({});
     const [isDateModalOpen, setIsDateModalOpen] = useState(false);
 
@@ -88,6 +90,7 @@ export default function VolunteerFilterModal({
         setSubjects(filterData?.subjects?.length ? filterData.subjects.join(",") : null);
         setCountry(filterData?.country ? filterData?.country : null);
         setSkills(filterData?.skill_ids?.length ? filterData.skill_ids.join(",") : null);
+        setPage(null);
         onClose();
     };
 
@@ -101,6 +104,7 @@ export default function VolunteerFilterModal({
         setSubjects(null);
         setCountry(null);
         setSkills(null);
+        setPage(null);
         onClose();
     };
 

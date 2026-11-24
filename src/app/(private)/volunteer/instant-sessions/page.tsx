@@ -18,6 +18,7 @@ import TagComponent from "@/components/common/Tag";
 import { showToast } from "@/components/common/Toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import { usePageClamp } from "@/hooks/usePageClamp";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
 import WhenLine from "@/components/common/WhenLine";
 import JoinButton from "@/components/common/JoinButton";
@@ -309,6 +310,15 @@ export default function VolunteerInstantSessionsPage() {
     const learnerRequests: any[] = learnerRequestsData?.items ?? [];
     const learnerRequestsTotal: number = learnerRequestsData?.total ?? 0;
     const learnerRequestsHasMore = Number(requestsPage) * 10 < learnerRequestsTotal;
+    // Matches exist but this page is empty (stale ?requests_page) -> go to the last page.
+    usePageClamp({
+        page: Number(requestsPage) || 1,
+        size: 10,
+        total: learnerRequestsTotal,
+        itemCount: learnerRequests.length,
+        setPage: (p) => setRequestsPage(p === 1 ? null : String(p)),
+        enabled: !isLearnerRequestsFetching,
+    });
 
     const {
         data: mySessionsData,
@@ -335,6 +345,14 @@ export default function VolunteerInstantSessionsPage() {
     const mySessions: any[] = mySessionsData?.items ?? [];
     const mySessionsTotal: number = mySessionsData?.total ?? 0;
     const mySessionsHasMore = Number(sessionsPage) * 12 < mySessionsTotal;
+    usePageClamp({
+        page: Number(sessionsPage) || 1,
+        size: 12,
+        total: mySessionsTotal,
+        itemCount: mySessions.length,
+        setPage: (p) => setSessionsPage(p === 1 ? null : String(p)),
+        enabled: !isMySessionsFetching,
+    });
 
     const handleAcceptRequest = async (requestId: string) => {
         if (!beginAction()) return;

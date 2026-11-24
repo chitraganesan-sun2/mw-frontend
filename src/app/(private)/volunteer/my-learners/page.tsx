@@ -10,7 +10,8 @@ import { useComponentStore } from "@/store/useComponenetStore";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { usePageClamp } from "@/hooks/usePageClamp";
+import { useEffect, useRef, useState } from "react";
 import { getCookie } from "@/utils/auth";
 import InnerWidth from "@/utils/innerWidth";
 import CardChips from "@/components/learners/VolunteerCard/CardChips";
@@ -110,6 +111,25 @@ export default function LearnersPage() {
     const { data: learners, isLoading, isFetching } = useQuery({
         queryKey: ["learners", pagination.page, pagination.size, debouncedQuery],
         queryFn: () => getAllLearners(pagination),
+    });
+
+    // A new search restarts at page 1 (page N of the old results may not exist). Skips the first
+    // run so the initial page is left alone.
+    const lastQuery = useRef(debouncedQuery);
+    useEffect(() => {
+        if (lastQuery.current === debouncedQuery) return;
+        lastQuery.current = debouncedQuery;
+        setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }));
+    }, [debouncedQuery]);
+
+    // Safety net: matches exist but this page is empty -> go to the last page that exists.
+    usePageClamp({
+        page: pagination.page,
+        size: pagination.size,
+        total: learners?.total,
+        itemCount: learners?.items?.length ?? 0,
+        setPage: (p) => setPagination((prev) => ({ ...prev, page: p })),
+        enabled: !isFetching,
     });
 
     useEffect(() => {

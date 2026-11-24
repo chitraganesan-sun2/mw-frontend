@@ -10,7 +10,8 @@ import { useComponentStore } from "@/store/useComponenetStore";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { usePageClamp } from "@/hooks/usePageClamp";
+import { useEffect, useRef, useState } from "react";
 import { getCookie } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -113,6 +114,25 @@ export default function VolunteerPage() {
     const { data: volunteers, isLoading, isFetching } = useQuery({
         queryKey: ["volunteers", pagination.page, pagination.size, debouncedQuery],
         queryFn: () => getAllVolunteers(pagination),
+    });
+
+    // A new search restarts at page 1 (page N of the old results may not exist). Skips the first
+    // run so the initial page is left alone.
+    const lastQuery = useRef(debouncedQuery);
+    useEffect(() => {
+        if (lastQuery.current === debouncedQuery) return;
+        lastQuery.current = debouncedQuery;
+        setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }));
+    }, [debouncedQuery]);
+
+    // Safety net: matches exist but this page is empty -> go to the last page that exists.
+    usePageClamp({
+        page: pagination.page,
+        size: pagination.size,
+        total: volunteers?.total,
+        itemCount: volunteers?.items?.length ?? 0,
+        setPage: (p) => setPagination((prev) => ({ ...prev, page: p })),
+        enabled: !isFetching,
     });
 
     useEffect(() => {

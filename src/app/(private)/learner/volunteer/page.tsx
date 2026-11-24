@@ -11,6 +11,7 @@ import { endpoints } from "@/api/constants";
 import { useComponentStore } from "@/store/useComponenetStore";
 import AddNewMeetingModal from "@/components/schedule/Modals/AddNewMeetingModal";
 import { useQueryState } from "nuqs";
+import { usePageClamp } from "@/hooks/usePageClamp";
 import MatchesTabs from "@/components/matches/MatchesTabs";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { EMPTY, ERRORS, HELP } from "@/constants/copy";
@@ -56,7 +57,7 @@ export default function LearnersPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [size] = useQueryState("size", { defaultValue: PAGINATION as string });
-    const [page] = useQueryState("page", { defaultValue: "1" });
+    const [page, setPage] = useQueryState("page", { defaultValue: "1" });
     const [searchQuery, setSearchQuery] = useQueryState("query");
     const [language_ids] = useQueryState("language_ids");
     const [subject_ids] = useQueryState("subject_ids");
@@ -108,6 +109,17 @@ export default function LearnersPage() {
             return response.data;
         },
         enabled: !isMatchesTab,
+    });
+
+    // Safety net: if the server says there are matches but this page is empty (stale page in the
+    // URL), jump to the last page that exists instead of a false "no results".
+    usePageClamp({
+        page: parseInt(page) || 1,
+        size: parseInt(size) || 1,
+        total: data?.total,
+        itemCount: data?.items?.length ?? 0,
+        setPage: (p) => setPage(p === 1 ? null : String(p)),
+        enabled: !isLoading && !isMatchesTab,
     });
 
     const appliedFiltersCount = useMemo(() => {
@@ -228,7 +240,10 @@ export default function LearnersPage() {
                             {query && (
                                 <button
                                     className="text-primary underline"
-                                    onClick={() => setSearchQuery(null)}
+                                    onClick={() => {
+                                        setSearchQuery(null);
+                                        setPage(null);
+                                    }}
                                 >
                                     Clear Search
                                 </button>

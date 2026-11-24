@@ -39,6 +39,8 @@ export default function LearnerFilterModal({
     const [academic_strengths, setAcademicStrengths] = useQueryState("academic_strengths");
     const [techniques_to_calm, setTechniquesThatWork] = useQueryState("techniques_to_calm");
     const [skill_ids, setSkillsExpertiseToLearn] = useQueryState("skill_ids");
+    // Any filter change restarts the list at page 1 (page N of the old results may not exist).
+    const [, setPage] = useQueryState("page");
 
     const [filterData, setFilterData] = useState<FilterData>({});
 
@@ -88,6 +90,7 @@ export default function LearnerFilterModal({
         setSkillsExpertiseToLearn(
             filterData?.skill_ids?.length ? filterData.skill_ids.join(",") : null
         );
+        setPage(null);
 
         onClose();
     };
@@ -99,6 +102,7 @@ export default function LearnerFilterModal({
         setAcademicStrengths(null);
         setTechniquesThatWork(null);
         setSkillsExpertiseToLearn(null);
+        setPage(null);
         onClose();
     };
 

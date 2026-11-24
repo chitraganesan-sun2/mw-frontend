@@ -17,6 +17,15 @@ const CommonHeader: React.FC = () => {
     const searchParams = useSearchParams();
     const { headerOptions } = useComponentStore();
     const [searchQuery, setSearchQuery] = useQueryState("query");
+    // A new search restarts every list at page 1 (page N of the old results may not exist).
+    const [, setPage] = useQueryState("page");
+    const [, setRequestsPage] = useQueryState("requests_page");
+    const [, setSessionsPage] = useQueryState("sessions_page");
+    const resetPages = () => {
+        setPage(null);
+        setRequestsPage(null);
+        setSessionsPage(null);
+    };
     const {
         searchPlaceholder,
         actionButtonOnClick,
@@ -63,10 +72,12 @@ const CommonHeader: React.FC = () => {
 
     const handleSearch = (value: string) => {
         setSearchQuery(value === "" ? null : value);
+        resetPages();
     };
 
     const handleMobileSearchClose = () => {
         setSearchQuery(null);
+        resetPages();
         setIsSearchInputOpen(false);
     };
 

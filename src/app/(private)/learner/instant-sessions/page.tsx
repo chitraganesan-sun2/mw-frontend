@@ -23,6 +23,7 @@ import { showToast } from "@/components/common/Toast";
 import { Spin } from "antd";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import { useQueryState } from "nuqs";
+import { usePageClamp } from "@/hooks/usePageClamp";
 import ProfileNameLink from "@/components/common/ProfileNameLink";
 import WhenLine from "@/components/common/WhenLine";
 import JoinButton from "@/components/common/JoinButton";
@@ -357,6 +358,15 @@ export default function InstantSessionsPage() {
     const myRequests: any[] = myRequestsData?.items ?? [];
     const myRequestsTotal: number = myRequestsData?.total ?? 0;
     const myRequestsHasMore = Number(requestsPage) * REQUESTS_PAGE_SIZE < myRequestsTotal;
+    // Matches exist but this page is empty (stale ?requests_page) -> go to the last page.
+    usePageClamp({
+        page: Number(requestsPage) || 1,
+        size: REQUESTS_PAGE_SIZE,
+        total: myRequestsTotal,
+        itemCount: myRequests.length,
+        setPage: (p) => setRequestsPage(p === 1 ? null : String(p)),
+        enabled: !isMyRequestsLoading,
+    });
 
     const availableSessions: Session[] = useMemo(() => {
         // The today and tomorrow fetches can both return the same post (the backend pads the
