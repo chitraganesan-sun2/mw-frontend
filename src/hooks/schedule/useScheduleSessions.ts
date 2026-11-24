@@ -46,6 +46,9 @@ export interface ScheduleSession {
     /** Participants' profile time zone labels (e.g. "PST - Pacific Standard Time (UTC-08:00)"). */
     learner_timezone?: string | null;
     volunteer_timezone?: string | null;
+    /** Set once each participant has left feedback on a completed session. */
+    feedback_collected_from_learner?: boolean | null;
+    feedback_collected_from_volunteer?: boolean | null;
 }
 
 export const scheduleSessionsKey = (role: ScheduleRole, when: "upcoming" | "past") =>

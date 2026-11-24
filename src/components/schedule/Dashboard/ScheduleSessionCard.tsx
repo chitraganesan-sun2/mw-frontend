@@ -1,6 +1,14 @@
 "use client";
 import { useState } from "react";
 import dayjs from "dayjs";
+import { useQueryClient } from "@tanstack/react-query";
+import { useQueryState } from "nuqs";
+import { PUT_API } from "@/api/request";
+import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
+import { useConfirm } from "@/hooks/useConfirm";
+import { useAppStore } from "@/store/useAppStore";
+import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { HiOutlineArrowDownTray } from "react-icons/hi2";
 import ReportPersonModal from "@/components/common/ReportPersonModal";
 import { declineReasonText } from "@/utils/declineReason";
@@ -11,6 +19,7 @@ import { joinNames } from "@/utils/joinNames";
 import { safeHref } from "@/utils/safeHref";
 import JoinButton from "@/components/common/JoinButton";
 import {
+    canCompleteSession,
     joinState,
     formatDuration,
     formatSessionDate,
@@ -77,6 +86,11 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     now = dayjs(),
 }) => {
     const [isReportOpen, setIsReportOpen] = useState(false);
+    const [completing, setCompleting] = useState(false);
+    const queryClient = useQueryClient();
+    const { confirm, confirmModal } = useConfirm();
+    const { setEventDetails } = useAppStore();
+    const [, setModal] = useQueryState("modal");
     const { date, start, end } = localTimes(session, role);
     // Absolute instants (from the UTC fields) for the Join decision - the local fields are in
     // the PROFILE timezone, which can differ from the browser's.
@@ -98,6 +112,12 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
         isLearnerViewer ? session.volunteer_timezone : session.learner_timezone
     );
     const awaitingMe = isAwaitingMyResponse(session, role);
+    // Sessions are never auto-completed: once an accepted session has ended, either person marks
+    // it completed (that credits the hours), then leaves feedback.
+    const canComplete = Boolean(session.session_id) && canCompleteSession(session, bounds, now);
+    const feedbackGiven =
+        role === "volunteer" ? session.feedback_collected_from_volunteer : session.feedback_collected_from_learner;
+    const canGiveFeedback = Boolean(session.session_id) && session.status === "completed" && !feedbackGiven;
     const showRespond = Boolean(onRespond) && awaitingMe;
     // Only an accepted session that hasn't started can be moved, one request at a time.
     const canReschedule =
@@ -111,6 +131,50 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     const isRescheduleRequest = session.status === "pending" && Boolean(session.reschedules_session_id);
     // A request nobody answered before its time passed is "Expired", not still "Pending".
     const statusKey = session.status === "pending" && bounds && !bounds.end.isAfter(now) ? "expired" : session.status;
+
+    const handleComplete = async () => {
+        if (completing) return;
+        const ok = await confirm({
+            title: "Mark this session as completed?",
+            description:
+                "This records the session as held and adds its hours to your totals. It can't be undone.",
+            confirmText: "Mark as completed",
+            cancelText: "Not yet",
+        });
+        if (!ok) return;
+        setCompleting(true);
+        try {
+            await PUT_API(endpoints.session.markAsCompleted(session.session_id), {});
+            showToast({ type: "success", message: "Session marked as completed." });
+            invalidateScheduleViews(queryClient, role);
+            // Hours and class counts shown on the profiles / browse lists.
+            ["volunteer-profile", "learner", "volunteer"].forEach((key) =>
+                queryClient.invalidateQueries({ queryKey: [key] })
+            );
+        } catch (err) {
+            showToast({
+                type: "error",
+                message: getApiErrorMessage(err, "Couldn't mark the session as completed. Please try again."),
+            });
+        } finally {
+            setCompleting(false);
+        }
+    };
+
+    const handleGiveFeedback = () => {
+        // The feedback modal reads the session from the store (same shape the calendar sets).
+        setEventDetails({
+            extendedProps: {
+                sessionId: session.session_id,
+                volunteerId: session.volunteer_id,
+                volunteer_full_name: session.volunteer_full_name,
+                learner: { id: session.learner_id, firstName: session.learner_first_name },
+                learner_full_name: joinNames(session.learner_first_name, session.learner_last_name),
+            },
+        });
+        setModal("feedback");
+    };
+
     const showDescription =
         Boolean(session.session_description) &&
         !isRedundantLevelDescription(session.session_description, session.requested_level);
@@ -202,7 +266,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 </p>
             )}
 
-            {(joinStatus !== "none" || showRespond || canReschedule || canReport || (!isNativePlatform() && session.status === "accepted")) && (
+            {(joinStatus !== "none" || showRespond || canComplete || canGiveFeedback || canReschedule || canReport || (!isNativePlatform() && session.status === "accepted")) && (
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pt-0.5">
                     {canReport && (
                         <button
@@ -212,6 +276,27 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             className="text-xs font-medium text-gray-600 underline-offset-2 hover:underline hover:text-gray-900 bg-transparent border-0 p-0 cursor-pointer"
                         >
                             Report a problem
+                        </button>
+                    )}
+                    {canGiveFeedback && (
+                        <button
+                            type="button"
+                            onClick={handleGiveFeedback}
+                            aria-label={`Give feedback on ${session.session_title || "this session"}`}
+                            className="text-xs font-medium text-primary underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer"
+                        >
+                            Give feedback
+                        </button>
+                    )}
+                    {canComplete && (
+                        <button
+                            type="button"
+                            onClick={handleComplete}
+                            disabled={completing}
+                            aria-label={`Mark ${session.session_title || "this session"} as completed`}
+                            className="rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {completing ? "Saving..." : "Mark as completed"}
                         </button>
                     )}
                     {canReschedule && (
@@ -256,6 +341,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                     <JoinButton state={joinStatus} href={joinHref} contextLabel={session.session_title || "session"} />
                 </div>
             )}
+            {confirmModal}
             {isReportOpen && (
                 <ReportPersonModal
                     isOpen
