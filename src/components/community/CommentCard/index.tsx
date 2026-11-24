@@ -48,16 +48,6 @@ const CommentCard: React.FC<CommentCardProps> = ({ reply, comment, onReply }) =>
         }
     };
 
-    // Format the date
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - date.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        return `${diffDays}d`;
-    };
-
     const handleReply = (comment: any) => {
         const replyId = reply ? comment.parent_comment_id : comment.comment_id;
         onReply(comment.author.name, replyId);
