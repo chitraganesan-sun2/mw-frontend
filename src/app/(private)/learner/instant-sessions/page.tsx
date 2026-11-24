@@ -33,6 +33,7 @@ import { useDebounce } from "use-debounce";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import {
+    hasSessionEnded,
     joinState,
     formatDuration,
     formatLevel,
@@ -736,7 +737,8 @@ export default function InstantSessionsPage() {
                                 wrapperClassName="flex-1"
                             />
                         )}
-                        {sessionDetail?.cancelAction && sessionDetail.cancelAction !== "none" && (
+                        {/* Not once the session has ended: the server refuses it (complete it from My Sessions). */}
+                        {sessionDetail?.cancelAction && sessionDetail.cancelAction !== "none" && !hasSessionEnded(sessionDetail.joinBounds, now) && (
                             <Button
                                 title="Cancel"
                                 btnVariant="tertiary"

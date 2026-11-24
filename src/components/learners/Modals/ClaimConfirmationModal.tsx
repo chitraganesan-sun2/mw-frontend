@@ -8,6 +8,7 @@ import ConfirmationSuccessfulModal from "./ConfirmationSuccessfulModal";
 import { GET_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { showToast } from "@/components/common/Toast";
+import { getApiErrorMessage } from "@/utils/apiError";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDuration, formatSessionDate, formatSessionTime, getDurationMinutes, getSessionInstantBounds, shortTimeZone } from "@/utils/sessionDisplay";
 import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
@@ -171,7 +172,7 @@ const ClaimConfirmationModal: React.FC<ClaimConfirmationModalProps> = ({
             }
         } catch (error) {
             console.error("Error unclaiming session:", error);
-            showToast({ message: "Couldn't unclaim the session. Please try again.", type: "error" });
+            showToast({ message: getApiErrorMessage(error, "Couldn't unclaim the session. Please try again."), type: "error" });
         } finally {
             unclaimingRef.current = false;
             // Hide loader after all API calls complete

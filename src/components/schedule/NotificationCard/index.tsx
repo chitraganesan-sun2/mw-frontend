@@ -126,6 +126,8 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ data, viewerRole = 
             // Was silent: a failed accept/decline (e.g. the session changed, or the calendar
             // invite couldn't be created) left the card unchanged with no explanation.
             showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't update this request. Please try again.") });
+            // A 409 (e.g. the slot was taken meanwhile) means this card is stale: refresh the lists.
+            invalidateScheduleViews(queryClient, viewerRole);
         },
     });
 

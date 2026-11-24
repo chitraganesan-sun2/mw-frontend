@@ -31,6 +31,7 @@ import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { useConfirm } from "@/hooks/useConfirm";
 import {
     canCompleteSession,
+    hasSessionEnded,
     joinState,
     formatDuration,
     formatLevel,
@@ -152,6 +153,8 @@ function MySessionCard({
     const joinStatus = joinState({ status: session.status, meet_link: safeHref(session.meet_link) }, bounds, now);
     // Complete only once the scheduled end has passed (the backend rejects it before that).
     const completable = canCompleteSession(session, bounds, now);
+    // Once the session has ended it can no longer be cancelled (the server refuses) - only completed.
+    const ended = hasSessionEnded(bounds, now);
     const level = session.requested_level || session.grade_level || session.expertise_level;
     const showDescription =
         Boolean(session.session_description) && !isRedundantLevelDescription(session.session_description, level);
@@ -216,13 +219,15 @@ function MySessionCard({
                                             Complete
                                         </button>
                                     )}
-                                    <button
-                                        className={`${actionClass} text-red-600 hover:text-red-700`}
-                                        disabled={isActionLoading}
-                                        onClick={() => onCancel(session.session_id)}
-                                    >
-                                        Cancel
-                                    </button>
+                                    {!ended && (
+                                        <button
+                                            className={`${actionClass} text-red-600 hover:text-red-700`}
+                                            disabled={isActionLoading}
+                                            onClick={() => onCancel(session.session_id)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    )}
                                 </>
                             )}
                             <button
@@ -631,14 +636,16 @@ export default function VolunteerInstantSessionsPage() {
                                         onClick={() => handleCompleteSession(sessionDetail.session_id)}
                                     />
                                 )}
-                                <Button
-                                    title="Cancel"
-                                    btnVariant="tertiary"
-                                    customClassName="!bg-white !text-red-600 !border !border-red-200 flex-1"
-                                    loading={detailAction === "cancel"}
-                                    disabled={isActionLoading}
-                                    onClick={() => handleCancelSession(sessionDetail.session_id)}
-                                />
+                                {!hasSessionEnded(detailBounds, now) && (
+                                    <Button
+                                        title="Cancel"
+                                        btnVariant="tertiary"
+                                        customClassName="!bg-white !text-red-600 !border !border-red-200 flex-1"
+                                        loading={detailAction === "cancel"}
+                                        disabled={isActionLoading}
+                                        onClick={() => handleCancelSession(sessionDetail.session_id)}
+                                    />
+                                )}
                             </>
                         )}
                     </div>
