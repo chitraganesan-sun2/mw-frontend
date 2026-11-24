@@ -190,7 +190,7 @@ const OverviewContent = ({ userData }: { userData: any }) => {
     );
 };
 
-const ReviewsContent = ({ userFeedback }: { userFeedback: any }) => {
+const ReviewsContent = ({ userFeedback, isLearner }: { userFeedback: any; isLearner?: boolean }) => {
     const ratingCardData = userFeedback?.feedbacks;
 
     return (
@@ -212,7 +212,7 @@ const ReviewsContent = ({ userFeedback }: { userFeedback: any }) => {
                                     key={index}
                                     name={item?.author_name}
                                     profileImg={item?.author_profile_picture?.image_url}
-                                    rating={item?.volunteer_commitment_level}
+                                    rating={isLearner ? item?.learner_interest_level : item?.volunteer_commitment_level}
                                     day={item?.created_at}
                                     review={item?.comment}
                                 />
@@ -356,7 +356,7 @@ const MobileProfileView = ({ data, userData, reviewEndpoint }: { data: any, user
                     {activeTab === "reviews" && (
                         <div>
                             {userFeedback?.feedbacks.length > 0 ? (
-                                <ReviewsContent userFeedback={userFeedback} />
+                                <ReviewsContent userFeedback={userFeedback} isLearner={isLearner} />
                             ) : (
                                 <div className="flex items-center justify-center h-full min-h-[300px]">
                                     <p className="text-sm text-gray-light font-normal">

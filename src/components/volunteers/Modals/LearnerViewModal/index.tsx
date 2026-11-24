@@ -580,7 +580,7 @@ const ReviewsContent = ({ learnerFeedback }: { learnerFeedback: any }) => {
                                     key={index}
                                     name={item?.author_name}
                                     profileImg={item?.author_profile_picture?.image_url}
-                                    rating={item?.volunteer_commitment_level}
+                                    rating={item?.learner_interest_level}
                                     day={item?.created_at}
                                     review={item?.comment}
                                 />
