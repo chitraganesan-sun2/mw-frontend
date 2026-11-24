@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { profileNow } from "@/utils/sessionDisplay";
+import { useNow } from "@/hooks/schedule/useProfileTimeZone";
 
 export interface UpcomingSlot {
     /** YYYY-MM-DD in the viewer's profile timezone. */
@@ -43,10 +44,14 @@ export function useUpcomingSlots(
         staleTime: 30 * 1000,
     });
 
+    // A clock tick, so a slot that starts while the form is open drops out of the dropdown instead
+    // of staying selectable until the next refetch (the memo used to depend on query data only).
+    const tick = useNow(30 * 1000);
     const slots = useMemo(() => {
         const now = profileNow(profileTimeZone).format("YYYY-MM-DD HH:mm");
         return (query.data?.slots ?? []).filter((s) => `${s.date} ${s.start_time}` > now);
-    }, [query.data, profileTimeZone]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [query.data, profileTimeZone, tick]);
 
     return { ...query, slots, unavailableReason: query.data?.unavailableReason ?? null };
 }
