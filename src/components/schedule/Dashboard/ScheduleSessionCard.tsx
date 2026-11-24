@@ -66,6 +66,24 @@ function localTimes(session: ScheduleSession, role: ScheduleRole) {
         : { date: session.learner_start_date, start: session.learner_start_time, end: session.learner_end_time };
 }
 
+/**
+ * The status the card actually shows: a pending request nobody answered before its time
+ * passed is "expired" (derived client-side, the API still says "pending"). The status filter
+ * must be built from the same value or it offers "Pending" and never "Expired".
+ */
+export function getDisplayStatus(
+    session: ScheduleSession,
+    role: ScheduleRole,
+    timeZoneLabel?: string,
+    now: dayjs.Dayjs = dayjs()
+): string {
+    const status = session.status ?? "";
+    if (status !== "pending") return status;
+    const { date, start, end } = localTimes(session, role);
+    const bounds = getSessionInstantBounds(session, { date, start, end, timeZoneLabel });
+    return bounds && !bounds.end.isAfter(now) ? "expired" : status;
+}
+
 function subjectLine(session: ScheduleSession): string {
     const subjects = [
         ...(session.requested_skills || []),
@@ -130,7 +148,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     const declinedBecause = declineReasonText(session.decline_reason, session.decline_note);
     const isRescheduleRequest = session.status === "pending" && Boolean(session.reschedules_session_id);
     // A request nobody answered before its time passed is "Expired", not still "Pending".
-    const statusKey = session.status === "pending" && bounds && !bounds.end.isAfter(now) ? "expired" : session.status;
+    const statusKey = getDisplayStatus(session, role, timeZoneLabel, now);
 
     const handleComplete = async () => {
         if (completing) return;

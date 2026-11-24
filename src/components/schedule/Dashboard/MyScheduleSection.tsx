@@ -16,7 +16,7 @@ import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import InfoTip from "@/components/common/InfoTip";
 import PageIntro from "@/components/common/PageIntro";
 import { HELP } from "@/constants/copy";
-import ScheduleSessionCard,{ isAwaitingMyResponse } from "./ScheduleSessionCard";
+import ScheduleSessionCard, { getDisplayStatus, isAwaitingMyResponse } from "./ScheduleSessionCard";
 import NextSessionBanner, { findNextSession } from "./NextSessionBanner";
 import {
     SCHEDULE_LABELS,
@@ -133,10 +133,14 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         [when, upcoming.data, role, timeZoneLabel, now]
     );
     const allSessions = useMemo(() => TABS.flatMap((tab) => byTab[tab]), [byTab]);
-    // Statuses present anywhere, for the filter dropdown.
+    // Statuses present anywhere, for the filter dropdown - the DISPLAYED status (an unanswered
+    // request in the past is "Expired"), so the options match the pill on the cards.
     const statusOptions = useMemo(
-        () => Array.from(new Set(allSessions.map((s) => s.status).filter(Boolean) as string[])),
-        [allSessions]
+        () =>
+            Array.from(
+                new Set(allSessions.map((s) => getDisplayStatus(s, role, timeZoneLabel, now)).filter(Boolean))
+            ),
+        [allSessions, role, timeZoneLabel, now]
     );
     // A status that no longer exists (e.g. after switching Upcoming/Past) falls back to "all".
     useEffect(() => {
@@ -147,7 +151,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const filteredByTab = useMemo(() => {
         const needle = search.trim().toLowerCase();
         const matches = (s: ScheduleSession) => {
-            if (statusFilter !== "all" && s.status !== statusFilter) return false;
+            if (statusFilter !== "all" && getDisplayStatus(s, role, timeZoneLabel, now) !== statusFilter) return false;
             if (!needle) return true;
             const person = role === "learner" ? s.volunteer_full_name : joinNames(s.learner_first_name, s.learner_last_name);
             const haystack = [
@@ -163,7 +167,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
             return haystack.includes(needle);
         };
         return Object.fromEntries(TABS.map((tab) => [tab, byTab[tab].filter(matches)])) as Record<ScheduleTab, ScheduleSession[]>;
-    }, [byTab, search, statusFilter, role]);
+    }, [byTab, search, statusFilter, role, timeZoneLabel, now]);
     const shownCount = TABS.reduce((n, tab) => n + filteredByTab[tab].length, 0);
     const loadedPast = past.data?.items.length ?? 0;
     const hiddenPast = when === "past" && (past.data?.total ?? 0) > loadedPast;
