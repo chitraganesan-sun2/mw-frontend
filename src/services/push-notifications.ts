@@ -209,7 +209,13 @@ export const registerTokenWithBackend = async (token: string): Promise<void> => 
 export const unregisterTokenFromBackend = async (): Promise<void> => {
   if (!isNativePlatform()) return;
   try {
-    await DELETE_API(endpoints.push_notifications.unregisterDevice);
+    // Name THIS device's token: without it the backend falls back to deleting every token the
+    // account has on the platform (which signs the user's other phones out of pushes).
+    const fcmToken = getCachedFcmToken();
+    await DELETE_API(
+      endpoints.push_notifications.unregisterDevice,
+      fcmToken ? { platform: getPlatformName() === 'ios' ? 'ios' : 'android', fcm_token: fcmToken } : undefined
+    );
   } catch (error) {
     console.error('[Push] Failed to unregister token with backend:', error);
   } finally {

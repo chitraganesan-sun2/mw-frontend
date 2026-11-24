@@ -29,10 +29,11 @@ export async function PUT_API<T>(endpoint: string, data: T) {
     return response;
 }
 
-export async function DELETE_API(endpoint: string) {
+export async function DELETE_API(endpoint: string, data?: unknown) {
     const response = await request({
         method: "DELETE",
         url: endpoint,
+        ...(data !== undefined ? { data } : {}),
     });
     return response;
 }
