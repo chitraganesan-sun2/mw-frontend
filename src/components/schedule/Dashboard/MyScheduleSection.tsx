@@ -3,12 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { joinNames } from "@/utils/joinNames";
 import { getStatusLabel } from "@/utils/sessionDisplay";
-import {
-    MAX_PAGE_SIZE,
-    PAST_STEP,
-    useScheduleSessions,
-    type ScheduleSession,
-} from "@/hooks/schedule/useScheduleSessions";
+import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import dayjs from "dayjs";
 import { useStartReschedule } from "@/hooks/schedule/useStartReschedule";
@@ -107,13 +102,12 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const now = useNow();
     const today = useProfileToday(role);
 
-    // Past history grows in steps ("Show more"); search / status filter narrow what is loaded.
-    const [pastSize, setPastSize] = useState<number>(PAST_STEP);
+    // Longer lists load page by page ("Show more"); search / status filter narrow what is loaded.
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
 
     const upcoming = useScheduleSessions(role, "upcoming");
-    const past = useScheduleSessions(role, "past", when === "past", pastSize);
+    const past = useScheduleSessions(role, "past", when === "past");
     const active = when === "upcoming" ? upcoming : past;
 
     const byTab = useMemo(() => {
@@ -169,9 +163,11 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         return Object.fromEntries(TABS.map((tab) => [tab, byTab[tab].filter(matches)])) as Record<ScheduleTab, ScheduleSession[]>;
     }, [byTab, search, statusFilter, role, timeZoneLabel, now]);
     const shownCount = TABS.reduce((n, tab) => n + filteredByTab[tab].length, 0);
-    const loadedPast = past.data?.items.length ?? 0;
-    const hiddenPast = when === "past" && (past.data?.total ?? 0) > loadedPast;
-    const canShowMore = hiddenPast && pastSize < MAX_PAGE_SIZE;
+    const loadedCount = active.data?.items.length ?? 0;
+    const totalCount = active.data?.total ?? 0;
+    // More rows exist than the pages loaded so far - for Upcoming too, which used to truncate silently.
+    const hasHidden = totalCount > loadedCount;
+    const canShowMore = hasHidden && Boolean(active.hasNextPage);
     const showFilters = allSessions.length >= 4 || isFiltering;
 
     return (
@@ -337,19 +333,21 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 </div>
             )}
             <div className="flex flex-col gap-2">
-                {hiddenPast && (
+                {hasHidden && (
                     <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
                         <p className="text-xs text-gray-500">
-                            Showing your {loadedPast} most recent of {past.data?.total} sessions.
+                            {when === "past"
+                                ? `Showing your ${loadedCount} most recent of ${totalCount} sessions.`
+                                : `Showing your next ${loadedCount} of ${totalCount} upcoming sessions.`}
                         </p>
                         {canShowMore && (
                             <button
                                 type="button"
-                                onClick={() => setPastSize((size) => Math.min(size + PAST_STEP, MAX_PAGE_SIZE))}
-                                disabled={past.isFetching}
+                                onClick={() => active.fetchNextPage()}
+                                disabled={active.isFetching}
                                 className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-800 hover:bg-gray-50 cursor-pointer disabled:opacity-60"
                             >
-                                {past.isFetching ? "Loading…" : "Show More"}
+                                {active.isFetching ? "Loading…" : "Show More"}
                             </button>
                         )}
                     </div>

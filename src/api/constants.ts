@@ -128,8 +128,8 @@ export const endpoints: EndpointProps = {
         getLearnerSessions: (id: string) => `session/learner/${id}`,
         getVolunteerSessions: (id: string) => `session/volunteer/${id}`,
         /** Schedule dashboard: upcoming (pending+accepted, soonest first) or past sessions. */
-        getScheduleSessions: (role: "learner" | "volunteer", id: string, when: "upcoming" | "past", size = 100) =>
-            `session/${role}/${encodeURIComponent(id)}?when=${when}&page=1&size=${size}`,
+        getScheduleSessions: (role: "learner" | "volunteer", id: string, when: "upcoming" | "past", size = 100, page = 1) =>
+            `session/${role}/${encodeURIComponent(id)}?when=${when}&page=${page}&size=${size}`,
         downloadIcs: (sessionId: string) => `session/${sessionId}/ics`,
         cancelSession: (id: string) => `session/${id}`,
         getApprovalNotifications: (id: string) => `session/pending_invites/${id}`,
