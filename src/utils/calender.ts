@@ -4,6 +4,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { getCookie } from "@/utils/auth";
+import { eventSpan } from "@/utils/eventSpan";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
@@ -114,8 +115,7 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                 events.push({
                     title: sd.session_title,
                     date: sd.volunteer_start_date,
-                    start: dayjs(`${sd.volunteer_start_date} ${sd.volunteer_start_time}`).format(),
-                    end: dayjs(`${sd.volunteer_start_date} ${sd.volunteer_end_time}`).format(),
+                    ...eventSpan(sd.volunteer_start_date, sd.volunteer_start_time, sd.volunteer_end_time),
                     backgroundColor: "var(--success-light-color)",
                     classNames: ["event-item", "rounded-md", "py-1", "my-0.5"],
                     textColor: "var(--success-color)",
@@ -152,8 +152,7 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                 events.push({
                     title: slot.title || "Posted instant session",
                     date: dayDate,
-                    start: dayjs(`${dayDate} ${slot.start_time}`).format(),
-                    end: dayjs(`${dayDate} ${slot.end_time}`).format(),
+                    ...eventSpan(dayDate, slot.start_time, slot.end_time),
                     backgroundColor: "var(--warning-light-color, #FFF3E0)",
                     classNames: ["event-item", "rounded-md", "py-1", "my-0.5"],
                     textColor: "var(--warning-color, #E65100)",
@@ -168,8 +167,7 @@ function mapVolunteerSlotsToEvents(data: any[] | undefined): CalendarEvent[] {
                 events.push({
                     title: slot.title || "Available",
                     date: dayDate,
-                    start: dayjs(`${dayDate} ${slot.start_time}`).format(),
-                    end: dayjs(`${dayDate} ${slot.end_time}`).format(),
+                    ...eventSpan(dayDate, slot.start_time, slot.end_time),
                     backgroundColor: "var(--gray-100)",
                     classNames: ["event-item", "rounded-md", "py-1", "my-0.5"],
                     textColor: "var(--gray-500)",
@@ -192,8 +190,7 @@ function mapLearnerSessionsToEvents(data: any): CalendarEvent[] {
     return items.map((item: EventResponse) => ({
         title: item.session_title,
         date: item.learner_start_date,
-        start: dayjs(`${item.learner_start_date} ${item.learner_start_time}`).format(),
-        end: dayjs(`${item.learner_start_date} ${item.learner_end_time}`).format(),
+        ...eventSpan(item.learner_start_date, item.learner_start_time, item.learner_end_time),
         backgroundColor: "var(--success-light-color)",
         classNames: ["event-item", "rounded-md", "py-1", "my-0.5"],
         textColor: "var(--success-color)",
