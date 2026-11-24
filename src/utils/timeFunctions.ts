@@ -3,6 +3,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import relativeTime from "dayjs/plugin/relativeTime";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { toUtcTime } from "@/utils/utcTime";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -69,13 +70,16 @@ export const generateTimeSlotId = (startTime: string, endTime: string) => {
     return hash.update(`${startTime}-${endTime}`).digest("hex");
 };
 
-export const convertToUTC = (utc_offset: string, time: string): string => {
-    // Use a fixed anchor date to ensure consistent behavior
-    const anchorDate = "2000-01-01"; // arbitrary fixed date
-    const local = dayjs(`${anchorDate} ${time}`, "YYYY-MM-DD HH:mm").utcOffset(utc_offset, true);
-    const utcTime = local.utc().format("HH:mm");
-    return utcTime;
-};
+/**
+ * `time` (HH:mm wall clock in the zone `utc_offset` e.g. "+05:30") as UTC "HH:mm". A missing or
+ * unreadable offset no longer throws: it uses `fallbackOffsetMinutes` (the profile zone's offset)
+ * and otherwise the browser's offset. Use toUtcTime() when the day shift matters.
+ */
+export const convertToUTC = (
+    utc_offset: string | null | undefined,
+    time: string,
+    fallbackOffsetMinutes?: number | null
+): string => toUtcTime(utc_offset, time, fallbackOffsetMinutes)?.time ?? "";
 
 export const extractTimezoneOffset = (timezoneLabel: string): string | null => {
     if (!timezoneLabel) return null;

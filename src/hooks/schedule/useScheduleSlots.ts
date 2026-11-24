@@ -6,6 +6,8 @@ import { showToast } from "@/components/common/Toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSendData } from "@/hooks/useReactQuery";
 import { convertToUTC, generateTimeSlotId } from "@/utils/timeFunctions";
+import { useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
+import { profileNow } from "@/utils/sessionDisplay";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { minuteRangesOverlap, slotMinuteRange } from "@/utils/sessionDisplay";
 
@@ -317,7 +319,11 @@ export function useScheduleSlots({
         });
     };
 
+    // If the stored offset is missing, the profile zone's current offset is the next best thing
+    // (convertToUTC then falls back to the browser's offset).
+    const profileTimeZoneLabel = useProfileTimeZone(role);
     const formatScheduleForAPI = (): APIScheduleFormat[] => {
+        const fallbackOffsetMinutes = profileTimeZoneLabel ? profileNow(profileTimeZoneLabel).utcOffset() : undefined;
         return DAYS.map((day) => ({
             day,
             slots: schedule[day]
@@ -335,8 +341,8 @@ export function useScheduleSlots({
                         start_time: slot.start_time,
                         end_time: slot.end_time,
                         slot_type: slotType,
-                        utc_start_time: convertToUTC(utcOffset, slot.start_time),
-                        utc_end_time: convertToUTC(utcOffset, slot.end_time),
+                        utc_start_time: convertToUTC(utcOffset, slot.start_time, fallbackOffsetMinutes),
+                        utc_end_time: convertToUTC(utcOffset, slot.end_time, fallbackOffsetMinutes),
                     };
 
                     if (isCustom && customData) {
