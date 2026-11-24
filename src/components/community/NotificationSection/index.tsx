@@ -11,6 +11,7 @@ import { timesAgo } from "@/utils/timeFunctions";
 import { useQueryState } from "nuqs";
 import { getCookie } from "@/utils/auth";
 import { safeImageSrc } from "@/utils/safeHref";
+import { NOTIFICATIONS_PAGE_SIZE, messageCountLabel, nextNotificationCursor } from "@/utils/notificationCursor";
 
 const POST_NOTIFICATION_TYPES = ["like", "comment", "liked_on_your_comment", "replied_to_your_comment"];
 
@@ -35,13 +36,14 @@ interface Notification {
     reference_id?: string;
     title?: string;
     author?: Author;
+    /** A collapsed burst of chat messages: how many it stands for. */
+    message_count?: number;
 }
 
 interface NotificationPage {
     items: Notification[];
+    /** The unread count. */
     total: number;
-    page: number;
-    size: number;
 }
 
 const NotificationCard: React.FC<{ notification: Notification }> = ({ notification }) => {
@@ -149,6 +151,11 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({ notificati
                                 notification?.author?.name
                             )}
                     </p>
+                    {messageCountLabel(notification.message_count) && (
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                            {messageCountLabel(notification.message_count)}
+                        </span>
+                    )}
                     <div className="w-2 h-2 bg-gray-300 rounded-full" />
                     <p className="text-gray-light font-medium text-sm sm:text-base">
                         {timesAgo(notification?.created_at)}
@@ -189,16 +196,13 @@ const NotificationSection: React.FC = () => {
     const [visibleIds, setVisibleIds] = useState<string[]>([]);
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching, isError } =
-        useInfiniteQuery<NotificationPage>({
+        useInfiniteQuery<NotificationPage, Error, { pages: NotificationPage[]; pageParams: unknown[] }, string[], string | undefined>({
             queryKey: ["notifications"],
-            queryFn: ({ pageParam = 1 }) =>
-                getNotifications({ page: pageParam as number, size: 20 }),
-            getNextPageParam: (lastPage) => {
-                const nextPage = lastPage.page + 1;
-                const totalPages = Math.ceil(lastPage.total / lastPage.size);
-                return nextPage <= totalPages ? nextPage : undefined;
-            },
-            initialPageParam: 1,
+            // Cursor paging: the page param is the id of the last notification already loaded.
+            queryFn: ({ pageParam }) =>
+                getNotifications({ before: pageParam, size: NOTIFICATIONS_PAGE_SIZE }),
+            getNextPageParam: (lastPage) => nextNotificationCursor(lastPage.items, NOTIFICATIONS_PAGE_SIZE),
+            initialPageParam: undefined,
         });
 
     const markAsReadMutation = useMutation({

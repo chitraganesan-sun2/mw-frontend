@@ -1,9 +1,23 @@
 import { endpoints } from "../constants";
 import { GET_API, PUT_API } from "../request";
+import { NOTIFICATIONS_PAGE_SIZE, isEndOfList, notificationsQuery } from "@/utils/notificationCursor";
 
-export const getNotifications = async ({ page = 1, size = 20 }: { page?: number, size?: number }) => {
-    const response: any = await GET_API(`${endpoints.post.getNotifications}?page=${page}&size=${size}`);
-    return response.data;
+/** One page of notifications by cursor: `before` is the id of the last item already loaded. An
+ * unknown cursor (404) just means the list has ended. `total` is the unread count. */
+export const getNotifications = async ({
+    before,
+    size = NOTIFICATIONS_PAGE_SIZE,
+    includeRead = false,
+}: { before?: string | null; size?: number; includeRead?: boolean } = {}) => {
+    try {
+        const response: any = await GET_API(
+            `${endpoints.post.getNotifications}?${notificationsQuery({ before, size, includeRead })}`
+        );
+        return response.data;
+    } catch (err) {
+        if (before && isEndOfList(err)) return { items: [], total: 0 };
+        throw err;
+    }
 }
 
 export const markNotificationsAsRead = async (notificationIds: string[]) => {
