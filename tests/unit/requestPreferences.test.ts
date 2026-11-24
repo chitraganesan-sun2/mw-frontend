@@ -42,3 +42,11 @@ test("the payload drops the date unless paused and turns an empty limit into nul
     assert.equal(buildRequestPreferencesPayload(form({ paused: false, pausedUntil: "2026-11-20" })).requests_paused_until, null);
     assert.equal(buildRequestPreferencesPayload(form({ paused: true })).requests_paused_until, null);
 });
+
+test("the resume-date bounds run from the profile-zone date, not the browser's", async () => {
+    const { pauseDateBounds } = await import("../../src/utils/requestPreferences.ts");
+    assert.deepEqual(pauseDateBounds("2026-11-01"), { min: "2026-11-01", max: "2027-01-30" }); // day 90
+    assert.deepEqual(pauseDateBounds("2026-12-31"), { min: "2026-12-31", max: "2027-03-31" }); // crosses the year
+    // the max the form offers is the last date the validator accepts
+    assert.equal(validateRequestPreferences(form({ paused: true, pausedUntil: pauseDateBounds(TODAY).max }), TODAY), null);
+});

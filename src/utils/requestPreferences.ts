@@ -11,6 +11,14 @@ export interface RequestPreferencesForm {
 
 const dayNumber = (iso: string) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 86_400_000;
 
+/** The date input's bounds for "Resume on", from today's date (YYYY-MM-DD) in the volunteer's PROFILE
+ * time zone - not the browser's: an evening in the Americas is already tomorrow in UTC, and the
+ * browser's date there would offer a "today" the server calls the past. Plain dates only, no clock. */
+export function pauseDateBounds(today: string): { min: string; max: string } {
+    const max = new Date((dayNumber(today) + MAX_PAUSE_DAYS) * 86_400_000).toISOString().slice(0, 10);
+    return { min: today, max };
+}
+
 /** A message for the form, or null when it can be saved. `today` is YYYY-MM-DD. */
 export function validateRequestPreferences(form: RequestPreferencesForm, today: string): string | null {
     if (form.capText.trim() !== "") {

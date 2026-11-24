@@ -5,15 +5,14 @@ import { endpoints } from "@/api/constants";
 import { GET_API, PUT_API } from "@/api/request";
 import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import {
     MAX_PAUSE_DAYS,
     MAX_PENDING_CAP,
     buildRequestPreferencesPayload,
+    pauseDateBounds,
     validateRequestPreferences,
 } from "@/utils/requestPreferences";
-
-const isoDay = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 /**
  * Settings card: pause new learner requests (optionally until a date) and/or limit how many can
@@ -47,12 +46,13 @@ const RequestPreferencesSection = ({ volunteerId }: { volunteerId: string }) => 
             .finally(() => setIsLoading(false));
     }, [volunteerId]);
 
-    const today = new Date();
-    const maxDay = new Date(today.getTime() + MAX_PAUSE_DAYS * 86_400_000);
+    // "Today" in the volunteer's profile time zone, and the 90-day limit counted from it.
+    const today = useProfileToday("volunteer");
+    const { min: minDay, max: maxDay } = pauseDateBounds(today);
 
     const handleSave = async () => {
         const form = { paused, pausedUntil, capText };
-        const problem = validateRequestPreferences(form, isoDay(today));
+        const problem = validateRequestPreferences(form, today);
         if (problem) {
             showToast({ type: "error", message: problem });
             return;
@@ -117,8 +117,8 @@ const RequestPreferencesSection = ({ volunteerId }: { volunteerId: string }) => 
                         id="pause-until"
                         type="date"
                         value={pausedUntil}
-                        min={isoDay(today)}
-                        max={isoDay(maxDay)}
+                        min={minDay}
+                        max={maxDay}
                         onChange={(e) => setPausedUntil(e.target.value)}
                         className="w-full md:w-[240px] rounded-lg border border-gray-300 px-3 h-10"
                     />
