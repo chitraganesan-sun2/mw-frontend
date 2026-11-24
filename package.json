@@ -61,7 +61,7 @@
     "framer-motion": "^14.6.0",
     "js-cookie": "^3.0.8",
     "jwt-decode": "^4.0.0",
-    "next": "^16.4.3",
+    "next": "^16.4.6",
     "nookies": "^2.5.2",
     "numeral": "^2.0.6",
     "nuqs": "^2.10.2",
@@ -97,7 +97,7 @@
     "@types/react-timeago": "^4.1.7",
     "@types/scrollreveal": "^0.0.11",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.4.3",
+    "eslint-config-next": "^16.4.6",
     "postcss": "^8.5.28",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.2"
