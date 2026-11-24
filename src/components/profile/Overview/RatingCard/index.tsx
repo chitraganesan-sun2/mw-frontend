@@ -6,7 +6,7 @@ import React from "react";
 import DummyProfileImg from "@/assets/images/DummyProfileImg.png";
 import { IoStarSharp } from "react-icons/io5";
 import dayjs from "dayjs";
-import { formatDisplayDate, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
+import { formatUtcTimestamp, DISPLAY_DATE_FORMAT } from "@/utils/timeFunctions";
 
 const RatingCard: React.FC<RatingCardProps> = ({ profileImg, name, rating, day, review }) => {
     return (
@@ -30,7 +30,8 @@ const RatingCard: React.FC<RatingCardProps> = ({ profileImg, name, rating, day, 
                         </div>
                         <div className="w-1.5 h-1.5 rounded-full bg-action"></div>
                         <p className="font-semibold text-black text-sm">
-                            {formatDisplayDate(day)}
+                            {/* review created_at is naive UTC: parse as UTC, show in the viewer's local date */}
+                            {formatUtcTimestamp(day, DISPLAY_DATE_FORMAT) || "-"}
                         </p>
                     </div>
                     <p className="text-sm font-normal text-gray-light flex flex-wrap">{review}</p>

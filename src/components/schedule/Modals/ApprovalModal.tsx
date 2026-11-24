@@ -11,6 +11,7 @@ import { ApprovalModalProps } from "./index.type.d";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import { showToast } from "@/components/common/Toast";
 import { formatSessionDate } from "@/utils/sessionDisplay";
+import { formatUtcTimestamp } from "@/utils/timeFunctions";
 
 type SessionsData = {
     learner_first_name: string;
@@ -214,7 +215,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
                                         <p className="font-medium text-gray-900">{n.title}</p>
                                         {n.created_at && (
                                             <p className="text-xs text-gray-600">
-                                                {new Date(n.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                                                {formatUtcTimestamp(n.created_at, "MMM D")}
                                             </p>
                                         )}
                                     </div>
