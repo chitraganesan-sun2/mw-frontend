@@ -4,7 +4,8 @@ import { HiOutlineBell } from "react-icons/hi2";
 import { endpoints } from "@/api/constants";
 import { GET_API } from "@/api/request";
 import ApprovalModal from "@/components/schedule/Modals/ApprovalModal";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { nextBellState } from "@/utils/bellToast";
 import { getCookie } from "@/utils/auth";
 import { useState, useEffect, useRef } from "react";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
@@ -24,8 +25,9 @@ const HeaderNotificationBell = () => {
     // Shared open state: a pending card's "Respond" on the Schedule dashboard opens this drawer too.
     const { isOpen, open: openDrawer, close: closeDrawer } = useApprovalDrawer();
     const [showToast, setShowToast] = useState(false);
-    const prevCount = useRef<number>(0);
-    const hasInitialized = useRef(false);
+    // null until the first real response (see nextBellState).
+    const prevCount = useRef<number | null>(null);
+    const queryClient = useQueryClient();
 
     const isLearner = role === "learner";
     const currentUserId = isLearner ? learnerId : volunteerId;
@@ -43,24 +45,28 @@ const HeaderNotificationBell = () => {
     });
 
     const unreadCount = Number(data?.unread_count || 0);
+    // undefined until the first response arrives (the badge reads 0 meanwhile).
+    const loadedCount = data === undefined ? undefined : unreadCount;
 
     // Toast on any genuine increase - but not on the first load, and not repeatedly while
     // the count merely stays elevated (the old `!== 0` guard also swallowed the first
     // increase after the badge had been cleared to 0).
     useEffect(() => {
-        if (!hasInitialized.current) {
-            hasInitialized.current = true;
-            prevCount.current = unreadCount;
-            return;
+        const { prev, toast } = nextBellState(prevCount.current, loadedCount);
+        const changed = prevCount.current !== null && prev !== prevCount.current;
+        prevCount.current = prev;
+        // The badge moved: the drawer's list (cached for minutes) is out of date too.
+        if (changed) {
+            ["approval-notifications", "learner-approval-notifications", "session-outcome-notifications"].forEach(
+                (key) => queryClient.invalidateQueries({ queryKey: [key] })
+            );
         }
-        const increased = unreadCount > prevCount.current;
-        prevCount.current = unreadCount;
-        if (increased) {
+        if (toast) {
             setShowToast(true);
             const timer = setTimeout(() => setShowToast(false), 5000);
             return () => clearTimeout(timer);
         }
-    }, [unreadCount]);
+    }, [loadedCount, queryClient]);
 
     // Show the bell for all authenticated users (volunteer + learner)
     if (!role || !["volunteer", "learner"].includes(role)) return null;

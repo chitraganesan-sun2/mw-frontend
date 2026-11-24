@@ -79,6 +79,10 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
         queryKey: [isLearner ? "learner-approval-notifications" : "approval-notifications", isOpen],
         queryFn: () => getNotifications(),
         enabled: isOpen,
+        // Always fetch fresh when the drawer opens: the global 5-minute staleTime served an old
+        // list while the badge (polled every 30s) already showed the new item.
+        staleTime: 0,
+        refetchOnMount: "always",
     });
 
     // What happened to the user's own sessions. The bell badge counts these, so they are listed
@@ -90,6 +94,8 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ isOpen, onClose, role = "
             return res?.data?.items ?? [];
         },
         enabled: isOpen,
+        staleTime: 0,
+        refetchOnMount: "always",
     });
     const outcomeItems = outcomes.data ?? [];
 
