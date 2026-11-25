@@ -463,6 +463,14 @@ export default function VolunteerInstantSessionsPage() {
                     Instant sessions happen <strong>today or tomorrow.</strong> Post a session for
                     learners to join, or accept one a learner has requested.
                 </p>
+                {/* The page's main action lives here, not in a column header, so it never wraps
+                    with the column width and both column headings line up. */}
+                <button
+                    onClick={() => setShowCreateForm(true)}
+                    className={`${START_SESSION_BTN_CLASS} ${SECTION_CONTROL_HEIGHT} !py-0 mt-2 inline-flex items-center whitespace-nowrap`}
+                >
+                    + {TERMS.postInstantSession}
+                </button>
             </div>
 
             <NewEventModal
@@ -481,36 +489,26 @@ export default function VolunteerInstantSessionsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My Posted Instant Sessions (sessions this volunteer started or accepted) - shown first */}
             <div className="min-w-0">
-                {/* Title left; "+ Post an Instant Session" and the status filter side by side on
-                    the right. On narrow phones the pair wraps under the title as one row and
-                    the dropdown shrinks rather than dropping to a third line / overflowing. */}
+                {/* Title left, status filter right (the post button is in the page header). */}
                 <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
                         My Posted Instant Sessions
                     </h2>
-                    <div className="flex items-center justify-end gap-3 ml-auto min-w-0 max-w-full">
-                        <button
-                            onClick={() => setShowCreateForm(true)}
-                            className={`${START_SESSION_BTN_CLASS} ${SECTION_CONTROL_HEIGHT} !py-0 max-sm:!px-4 inline-flex items-center shrink-0 whitespace-nowrap`}
-                        >
-                            + {TERMS.postInstantSession}
-                        </button>
-                        <select
-                            aria-label="Filter by status"
-                            className={`${SECTION_CONTROL_HEIGHT} min-w-0 flex-1 sm:flex-none px-3 border border-gray-200 rounded-xl text-sm bg-white`}
-                            value={sessionsStatus || ""}
-                            onChange={(e) => {
-                                setSessionsStatus(e.target.value || null);
-                                setSessionsPage("1");
-                            }}
-                        >
-                            {MY_SESSIONS_STATUS_FILTERS.map((s) => (
-                                <option key={s} value={s}>
-                                    {s ? getStatusLabel(s) : "All statuses"}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <select
+                        aria-label="Filter by status"
+                        className={`${SECTION_CONTROL_HEIGHT} min-w-0 px-3 border border-gray-200 rounded-xl text-sm bg-white`}
+                        value={sessionsStatus || ""}
+                        onChange={(e) => {
+                            setSessionsStatus(e.target.value || null);
+                            setSessionsPage("1");
+                        }}
+                    >
+                        {MY_SESSIONS_STATUS_FILTERS.map((s) => (
+                            <option key={s} value={s}>
+                                {s ? getStatusLabel(s) : "All statuses"}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 {isMySessionsError && !mySessionsData ? (
@@ -564,9 +562,13 @@ export default function VolunteerInstantSessionsPage() {
 
             {/* Instant Sessions requested by Learners (open learner requests any volunteer can accept) */}
             <div className="min-w-0">
-                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
-                    Instant Sessions Requested by Learners
-                </h2>
+                {/* Same height as the left header (it holds the 40px status filter) so the two
+                    headings line up. */}
+                <div className="flex items-center min-h-10 mb-4">
+                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
+                        Instant Sessions Requested by Learners
+                    </h2>
+                </div>
                 {isLearnerRequestsError && !learnerRequestsData ? (
                     <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />
                 ) : learnerRequests.length > 0 ? (
