@@ -586,22 +586,24 @@ export default function InstantSessionsPage() {
                     Instant sessions happen <strong>today or tomorrow.</strong> Browse sessions
                     volunteers have posted, or request one at a time and subject that suit you.
                 </p>
+                {/* The page's main action lives here, not in a column header, so it never wraps
+                    with the column width and both column headings line up. */}
+                <button
+                    onClick={() => setIsRequestModalOpen(true)}
+                    className="btn-primary-fill h-10 inline-flex items-center px-5 mt-2 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity whitespace-nowrap"
+                >
+                    + {TERMS.requestInstantSession}
+                </button>
             </div>
 
+            {/* Two columns from lg up (requests left, volunteer-posted right); stacked on smaller
+                screens. Inside each column the cards stack vertically. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My Requested Sessions (the learner-request-for-any-volunteer flow) - shown first */}
-            <div className="mb-10">
-                {/* Same header row as the volunteer page: title left, action right, wraps on phones. */}
-                <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
-                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
-                        My Requested Instant Sessions
-                    </h2>
-                    <button
-                        onClick={() => setIsRequestModalOpen(true)}
-                        className="btn-primary-fill h-10 inline-flex items-center px-5 rounded-xl text-sm font-medium hover:opacity-90 transition-opacity ml-auto shrink-0 whitespace-nowrap"
-                    >
-                        + {TERMS.requestInstantSession}
-                    </button>
-                </div>
+            <div className="min-w-0">
+                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
+                    My Requested Instant Sessions
+                </h2>
 
                 {isMyRequestsLoading ? (
                     <div className="flex justify-center py-6">
@@ -611,7 +613,7 @@ export default function InstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load your requests." onRetry={() => refetchMyRequests()} />
                 ) : myRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <div className="flex flex-col gap-3">
                             {myRequests.map((req) => (
                                 <RequestedSessionCard
                                     key={req.request_id}
@@ -656,7 +658,7 @@ export default function InstantSessionsPage() {
             </div>
 
             {/* Available Instant Sessions (volunteer-opened slots, browse + join) */}
-            <div>
+            <div className="min-w-0">
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
                     Instant Sessions Posted by Volunteers
                 </h2>
@@ -667,8 +669,9 @@ export default function InstantSessionsPage() {
                     </div>
                 )}
 
-                {availableSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-4">
+                {/* Open and booked sessions share one vertical list. */}
+                {(availableSessions.length > 0 || claimedSessions.length > 0) && (
+                    <div className="flex flex-col gap-3">
                         {availableSessions.map((session) => (
                             <SessionCard
                                 key={session.id}
@@ -676,11 +679,6 @@ export default function InstantSessionsPage() {
                                 onClick={() => handleSessionClick(session)}
                             />
                         ))}
-                    </div>
-                )}
-
-                {claimedSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         {claimedSessions.map((session) => (
                             <SessionCard
                                 key={session.id}
@@ -702,6 +700,7 @@ export default function InstantSessionsPage() {
                         </p>
                     </div>
                 )}
+            </div>
             </div>
 
             {selectedSession && (
