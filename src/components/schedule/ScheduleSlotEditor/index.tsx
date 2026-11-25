@@ -63,6 +63,14 @@ const TimePickerComponent = ({
                 closeOnSelect={false}
                 slotProps={{ textField: { fullWidth: true } }}
                 sx={{
+                    // The two fields share a ~300px row (and ~230px on a phone); MUI's default 16px
+                    // text and 14px side padding clipped "10:00 AM" to "10:00 AN" under the clock icon.
+                    "& .MuiPickersOutlinedInput-root": {
+                        paddingLeft: "10px",
+                        paddingRight: "4px",
+                        "& .MuiIconButton-root": { padding: "2px", marginRight: 0 },
+                    },
+                    "& .MuiPickersInputBase-sectionsContainer": { fontSize: "14px" },
                     "& .MuiOutlinedInput-root": {
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                             border: "2px solid var(--background-secondary-color) !important",
@@ -138,7 +146,7 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                 <div
                                     role="button"
                                     tabIndex={0}
-                                    aria-expanded={isExpanded}
+                                    aria-expanded={!!isExpanded}
                                     className="flex items-center justify-between cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
                                     onClick={() => toggleDay(day)}
                                     onKeyDown={keyActivate(() => toggleDay(day))}
