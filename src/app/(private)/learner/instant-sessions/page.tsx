@@ -611,7 +611,7 @@ export default function InstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load your requests." onRetry={() => refetchMyRequests()} />
                 ) : myRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {myRequests.map((req) => (
                                 <RequestedSessionCard
                                     key={req.request_id}
@@ -667,8 +667,10 @@ export default function InstantSessionsPage() {
                     </div>
                 )}
 
-                {availableSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-4">
+                {/* One grid for both, so open and booked sessions fill the two columns together
+                    instead of each list starting its own row. */}
+                {(availableSessions.length > 0 || claimedSessions.length > 0) && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {availableSessions.map((session) => (
                             <SessionCard
                                 key={session.id}
@@ -676,11 +678,6 @@ export default function InstantSessionsPage() {
                                 onClick={() => handleSessionClick(session)}
                             />
                         ))}
-                    </div>
-                )}
-
-                {claimedSessions.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         {claimedSessions.map((session) => (
                             <SessionCard
                                 key={session.id}

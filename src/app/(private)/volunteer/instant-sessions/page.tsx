@@ -522,7 +522,7 @@ export default function VolunteerInstantSessionsPage() {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {mySessions.map((session) => (
                                 <MySessionCard
                                     key={session.session_id}
@@ -568,7 +568,7 @@ export default function VolunteerInstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />
                 ) : learnerRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {learnerRequests.map((req) => (
                                 <LearnerRequestCard
                                     key={req.request_id}

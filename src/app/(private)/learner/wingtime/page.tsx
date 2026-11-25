@@ -154,7 +154,7 @@ export default function LearnerWingTimePage() {
                     <QueryErrorNotice message="Couldn't load your WingTimes." onRetry={() => mine.refetch()} />
                 ) : myItems.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {myItems.map((item) => (
                                 <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
                             ))}
@@ -177,7 +177,7 @@ export default function LearnerWingTimePage() {
                     <QueryErrorNotice message="Couldn't load WingTimes." onRetry={() => browse.refetch()} />
                 ) : openItems.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {openItems.map((item) => (
                                 <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
                             ))}
