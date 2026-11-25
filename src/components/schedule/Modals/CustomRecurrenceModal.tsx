@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CenterModal from "@/components/common/Modals/CenterModal";
 import { DatePicker, Radio, Input } from "antd";
 import dayjs, { Dayjs } from "dayjs";
@@ -32,7 +32,8 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
 }) => {
     // "Today" in the user's PROFILE timezone - the browser's date can differ.
     const today = useProfileToday();
-    const [repeatEvery, setRepeatEvery] = useState<number>(initialData?.repeatEvery ?? 0);
+    // "Every 0 weeks" means nothing (and was silently saved as plain weekly), so 1 is the floor.
+    const [repeatEvery, setRepeatEvery] = useState<number>(initialData?.repeatEvery || 1);
     const [startDate, setStartDate] = useState<Dayjs | null>(
         initialData?.start_date ? dayjs(initialData.start_date) : null
     );
@@ -43,15 +44,20 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
         initialData?.end_date ? dayjs(initialData.end_date) : null
     );
 
-    // Reset form when modal opens/closes or initialData changes
+    // Reset the form each time the modal OPENS. The parent builds `initialData` as a new object on
+    // every render, so depending on it here wiped the user's picks whenever the parent re-rendered
+    // (a background refetch, a window refocus) while the modal was open - read it through a ref.
+    const initialDataRef = useRef(initialData);
+    initialDataRef.current = initialData;
     useEffect(() => {
         if (isOpen) {
-            setRepeatEvery(initialData?.repeatEvery ?? 0);
-            setStartDate(initialData?.start_date ? dayjs(initialData.start_date) : null);
-            setEndType(initialData?.end_date ? "date" : "never");
-            setEndDate(initialData?.end_date ? dayjs(initialData.end_date) : null);
+            const initial = initialDataRef.current;
+            setRepeatEvery(initial?.repeatEvery || 1);
+            setStartDate(initial?.start_date ? dayjs(initial.start_date) : null);
+            setEndType(initial?.end_date ? "date" : "never");
+            setEndDate(initial?.end_date ? dayjs(initial.end_date) : null);
         }
-    }, [isOpen, initialData]);
+    }, [isOpen]);
 
     const handleSave = () => {
         if (onSave) {
@@ -98,12 +104,12 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
                     <div className="flex items-center gap-2">
                         <Input
                             type="text"
-                            min={0}
+                            min={1}
                             max={6}
                             value={repeatEvery}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 const value = Number(e.target.value);
-                                if (!isNaN(value) && value >= 0 && value <= 6) {
+                                if (!isNaN(value) && value >= 1 && value <= 6) {
                                     setRepeatEvery(value);
                                 }
                             }}
@@ -122,7 +128,7 @@ const CustomRecurrenceModal: React.FC<CustomRecurrenceModalProps> = ({
                         </button>
                         <button
                             type="button"
-                            onClick={() => setRepeatEvery((prev) => Math.max(0, prev - 1))}
+                            onClick={() => setRepeatEvery((prev) => Math.max(1, prev - 1))}
                             className="p-0 border-0 bg-transparent hover:opacity-70 transition-opacity cursor-pointer flex items-center justify-center"
                             style={{ height: '12px', width: '20px' }}
                         >
