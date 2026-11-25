@@ -89,12 +89,49 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const canShowMore = hasHidden && Boolean(active.hasNextPage);
     const showFilters = sorted.length >= 4 || isFiltering;
     const visibleFilters = FILTERS.filter((f) => f !== "wingtime" || WINGTIME_ENABLED);
+    // Requests from someone else that are waiting for the viewer (the side panel lists them).
+    const awaiting = useMemo(
+        () => (when === "upcoming" ? sorted.filter((e) => e.needsResponse && e.data.type === "session") : []),
+        [when, sorted]
+    );
+    const showTypeFilters = sorted.length > 0 || kind !== "all";
+    const hasPanel = Boolean(nextSession) || awaiting.length > 0 || showTypeFilters;
 
     const resetFilters = () => {
         setSearch("");
         setStatusFilter("all");
         setKind("all");
     };
+
+    // The same type filter, as chips on narrow screens and a vertical list in the side panel.
+    const typeFilter = (layout: "chips" | "list") => (
+        <div
+            role="group"
+            aria-label="Filter by type"
+            className={layout === "chips" ? "flex flex-wrap gap-2 lg:hidden" : "flex flex-col gap-1"}
+        >
+            {visibleFilters.map((f) => (
+                <button
+                    key={`${layout}-${f}`}
+                    type="button"
+                    aria-pressed={kind === f}
+                    onClick={() => setKind(f)}
+                    className={
+                        layout === "chips"
+                            ? `rounded-full border px-3 py-1 text-xs font-medium cursor-pointer ${
+                                  kind === f ? "border-transparent bg-action text-white" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                              }`
+                            : `flex items-center justify-between rounded-lg px-3 py-1.5 text-sm font-medium cursor-pointer border-0 ${
+                                  kind === f ? "bg-action text-white" : "bg-transparent text-gray-700 hover:bg-gray-100"
+                              }`
+                    }
+                >
+                    <span>{AGENDA_FILTER_LABEL[f]}</span>
+                    <span className={kind === f ? "opacity-90" : "text-gray-500"}>{layout === "chips" ? `(${counts[f]})` : counts[f]}</span>
+                </button>
+            ))}
+        </div>
+    );
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
@@ -124,29 +161,17 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
 
             <PageIntro className="text-center">{HELP.mySessions}</PageIntro>
 
-            {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
-
-            <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
-                {/* Type chips, with how many of each are loaded. */}
-                {(sorted.length > 0 || kind !== "all") && (
-                    <div role="group" aria-label="Filter by type" className="flex flex-wrap gap-2">
-                        {visibleFilters.map((f) => (
-                            <button
-                                key={f}
-                                type="button"
-                                aria-pressed={kind === f}
-                                onClick={() => setKind(f)}
-                                className={`rounded-full border px-3 py-1 text-xs font-medium cursor-pointer ${
-                                    kind === f
-                                        ? "border-transparent bg-action text-white"
-                                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                                }`}
-                            >
-                                {AGENDA_FILTER_LABEL[f]} <span className={kind === f ? "opacity-90" : "text-gray-500"}>({counts[f]})</span>
-                            </button>
-                        ))}
+            {/* Wide screens: the agenda on the left, a panel on the right (next up, what needs a
+                reply, type filters). Narrower screens: one column, banner and chips on top. */}
+            <div className={`grid grid-cols-1 gap-4 ${hasPanel ? "lg:grid-cols-[minmax(0,1fr)_18rem]" : ""} lg:items-start`}>
+            <div className="flex min-w-0 flex-col gap-3">
+                {nextSession && (
+                    <div className="lg:hidden">
+                        <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />
                     </div>
                 )}
+
+                {showTypeFilters && typeFilter("chips")}
 
                 {showFilters && (
                     <div className="flex flex-col gap-2 sm:flex-row">
@@ -322,6 +347,43 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                         )}
                     </div>
                 )}
+            </div>
+
+            {hasPanel && (
+                <aside aria-label="Schedule summary" className="hidden lg:flex lg:sticky lg:top-3 flex-col gap-3">
+                    {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
+
+                    {awaiting.length > 0 && (
+                        <div className="rounded-lg border border-amber-300 bg-amber-50/40 p-3">
+                            <h3 className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+                                Needs your response ({awaiting.length})
+                            </h3>
+                            <ul className="mt-1.5 flex flex-col gap-1">
+                                {awaiting.slice(0, 3).map((e) => (
+                                    <li key={e.key} className="truncate text-sm text-gray-800">
+                                        {e.data.type === "session" ? e.data.session.session_title || "Session" : ""}
+                                    </li>
+                                ))}
+                            </ul>
+                            {awaiting.length > 3 && <p className="mt-1 text-xs text-gray-500">and {awaiting.length - 3} more</p>}
+                            <button
+                                type="button"
+                                onClick={openApprovals}
+                                className="mt-2 rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer"
+                            >
+                                Respond
+                            </button>
+                        </div>
+                    )}
+
+                    {showTypeFilters && (
+                        <div className="rounded-lg border border-gray-200 p-2">
+                            <h3 className="px-1 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Show</h3>
+                            {typeFilter("list")}
+                        </div>
+                    )}
+                </aside>
+            )}
             </div>
         </section>
     );
