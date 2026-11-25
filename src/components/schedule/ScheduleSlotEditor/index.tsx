@@ -335,13 +335,13 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                 return {
                                     start_date: customData.start_date,
                                     end_date: customData.end_date,
-                                    repeatEvery: customData.weekly_repeat_interval || 0,
+                                    repeatEvery: customData.weekly_repeat_interval || 1,
                                 };
                             } else if (slotData?.slot_type === "custom" && slotData.start_date) {
                                 return {
                                     start_date: slotData.start_date,
                                     end_date: slotData.end_date,
-                                    repeatEvery: 2,
+                                    repeatEvery: slotData.weekly_repeat_interval || 1,
                                 };
                             }
                             return undefined;

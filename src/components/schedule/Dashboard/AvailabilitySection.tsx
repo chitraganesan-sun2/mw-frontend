@@ -152,9 +152,11 @@ const ONE_TIME_KEY = ["volunteer_slot", "one_time"];
 function recurrenceLabel(slot: WeeklySlot): string {
     const interval = slot.weekly_repeat_interval && slot.weekly_repeat_interval > 1 ? slot.weekly_repeat_interval : 1;
     const every = interval > 1 ? `Every ${interval} weeks` : "Weekly";
-    if (slot.slot_type === "custom" && slot.end_date) return `${every} until ${formatSessionDate(slot.end_date)}`;
-    if (slot.slot_type === "custom" && slot.start_date) return `${every} from ${formatSessionDate(slot.start_date)}`;
-    return every;
+    if (slot.slot_type !== "custom") return every;
+    // Show both ends: "until Dec 20" alone hid when the pattern starts.
+    const from = slot.start_date ? ` from ${formatSessionDate(slot.start_date)}` : "";
+    const until = slot.end_date ? ` until ${formatSessionDate(slot.end_date)}` : "";
+    return `${every}${from}${until}`;
 }
 
 interface AvailabilitySectionProps {
