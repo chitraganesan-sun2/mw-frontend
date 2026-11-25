@@ -22,7 +22,8 @@ export const HELP = {
     viewCalendar: "See your sessions and availability on a monthly calendar.",
     scheduleAvailability: "Set the weekly times you are free for sessions.",
 
-    mySessions: "Your upcoming sessions, grouped by how they were arranged. Past sessions are under Past.",
+    mySessions:
+        "Everything you have scheduled, in one place: sessions, instant sessions and WingTimes, in date order. Finished ones are under Past.",
     availabilityVolunteer:
         "The weekly and one-time hours you offer. Learners can book these times; booked times show under Volunteer Slots I'm Offering.",
     availabilityLearner: "The weekly times you are usually free for sessions.",

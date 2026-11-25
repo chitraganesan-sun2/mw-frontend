@@ -23,6 +23,9 @@ export function invalidateScheduleViews(queryClient: QueryClient, role: Schedule
         role === "volunteer" ? "volunteer_slot" : "learner_slot",
         "availableDays",
         "available-slots",
+        // My Schedule's WingTime and open-instant lists.
+        "wingtime",
+        "instant",
         // Instant-session pages.
         ...(role === "learner"
             ? ["learner-instant-sessions", "learner-accepted-instant-sessions", "learner-my-requests"]

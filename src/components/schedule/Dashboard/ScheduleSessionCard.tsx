@@ -47,6 +47,8 @@ interface ScheduleSessionCardProps {
     /** Asks the other person to move this accepted session to a new time. */
     onReschedule?: (session: ScheduleSession) => void;
     now?: dayjs.Dayjs;
+    /** What kind of thing this is (My Schedule's type tag), shown above the title. */
+    typeTag?: React.ReactNode;
 }
 
 /** A pending direct session the OTHER party asked for: the viewer is the one who has to
@@ -102,6 +104,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
     onRespond,
     onReschedule,
     now = dayjs(),
+    typeTag,
 }) => {
     const [isReportOpen, setIsReportOpen] = useState(false);
     const [completing, setCompleting] = useState(false);
@@ -206,6 +209,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
+                    {typeTag}
                     <h3 className="text-sm font-semibold text-gray-900 truncate">
                         {session.session_title || "Session"}
                     </h3>

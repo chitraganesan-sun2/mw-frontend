@@ -1,85 +1,35 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
-import { joinNames } from "@/utils/joinNames";
-import { getStatusLabel } from "@/utils/sessionDisplay";
-import { useScheduleSessions, type ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
+import PageIntro from "@/components/common/PageIntro";
+import WingTimeCard from "@/components/wingtime/WingTimeCard";
+import { HELP } from "@/constants/copy";
+import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
-import dayjs from "dayjs";
+import { useScheduleAgenda } from "@/hooks/schedule/useScheduleAgenda";
 import { useStartReschedule } from "@/hooks/schedule/useStartReschedule";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
-import InfoTip from "@/components/common/InfoTip";
-import PageIntro from "@/components/common/PageIntro";
-import { HELP } from "@/constants/copy";
-import ScheduleSessionCard, { getDisplayStatus, isAwaitingMyResponse } from "./ScheduleSessionCard";
-import NextSessionBanner, { findNextSession } from "./NextSessionBanner";
 import {
-    SCHEDULE_LABELS,
-    SCHEDULE_TAB_EMPTY,
-    SCHEDULE_TAB_LABELS,
-    getScheduleTab,
-    type ScheduleRole,
-    type ScheduleTab,
-} from "./scheduleCategories";
-
-const TABS: ScheduleTab[] = ["posted", "accepted", "direct"];
+    AGENDA_FILTER_LABEL,
+    countByKind,
+    filterAgenda,
+    groupAgenda,
+    sortAgenda,
+    statusOptions,
+    type AgendaFilter,
+} from "@/utils/scheduleAgenda";
+import ScheduleOpenInstantCard from "./ScheduleOpenInstantCard";
+import ScheduleSessionCard from "./ScheduleSessionCard";
+import ScheduleTypeTag from "./ScheduleTypeTag";
+import NextSessionBanner, { findNextSession } from "./NextSessionBanner";
+import { SCHEDULE_LABELS, getSessionOriginNote, type ScheduleRole } from "./scheduleCategories";
 
 interface MyScheduleSectionProps {
     role: ScheduleRole;
     timeZoneLabel?: string;
     onOpenProfile: (userId: string) => void;
-}
-
-/** "My Posted Sessions (accepted by learners)" -> ["My Posted Sessions", "accepted by learners"]. */
-function splitTabLabel(label: string): [string, string] {
-    const m = label.match(/^(.*?)\s*\((.*)\)$/);
-    return m ? [m[1], m[2]] : [label, ""];
-}
-
-interface SessionGroup {
-    key: string;
-    label: string;
-    accent?: boolean;
-    items: ScheduleSession[];
-}
-
-/** Date groups so the next session is easy to spot. Upcoming: requests waiting for the viewer
- * first, then Today / Tomorrow / This week / Next week / Later. Past: Today / Yesterday /
- * Earlier this week / Earlier this month / Older, with cancelled or declined sessions that were
- * scheduled for a later date kept together. Input order (already sorted by the API) is kept. */
-function groupSessions(sessions: ScheduleSession[], role: ScheduleRole, when: "upcoming" | "past", today: string): SessionGroup[] {
-    const groups: SessionGroup[] = [];
-    const add = (key: string, label: string, session: ScheduleSession, accent = false) => {
-        let group = groups.find((g) => g.key === key);
-        if (!group) {
-            group = { key, label, accent, items: [] };
-            groups.push(group);
-        }
-        group.items.push(session);
-    };
-    const base = dayjs(today);
-    sessions.forEach((session) => {
-        if (when === "upcoming" && isAwaitingMyResponse(session, role)) {
-            add("respond", "Needs your response", session, true);
-            return;
-        }
-        const date = role === "volunteer" ? session.volunteer_start_date : session.learner_start_date;
-        const diff = date && base.isValid() ? dayjs(date).diff(base, "day") : 0;
-        if (when === "upcoming") {
-            if (diff <= 0) add("today", "Today", session);
-            else if (diff === 1) add("tomorrow", "Tomorrow", session);
-            else if (diff <= 6) add("week", "This week", session);
-            else if (diff <= 13) add("next", "Next week", session);
-            else add("later", "Later", session);
-        } else if (diff > 0) {
-            add("cancelled-later", "Cancelled or declined", session);
-        } else if (diff === 0) add("today", "Today", session);
-        else if (diff === -1) add("yesterday", "Yesterday", session);
-        else if (diff >= -6) add("week", "Earlier this week", session);
-        else if (diff >= -30) add("month", "Earlier this month", session);
-        else add("older", "Older", session);
-    });
-    return groups;
 }
 
 export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
@@ -92,83 +42,59 @@ export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
     );
 }
 
+const FILTERS: AgendaFilter[] = ["all", "session", "instant", "wingtime"];
+
+/**
+ * My Schedule: one agenda of everything the viewer has scheduled - regular sessions, instant
+ * sessions (incl. ones still waiting for the other person) and WingTimes - grouped by date, with
+ * a type tag and a status pill on every card. Upcoming / Past toggle; filter by type, status
+ * and search.
+ */
 const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile }) => {
+    const router = useRouter();
     const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
+    const [kind, setKind] = useState<AgendaFilter>("all");
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
 
     const startReschedule = useStartReschedule(role);
-
     const openApprovals = useApprovalDrawer((state) => state.open);
     // Re-evaluated every minute so Join appears/disappears without a reload.
     const now = useNow();
     const today = useProfileToday(role);
 
-    // Longer lists load page by page ("Show more"); search / status filter narrow what is loaded.
-    const [search, setSearch] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+    const { entries, sessions: active, upcomingSessions, extras } = useScheduleAgenda(role, when, timeZoneLabel, today, now);
 
-    const upcoming = useScheduleSessions(role, "upcoming");
-    const past = useScheduleSessions(role, "past", when === "past");
-    const active = when === "upcoming" ? upcoming : past;
-
-    const byTab = useMemo(() => {
-        const groups: Record<ScheduleTab, ScheduleSession[]> = { posted: [], accepted: [], direct: [] };
-        (active.data?.items || []).forEach((session) => {
-            // A volunteer's slot bookings are listed under Availability while upcoming, but that
-            // section has no past view - so in Past they appear under Direct (a specific learner
-            // booked the slot) instead of vanishing from history.
-            const tab = getScheduleTab(session, role) ?? (when === "past" ? "direct" : null);
-            if (tab) groups[tab].push(session);
-        });
-        return groups;
-    }, [active.data, role, when]);
-
-    const nextSession = useMemo(
-        () => (when === "upcoming" ? findNextSession(upcoming.data?.items || [], role, timeZoneLabel, now) : null),
-        [when, upcoming.data, role, timeZoneLabel, now]
-    );
-    const allSessions = useMemo(() => TABS.flatMap((tab) => byTab[tab]), [byTab]);
-    // Statuses present anywhere, for the filter dropdown - the DISPLAYED status (an unanswered
-    // request in the past is "Expired"), so the options match the pill on the cards.
-    const statusOptions = useMemo(
-        () =>
-            Array.from(
-                new Set(allSessions.map((s) => getDisplayStatus(s, role, timeZoneLabel, now)).filter(Boolean))
-            ),
-        [allSessions, role, timeZoneLabel, now]
-    );
+    const sorted = useMemo(() => sortAgenda(entries, when), [entries, when]);
+    const counts = useMemo(() => countByKind(sorted), [sorted]);
+    const statuses = useMemo(() => statusOptions(sorted), [sorted]);
     // A status that no longer exists (e.g. after switching Upcoming/Past) falls back to "all".
     useEffect(() => {
-        if (statusFilter !== "all" && !statusOptions.includes(statusFilter)) setStatusFilter("all");
-    }, [statusFilter, statusOptions]);
-    const isFiltering = search.trim() !== "" || statusFilter !== "all";
-    // Search and status narrow all three columns at once.
-    const filteredByTab = useMemo(() => {
-        const needle = search.trim().toLowerCase();
-        const matches = (s: ScheduleSession) => {
-            if (statusFilter !== "all" && getDisplayStatus(s, role, timeZoneLabel, now) !== statusFilter) return false;
-            if (!needle) return true;
-            const person = role === "learner" ? s.volunteer_full_name : joinNames(s.learner_first_name, s.learner_last_name);
-            const haystack = [
-                s.session_title,
-                person,
-                ...(s.requested_skills || []),
-                ...(s.academic_skills || []),
-                ...(s.non_academic_skills || []),
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-            return haystack.includes(needle);
-        };
-        return Object.fromEntries(TABS.map((tab) => [tab, byTab[tab].filter(matches)])) as Record<ScheduleTab, ScheduleSession[]>;
-    }, [byTab, search, statusFilter, role, timeZoneLabel, now]);
-    const shownCount = TABS.reduce((n, tab) => n + filteredByTab[tab].length, 0);
+        if (statusFilter !== "all" && !statuses.some((s) => s.value === statusFilter)) setStatusFilter("all");
+    }, [statusFilter, statuses]);
+
+    const isFiltering = search.trim() !== "" || statusFilter !== "all" || kind !== "all";
+    const filtered = useMemo(() => filterAgenda(sorted, { kind, status: statusFilter, search }), [sorted, kind, statusFilter, search]);
+    const groups = useMemo(() => groupAgenda(filtered, when, today), [filtered, when, today]);
+
+    const nextSession = useMemo(
+        () => (when === "upcoming" ? findNextSession(upcomingSessions.data?.items || [], role, timeZoneLabel, now) : null),
+        [when, upcomingSessions.data, role, timeZoneLabel, now]
+    );
+
     const loadedCount = active.data?.items.length ?? 0;
     const totalCount = active.data?.total ?? 0;
-    // More rows exist than the pages loaded so far - for Upcoming too, which used to truncate silently.
+    // More sessions exist than the pages loaded so far.
     const hasHidden = totalCount > loadedCount;
     const canShowMore = hasHidden && Boolean(active.hasNextPage);
-    const showFilters = allSessions.length >= 4 || isFiltering;
+    const showFilters = sorted.length >= 4 || isFiltering;
+    const visibleFilters = FILTERS.filter((f) => f !== "wingtime" || WINGTIME_ENABLED);
+
+    const resetFilters = () => {
+        setSearch("");
+        setStatusFilter("all");
+        setKind("all");
+    };
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
@@ -178,7 +104,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 <h2 id="my-schedule-heading" className="text-lg font-medium text-center">
                     {SCHEDULE_LABELS.mySchedule}
                 </h2>
-                <div role="group" aria-label="Show sessions" className="inline-flex rounded-full border border-gray-200 p-0.5 text-xs sm:justify-self-end">
+                <div role="group" aria-label="Show schedule" className="inline-flex rounded-full border border-gray-200 p-0.5 text-xs sm:justify-self-end">
                     {(["upcoming", "past"] as const).map((w) => (
                         <button
                             key={w}
@@ -186,8 +112,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             aria-pressed={when === w}
                             onClick={() => {
                                 setWhen(w);
-                                setSearch("");
-                                setStatusFilter("all");
+                                resetFilters();
                             }}
                             className={`rounded-full px-3 py-1 font-medium capitalize ${when === w ? "bg-action text-white" : "text-gray-700 hover:bg-gray-100"}`}
                         >
@@ -201,138 +126,183 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
 
             {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
 
-            {showFilters && (
-                <div className="flex flex-col gap-2 sm:flex-row">
-                    <input
-                        type="search"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search by title, person, or subject"
-                        aria-label="Search sessions"
-                        className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
-                    />
-                    {statusOptions.length > 1 && (
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            aria-label="Filter by status"
-                            className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm"
-                        >
-                            <option value="all">All statuses</option>
-                            {statusOptions.map((status) => (
-                                <option key={status} value={status}>
-                                    {getStatusLabel(status)}
-                                </option>
-                            ))}
-                        </select>
-                    )}
-                </div>
-            )}
-
-            {/* Announces the result of a search / filter to screen readers. */}
-            <p role="status" aria-live="polite" className="sr-only">
-                {isFiltering ? `${shownCount} of ${allSessions.length} sessions shown` : ""}
-            </p>
-
-            {/* isPending, not isLoading: the query stays disabled until the user id is read
-                from the cookie, and a disabled query reports isLoading=false - the empty-state
-                text used to flash before the real list. */}
-            {active.isError ? (
-                <QueryErrorNotice message="Couldn't load your sessions." onRetry={() => active.refetch()} />
-            ) : (
-                <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-                    {TABS.map((tab) => {
-                        const [colTitle, colNote] = splitTabLabel(SCHEDULE_TAB_LABELS[role][tab]);
-                        const sessions = filteredByTab[tab];
-                        const groups = groupSessions(sessions, role, when, today);
-                        const count = active.data ? byTab[tab].length : null;
-                        return (
-                            <section
-                                key={tab}
-                                aria-labelledby={`schedule-col-${tab}`}
-                                className="flex min-w-0 flex-col gap-2 rounded-lg border border-gray-200 p-2"
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
+                {/* Type chips, with how many of each are loaded. */}
+                {(sorted.length > 0 || kind !== "all") && (
+                    <div role="group" aria-label="Filter by type" className="flex flex-wrap gap-2">
+                        {visibleFilters.map((f) => (
+                            <button
+                                key={f}
+                                type="button"
+                                aria-pressed={kind === f}
+                                onClick={() => setKind(f)}
+                                className={`rounded-full border px-3 py-1 text-xs font-medium cursor-pointer ${
+                                    kind === f
+                                        ? "border-transparent bg-action text-white"
+                                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                                }`}
                             >
-                                <div className="px-1 pt-0.5">
-                                    <h3 id={`schedule-col-${tab}`} className="flex items-center gap-1 text-sm font-semibold leading-snug">
-                                        <span>
-                                            {colTitle}
-                                            {count !== null && <span className="ml-1 font-normal text-gray-500">({count})</span>}
-                                        </span>
-                                        <InfoTip label={colTitle}>
-                                            <p>{HELP.sessionColumn[role][tab]}</p>
-                                        </InfoTip>
-                                    </h3>
-                                    {colNote && <p className="text-[11px] text-gray-500">{colNote}</p>}
-                                </div>
-                                {/* Each column scrolls on its own. */}
-                                <div
-                                    tabIndex={0}
-                                    role="region"
-                                    aria-label={`${colTitle} list`}
-                                    className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto pr-1 lg:max-h-[65vh]"
+                                {AGENDA_FILTER_LABEL[f]} <span className={kind === f ? "opacity-90" : "text-gray-500"}>({counts[f]})</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {showFilters && (
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <input
+                            type="search"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search by title, person, or subject"
+                            aria-label="Search your schedule"
+                            className="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm"
+                        />
+                        {statuses.length > 1 && (
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                aria-label="Filter by status"
+                                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm"
+                            >
+                                <option value="all">All statuses</option>
+                                {statuses.map((s) => (
+                                    <option key={s.value} value={s.value}>
+                                        {s.label}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+                )}
+
+                {/* Announces the result of a search / filter to screen readers. */}
+                <p role="status" aria-live="polite" className="sr-only">
+                    {isFiltering ? `${filtered.length} of ${sorted.length} items shown` : ""}
+                </p>
+
+                {(extras.wingtimeError || extras.instantError) && (
+                    <QueryErrorNotice
+                        message={
+                            extras.wingtimeError && extras.instantError
+                                ? "Couldn't load your WingTimes and instant requests."
+                                : extras.wingtimeError
+                                  ? "Couldn't load your WingTimes."
+                                  : "Couldn't load your instant requests."
+                        }
+                        onRetry={extras.retry}
+                    />
+                )}
+
+                {/* isPending, not isLoading: the query stays disabled until the user id is read from
+                    the cookie, and a disabled query reports isLoading=false - the empty-state text
+                    used to flash before the real list. */}
+                {active.isError ? (
+                    <QueryErrorNotice message="Couldn't load your schedule." onRetry={() => active.refetch()} />
+                ) : active.isPending ? (
+                    <SessionListSkeleton rows={3} />
+                ) : groups.length === 0 ? (
+                    <div className="flex flex-col items-center gap-2 py-8 text-center">
+                        {isFiltering ? (
+                            <>
+                                <p className="text-sm text-gray-600">Nothing matches your filters.</p>
+                                <button
+                                    type="button"
+                                    onClick={resetFilters}
+                                    className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
                                 >
-                                    {active.isPending ? (
-                                        <SessionListSkeleton />
-                                    ) : sessions.length === 0 ? (
-                                        <div className="flex flex-col items-center gap-2 py-4 text-center">
-                                            <p className="text-sm text-gray-600">
-                                                {isFiltering
-                                                    ? "No sessions match your search."
-                                                    : when === "past"
-                                                      ? "No past sessions here yet."
-                                                      : SCHEDULE_TAB_EMPTY[role][tab]}
-                                            </p>
-                                            {isFiltering && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setSearch("");
-                                                        setStatusFilter("all");
-                                                    }}
-                                                    className="text-xs font-medium text-gray-700 underline bg-transparent border-0 p-0 cursor-pointer"
-                                                >
-                                                    Clear Search
-                                                </button>
+                                    Clear Filters
+                                </button>
+                            </>
+                        ) : when === "past" ? (
+                            <p className="text-sm text-gray-600">Nothing in your past schedule yet.</p>
+                        ) : (
+                            <>
+                                <p className="text-sm text-gray-600">Nothing scheduled yet.</p>
+                                <p className="text-xs text-gray-500">
+                                    {role === "learner" ? (
+                                        <>
+                                            Try <Link className="underline" href="/learner/book-for-later">Book for Later</Link>,{" "}
+                                            <Link className="underline" href="/learner/instant-sessions">Instant Sessions</Link>
+                                            {WINGTIME_ENABLED && (
+                                                <>
+                                                    {" "}or <Link className="underline" href="/learner/wingtime">WingTime</Link>
+                                                </>
                                             )}
-                                        </div>
+                                            .
+                                        </>
                                     ) : (
-                                        groups.map((group) => (
-                                            <div
-                                                key={group.key}
-                                                role="group"
-                                                aria-labelledby={`schedule-group-${tab}-${group.key}`}
-                                                className="flex flex-col gap-2"
-                                            >
-                                                <h4
-                                                    id={`schedule-group-${tab}-${group.key}`}
-                                                    className={`text-[11px] font-semibold uppercase tracking-wide ${
-                                                        group.accent ? "text-amber-700" : "text-gray-500"
-                                                    }`}
-                                                >
-                                                    {group.label} <span className="font-normal">({group.items.length})</span>
-                                                </h4>
-                                                {group.items.map((session) => (
-                                                    <ScheduleSessionCard
-                                                        key={session.session_id}
-                                                        session={session}
-                                                        role={role}
-                                                        timeZoneLabel={timeZoneLabel}
-                                                        onOpenProfile={onOpenProfile}
-                                                        onRespond={openApprovals}
-                                                        onReschedule={when === "upcoming" ? (s) => startReschedule(s) : undefined}
-                                                        now={now}
-                                                    />
-                                                ))}
-                                            </div>
-                                        ))
+                                        <>
+                                            Post an <Link className="underline" href="/volunteer/instant-sessions">Instant Session</Link>
+                                            {WINGTIME_ENABLED && (
+                                                <>
+                                                    {" "}or propose a <Link className="underline" href="/volunteer/wingtime">WingTime</Link>
+                                                </>
+                                            )}
+                                            , or add{" "}
+                                            <Link className="underline" href="/volunteer/book-for-later">availability</Link>.
+                                        </>
                                     )}
-                                </div>
-                            </section>
-                        );
-                    })}
-                </div>
-            )}
-            <div className="flex flex-col gap-2">
+                                </p>
+                            </>
+                        )}
+                    </div>
+                ) : (
+                    groups.map((group) => (
+                        <div key={group.key} role="group" aria-labelledby={`schedule-group-${group.key}`} className="flex flex-col gap-2">
+                            <h3
+                                id={`schedule-group-${group.key}`}
+                                className={`text-[11px] font-semibold uppercase tracking-wide ${group.accent ? "text-amber-700" : "text-gray-500"}`}
+                            >
+                                {group.label} <span className="font-normal">({group.items.length})</span>
+                            </h3>
+                            {group.items.map((entry) => {
+                                const data = entry.data;
+                                if (data.type === "session") {
+                                    return (
+                                        <ScheduleSessionCard
+                                            key={entry.key}
+                                            session={data.session}
+                                            role={role}
+                                            timeZoneLabel={timeZoneLabel}
+                                            onOpenProfile={onOpenProfile}
+                                            onRespond={openApprovals}
+                                            onReschedule={when === "upcoming" ? (s) => startReschedule(s) : undefined}
+                                            now={now}
+                                            typeTag={<ScheduleTypeTag kind={entry.kind} note={getSessionOriginNote(data.session, role)} />}
+                                        />
+                                    );
+                                }
+                                if (data.type === "wingtime") {
+                                    return (
+                                        <WingTimeCard
+                                            key={entry.key}
+                                            item={data.wingtime}
+                                            tzLabel={timeZoneLabel}
+                                            onClick={() => router.push(`/${role}/wingtime`)}
+                                            typeTag={
+                                                <ScheduleTypeTag
+                                                    kind="wingtime"
+                                                    note={data.wingtime.is_host ? "You're hosting" : "You signed up"}
+                                                />
+                                            }
+                                        />
+                                    );
+                                }
+                                return (
+                                    <ScheduleOpenInstantCard
+                                        key={entry.key}
+                                        row={data.row}
+                                        role={role}
+                                        timeZoneLabel={timeZoneLabel}
+                                        typeTag={<ScheduleTypeTag kind="instant" note={role === "learner" ? "Your request" : "Your posting"} />}
+                                    />
+                                );
+                            })}
+                        </div>
+                    ))
+                )}
+
                 {hasHidden && (
                     <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
                         <p className="text-xs text-gray-500">
