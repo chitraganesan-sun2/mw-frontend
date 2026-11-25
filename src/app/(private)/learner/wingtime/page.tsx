@@ -143,8 +143,11 @@ export default function LearnerWingTimePage() {
                 </p>
             </div>
 
+            {/* Two columns from lg up (mine left, upcoming right); stacked on smaller screens.
+                Inside each column the cards stack vertically. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My WingTimes - shown first, like My Requested Instant Sessions */}
-            <div className="mb-10">
+            <div className="min-w-0">
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">My WingTimes</h2>
                 {mine.isLoading ? (
                     <div className="flex justify-center py-6">
@@ -154,7 +157,7 @@ export default function LearnerWingTimePage() {
                     <QueryErrorNotice message="Couldn't load your WingTimes." onRetry={() => mine.refetch()} />
                 ) : myItems.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-3">
                             {myItems.map((item) => (
                                 <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
                             ))}
@@ -167,7 +170,7 @@ export default function LearnerWingTimePage() {
             </div>
 
             {/* Upcoming WingTimes - browse and sign up */}
-            <div>
+            <div className="min-w-0">
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">Upcoming WingTimes</h2>
                 {browse.isLoading ? (
                     <div className="flex justify-center py-6">
@@ -177,7 +180,7 @@ export default function LearnerWingTimePage() {
                     <QueryErrorNotice message="Couldn't load WingTimes." onRetry={() => browse.refetch()} />
                 ) : openItems.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-3">
                             {openItems.map((item) => (
                                 <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
                             ))}
@@ -187,6 +190,7 @@ export default function LearnerWingTimePage() {
                 ) : (
                     emptyCard("No WingTimes Available", "New WingTimes will show up here.")
                 )}
+            </div>
             </div>
         </div>
     );

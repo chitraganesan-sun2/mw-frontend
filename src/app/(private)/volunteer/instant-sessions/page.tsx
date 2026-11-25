@@ -476,8 +476,11 @@ export default function VolunteerInstantSessionsPage() {
                 }}
             />
 
+            {/* Two columns from lg up (my posted left, learner requests right); stacked on smaller
+                screens. Inside each column the cards stack vertically. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My Posted Instant Sessions (sessions this volunteer started or accepted) - shown first */}
-            <div className="mb-10">
+            <div className="min-w-0">
                 {/* Title left; "+ Post an Instant Session" and the status filter side by side on
                     the right. On narrow phones the pair wraps under the title as one row and
                     the dropdown shrinks rather than dropping to a third line / overflowing. */}
@@ -522,7 +525,7 @@ export default function VolunteerInstantSessionsPage() {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-3">
                             {mySessions.map((session) => (
                                 <MySessionCard
                                     key={session.session_id}
@@ -560,7 +563,7 @@ export default function VolunteerInstantSessionsPage() {
             </div>
 
             {/* Instant Sessions requested by Learners (open learner requests any volunteer can accept) */}
-            <div>
+            <div className="min-w-0">
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
                     Instant Sessions Requested by Learners
                 </h2>
@@ -568,7 +571,7 @@ export default function VolunteerInstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load learner requests." onRetry={() => refetchLearnerRequests()} />
                 ) : learnerRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-3">
                             {learnerRequests.map((req) => (
                                 <LearnerRequestCard
                                     key={req.request_id}
@@ -600,6 +603,7 @@ export default function VolunteerInstantSessionsPage() {
                 ) : (
                     <p className="text-gray-500 text-sm text-center py-6">No open learner requests right now.</p>
                 )}
+            </div>
             </div>
 
             <CenterModal

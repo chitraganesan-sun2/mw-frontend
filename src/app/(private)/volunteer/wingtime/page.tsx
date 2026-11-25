@@ -126,7 +126,7 @@ export default function VolunteerWingTimePage() {
                     <QueryErrorNotice message="Couldn't load your WingTimes." onRetry={() => hosted.refetch()} />
                 ) : items.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-3">
                             {items.map((item) => (
                                 <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
                             ))}

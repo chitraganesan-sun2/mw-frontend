@@ -588,8 +588,11 @@ export default function InstantSessionsPage() {
                 </p>
             </div>
 
+            {/* Two columns from lg up (requests left, volunteer-posted right); stacked on smaller
+                screens. Inside each column the cards stack vertically. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My Requested Sessions (the learner-request-for-any-volunteer flow) - shown first */}
-            <div className="mb-10">
+            <div className="min-w-0">
                 {/* Same header row as the volunteer page: title left, action right, wraps on phones. */}
                 <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
                     <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
@@ -611,7 +614,7 @@ export default function InstantSessionsPage() {
                     <QueryErrorNotice message="Couldn't load your requests." onRetry={() => refetchMyRequests()} />
                 ) : myRequests.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-3">
                             {myRequests.map((req) => (
                                 <RequestedSessionCard
                                     key={req.request_id}
@@ -656,7 +659,7 @@ export default function InstantSessionsPage() {
             </div>
 
             {/* Available Instant Sessions (volunteer-opened slots, browse + join) */}
-            <div>
+            <div className="min-w-0">
                 <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
                     Instant Sessions Posted by Volunteers
                 </h2>
@@ -667,10 +670,9 @@ export default function InstantSessionsPage() {
                     </div>
                 )}
 
-                {/* One grid for both, so open and booked sessions fill the two columns together
-                    instead of each list starting its own row. */}
+                {/* Open and booked sessions share one vertical list. */}
                 {(availableSessions.length > 0 || claimedSessions.length > 0) && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-3">
                         {availableSessions.map((session) => (
                             <SessionCard
                                 key={session.id}
@@ -699,6 +701,7 @@ export default function InstantSessionsPage() {
                         </p>
                     </div>
                 )}
+            </div>
             </div>
 
             {selectedSession && (
