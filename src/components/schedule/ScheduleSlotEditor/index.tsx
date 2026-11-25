@@ -61,6 +61,7 @@ const TimePickerComponent = ({
                     }
                 }}
                 closeOnSelect={false}
+                slotProps={{ textField: { fullWidth: true } }}
                 sx={{
                     "& .MuiOutlinedInput-root": {
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -147,12 +148,14 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                 </div>
                                 {isExpanded && (
                                     <div className="flex items-start justify-between gap-2 pt-2">
-                                        <div className="flex flex-col items-center gap-2 w-full px-1">
+                                        <div className="flex flex-col items-center gap-2 w-full min-w-0 px-1">
                                             {schedule[day].length > 0 ? (
                                                 schedule[day].map((slot, slotIndex) => (
-                                                    <div key={slotIndex} className="flex flex-col gap-2">
-                                                        <div className="flex gap-2 items-center">
-                                                            <div>
+                                                    <div key={slotIndex} className="flex flex-col gap-2 w-full min-w-0">
+                                                        {/* The two pickers share the row; each MUI field is ~222px
+                                                            on its own, so unconstrained they spilled out of the card. */}
+                                                        <div className="flex gap-2 items-center w-full min-w-0">
+                                                            <div className="flex-1 min-w-0">
                                                                 <TimePickerComponent
                                                                     day={day}
                                                                     slot={slot}
@@ -164,7 +167,7 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                                 />
                                                             </div>
                                                             <p className="text-sm font-medium">to</p>
-                                                            <div>
+                                                            <div className="flex-1 min-w-0">
                                                                 <TimePickerComponent
                                                                     day={day}
                                                                     slot={slot}

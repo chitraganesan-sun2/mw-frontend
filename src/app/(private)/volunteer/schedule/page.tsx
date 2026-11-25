@@ -154,7 +154,15 @@ export default function SchedulePage() {
                     setModal(null);
                 }}
             />
-            <MyScheduleModal isOpen={isOpenSchedule} onClose={handleNavigate} />
+            {/* Close the drawer right away; it used to wait for the router.push round trip, so on a
+                slow connection it sat open after "Schedule updated." */}
+            <MyScheduleModal
+                isOpen={isOpenSchedule}
+                onClose={() => {
+                    setIsOpenSchedule(false);
+                    handleNavigate();
+                }}
+            />
             <AddNewMeetingModalVolunteer isOpen={isOpenAddSession} onClose={handleNavigate} />
             <FeedbackModal
                 mode="create"

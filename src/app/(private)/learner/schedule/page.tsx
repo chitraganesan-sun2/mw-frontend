@@ -158,7 +158,14 @@ export default function LearnerSchedulePage() {
                 onClose={handleNavigate}
                 initialDate={presetDate}
             />
-            <LearnerScheduleModal isOpen={isOpenAvailability} onClose={handleNavigate} />
+            {/* Close the drawer right away instead of waiting for the router.push round trip. */}
+            <LearnerScheduleModal
+                isOpen={isOpenAvailability}
+                onClose={() => {
+                    setIsOpenAvailability(false);
+                    handleNavigate();
+                }}
+            />
             <FeedbackModal
                 mode="create"
                 isOpen={isOpenFeedback}
