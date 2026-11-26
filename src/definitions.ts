@@ -26,9 +26,12 @@ export const API_URL = typeof window !== 'undefined' && isNativePlatform()
 export const GOOGLE_WEB_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 export const GOOGLE_IOS_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID;
 export const GOOGLE_IOS_URL_SCHEME = process.env.NEXT_PUBLIC_GOOGLE_IOS_URL_SCHEME;
-export const GOOGLE_ANALYTICS_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
+// UAT builds (NEXT_PUBLIC_APP_ENV=uat) never send analytics: Vercel's Preview scope shares the production keys,
+// and test clicks must not land in the real GA4 / PostHog numbers.
+const IS_UAT_BUILD = process.env.NEXT_PUBLIC_APP_ENV === "uat";
+export const GOOGLE_ANALYTICS_ID = IS_UAT_BUILD ? undefined : process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
-export const POSTHOG_API_KEY = process.env.NEXT_PUBLIC_POSTHOG_API_KEY;
+export const POSTHOG_API_KEY = IS_UAT_BUILD ? undefined : process.env.NEXT_PUBLIC_POSTHOG_API_KEY;
 export const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 export const VIEW_DEMO_LINK = process.env.NEXT_PUBLIC_VIEW_DEMO_LINK;
 export const VIEW_DEMO_LINK_FOR_VOLUNTEER = process.env.NEXT_PUBLIC_VIEW_DEMO_LINK_FOR_VOLUNTEER;
