@@ -84,7 +84,7 @@ const Header = () => {
                         </button>
                         <h1 className="flex items-center gap-2 text-[20px] md:text-lg font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
-                            {isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookForLater : "My Schedule"}
+                            {isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookSession : "My Schedule"}
                         </h1>
                         {/* The month only drives the calendar, so it only shows there. */}
                         {isCalendarView && (

@@ -11,6 +11,8 @@ import dayjs from "dayjs";
 export type AgendaKind = "session" | "instant" | "wingtime";
 export type AgendaFilter = "all" | AgendaKind;
 export type AgendaWhen = "upcoming" | "past";
+/** The three views of My Schedule: what is still to come, what was held, what will never happen. */
+export type AgendaTab = "upcoming" | "completed" | "cancelled";
 
 export interface AgendaEntry<T = unknown> {
     /** Unique across kinds ("session:<id>", "wingtime:<id>", "instant:<id>"). */
@@ -21,6 +23,8 @@ export interface AgendaEntry<T = unknown> {
     time: string;
     /** A request from someone else that is waiting for the viewer - shown first when upcoming. */
     needsResponse: boolean;
+    /** Which My Schedule view it belongs to (see agendaTabOf). */
+    tab: AgendaTab;
     /** The status the card's pill shows (the status filter is built from these). */
     status: string;
     /** The pill's words, so the filter dropdown reads exactly like the cards. */
@@ -31,18 +35,45 @@ export interface AgendaEntry<T = unknown> {
     data: T;
 }
 
+// The names match the booking section: sessions booked for a chosen date are "Book for Later".
 export const AGENDA_KIND_LABEL: Record<AgendaKind, string> = {
-    session: "Session",
+    session: "Book for Later",
     instant: "Instant",
     wingtime: "WingTime",
 };
 
-/** Chip labels - plural, as they read in "All / Sessions / Instant / WingTimes". */
+export const AGENDA_TAB_LABEL: Record<AgendaTab, string> = {
+    upcoming: "Upcoming",
+    completed: "Completed",
+    cancelled: "Cancelled",
+};
+
+/** One line under the tabs saying what the selected one holds. */
+export const AGENDA_TAB_HINT: Record<AgendaTab, string> = {
+    upcoming: "Sessions, instant sessions and WingTimes that are still to come, soonest first.",
+    completed: "Everything that has taken place. Sessions that have ended are waiting at the top for you to mark them completed.",
+    cancelled: "Cancelled, declined and expired requests and sessions.",
+};
+
+/** Statuses that will never take place, whatever their date. */
+const NEVER_HAPPENS = new Set(["cancelled", "rejected", "declined", "expired"]);
+
+/**
+ * Which view an item belongs to. `ended` = it is in the past window (the server's rule for sessions,
+ * the end time for WingTimes). A cancelled / declined / expired item is "cancelled" even when its
+ * date is still ahead, so it never sits among the plans.
+ */
+export function agendaTabOf(status: string, ended: boolean): AgendaTab {
+    if (NEVER_HAPPENS.has(status.toLowerCase())) return "cancelled";
+    return ended ? "completed" : "upcoming";
+}
+
+/** Filter chip labels. */
 export const AGENDA_FILTER_LABEL: Record<AgendaFilter, string> = {
     all: "All",
-    session: "Sessions",
-    instant: "Instant",
-    wingtime: "WingTimes",
+    session: "Book for Later",
+    instant: "Instant Sessions",
+    wingtime: "WingTime",
 };
 
 const sortKey = (e: Pick<AgendaEntry, "date" | "time">) => `${e.date || "9999-12-31"} ${e.time || "00:00"}`;
@@ -86,6 +117,12 @@ export function groupAgenda<T>(entries: AgendaEntry<T>[], when: AgendaWhen, toda
             add("respond", "Needs your response", entry, true);
             return;
         }
+        // An accepted session that has ended is still waiting to be marked completed (sessions are never
+        // auto-completed), so it leads the Completed view instead of sinking into the history.
+        if (when === "past" && entry.status === "accepted") {
+            add("wrapup", "Ended - mark as completed", entry, true);
+            return;
+        }
         const diff = entry.date && base.isValid() ? dayjs(entry.date).diff(base, "day") : 0;
         if (when === "upcoming") {
             if (diff <= 0) add("today", "Today", entry);
@@ -103,8 +140,10 @@ export function groupAgenda<T>(entries: AgendaEntry<T>[], when: AgendaWhen, toda
     });
     // Groups are created in the order their first item turns up, so a waiting request that sorts
     // behind today's items would otherwise land mid-list. It always leads.
-    const respond = groups.findIndex((g) => g.key === "respond");
-    if (respond > 0) groups.unshift(...groups.splice(respond, 1));
+    ["wrapup", "respond"].forEach((key) => {
+        const at = groups.findIndex((g) => g.key === key);
+        if (at > 0) groups.unshift(...groups.splice(at, 1));
+    });
     return groups;
 }
 
@@ -129,6 +168,15 @@ export function countByKind(entries: Pick<AgendaEntry, "kind">[]): Record<Agenda
     const counts: Record<AgendaFilter, number> = { all: entries.length, session: 0, instant: 0, wingtime: 0 };
     entries.forEach((e) => {
         counts[e.kind] += 1;
+    });
+    return counts;
+}
+
+/** How many entries are in each view (for the tab counts). */
+export function countByTab(entries: Pick<AgendaEntry, "tab">[]): Record<AgendaTab, number> {
+    const counts: Record<AgendaTab, number> = { upcoming: 0, completed: 0, cancelled: 0 };
+    entries.forEach((e) => {
+        counts[e.tab] += 1;
     });
     return counts;
 }

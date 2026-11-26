@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import PageIntro from "@/components/common/PageIntro";
 import WingTimeCard from "@/components/wingtime/WingTimeCard";
-import { HELP } from "@/constants/copy";
+import { HELP, TERMS } from "@/constants/copy";
+import { HiOutlineCalendarDays, HiOutlinePlus } from "react-icons/hi2";
+import { CALENDAR_VIEW } from "@/components/schedule/Header";
 import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 import { useScheduleAgenda } from "@/hooks/schedule/useScheduleAgenda";
@@ -13,12 +15,16 @@ import { useStartReschedule } from "@/hooks/schedule/useStartReschedule";
 import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import {
     AGENDA_FILTER_LABEL,
+    AGENDA_TAB_HINT,
+    AGENDA_TAB_LABEL,
     countByKind,
+    countByTab,
     filterAgenda,
     groupAgenda,
     sortAgenda,
     statusOptions,
     type AgendaFilter,
+    type AgendaTab,
 } from "@/utils/scheduleAgenda";
 import ScheduleOpenInstantCard from "./ScheduleOpenInstantCard";
 import ScheduleSessionCard from "./ScheduleSessionCard";
@@ -43,16 +49,20 @@ export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
 }
 
 const FILTERS: AgendaFilter[] = ["all", "session", "instant", "wingtime"];
+const TABS: AgendaTab[] = ["upcoming", "completed", "cancelled"];
 
 /**
- * My Schedule: one agenda of everything the viewer has scheduled - regular sessions, instant
- * sessions (incl. ones still waiting for the other person) and WingTimes - grouped by date, with
- * a type tag and a status pill on every card. Upcoming / Past toggle; filter by type, status
- * and search.
+ * My Schedule: the one place for everything the viewer has scheduled - Book for Later sessions,
+ * Instant Sessions (incl. ones still waiting for the other person) and WingTimes - as a single
+ * agenda grouped by date, with a type tag and a status pill on every card. Three views (Upcoming /
+ * Completed / Cancelled); filter by type, status and search. A side panel keeps the next session and
+ * anything waiting for a reply in sight whichever view is open.
  */
 const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile }) => {
     const router = useRouter();
-    const [when, setWhen] = useState<"upcoming" | "past">("upcoming");
+    const [tab, setTab] = useState<AgendaTab>("upcoming");
+    // The server's two windows: upcoming, and everything that is over (completed, cancelled, declined).
+    const when = tab === "upcoming" ? "upcoming" : "past";
     const [kind, setKind] = useState<AgendaFilter>("all");
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
@@ -63,9 +73,17 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const now = useNow();
     const today = useProfileToday(role);
 
-    const { entries, sessions: active, upcomingSessions, extras } = useScheduleAgenda(role, when, timeZoneLabel, today, now);
+    const { entries, sessions: active, upcomingSessions, pastLoaded, pastHasMore, extras } = useScheduleAgenda(
+        role,
+        tab,
+        timeZoneLabel,
+        today,
+        now
+    );
 
-    const sorted = useMemo(() => sortAgenda(entries, when), [entries, when]);
+    const tabCounts = useMemo(() => countByTab(entries), [entries]);
+    const inTab = useMemo(() => entries.filter((e) => e.tab === tab), [entries, tab]);
+    const sorted = useMemo(() => sortAgenda(inTab, when), [inTab, when]);
     const counts = useMemo(() => countByKind(sorted), [sorted]);
     const statuses = useMemo(() => statusOptions(sorted), [sorted]);
     // A status that no longer exists (e.g. after switching Upcoming/Past) falls back to "all".
@@ -77,9 +95,10 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const filtered = useMemo(() => filterAgenda(sorted, { kind, status: statusFilter, search }), [sorted, kind, statusFilter, search]);
     const groups = useMemo(() => groupAgenda(filtered, when, today), [filtered, when, today]);
 
+    // Shown beside every view: what is next and what needs a reply do not depend on the tab.
     const nextSession = useMemo(
-        () => (when === "upcoming" ? findNextSession(upcomingSessions.data?.items || [], role, timeZoneLabel, now) : null),
-        [when, upcomingSessions.data, role, timeZoneLabel, now]
+        () => findNextSession(upcomingSessions.data?.items || [], role, timeZoneLabel, now),
+        [upcomingSessions.data, role, timeZoneLabel, now]
     );
 
     const loadedCount = active.data?.items.length ?? 0;
@@ -91,11 +110,12 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const visibleFilters = FILTERS.filter((f) => f !== "wingtime" || WINGTIME_ENABLED);
     // Requests from someone else that are waiting for the viewer (the side panel lists them).
     const awaiting = useMemo(
-        () => (when === "upcoming" ? sorted.filter((e) => e.needsResponse && e.data.type === "session") : []),
-        [when, sorted]
+        () => entries.filter((e) => e.tab === "upcoming" && e.needsResponse && e.data.type === "session"),
+        [entries]
     );
     const showTypeFilters = sorted.length > 0 || kind !== "all";
-    const hasPanel = Boolean(nextSession) || awaiting.length > 0 || showTypeFilters;
+    // The panel always has its links, so the wide layout never changes shape between views.
+    const hasPanel = true;
 
     const resetFilters = () => {
         setSearch("");
@@ -135,35 +155,69 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
-            {/* Heading centered, Upcoming/Past toggle at the right (stacked and centered on phones). */}
-            <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr]">
-                <span aria-hidden="true" className="hidden sm:block" />
-                <h2 id="my-schedule-heading" className="text-lg font-medium text-center">
-                    {SCHEDULE_LABELS.mySchedule}
-                </h2>
-                <div role="group" aria-label="Show schedule" className="inline-flex rounded-full border border-gray-200 p-0.5 text-xs sm:justify-self-end">
-                    {(["upcoming", "past"] as const).map((w) => (
-                        <button
-                            key={w}
-                            type="button"
-                            aria-pressed={when === w}
-                            onClick={() => {
-                                setWhen(w);
-                                resetFilters();
-                            }}
-                            className={`rounded-full px-3 py-1 font-medium capitalize ${when === w ? "bg-action text-white" : "text-gray-700 hover:bg-gray-100"}`}
-                        >
-                            {w}
-                        </button>
-                    ))}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h2 id="my-schedule-heading" className="text-lg font-medium">
+                        {SCHEDULE_LABELS.mySchedule}
+                    </h2>
+                    <PageIntro>{HELP.mySessions}</PageIntro>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:flex">
+                    <Link
+                        href={`/${role}/book-a-session`}
+                        className="inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-action bg-action px-3 py-1.5 text-sm font-medium text-white hover:bg-action-hover"
+                    >
+                        <HiOutlinePlus size={16} aria-hidden="true" />
+                        {TERMS.bookSession}
+                    </Link>
+                    <Link
+                        href={`/${role}/book-for-later?view=${CALENDAR_VIEW}`}
+                        title={HELP.viewCalendar}
+                        className="inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
+                    >
+                        <HiOutlineCalendarDays size={16} aria-hidden="true" />
+                        {SCHEDULE_LABELS.viewCalendar}
+                    </Link>
                 </div>
             </div>
 
-            <PageIntro className="text-center">{HELP.mySessions}</PageIntro>
+            {/* Upcoming / Completed / Cancelled. The past views load the server's past window on first use. */}
+            <div role="tablist" aria-label="Show schedule" className="grid grid-cols-3 border-b border-gray-200 sm:flex sm:gap-1">
+                {TABS.map((t) => {
+                    const known = t === "upcoming" || pastLoaded;
+                    const more = (t === "upcoming" ? Boolean(upcomingSessions.hasNextPage) : pastHasMore) ? "+" : "";
+                    return (
+                        <button
+                            key={t}
+                            id={`schedule-tab-${t}`}
+                            type="button"
+                            role="tab"
+                            aria-selected={tab === t}
+                            aria-controls="schedule-tabpanel"
+                            onClick={() => {
+                                setTab(t);
+                                resetFilters();
+                            }}
+                            className={`-mb-px border-0 border-b-2 bg-transparent px-2 py-2 text-sm font-medium cursor-pointer whitespace-nowrap sm:px-4 ${
+                                tab === t ? "border-b-action text-gray-900" : "border-b-transparent text-gray-600 hover:text-gray-900"
+                            }`}
+                        >
+                            {AGENDA_TAB_LABEL[t]}
+                            {known && <span className="ml-1 font-normal text-gray-500">({tabCounts[t]}{more})</span>}
+                        </button>
+                    );
+                })}
+            </div>
+            <PageIntro className="-mt-1">{AGENDA_TAB_HINT[tab]}</PageIntro>
 
             {/* Wide screens: the agenda on the left, a panel on the right (next up, what needs a
                 reply, type filters). Narrower screens: one column, banner and chips on top. */}
-            <div className={`grid grid-cols-1 gap-4 ${hasPanel ? "lg:grid-cols-[minmax(0,1fr)_18rem]" : ""} lg:items-start`}>
+            <div
+                id="schedule-tabpanel"
+                role="tabpanel"
+                aria-labelledby={`schedule-tab-${tab}`}
+                className={`grid grid-cols-1 gap-4 ${hasPanel ? "lg:grid-cols-[minmax(0,1fr)_18rem]" : ""} lg:items-start`}
+            >
             <div className="flex min-w-0 flex-col gap-3">
                 {nextSession && (
                     <div className="lg:hidden">
@@ -239,35 +293,24 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                                     Clear Filters
                                 </button>
                             </>
-                        ) : when === "past" ? (
-                            <p className="text-sm text-gray-600">Nothing in your past schedule yet.</p>
+                        ) : tab !== "upcoming" ? (
+                            <p className="text-sm text-gray-600">
+                                {tab === "completed" ? "No completed sessions yet." : "Nothing has been cancelled."}
+                            </p>
                         ) : (
                             <>
                                 <p className="text-sm text-gray-600">Nothing scheduled yet.</p>
                                 <p className="text-xs text-gray-500">
-                                    {role === "learner" ? (
+                                    <Link className="underline" href={`/${role}/book-a-session`}>
+                                        {role === "learner" ? "Book a Session" : "Post an Instant Session or plan a session"}
+                                    </Link>
+                                    {WINGTIME_ENABLED && (
                                         <>
-                                            Try <Link className="underline" href="/learner/book-for-later">Book for Later</Link>,{" "}
-                                            <Link className="underline" href="/learner/instant-sessions">Instant Sessions</Link>
-                                            {WINGTIME_ENABLED && (
-                                                <>
-                                                    {" "}or <Link className="underline" href="/learner/wingtime">WingTime</Link>
-                                                </>
-                                            )}
-                                            .
-                                        </>
-                                    ) : (
-                                        <>
-                                            Post an <Link className="underline" href="/volunteer/instant-sessions">Instant Session</Link>
-                                            {WINGTIME_ENABLED && (
-                                                <>
-                                                    {" "}or propose a <Link className="underline" href="/volunteer/wingtime">WingTime</Link>
-                                                </>
-                                            )}
-                                            , or add{" "}
-                                            <Link className="underline" href="/volunteer/book-for-later">availability</Link>.
+                                            {" "}or {role === "learner" ? "join" : "propose"} a{" "}
+                                            <Link className="underline" href={`/${role}/wingtime`}>WingTime</Link>
                                         </>
                                     )}
+                                    .
                                 </p>
                             </>
                         )}
@@ -332,7 +375,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                     <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
                         <p className="text-xs text-gray-500">
                             {when === "past"
-                                ? `Showing your ${loadedCount} most recent of ${totalCount} sessions.`
+                                ? `Showing your ${loadedCount} most recent of ${totalCount} past sessions.`
                                 : `Showing your next ${loadedCount} of ${totalCount} upcoming sessions.`}
                         </p>
                         {canShowMore && (

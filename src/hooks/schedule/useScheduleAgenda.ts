@@ -8,7 +8,7 @@ import { WINGTIME_ENABLED } from "@/config/wingtime";
 import { joinNames } from "@/utils/joinNames";
 import { getStatusLabel, profileTimeZoneIana } from "@/utils/sessionDisplay";
 import { wingtimeHasEnded, wingtimePill, type WingTime } from "@/utils/wingtime";
-import type { AgendaEntry, AgendaWhen } from "@/utils/scheduleAgenda";
+import { agendaTabOf, type AgendaEntry, type AgendaTab } from "@/utils/scheduleAgenda";
 import { getDisplayStatus, isAwaitingMyResponse } from "@/components/schedule/Dashboard/ScheduleSessionCard";
 import { getSessionKind, type ScheduleRole } from "@/components/schedule/Dashboard/scheduleCategories";
 import { useScheduleSessions, type ScheduleSession } from "./useScheduleSessions";
@@ -45,7 +45,9 @@ function sessionEntry(
     session: ScheduleSession,
     role: ScheduleRole,
     tzLabel: string | undefined,
-    now: dayjs.Dayjs
+    now: dayjs.Dayjs,
+    /** From the server's past window (finished, cancelled, declined) rather than its upcoming one. */
+    ended: boolean
 ): ScheduleAgendaEntry {
     const mine = role === "volunteer";
     const date = (mine ? session.volunteer_start_date : session.learner_start_date) || "";
@@ -55,9 +57,10 @@ function sessionEntry(
     return {
         key: `session:${session.session_id}`,
         kind: getSessionKind(session),
+        tab: agendaTabOf(status, ended),
         date,
         time,
-        needsResponse: isAwaitingMyResponse(session, role),
+        needsResponse: !ended && isAwaitingMyResponse(session, role),
         status,
         statusLabel: getStatusLabel(status),
         searchText: lower(
@@ -79,10 +82,15 @@ function wingtimeStatus(w: WingTime, now: dayjs.Dayjs): { status: string; label:
 
 function wingtimeEntry(w: WingTime, iana: string, now: dayjs.Dayjs): ScheduleAgendaEntry {
     const start = dayjs.utc(w.start_utc).tz(iana);
-    const { status, label } = wingtimeStatus(w, now);
+    const ended = wingtimeHasEnded(w, now);
+    // A proposal nobody approved before its time passed never took place.
+    const lapsed = ended && w.status === "pending_approval";
+    const { status, label } = lapsed ? { status: "expired", label: "Expired" } : wingtimeStatus(w, now);
     return {
         key: `wingtime:${w.wingtime_id}`,
         kind: "wingtime",
+        // Ended is decided by the end time in absolute UTC; cancelled / declined / expired never happen.
+        tab: agendaTabOf(status, ended),
         date: start.format("YYYY-MM-DD"),
         time: start.format("HH:mm"),
         needsResponse: false,
@@ -122,6 +130,7 @@ function instantEntry(row: OpenInstantRow): ScheduleAgendaEntry {
     return {
         key: `instant:${row.id}`,
         kind: "instant",
+        tab: "upcoming",
         date: row.date,
         time: row.start,
         needsResponse: false,
@@ -134,39 +143,47 @@ function instantEntry(row: OpenInstantRow): ScheduleAgendaEntry {
 
 /**
  * Everything the viewer has scheduled, as one list of agenda entries: sessions (direct and
- * instant), WingTimes, and instant sessions still waiting for the other person. `entries` is
- * unsorted - the section sorts and groups it. `sessions` is the paged sessions query for the
- * chosen window (its "Show More"); `upcomingSessions` always feeds the Next Session banner.
+ * instant), WingTimes, and instant sessions still waiting for the other person. Every entry says
+ * which view it belongs to (`tab`); the section filters, sorts and groups. Upcoming data is always
+ * loaded (it feeds the tab count and the Next Session banner); the past window only once the
+ * Completed or Cancelled view is opened. `sessions` is the paged query of the chosen window (its
+ * "Show More").
  */
 export function useScheduleAgenda(
     role: ScheduleRole,
-    when: AgendaWhen,
+    tab: AgendaTab,
     tzLabel: string | undefined,
     today: string,
     now: dayjs.Dayjs
 ) {
+    const needsPast = tab !== "upcoming";
     const upcomingSessions = useScheduleSessions(role, "upcoming");
-    const pastSessions = useScheduleSessions(role, "past", when === "past");
-    const sessions = when === "upcoming" ? upcomingSessions : pastSessions;
+    const pastSessions = useScheduleSessions(role, "past", needsPast);
+    const sessions = needsPast ? pastSessions : upcomingSessions;
 
-    // A learner's registrations (upcoming by default; `when=past` once the backend supports it, ignored
-    // by an older one - the end-time filter below keeps each window correct either way) / a host's own
-    // WingTimes in any status.
-    const wingtimes = useQuery({
-        queryKey: ["wingtime", "schedule", role, when],
+    // A learner's registrations (the upcoming window, and the past one - which an older backend ignores:
+    // the end-time rule below keeps each item in the right view either way) / a host's own WingTimes in
+    // any status (one list, so it is fetched once).
+    const fetchWingtimes = (when: "upcoming" | "past") => async () => {
+        const base = role === "learner" ? endpoints.wingtime.myRegistrations : endpoints.wingtime.hosted;
+        const res: any = await GET_API(`${base}?page=1&size=${EXTRAS_PAGE}${role === "learner" ? `&when=${when}` : ""}`);
+        return (res?.data?.items ?? []) as WingTime[];
+    };
+    const wingtimesUpcoming = useQuery({
+        queryKey: ["wingtime", "schedule", role, "upcoming"],
         enabled: WINGTIME_ENABLED,
-        queryFn: async () => {
-            const base = role === "learner" ? endpoints.wingtime.myRegistrations : endpoints.wingtime.hosted;
-            const res: any = await GET_API(`${base}?page=1&size=${EXTRAS_PAGE}${role === "learner" ? `&when=${when}` : ""}`);
-            return (res?.data?.items ?? []) as WingTime[];
-        },
-        refetchInterval: when === "upcoming" ? 60000 : false,
+        queryFn: fetchWingtimes("upcoming"),
+        refetchInterval: 60000,
+    });
+    const wingtimesPast = useQuery({
+        queryKey: ["wingtime", "schedule", role, "past"],
+        enabled: WINGTIME_ENABLED && needsPast && role === "learner",
+        queryFn: fetchWingtimes("past"),
     });
 
-    // Open instant items only matter while upcoming; once accepted/claimed they are sessions.
+    // Open instant items matter while they are still plans; once accepted / claimed they are sessions.
     const openInstant = useQuery({
         queryKey: ["instant", "schedule-open", role],
-        enabled: when === "upcoming",
         queryFn: async () => {
             const url =
                 role === "learner"
@@ -178,40 +195,54 @@ export function useScheduleAgenda(
         refetchInterval: 30000,
     });
 
-    const sessionItems = sessions.data?.items;
-    const wingtimeItems = wingtimes.data;
+    const upcomingItems = upcomingSessions.data?.items;
+    const pastItems = pastSessions.data?.items;
+    const wingtimeUpcomingItems = wingtimesUpcoming.data;
+    const wingtimePastItems = wingtimesPast.data;
     const openItems = openInstant.data;
 
     const entries = useMemo(() => {
         const iana = profileTimeZoneIana(tzLabel) ?? dayjs.tz.guess();
-        const out: ScheduleAgendaEntry[] = (sessionItems || []).map((s) => sessionEntry(s, role, tzLabel, now));
+        const out: ScheduleAgendaEntry[] = [
+            ...(upcomingItems || []).map((s) => sessionEntry(s, role, tzLabel, now, false)),
+            ...(pastItems || []).map((s) => sessionEntry(s, role, tzLabel, now, true)),
+        ];
 
-        (wingtimeItems || []).forEach((w) => {
-            // Which window it belongs to is decided by when it ENDS, in absolute time.
-            const ended = wingtimeHasEnded(w, now);
-            if ((when === "upcoming") === !ended) out.push(wingtimeEntry(w, iana, now));
+        // The two windows can overlap (a host's list is one list), so a WingTime is added once.
+        const seen = new Set<string>();
+        [...(wingtimeUpcomingItems || []), ...(wingtimePastItems || [])].forEach((w) => {
+            if (seen.has(w.wingtime_id)) return;
+            seen.add(w.wingtime_id);
+            out.push(wingtimeEntry(w, iana, now));
         });
 
-        if (when === "upcoming") {
-            (openItems || []).forEach((raw) => {
-                const row = openInstantRow(role, raw);
-                // An unclaimed post / unanswered request whose day has passed is not a plan any more.
-                if (row.date && today && row.date < today) return;
-                out.push(instantEntry(row));
-            });
-        }
+        (openItems || []).forEach((raw) => {
+            const row = openInstantRow(role, raw);
+            // An unclaimed post / unanswered request whose day has passed is not a plan any more.
+            if (row.date && today && row.date < today) return;
+            out.push(instantEntry(row));
+        });
         return out;
-    }, [sessionItems, wingtimeItems, openItems, role, when, tzLabel, today, now]);
+    }, [upcomingItems, pastItems, wingtimeUpcomingItems, wingtimePastItems, openItems, role, tzLabel, today, now]);
+
+    const wingtimeError =
+        WINGTIME_ENABLED &&
+        ((wingtimesUpcoming.isError && !wingtimesUpcoming.data) || (wingtimesPast.isError && !wingtimesPast.data));
 
     return {
         entries,
         sessions,
         upcomingSessions,
+        /** The past window has been fetched, so the Completed / Cancelled counts mean something. */
+        pastLoaded: Boolean(pastSessions.data),
+        /** More past sessions exist than the pages loaded so far (the counts are then "at least"). */
+        pastHasMore: Boolean(pastSessions.hasNextPage),
         extras: {
-            wingtimeError: WINGTIME_ENABLED && wingtimes.isError && !wingtimes.data,
-            instantError: when === "upcoming" && openInstant.isError && !openInstant.data,
+            wingtimeError,
+            instantError: openInstant.isError && !openInstant.data,
             retry: () => {
-                if (wingtimes.isError) wingtimes.refetch();
+                if (wingtimesUpcoming.isError) wingtimesUpcoming.refetch();
+                if (wingtimesPast.isError) wingtimesPast.refetch();
                 if (openInstant.isError) openInstant.refetch();
             },
         },

@@ -7,6 +7,10 @@
 
 /** Approved names for the three ways of getting a session. */
 export const TERMS = {
+    /** The booking section in the menu: Instant Sessions and Book for Later live under it (WingTime stays separate). */
+    bookSession: "Book a Session",
+    /** Start a session right now / today or tomorrow. */
+    instantSessions: "Instant Sessions",
     /** Pick one of a volunteer's open times; the volunteer then accepts or declines. */
     bookForLater: "Book for Later",
     /** Learner asks for a session today/tomorrow; any volunteer can accept. */
@@ -18,12 +22,16 @@ export const TERMS = {
 } as const;
 
 export const HELP = {
+    bookSession: "Two ways to get a session: connect right away with an Instant Session, or choose a future date and time with Book for Later.",
+    instantSessionsLearner: "Need help soon? Request a session for today or tomorrow, or join one a volunteer has posted. Any available volunteer can accept.",
+    instantSessionsVolunteer: "Free right now? Post a session for today or tomorrow, or accept a learner's request. Learners can join straight away.",
+    bookForLaterLearner: "Plan ahead. Pick one of a volunteer's open times on the date you prefer; the volunteer then accepts or declines.",
+    bookForLaterVolunteer: "Plan ahead. Propose a session to a learner for a future date and time, and set the weekly hours learners can book.",
     bookForLater: "Request a session with a volunteer at one of their open times. The volunteer has to accept before it is confirmed.",
     viewCalendar: "See your sessions and availability on a monthly calendar.",
     scheduleAvailability: "Set the weekly times you are free for sessions.",
 
-    mySessions:
-        "Everything you have scheduled, in one place: sessions, instant sessions and WingTimes, in date order. Finished ones are under Past.",
+    mySessions: "Everything you have scheduled, in one place: sessions, instant sessions and WingTimes, in date order.",
     availabilityVolunteer:
         "The weekly and one-time hours you offer. Learners can book these times; booked times show under Volunteer Slots I'm Offering.",
     availabilityLearner: "The weekly times you are usually free for sessions.",

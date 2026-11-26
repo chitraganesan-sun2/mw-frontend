@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import BookSessionTabs from "@/components/booking/BookSessionTabs";
 import AvailabilitySection from "./AvailabilitySection";
 import CalendarLegend from "./CalendarLegend";
 import MyScheduleSection from "./MyScheduleSection";
@@ -28,7 +29,8 @@ interface ScheduleDashboardLayoutProps {
 /**
  * The Schedule dashboard (the signed-in landing page), split over two pages:
  * - My Schedule: My Sessions only;
- * - Book for Later: Availability, or (header's "View my calendar") the calendar on its own.
+ * - Book for Later (one of the two Book a Session options): Availability, or (header's "View my calendar")
+ *   the calendar on its own.
  */
 const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     role,
@@ -87,9 +89,11 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
         );
     }
 
-    // Book for Later: availability (and the header's booking / calendar actions).
+    // Book for Later: availability (and the header's booking / calendar actions), under the
+    // Book a Session switch so the other option (Instant Sessions) is one tap away.
     return (
         <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
+            <BookSessionTabs />
             <div className="min-w-0">
                 <AvailabilitySection
                     role={role}

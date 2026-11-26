@@ -12,7 +12,6 @@ import {
     VolunteerIcon,
     MessageIcon,
     SettingIcon,
-    InstantSessionIcon,
 } from "@/assets/icons";
 import { MdOutlineGroups } from "react-icons/md";
 import { HiOutlineCalendarDays } from "react-icons/hi2";
@@ -37,13 +36,6 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const { unreadMessages } = useUnreadMessages();
 
-    // Instant Sessions - for both learners and volunteers
-    const instantSessionsLink = {
-        href: "/instant-sessions",
-        text: "Instant Sessions",
-        icon: <InstantSessionIcon />,
-    };
-
     // WingTime - volunteer-led group sessions; only shown where the feature is switched on.
     const wingTimeLinks = WINGTIME_ENABLED
         ? [{ href: "/wingtime", text: "WingTime", icon: <MdOutlineGroups size={22} /> }]
@@ -51,15 +43,17 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
 
     const baseLinksData = [
         {
+            // Everything you have scheduled, in one place (sessions, instant sessions, WingTime).
             href: "/schedule",
             text: "My Schedule",
             icon: <CalendarIcon />,
         },
         {
-            // Booking, availability and the calendar (kept off My Schedule so that stays sessions-only).
-            href: "/book-for-later",
-            text: TERMS.bookForLater,
+            // The booking section: Instant Sessions and Book for Later (WingTime stays its own link).
+            href: "/book-a-session",
+            text: TERMS.bookSession,
             icon: <HiOutlineCalendarDays size={22} />,
+            alsoActiveFor: ["/instant-sessions", "/book-for-later"],
         },
     ];
 
@@ -102,9 +96,9 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
     ];
 
     // Combine all links in the desired order
-    // For both roles: My Schedule (the landing dashboard), Instant Sessions, Role-based link,
+    // For both roles: My Schedule (the landing dashboard), Book a Session, WingTime, Role-based link,
     // Resources, Community, Messages, Settings
-    const linksData = [...baseLinksData, instantSessionsLink, ...wingTimeLinks, roleBasedLink, ...remainingLinks];
+    const linksData: any[] = [...baseLinksData, ...wingTimeLinks, roleBasedLink, ...remainingLinks];
 
     const handleSignOut = () => signOut();
 

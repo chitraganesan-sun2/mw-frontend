@@ -134,7 +134,7 @@ const CommonHeader: React.FC = () => {
                                         </span>
                                     ))}
                                 {headerTitle && (
-                                    <h1 className="md:text-lg text-[20px] font-medium">{headerTitle}</h1>
+                                    <h1 className="md:text-lg text-[20px] font-medium normal-case">{headerTitle}</h1>
                                 )}
                             </>
                         )}
