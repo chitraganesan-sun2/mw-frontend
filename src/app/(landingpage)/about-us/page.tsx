@@ -7,13 +7,13 @@ import { SHARE_IMAGES } from "@/constants/seo";
 
 export const metadata: Metadata = {
     title: "About Us",
-    description: "MelodyWings is a heartfelt initiative providing free tutoring for students with disabilities and special needs, connecting them with volunteers who gain valuable experience and community service hours.",
+    description: "MelodyWings provides free, personalized learning opportunities for learners with disabilities and special needs, taught by volunteers who share their knowledge and earn community service hours.",
     alternates: {
         canonical: "/about-us",
     },
     openGraph: {
         title: "About Us | MelodyWings",
-        description: "MelodyWings is a heartfelt initiative providing free tutoring for students with disabilities and special needs, connecting them with volunteers who gain valuable experience and community service hours.",
+        description: "MelodyWings provides free, personalized learning opportunities for learners with disabilities and special needs, taught by volunteers who share their knowledge and earn community service hours.",
         url: "/about-us",
         images: SHARE_IMAGES,
     },
@@ -29,7 +29,7 @@ const AboutUs = () => {
                 descriptionStyle="!text-sm md:!text-sm lg:!text-xl !font-normal !text-black !text-center"
                 as="h1"
                 title="About Us"
-                description="MelodyWings is a heartfelt initiative created to provide free learning sessions for learners with disabilities and special needs. It is a platform where these learners can receive personalized lessons in subjects they are passionate about or need help with, all while volunteers gain valuable experience and earn community service hours."
+                description="MelodyWings is an initiative dedicated to providing free learning opportunities for learners with disabilities and special needs. Through personalized lessons, learners can explore subjects they are passionate about or receive support in areas where they need it. At the same time, volunteers have the opportunity to share their knowledge, gain valuable experience, and earn community service hours."
             />
             <AboutSectionCard />
             <MeetOurTeam />
