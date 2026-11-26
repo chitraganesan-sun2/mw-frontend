@@ -6,13 +6,27 @@ import Divider from "@/components/common/Divider";
 import { FaStar } from "react-icons/fa";
 import { formatString } from "@/utils/stringFormats";
 import Button from "@/components/common/Button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { GET_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { formatRatingSummary } from "@/utils/formatRating";
 import { safeImageSrc } from "@/utils/safeHref";
 import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
+
+/** Subjects then skills, de-duplicated (case-insensitive), without the "None" placeholder an empty picker can leave behind. */
+const combineSkillNames = (subjects?: string[], skills?: Array<{ skill_name: string }>): string[] => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const raw of [...(Array.isArray(subjects) ? subjects : []), ...(skills ?? []).map((s) => s?.skill_name)]) {
+        const name = typeof raw === "string" ? raw.trim() : "";
+        const key = name.toLowerCase();
+        if (!name || key === "none" || seen.has(key)) continue;
+        seen.add(key);
+        out.push(name);
+    }
+    return out;
+};
 
 const VolunteerCard: React.FC<VolunteerCardProps> = ({
     onSeeMoreClick,
@@ -30,6 +44,9 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
     skillsToLearn,
 }) => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const allSkills = combineSkillNames(subjects, skillsToLearn);
 
     const handleChatClick = async () => {
         GET_API(endpoints.chat.createChatForVolunteer(volunteerId))
@@ -42,7 +59,12 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
     };
 
     const handleScheduleMeeting = () => {
-        router.push(`/learner/volunteer?volunteerId=${volunteerId}&modal=add_new_meeting`);
+        // Keep the tab: opening Book for Later from "My Matches" used to flip the page to "All Volunteers"
+        // behind the drawer (and load that whole list), and closing it left the person on the wrong tab.
+        const tabParam = searchParams.get("tab");
+        router.push(
+            `/learner/volunteer?volunteerId=${volunteerId}&modal=add_new_meeting${tabParam ? `&tab=${encodeURIComponent(tabParam)}` : ""}`
+        );
     };
 
     return (
@@ -99,17 +121,11 @@ const VolunteerCard: React.FC<VolunteerCardProps> = ({
             </div>
             <div className="flex flex-col gap-2.5">
                 {Array.isArray(languages) && languages.length > 0 && (
-                    <CardChips label="Languages" value={languages.join(", ")} />
+                    <CardChips label="I speak" value={languages.join(", ")} />
                 )}
-                {Array.isArray(subjects) && subjects.length > 0 && (
-                    <CardChips label="Academic Skills" value={subjects.join(", ")} />
-                )}
-                {skillsToLearn && skillsToLearn.length > 0 && (
-                    <CardChips
-                        label="Non-Academic Skills"
-                        value={skillsToLearn.map((skill) => skill.skill_name).join(", ")}
-                    />
-                )}
+                {/* One combined line (academic subjects first, then other skills) so the card shows more
+                    at a glance; the Academic / Arts & Life split lives in the profile view. */}
+                {allSkills.length > 0 && <CardChips label="Skills" value={allSkills.join(", ")} wrap />}
             </div>
             <Divider />
             {/* "Book for Later" only when the volunteer has recurring availability slots

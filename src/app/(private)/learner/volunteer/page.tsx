@@ -63,6 +63,7 @@ export default function LearnersPage() {
     const [subject_ids] = useQueryState("subject_ids");
     const [country] = useQueryState("country");
     const [skill_ids] = useQueryState("skill_ids");
+    const [skill_category] = useQueryState("skill_category");
     const [start_date] = useQueryState("start_date");
     const [end_date] = useQueryState("end_date");
     const [start_time] = useQueryState("start_time");
@@ -86,6 +87,7 @@ export default function LearnersPage() {
             language_ids,
             subject_ids,
             skill_ids,
+            skill_category,
             start_date,
             end_date,
             start_time,
@@ -100,6 +102,7 @@ export default function LearnersPage() {
                 subject_ids: subject_ids || "",
                 country: country || "",
                 skill_ids: skill_ids || "",
+                skill_category: skill_category || "",
                 start_date: start_date || "",
                 end_date: end_date || "",
                 start_time: start_time || "",
@@ -123,9 +126,9 @@ export default function LearnersPage() {
     });
 
     const appliedFiltersCount = useMemo(() => {
-        const filters = [language_ids, subject_ids, country, skill_ids, start_date, start_time];
+        const filters = [language_ids, subject_ids, country, skill_ids, skill_category, start_date, start_time];
         return filters.filter((filter) => filter).length;
-    }, [language_ids, subject_ids, country, skill_ids, start_date, start_time]);
+    }, [language_ids, subject_ids, country, skill_ids, skill_category, start_date, start_time]);
     useEffect(() => {
         if (data?.items) {
             const formattedData: VolunteerCardData[] = data.items.map((volunteer: any) => ({

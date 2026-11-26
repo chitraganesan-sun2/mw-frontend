@@ -135,6 +135,7 @@ export default function LearnerMatchesPanel() {
                         volunteerHrs={matchedVolunteer.total_volunteered_hours?.toString()}
                         studentConnected={matchedVolunteer.students_connected?.toString()}
                         subjects={matchedVolunteer.volunteer_subjects?.map((s: any) => s.subject_name)}
+                        skillsToLearn={matchedVolunteer.volunteer_skills}
                         languages={matchedVolunteer.volunteer_languages?.map((l: any) => l.language_name)}
                         totalReviews={matchedVolunteer.total_reviews}
                         overallRating={matchedVolunteer.overall_rating}

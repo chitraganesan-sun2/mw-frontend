@@ -62,6 +62,10 @@ const securityHeaders = [
     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
     { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(), payment=()" },
     { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+    // UAT build (NEXT_PUBLIC_APP_ENV=uat on Vercel's Preview scope): never let a search engine index it.
+    ...(process.env.NEXT_PUBLIC_APP_ENV === "uat"
+        ? [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }]
+        : []),
 ];
 
 /** @type {import('next').NextConfig} */

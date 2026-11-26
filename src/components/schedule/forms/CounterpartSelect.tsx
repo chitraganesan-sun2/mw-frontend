@@ -108,7 +108,8 @@ export default function CounterpartSelect({
                 // Stable id - react-select's auto ids differ between server and client renders.
                 instanceId={name}
                 cacheOptions
-                defaultOptions
+                // A locked-in choice (deep link from a match card) never opens the list, so don't fetch it.
+                defaultOptions={!disabled}
                 loadOptions={loadOptions}
                 value={value}
                 onChange={(option) => onChange(option ?? null)}

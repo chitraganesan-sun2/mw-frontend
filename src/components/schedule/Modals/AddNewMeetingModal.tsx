@@ -132,23 +132,48 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         rescheduleId
     );
 
-    // Deep link (?volunteerId=): preselect that volunteer, label included.
+    // One shared fetch per volunteer: the match card already loaded this profile (same cache key), and the
+    // skills effect below needs it again - without this the drawer made the same request twice, one after the other.
+    const fetchVolunteerProfile = (id: string) =>
+        queryClient.fetchQuery({
+            queryKey: ["matchedVolunteer", id],
+            queryFn: async () => {
+                const response: any = await GET_API(endpoints.volunteer.getIndividualVolunteer(id));
+                return response.data;
+            },
+            staleTime: 60_000,
+        });
+
+    // Deep link (?volunteerId=): preselect that volunteer straight away. The id is already known, so the
+    // field and the open-times request don't have to wait for the profile; the name fills in from the cache
+    // (instant from a match card) or as soon as the profile arrives.
     useEffect(() => {
         if (!isOpen || !volunteerId) return;
         let cancelled = false;
-        GET_API(endpoints.volunteer.getIndividualVolunteer(volunteerId))
-            .then(({ data }: any) => {
-                if (cancelled || !data?.volunteer_id) return;
-                setVolunteerOption({
-                    value: data.volunteer_id,
-                    label: joinNames(data?.volunteer_first_name, data?.volunteer_last_name) || "Volunteer",
-                });
-                setFormData((prev) => ({ ...prev, select_volunteer: data.volunteer_id }));
+        const nameOf = (d: any) => joinNames(d?.volunteer_first_name, d?.volunteer_last_name) || "Volunteer";
+        const cached: any = queryClient.getQueryData(["matchedVolunteer", volunteerId]);
+        setVolunteerOption({ value: volunteerId, label: cached?.volunteer_id ? nameOf(cached) : "Loading…" });
+        setFormData((prev) => ({ ...prev, select_volunteer: volunteerId }));
+        fetchVolunteerProfile(volunteerId)
+            .then((data: any) => {
+                if (cancelled) return;
+                if (!data?.volunteer_id) {
+                    // Not a real volunteer id: undo the optimistic preselection.
+                    setVolunteerOption(null);
+                    setFormData((prev) => ({ ...prev, select_volunteer: "" }));
+                    return;
+                }
+                setVolunteerOption({ value: data.volunteer_id, label: nameOf(data) });
             })
-            .catch(() => undefined);
+            .catch(() => {
+                if (cancelled) return;
+                setVolunteerOption(null);
+                setFormData((prev) => ({ ...prev, select_volunteer: "" }));
+            });
         return () => {
             cancelled = true;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- re-run only when the modal opens or the id changes
     }, [isOpen, volunteerId]);
 
     // Reschedule: carry over what the original session was about (title, details, skill).
@@ -346,8 +371,8 @@ export default function AddNewMeetingModal({ isOpen, onClose, initialDate }: Add
         if (formData.select_volunteer) {
             // The skills they've declared they can teach populate the Category / Skill pickers.
             let cancelled = false;
-            GET_API(endpoints.volunteer.getIndividualVolunteer(formData.select_volunteer))
-                .then(({ data }) => {
+            fetchVolunteerProfile(formData.select_volunteer)
+                .then((data: any) => {
                     if (cancelled) return;
                     const { academic, nonAcademic } = skillOptionsByCategory(data);
                     setVolunteerAcademicOptions(academic.map((name) => ({ label: name, value: name })));

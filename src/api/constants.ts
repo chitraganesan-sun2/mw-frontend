@@ -237,6 +237,8 @@ export const endpoints: EndpointProps = {
         learnerPermission: (id: string) => `learner/${id}/chat_permission`,
     },
     tutorialLinks: {
+        // The admin-set product demo link for a role ({ url } or { url: null }).
+        demo: (role: string) => `tutorial-links/demo?role=${role}`,
         getAll: "tutorial-links/",
     },
     publicCommunity: {

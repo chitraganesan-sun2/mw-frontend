@@ -13,6 +13,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import type { TimeSlot, UseScheduleSlotsResult } from "@/hooks/schedule/useScheduleSlots";
 import { getSlotId } from "@/hooks/schedule/useScheduleSlots";
 import { formatTimeRange, isOvernightRange } from "@/utils/sessionDisplay";
+import { useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 
 interface TimePickerComponentProps {
     day: string;
@@ -117,6 +118,8 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
     removeTimeSlot,
 }) => {
     const timePickerClass = cn("!text-sm");
+    // "Today" in the profile timezone, the same clock the custom-recurrence date pickers use.
+    const today = useProfileToday();
 
     // Every interactive control in this editor is a styled div/span rather than a
     // <button> (icon-only controls, or elements that can't be a real <button>
@@ -294,10 +297,26 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                                                 );
                                                             })()}
                                                         </div>
+                                                        {/* The end date used to be reachable only through "Custom" in the dropdown above,
+                                                            with nothing saying a slot can end at all. Show it, and edit it in one click. */}
+                                                        <div className="flex items-center justify-between gap-2 px-1 text-xs text-gray-600">
+                                                            <span>
+                                                                {slot.slot_type === "custom" && slot.end_date
+                                                                    ? `Repeats until ${dayjs(slot.end_date).format("MMM D, YYYY")}`
+                                                                    : "Repeats every week, no end date"}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                className="appearance-none border-0 bg-transparent p-0 text-primary underline cursor-pointer whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
+                                                                onClick={() => handleRepeatFrequencyChange(day, getSlotId(slot), "custom")}
+                                                            >
+                                                                {slot.slot_type === "custom" && slot.end_date ? "Edit end date" : "Set end date"}
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="text-sm text-gray-500 font-medium border border-stroke-light text-center rounded-xl px-3 py-1.5 w-[267px]">
+                                                <div className="text-sm text-gray-500 font-medium border border-stroke-light text-center rounded-xl px-3 py-1.5 w-full">
                                                     No schedules yet
                                                 </div>
                                             )}
@@ -344,7 +363,9 @@ const ScheduleSlotEditor: React.FC<ScheduleSlotEditorProps> = ({
                                     repeatEvery: slotData.weekly_repeat_interval || 1,
                                 };
                             }
-                            return undefined;
+                            // A plain weekly slot has no dates yet ("Set end date"): start today, every week, so the
+                            // person only has to choose the end date instead of filling in the other two fields first.
+                            return { start_date: today, repeatEvery: 1 };
                         })()
                         : undefined
                 }
