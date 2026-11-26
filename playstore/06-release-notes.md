@@ -1,3 +1,32 @@
+# Release notes — v1.8.7 (versionCode 24)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.8.7
+
+• Choose push and email notifications separately in Settings
+• Session reminders: a day before scheduled sessions and WingTimes; an hour and 5 minutes before instant sessions
+• Volunteer cards show all skills on one line, and you can filter volunteers by Academic or Arts & Life
+• Book for Later opens faster and keeps you on My Matches
+• Set an end date on a weekly availability time
+• View Demo now opens the latest demo video
+```
+
+---
+
+## Internal changelog — v1.8.7 (versionCode 24)
+
+Web changes from the 2026-11-26 manager feedback round, now baked into the app bundle (all already live on the web):
+Email Notifications switch in Settings (separate from push), volunteer card + Academic / Arts & Life filter and split
+profile view, Book for Later no longer refetches the browse list / keeps the My Matches tab, availability drawer layout
++ Set / Edit end date on recurring slots, View Demo reads the admin-set link (GET /tutorial-links/demo). The reminder,
+WingTime and matcher changes are backend-only and already reach every installed version.
+
+No native or permission changes.
+
+---
+
 # Release notes — v1.8.6 (versionCode 23)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
