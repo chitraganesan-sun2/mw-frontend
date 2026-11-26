@@ -157,7 +157,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
-                    <h2 id="my-schedule-heading" className="text-lg font-medium">
+                    <h2 id="my-schedule-heading" className="sr-only">
                         {SCHEDULE_LABELS.mySchedule}
                     </h2>
                     <PageIntro>{HELP.mySessions}</PageIntro>
