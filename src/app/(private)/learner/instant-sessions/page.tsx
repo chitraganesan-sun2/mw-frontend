@@ -584,7 +584,7 @@ export default function InstantSessionsPage() {
             {/* Instant Sessions and Book for Later are the two options of the Book a Session section. */}
             <BookSessionTabs className="mb-4" />
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h1 className="text-2xl font-medium text-gray-900">Instant Sessions</h1>
+                <h2 className="text-2xl font-medium text-gray-900">Instant Sessions</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     Instant sessions happen <strong>today or tomorrow.</strong> Browse sessions
                     volunteers have posted, or request one at a time and subject that suit you.

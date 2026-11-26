@@ -64,11 +64,13 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                   href: "/learners",
                   text: "Learners",
                   icon: <LearnerIcon />,
+                  alsoActiveFor: ["/my-learners"],
               }
             : {
                   href: "/volunteer",
                   text: "Volunteers",
                   icon: <VolunteerIcon />,
+                  alsoActiveFor: ["/my-volunteers"],
               };
 
     const remainingLinks: any[] = [

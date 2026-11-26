@@ -10,13 +10,13 @@ import SideModal from "@/components/common/Modals/MobileSideModal";
 import Sidebar from "@/components/common/Sidebar";
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
-import { HiOutlineArrowLeft, HiOutlineCalendarDays, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
 import { HELP, TERMS } from "@/constants/copy";
 
-/** ?view=calendar shows the calendar on its own; no param = the schedule (availability +
- * sessions). A URL param, not local state, so the view survives a refresh / can be linked. */
+/** ?view=calendar shows My Schedule as a calendar; no param = the list. A URL param, not local
+ * state, so the view survives a refresh / can be linked. */
 export const CALENDAR_VIEW = "calendar";
 
 const Header = () => {
@@ -38,8 +38,8 @@ const Header = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isVolunteer = role === "volunteer";
-    // Two pages share this header: My Schedule (just the sessions, kept uncluttered) and
-    // Book for Later (booking, availability and the calendar).
+    // Two pages share this header: My Schedule (the list, or the calendar view of it) and
+    // Book for Later (booking and availability, the second option of Book a Session).
     const pathname = usePathname();
     const isPlanner = pathname?.includes("/book-for-later");
     const basePath = `/${isVolunteer ? "volunteer" : "learner"}/${isPlanner ? "book-for-later" : "schedule"}`;
@@ -50,7 +50,15 @@ const Header = () => {
     useEffect(() => {
         setIsSideNavBarOpen(false);
     }, [pathname]);
-    const isCalendarView = isPlanner && searchParams.get("view") === CALENDAR_VIEW;
+    const isCalendarView = !isPlanner && searchParams.get("view") === CALENDAR_VIEW;
+
+    const pageTitle = isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookSession : "My Schedule";
+    // The browser tab / history entry names the page too ("My Schedule | MelodyWings").
+    // Re-applied when the query changes too: Next resets the tab title to the site default on a same-page navigation.
+    const search = searchParams.toString();
+    useEffect(() => {
+        document.title = `${pageTitle} | MelodyWings`;
+    }, [pageTitle, pathname, search]);
 
     // Keep the current view and month when opening a modal, so closing it returns here.
     const pushWith = (changes: Record<string, string | null>) => {
@@ -84,7 +92,7 @@ const Header = () => {
                         </button>
                         <h1 className="flex items-center gap-2 text-[20px] md:text-lg font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
-                            {isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookSession : "My Schedule"}
+                            {pageTitle}
                         </h1>
                         {/* The month only drives the calendar, so it only shows there. */}
                         {isCalendarView && (
@@ -108,28 +116,28 @@ const Header = () => {
                         </div>
                     )}
                 </div>
-                {role && isPlanner && (
-                    // Phones: two rows (calendar + availability side by side, Add below)
-                    // instead of three full-width rows.
-                    <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
-                        {isCalendarView && isMobileOrTabScreen && (
-                            <div className="col-span-2">
-                                <MonthYearPicker />
-                            </div>
-                        )}
-                        <button type="button" onClick={toggleCalendar} title={isCalendarView ? undefined : HELP.viewCalendar} className={actionBtn}>
-                            {isCalendarView ? (
-                                <>
-                                    <HiOutlineArrowLeft size={16} aria-hidden="true" />
-                                    Back to {TERMS.bookForLater}
-                                </>
-                            ) : (
-                                <>
-                                    <HiOutlineCalendarDays size={16} aria-hidden="true" />
-                                    {SCHEDULE_LABELS.viewCalendar}
-                                </>
-                            )}
+                {role && isCalendarView && (
+                    // The calendar: back to the list, and the month picker on phones.
+                    <div className="grid grid-cols-1 gap-2 lg:flex lg:items-center">
+                        {isMobileOrTabScreen && <MonthYearPicker />}
+                        <button type="button" onClick={toggleCalendar} className={actionBtn}>
+                            <HiOutlineArrowLeft size={16} aria-hidden="true" />
+                            Back to My Schedule
                         </button>
+                        <button
+                            type="button"
+                            onClick={openAddSession}
+                            title={HELP.bookForLater}
+                            className={`${actionBtn} !border-action !bg-action !text-white hover:!bg-action-hover`}
+                        >
+                            <HiOutlinePlus size={16} aria-hidden="true" />
+                            {TERMS.bookForLater}
+                        </button>
+                    </div>
+                )}
+                {role && isPlanner && (
+                    // Book for Later: set availability, and book (learner) / propose (volunteer) a session.
+                    <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
                         <button type="button" onClick={openAvailability} title={HELP.scheduleAvailability} className={actionBtn}>
                             {SCHEDULE_LABELS.scheduleAvailability}
                         </button>
@@ -137,7 +145,7 @@ const Header = () => {
                             type="button"
                             onClick={openAddSession}
                             title={HELP.bookForLater}
-                            className={`${actionBtn} col-span-2 !border-action !bg-action !text-white hover:!bg-action-hover`}
+                            className={`${actionBtn} !border-action !bg-action !text-white hover:!bg-action-hover`}
                         >
                             <HiOutlinePlus size={16} aria-hidden="true" />
                             {TERMS.bookForLater}

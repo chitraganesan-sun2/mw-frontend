@@ -41,16 +41,16 @@ export default function LearnerSchedulePage() {
 
     const [modal, setModal] = useQueryState("modal");
     const [view] = useQueryState("view");
-    // The same page backs My Schedule (sessions) and Book for Later (availability + calendar,
-    // /learner/book-for-later re-exports it); the path says which.
+    // The same page backs My Schedule (sessions + calendar) and Book for Later (availability and
+    // booking, /learner/book-for-later re-exports it); the path says which.
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const isPlanner = pathname.includes("/book-for-later");
     const basePath = isPlanner ? "/learner/book-for-later" : "/learner/schedule";
-    const isCalendarView = isPlanner && view === CALENDAR_VIEW;
-    // Older links (?view=calendar on My Schedule) land on the calendar's new home.
+    const isCalendarView = !isPlanner && view === CALENDAR_VIEW;
+    // The calendar belongs to My Schedule; older links (?view=calendar on Book for Later) land there.
     useEffect(() => {
-        if (!isPlanner && view === CALENDAR_VIEW) router.replace(`/learner/book-for-later?${searchParams.toString()}`);
+        if (isPlanner && view === CALENDAR_VIEW) router.replace(`/learner/schedule?${searchParams.toString()}`);
     }, [isPlanner, view, router, searchParams]);
     const [presetDate] = useQueryState("date");
     const [volunteerId, setVolunteerId] = useQueryState("volunteerId");
@@ -94,12 +94,12 @@ export default function LearnerSchedulePage() {
         router.push(`${basePath}?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
     };
 
-    // Clicking a day on the calendar opens Book for Later for that date - the learner
-    // counterpart of the volunteer's click-a-day-to-add-availability.
+    // Clicking a day on the calendar opens the booking form for that date (on the calendar itself, so
+    // closing it returns here) - the learner counterpart of the volunteer's click-a-day-to-add-availability.
     const handleDateSelect = (date: string) => {
         // "Today" in the learner's PROFILE timezone, not the browser's.
         if (!date || date.slice(0, 10) < profileToday(learnerTimeZone)) return;
-        router.push(`/learner/book-for-later?view=${CALENDAR_VIEW}&modal=add_new_meeting&date=${encodeURIComponent(date)}`);
+        router.push(`/learner/schedule?view=${CALENDAR_VIEW}&modal=add_new_meeting&date=${encodeURIComponent(date)}`);
     };
 
     const handleSubmitFeedback = async (formData: any) => {

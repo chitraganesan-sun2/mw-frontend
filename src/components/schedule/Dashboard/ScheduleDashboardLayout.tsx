@@ -13,7 +13,7 @@ interface ScheduleDashboardLayoutProps {
     role: ScheduleRole;
     /** true on the Book for Later page (availability + calendar), false on My Schedule (sessions only). */
     isPlanner: boolean;
-    /** "calendar" (?view=calendar, header's "View my calendar") or the schedule view. */
+    /** The calendar view of My Schedule (?view=calendar), or the list. */
     isCalendarView: boolean;
     timeZoneLabel?: string;
     onScheduleAvailability: () => void;
@@ -28,9 +28,8 @@ interface ScheduleDashboardLayoutProps {
 
 /**
  * The Schedule dashboard (the signed-in landing page), split over two pages:
- * - My Schedule: My Sessions only;
- * - Book for Later (one of the two Book a Session options): Availability, or (header's "View my calendar")
- *   the calendar on its own.
+ * - My Schedule: the activity list, or (?view=calendar) the same activity as a calendar;
+ * - Book for Later (one of the two Book a Session options): Availability, and the booking actions in the header.
  */
 const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     role,

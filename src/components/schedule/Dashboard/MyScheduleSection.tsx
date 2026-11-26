@@ -171,7 +171,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                         {TERMS.bookSession}
                     </Link>
                     <Link
-                        href={`/${role}/book-for-later?view=${CALENDAR_VIEW}`}
+                        href={`/${role}/schedule?view=${CALENDAR_VIEW}`}
                         title={HELP.viewCalendar}
                         className="inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-black hover:bg-gray-50"
                     >

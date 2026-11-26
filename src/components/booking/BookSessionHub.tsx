@@ -75,7 +75,7 @@ export default function BookSessionHub({ role }: { role: ScheduleRole }) {
         <div className="h-full w-full animate-fadeIn overflow-y-auto p-4 lg:p-6">
             <div className="mx-auto flex max-w-4xl flex-col gap-6">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-medium text-gray-900">{TERMS.bookSession}</h1>
+                    <h2 className="text-2xl font-medium text-gray-900">How would you like to book?</h2>
                     <p className="max-w-2xl text-sm text-gray-600">{HELP.bookSession}</p>
                 </div>
 

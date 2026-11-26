@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useComponentStore } from "@/store/useComponenetStore";
-import { IoIosArrowBack } from "react-icons/io";
+import { getHeaderIcon } from "@/layouts/helper";
 import { POST_API, GET_API, PUT_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { TERMS } from "@/constants/copy";
@@ -251,7 +251,7 @@ function MySessionCard({
 export default function VolunteerInstantSessionsPage() {
     const { confirm: askConfirm, confirmModal } = useConfirm();
     const { setHeaderOptions } = useComponentStore();
-    const router = useRouter();
+    const pathname = usePathname();
     const queryClient = useQueryClient();
     const [isActionLoading, setIsActionLoading] = useState(false);
     // `isActionLoading` is state and lags a render behind, so a double-click on Accept / Cancel /
@@ -287,11 +287,9 @@ export default function VolunteerInstantSessionsPage() {
     useEffect(() => {
         setHeaderOptions({
             title: TERMS.bookSession,
-            titleIcon: <IoIosArrowBack className="text-lg" />,
-            titleIconClick: () => router.push(`/${role}/book-a-session`),
+            titleIcon: getHeaderIcon(pathname),
             searchPlaceholder: "Search",
             showButton: false,
-            showTitleButton: true,
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -461,7 +459,7 @@ export default function VolunteerInstantSessionsPage() {
             {/* Instant Sessions and Book for Later are the two options of the Book a Session section. */}
             <BookSessionTabs className="mb-4" />
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h1 className="text-2xl font-medium text-gray-900">Instant Sessions</h1>
+                <h2 className="text-2xl font-medium text-gray-900">Instant Sessions</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     Instant sessions happen <strong>today or tomorrow.</strong> Post a session for
                     learners to join, or accept one a learner has requested.

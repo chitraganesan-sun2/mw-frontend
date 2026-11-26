@@ -49,8 +49,7 @@ const CommonHeader: React.FC = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isMobile = InnerWidth() < 768;
-    // Blank on desktop for Instant Sessions, which carries its own page title - then no heading is rendered.
-    const headerTitle = formatString(!pathname?.includes("/instant-sessions") || isMobileOrTabScreen ? (title ?? "") : "");
+    const headerTitle = formatString(title ?? "");
     const isMessagesChatPage =
         (pathname?.includes("/volunteer/messages") || pathname?.includes("/learner/messages")) &&
         searchParams?.get("chatId");
@@ -69,6 +68,13 @@ const CommonHeader: React.FC = () => {
     useEffect(() => {
         setIsSideNavBarOpen(false);
     }, [pathname]);
+
+    // The browser tab / history entry names the page too ("Settings | MelodyWings").
+    // Re-applied when the query changes too: Next resets the tab title to the site default on a same-page navigation.
+    const search = searchParams?.toString();
+    useEffect(() => {
+        if (title) document.title = `${formatString(title)} | MelodyWings`;
+    }, [title, pathname, search]);
 
     const handleSearch = (value: string) => {
         setSearchQuery(value === "" ? null : value);
@@ -104,7 +110,7 @@ const CommonHeader: React.FC = () => {
                                 <SideMenuIcon height="22px" width="22px" />
                             </button>
                         )}
-                        {isMobileOrTabScreen && leftButton?.showButton && !pathname?.includes("/instant-sessions") ? (
+                        {isMobileOrTabScreen && leftButton?.showButton ? (
                             <Button
                                 title={leftButton?.buttonTitle}
                                 onClick={leftButton?.buttonOnClick}
@@ -116,7 +122,6 @@ const CommonHeader: React.FC = () => {
                             <>
                                 {titleIcon &&
                                     (showTitleButton || !isMobileOrTabScreen) &&
-                                    (!pathname?.includes("/instant-sessions") || isMobileOrTabScreen) &&
                                     (titleIconClick ? (
                                         <Button
                                             icon={titleIcon}
@@ -199,7 +204,7 @@ const CommonHeader: React.FC = () => {
                                         btnVariant="tertiary"
                                     />
                                 ) : (
-                            <div className={pathname?.includes("/instant-sessions") ? "!pr-5" : ""}>
+                            <div>
                                 <Input
                                     value={searchQuery ?? ""}
                                     inputType="search"

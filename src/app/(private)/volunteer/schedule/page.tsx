@@ -39,16 +39,16 @@ export default function SchedulePage() {
         useAppStore();
     const [modal, setModal] = useQueryState("modal");
     const [view] = useQueryState("view");
-    // The same page backs My Schedule (sessions) and Book for Later (availability + calendar,
-    // /volunteer/book-for-later re-exports it); the path says which.
+    // The same page backs My Schedule (sessions + calendar) and Book for Later (availability and
+    // booking, /volunteer/book-for-later re-exports it); the path says which.
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const isPlanner = pathname.includes("/book-for-later");
     const basePath = isPlanner ? "/volunteer/book-for-later" : "/volunteer/schedule";
-    const isCalendarView = isPlanner && view === CALENDAR_VIEW;
-    // Older links (?view=calendar on My Schedule) land on the calendar's new home.
+    const isCalendarView = !isPlanner && view === CALENDAR_VIEW;
+    // The calendar belongs to My Schedule; older links (?view=calendar on Book for Later) land there.
     useEffect(() => {
-        if (!isPlanner && view === CALENDAR_VIEW) router.replace(`/volunteer/book-for-later?${searchParams.toString()}`);
+        if (isPlanner && view === CALENDAR_VIEW) router.replace(`/volunteer/schedule?${searchParams.toString()}`);
     }, [isPlanner, view, router, searchParams]);
     const [learnerId, setLearnerId] = useQueryState("learnerId");
     const volunteerId = getCookie("volunteer_id");
