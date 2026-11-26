@@ -12,20 +12,16 @@ function AboutSectionCard() {
         </div>
         <div className="lg:w-[78%]">
           <p className="text-sm md:text-base lg:text-xl font-normal leading-8 max-md:!leading-6 text-justify tracking-wide">
-            The idea for MelodyWings was born from the shared experiences of a mother-daughter duo, Chitra and Nithila, during their time volunteering with His Mountain Top Ministries (<Link href="https://hismountaintopministries.com" target="_blank" className="font-semibold underline">HMM</Link>) through National Charity League Inc (NCL). {" "}
-            <Link href="https://www.nationalcharityleague.org/chapter/granitebayarea" target="_blank" className="font-semibold underline">NCL, Granite Bay Area Chapter</Link> is a group of mothers and daughters who have come together in a commitment to community service for more than 35 non-profits, and HMM is one among them.
-            HMM offers horse therapy for children with special needs.
-            As &quot;sidewalkers,&quot; Chitra and Nithila walked alongside the horses, ensuring the children&apos;s safety as they participated in therapeutic activities.
+            The idea for MelodyWings grew out of the volunteer experiences of mother-daughter duo Chitra and Nithila while volunteering with His Mountaintop Ministries (<Link href="https://hismountaintopministries.com" target="_blank" className="font-semibold underline">HMM</Link>). There, they worked alongside children with special needs participating in equine assisted therapy. As side-walkers, they walked alongside the horses to help ensure the children&apos;s safety during their sessions.
           </p>
         </div>
       </div>
-      <div>
+      <div className="flex flex-col gap-5">
         <p className="text-sm md:text-base lg:text-xl font-normal leading-8 max-md:!leading-6 text-justify tracking-wide">
-          They observed that one kid, despite struggling with stress and self-regulation, loved singing and had an exceptional voice.
-          A few other children who found it hard to focus for long still enjoyed singing full rhymes with enthusiasm.
-          Motivated by these experiences, Nithila decided to begin a research project in high school focused on the impact of music on children with special needs.
-          This passion, combined with a love for music, inspired the creation of MelodyWings—a platform designed to help children explore their musical interests with the support of dedicated volunteers.
-          Over time, MelodyWings expanded to offer a wide variety of subjects and skill-building opportunities, all tailored to the unique needs of learners with special needs and developmental disabilities.
+          Among the children they met was one who often struggled with stress and self-regulation but had a remarkable love for singing and a beautiful voice. They also noticed other children who had difficulty staying focused for long periods but would happily sing songs and nursery rhymes. These experiences highlighted how children could engage with learning in different ways when given opportunities to explore their interests.
+        </p>
+        <p className="text-sm md:text-base lg:text-xl font-normal leading-8 max-md:!leading-6 text-justify tracking-wide">
+          Inspired by these experiences, they wanted to create opportunities for children to pursue their interests, regardless of barriers such as socioeconomic circumstances or limited access to specialized learning opportunities. What began as an idea centered around music gradually expanded into something broader. Today, MelodyWings offers personalized sessions across a variety of subjects and activities, tailored to each learner&apos;s interests, strengths, and individual needs.
         </p>
       </div>
     </div>
