@@ -30,7 +30,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
  * Help hub at the top of Resources: the role's product demo (moved here from the schedule
  * header - it is the same admin-managed Tutorial Link the approval emails use, category
  * learner_demo / volunteer_demo, newest first, with the NEXT_PUBLIC_VIEW_DEMO_LINK* env var
- * as a fallback) followed by the tutorials and guides.
+ * as a fallback) followed by the tutorials and guides. The demo link comes from its own endpoint: the list endpoint
+ * deliberately leaves these categories out, so reading it from the list always fell through to the env fallback.
  */
 const TutorialLinks = () => {
     // Deferred cookie read - see Sidebar/index.tsx for the SSR hydration reason.
@@ -49,19 +50,27 @@ const TutorialLinks = () => {
         },
     });
 
+    // The admin-set demo link for this role ({ url: null } when none is set). A failure just means the fallback is used.
+    const demoRole = role === "volunteer" ? "volunteer" : "learner";
+    const { data: demo, isPending: isDemoPending } = useQuery<{ url: string | null }>({
+        queryKey: ["tutorial-demo-link", demoRole],
+        queryFn: async () => {
+            const res = await GET_API(endpoints.tutorialLinks.demo(demoRole));
+            return { url: typeof res?.data?.url === "string" ? res.data.url : null };
+        },
+        enabled: role !== undefined,
+        retry: false,
+    });
+
     const { demoUrl, guides } = useMemo(() => {
-        const demoCategory = role === "volunteer" ? "volunteer_demo" : "learner_demo";
-        const newestDemo = links
-            .filter((l) => l.category === demoCategory)
-            .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""))[0];
         const envFallback = role === "volunteer" ? VIEW_DEMO_LINK_FOR_VOLUNTEER : VIEW_DEMO_LINK;
         return {
-            demoUrl: safeHref(newestDemo?.url || envFallback),
+            demoUrl: safeHref(demo?.url || envFallback),
             guides: links.filter((l) => !DEMO_CATEGORIES.includes(l.category)),
         };
-    }, [links, role]);
+    }, [links, role, demo]);
 
-    if (isPending) return (
+    if (isPending || (role !== undefined && isDemoPending)) return (
         <div className="bg-white rounded-2xl p-5 shadow-sm animate-pulse">
             <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
             <div className="h-10 bg-gray-100 rounded-xl" />

@@ -192,6 +192,7 @@ export type EndpointProps = {
         learnerPermission: (id: string) => string;
     };
     tutorialLinks: {
+        demo: (role: string) => string;
         getAll: string;
     };
     publicCommunity: {
