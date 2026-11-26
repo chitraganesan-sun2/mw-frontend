@@ -108,6 +108,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
 }) => {
     const [isReportOpen, setIsReportOpen] = useState(false);
     const [completing, setCompleting] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
     const queryClient = useQueryClient();
     const { confirm, confirmModal } = useConfirm();
     const { setEventDetails } = useAppStore();
@@ -146,6 +147,14 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
         session.status === "accepted" &&
         !session.reschedule_pending &&
         Boolean(bounds && bounds.start.isAfter(now));
+    // A pending request or an accepted session that has not ended can be called off (the server refuses
+    // once it has ended; the other person decides pending requests addressed to them, via Respond).
+    const canCancel =
+        Boolean(session.session_id) &&
+        (session.status === "pending" || session.status === "accepted") &&
+        !awaitingMe &&
+        Boolean(bounds && bounds.end.isAfter(now));
+    const isWithdraw = session.status === "pending";
     // Only a session that was actually arranged has another person to report.
     const canReport = Boolean(session.session_id) && (session.status === "accepted" || session.status === "completed");
     const declinedBecause = declineReasonText(session.decline_reason, session.decline_note);
@@ -179,6 +188,33 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
             });
         } finally {
             setCompleting(false);
+        }
+    };
+
+    const handleCancel = async () => {
+        if (cancelling) return;
+        const ok = await confirm({
+            title: isWithdraw ? "Withdraw this request?" : "Cancel this session?",
+            description: isWithdraw
+                ? `${counterpartName || "The other person"} will be told you withdrew it.`
+                : `${counterpartName || "The other person"} will be told it is cancelled. It can't be undone.`,
+            confirmText: isWithdraw ? "Withdraw" : "Cancel session",
+            cancelText: "Keep it",
+            danger: true,
+        });
+        if (!ok) return;
+        setCancelling(true);
+        try {
+            await PUT_API(endpoints.session.cancelSession(session.session_id), { status: "cancelled" });
+            showToast({ type: "success", message: isWithdraw ? "Request withdrawn." : "Session cancelled." });
+            invalidateScheduleViews(queryClient, role);
+        } catch (err) {
+            showToast({
+                type: "error",
+                message: getApiErrorMessage(err, "Couldn't cancel the session. Please try again."),
+            });
+        } finally {
+            setCancelling(false);
         }
     };
 
@@ -288,7 +324,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                 </p>
             )}
 
-            {(joinStatus !== "none" || showRespond || canComplete || canGiveFeedback || canReschedule || canReport || (!isNativePlatform() && session.status === "accepted")) && (
+            {(joinStatus !== "none" || showRespond || canComplete || canGiveFeedback || canReschedule || canCancel || canReport || (!isNativePlatform() && session.status === "accepted")) && (
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 pt-0.5">
                     {canReport && (
                         <button
@@ -319,6 +355,17 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             className="rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {completing ? "Saving..." : "Mark as completed"}
+                        </button>
+                    )}
+                    {canCancel && (
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={cancelling}
+                            aria-label={`${isWithdraw ? "Withdraw" : "Cancel"} ${session.session_title || "this session"}`}
+                            className="text-xs font-medium text-rose-700 underline-offset-2 hover:underline bg-transparent border-0 p-0 cursor-pointer disabled:opacity-60"
+                        >
+                            {cancelling ? "Saving..." : isWithdraw ? "Withdraw request" : "Cancel session"}
                         </button>
                     )}
                     {canReschedule && (

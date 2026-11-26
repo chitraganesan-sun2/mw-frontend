@@ -90,7 +90,7 @@ export default function BookSessionHub({ role }: { role: ScheduleRole }) {
                         points={
                             learner
                                 ? ["No volunteer to pick", "The first volunteer to accept gets the session", "Starts within a day"]
-                                : ["Post when you are free", "A learner can join straight away", "Starts within a day"]
+                                : ["Post when you are free", "Or accept a learner's request", "Starts within a day"]
                         }
                         cta={learner ? "Find an Instant Session" : "Post an Instant Session"}
                     />

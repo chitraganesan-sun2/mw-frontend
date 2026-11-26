@@ -10,6 +10,7 @@ import Sidebar from "@/components/common/Sidebar";
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { IoIosSearch } from "react-icons/io";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 
 const CommonHeader: React.FC = () => {
@@ -69,12 +70,7 @@ const CommonHeader: React.FC = () => {
         setIsSideNavBarOpen(false);
     }, [pathname]);
 
-    // The browser tab / history entry names the page too ("Settings | MelodyWings").
-    // Re-applied when the query changes too: Next resets the tab title to the site default on a same-page navigation.
-    const search = searchParams?.toString();
-    useEffect(() => {
-        if (title) document.title = `${formatString(title)} | MelodyWings`;
-    }, [title, pathname, search]);
+    usePageTitle(title ? formatString(title) : null);
 
     const handleSearch = (value: string) => {
         setSearchQuery(value === "" ? null : value);

@@ -11,6 +11,7 @@ import Sidebar from "@/components/common/Sidebar";
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
 import { HiOutlineArrowLeft, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
 import { HELP, TERMS } from "@/constants/copy";
@@ -53,12 +54,7 @@ const Header = () => {
     const isCalendarView = !isPlanner && searchParams.get("view") === CALENDAR_VIEW;
 
     const pageTitle = isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookSession : "My Schedule";
-    // The browser tab / history entry names the page too ("My Schedule | MelodyWings").
-    // Re-applied when the query changes too: Next resets the tab title to the site default on a same-page navigation.
-    const search = searchParams.toString();
-    useEffect(() => {
-        document.title = `${pageTitle} | MelodyWings`;
-    }, [pageTitle, pathname, search]);
+    usePageTitle(pageTitle);
 
     // Keep the current view and month when opening a modal, so closing it returns here.
     const pushWith = (changes: Record<string, string | null>) => {
