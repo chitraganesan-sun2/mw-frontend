@@ -18,6 +18,7 @@ const meetingFormSchema = z.object({
     languages_known: z.any().optional(),
     subjects: z.array(z.string()).optional(),
     skill_ids: z.array(z.string()).optional(),
+    skill_category: z.string().nullable().optional(),
     available_time: z.any(),
     available_days: z.any(),
 });
@@ -43,6 +44,8 @@ export default function VolunteerFilterModal({
     const [start_date, setStartDate] = useQueryState("start_date");
     const [end_date, setEndDate] = useQueryState("end_date");
     const [skill_ids, setSkills] = useQueryState("skill_ids");
+    // "academic" | "non_academic" | null (any): volunteers who teach something in that category.
+    const [skill_category, setSkillCategory] = useQueryState("skill_category");
     // Any filter change restarts the list at page 1 (page N of the old results may not exist).
     const [, setPage] = useQueryState("page");
     const [filterData, setFilterData] = useState<FilterData>({});
@@ -67,8 +70,9 @@ export default function VolunteerFilterModal({
             ],
             available_time: { from, to },
             skill_ids: skill_ids?.split(",") || [],
+            skill_category: skill_category || null,
         });
-    }, [language_ids, subject_ids, start_date, end_date, start_time, end_time, skill_ids, country]);
+    }, [language_ids, subject_ids, start_date, end_date, start_time, end_time, skill_ids, country, skill_category]);
 
     const handleChange = (name: keyof FilterData, value: any) => {
         setFilterData((prev) => ({
@@ -90,6 +94,7 @@ export default function VolunteerFilterModal({
         setSubjects(filterData?.subjects?.length ? filterData.subjects.join(",") : null);
         setCountry(filterData?.country ? filterData?.country : null);
         setSkills(filterData?.skill_ids?.length ? filterData.skill_ids.join(",") : null);
+        setSkillCategory(filterData?.skill_category ? filterData.skill_category : null);
         setPage(null);
         onClose();
     };
@@ -104,6 +109,7 @@ export default function VolunteerFilterModal({
         setSubjects(null);
         setCountry(null);
         setSkills(null);
+        setSkillCategory(null);
         setPage(null);
         onClose();
     };
@@ -123,6 +129,35 @@ export default function VolunteerFilterModal({
             modalWidth={isMobileScreen ? 600 : 400}
         >
             <div className="flex flex-col max-lg:gap-2 px-5 mt-7">
+                <div className="flex flex-col mb-4" role="group" aria-labelledby="skill-category-label">
+                    <span id="skill-category-label" className="text-sm font-medium text-gray-700 mb-2">
+                        What They Teach
+                    </span>
+                    <div className="flex gap-2">
+                        {[
+                            { value: null, label: "Any" },
+                            { value: "academic", label: "Academic" },
+                            { value: "non_academic", label: "Arts & Life Skills" },
+                        ].map((option) => {
+                            const selected = (filterData?.skill_category ?? null) === option.value;
+                            return (
+                                <button
+                                    key={option.label}
+                                    type="button"
+                                    aria-pressed={selected}
+                                    onClick={() => handleChange("skill_category", option.value)}
+                                    className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium cursor-pointer ${
+                                        selected
+                                            ? "bg-[#4C5B6D] border-[#4C5B6D] text-white"
+                                            : "bg-white border-gray-300 text-black hover:bg-gray-50"
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
                 {VolunteerFilterModalConstants.map((field: any) => (
                     <Input
                         key={field.name}

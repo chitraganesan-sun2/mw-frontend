@@ -22,18 +22,18 @@ const SESSION_MATCH_OPTIONS = [
         value: "all_sessions",
         label: "All Sessions",
         description:
-            "Get an email every time a volunteer posts an instant session, so you can look over the topic and decide whether to join.",
+            "Get an alert (push and email) every time a volunteer posts an instant session, so you can look over the topic and decide whether to join.",
     },
     {
         value: "skills_to_learn",
         label: "Sessions Matching What I Want to Learn",
         description:
-            "Get an email only when a volunteer's session matches what you want to learn — exact matches plus closely related ones we detect automatically.",
+            "Get an alert only when a volunteer's session matches what you want to learn — exact matches plus closely related ones we detect automatically.",
     },
     {
         value: "none",
-        label: "No Email Notifications",
-        description: "Don't email me when volunteers post instant sessions.",
+        label: "No Instant Session Alerts",
+        description: "Don't notify me (by push or email) when volunteers post instant sessions.",
     },
 ] as const;
 
@@ -61,6 +61,8 @@ const Settings = () => {
     const [sessionMatchPreference, setSessionMatchPreference] =
         useState<SessionMatchValue>("all_sessions");
     const [pushEnabled, setPushEnabled] = useState(true);
+    // Optional emails (reminders, WingTime updates). On unless turned off; sign-in codes and approval/safety emails always send.
+    const [emailEnabled, setEmailEnabled] = useState(true);
     // WingTime announcements are opt-in: off until the learner (or their guardian) turns them on.
     const [wingTimeEnabled, setWingTimeEnabled] = useState(false);
     const { setHeaderOptions } = useComponentStore();
@@ -138,6 +140,19 @@ const Settings = () => {
         });
     };
 
+    const handleEmailEnabledChange = (value: boolean) => {
+        const previous = emailEnabled;
+        setEmailEnabled(value);
+        PUT_API(`${endpoints.learner.getIndividualLearner(learnerId as string)}/email_preference`, {
+            email_notifications_enabled: value,
+        }).then(() => {
+            showToast({ type: "success", message: "Setting saved." });
+        }).catch((err) => {
+            setEmailEnabled(previous);
+            showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't save that setting. Please try again.") });
+        });
+    };
+
     const handleWingTimePreferenceChange = (value: boolean) => {
         const previous = wingTimeEnabled;
         setWingTimeEnabled(value);
@@ -175,6 +190,7 @@ const Settings = () => {
                 if (typeof res.data?.push_notifications_enabled === "boolean") {
                     setPushEnabled(res.data.push_notifications_enabled);
                 }
+                setEmailEnabled(res.data?.email_notifications_enabled !== false);
                 setWingTimeEnabled(res.data?.wingtime_notifications_enabled === true);
             })
             .catch((err) => {
@@ -281,6 +297,22 @@ const Settings = () => {
                     />
                 </div>
 
+                <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full md:border-t md:border-gray-100 md:pt-5">
+                    <div className="flex flex-col gap-2">
+                        <p id="email-notifications-label" className="md:text-base text-[14px] font-medium">Email Notifications</p>
+                        <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
+                            Get emails with reminders and updates about your sessions and WingTimes. Sign-in codes, approval decisions and safety notices are always sent.
+                        </p>
+                    </div>
+                    <Switch
+                        aria-labelledby="email-notifications-label"
+                        checked={emailEnabled}
+                        loading={isLoading}
+                        onChange={(value) => handleEmailEnabledChange(value)}
+                        className="w-fit [&.ant-switch-checked]:bg-action"
+                    />
+                </div>
+
                 {WINGTIME_ENABLED && (
                     <div className="flex bg-white p-3 md:p-0 rounded-[12px] md:bg-transparent justify-between gap-2 items-center w-full md:border-t md:border-gray-100 md:pt-5">
                         <div className="flex flex-col gap-2">
@@ -306,10 +338,10 @@ const Settings = () => {
                         {/* A real <label htmlFor> - AntD Select drops aria-label before it
                             reaches the combobox input, but forwards id. */}
                         <label htmlFor="instant-session-email-preference" className="md:text-base text-[14px] font-medium">
-                            Instant Session Email Notification Preferences
+                            Instant Session Alerts
                         </label>
                         <p className="font-normal text-[#4F4F4F] md:text-sm text-[12px]">
-                            Manage email notifications for instant sessions posted by volunteers.
+                            Choose which instant sessions posted by volunteers we alert you about, by push and email.
                         </p>
                     </div>
                     <Select

@@ -100,7 +100,7 @@ interface VolunteerData {
     };
     volunteer_languages: Array<{ language_name: string; language_id: string }>;
     volunteer_subjects: Array<{ subject_name: string; subject_id: string }>;
-    volunteer_skills: Array<{ skill_name: string; skill_id: string }>;
+    volunteer_skills: Array<{ skill_name: string; skill_id: string; category?: string | null }>;
     profile_picture: { image_url: string };
     total_volunteered_hours: number;
     students_connected: number;
@@ -253,9 +253,20 @@ const OverviewContent = ({
     // instead of the two being rendered from separate arrays with unrelated fields between them.
     const overviewDetails = [
         {
+            // Academic = the subjects they teach plus any catalog skill marked academic (the server stamps the
+            // catalog category on each skill); everything else is under Arts & Life Skills below.
             type: "tags" as const,
-            title: "Subjects I Teach",
-            tags: volunteerData?.volunteer_subjects?.map((subject) => subject?.subject_name),
+            title: "Academic Skills I Teach",
+            tags: Array.from(
+                new Set(
+                    [
+                        ...(volunteerData?.volunteer_subjects?.map((subject) => subject?.subject_name) ?? []),
+                        ...(volunteerData?.volunteer_skills
+                            ?.filter((skill) => skill?.category === "academic")
+                            .map((skill) => skill?.skill_name) ?? []),
+                    ].filter(Boolean)
+                )
+            ),
         },
         {
             type: "description" as const,
@@ -264,8 +275,10 @@ const OverviewContent = ({
         },
         {
             type: "tags" as const,
-            title: "Skills You Can Share with Learners",
-            tags: volunteerData?.volunteer_skills?.map((skill) => skill?.skill_name),
+            title: "Arts & Life Skills I Can Share",
+            tags: volunteerData?.volunteer_skills
+                ?.filter((skill) => skill?.category !== "academic")
+                .map((skill) => skill?.skill_name),
         },
         {
             type: "description" as const,
@@ -482,7 +495,9 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
     } = useQuery({
         queryKey: ["volunteer", volunteerId],
         queryFn: getIndividualVolunteer,
-        enabled: !!volunteerId,
+        // This modal is always mounted on the volunteers page; don't fetch the profile, feedback and
+        // match info for a modal that is closed (e.g. while Book for Later is open on the same ?volunteerId=).
+        enabled: isOpen && !!volunteerId,
         // Profile Details must reflect edits the volunteer has since made - don't serve a
         // stale cached copy when the learner reopens the modal.
         staleTime: 0,
@@ -492,13 +507,13 @@ const VolunteerViewModal: React.FC<VolunteerViewModalProps> = ({ isOpen, onClose
     const { data: volunteerFeedback } = useQuery({
         queryKey: ["volunteerFeedback", volunteerId],
         queryFn: getVolunterFeedback,
-        enabled: !!volunteerId,
+        enabled: isOpen && !!volunteerId,
     });
 
     const { data: matchInfo } = useQuery({
         queryKey: ["learnerMatchWithVolunteer", volunteerId],
         queryFn: getMatchInfo,
-        enabled: !!volunteerId,
+        enabled: isOpen && !!volunteerId,
     });
 
     const handleTabChange = (tab: string) => {
