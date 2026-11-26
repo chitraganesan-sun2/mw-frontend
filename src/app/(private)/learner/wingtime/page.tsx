@@ -123,9 +123,9 @@ export default function LearnerWingTimePage() {
     };
 
     const emptyCard = (title: string, text: string) => (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-            <div className="text-5xl mb-4">🎵</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+        <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+            <div className="text-2xl mb-1">🎵</div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">{title}</h3>
             <p className="text-sm text-gray-500">{text}</p>
         </div>
     );
