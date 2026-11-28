@@ -119,7 +119,7 @@ function CompactSessionRow({
                         type="button"
                         onClick={onRespond}
                         aria-label={`Respond to the session request${learnerName ? ` from ${learnerName}` : ""}`}
-                        className="rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer"
+                        className="rounded-full bg-rose-600 px-3 py-1 text-xs font-semibold text-white hover:bg-rose-700 border-0 cursor-pointer"
                     >
                         Respond
                     </button>
@@ -353,7 +353,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                         <button
                             type="button"
                             onClick={onScheduleAvailability}
-                            className="rounded-full bg-action px-4 py-1.5 text-xs font-semibold text-white hover:bg-action-hover border-0 cursor-pointer"
+                            className="rounded-full btn-primary-fill px-4 py-1.5 text-xs font-semibold hover:opacity-90 cursor-pointer"
                         >
                             Schedule My Availability
                         </button>
@@ -447,7 +447,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                         </label>
                         <button
                             type="submit"
-                            className="h-9 rounded-full bg-action px-4 text-xs font-semibold text-white disabled:opacity-50"
+                            className="h-9 rounded-full btn-primary-fill px-4 text-xs font-semibold disabled:opacity-50"
                             disabled={!newDate}
                         >
                             Choose times
