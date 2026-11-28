@@ -1,5 +1,5 @@
 const createLink = (href: string, text: string) =>
-    `<a href="${href}" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
+    `<a href="${href}" class="text-blue-500 underline break-words" target="_blank" rel="noopener noreferrer">${text}</a>`;
 
 const privacyPolicyLink = createLink("/privacy-policy", "Privacy Policy");
 const websiteLink = createLink("https://www.melodywings.org", "www.melodywings.org");

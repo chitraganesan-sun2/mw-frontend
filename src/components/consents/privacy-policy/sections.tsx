@@ -59,7 +59,7 @@ const renderSection = (item: any, key: string = "root"): React.ReactNode => {
         return (
             <p
                 key={key}
-                className="text-base text-justify text-gray-700"
+                className="text-base text-justify text-gray-700 break-words"
                 dangerouslySetInnerHTML={{ __html: item }}
             />
         );
@@ -113,7 +113,7 @@ const renderSection = (item: any, key: string = "root"): React.ReactNode => {
                                 ) : (
                                     <li
                                         key={`${key}-${idx}`}
-                                        className="text-base text-justify text-gray-700"
+                                        className="text-base text-justify text-gray-700 break-words"
                                         dangerouslySetInnerHTML={{
                                             __html: typeof subItem === "string" ? subItem : ""
                                         }}
