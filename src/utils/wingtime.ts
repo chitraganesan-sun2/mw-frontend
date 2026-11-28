@@ -83,6 +83,11 @@ export function wingtimeWhen(w: Pick<WingTime, "start_utc" | "end_utc">, tzLabel
     return tzLabel ? text : text.replace(/( · \d+ min)$/, ` ${zoneAbbreviation(iana, start)}$1`);
 }
 
+/** Has it finished? (end time in absolute UTC) */
+export function wingtimeHasEnded(w: Pick<WingTime, "end_utc">, now: dayjs.Dayjs = dayjs()): boolean {
+    return !dayjs.utc(w.end_utc).isAfter(now);
+}
+
 export function wingtimeBounds(w: Pick<WingTime, "start_utc" | "end_utc">) {
     return { start: dayjs.utc(w.start_utc), end: dayjs.utc(w.end_utc) };
 }
@@ -106,8 +111,13 @@ export function spotsText(w: Pick<WingTime, "spots_left" | "capacity">): string 
  * The status pill a viewer sees, in the app's one status vocabulary (sessionDisplay): a host sees
  * where their proposal stands; a learner sees Available / Booked / Cancelled (or Full).
  */
-export function wingtimePill(w: WingTime): { label: string; className: string } {
+export function wingtimePill(w: WingTime, now: dayjs.Dayjs = dayjs()): { label: string; className: string } {
     if (w.status === "cancelled") return { label: "Cancelled", className: getStatusPillClass("cancelled") };
+    // The server only flips an approved WingTime to "completed" later; once it has ended, the host
+    // and anyone who signed up should already read "Completed", not "Approved" / "Booked".
+    if (wingtimeHasEnded(w, now) && (w.status === "approved" || w.status === "completed") && (w.is_host || w.is_registered)) {
+        return { label: WINGTIME_STATUS_LABEL.completed, className: WINGTIME_STATUS_PILL.completed };
+    }
     if (w.is_host) return { label: WINGTIME_STATUS_LABEL[w.status], className: WINGTIME_STATUS_PILL[w.status] };
     if (w.is_registered) return { label: getStatusLabel("booked"), className: getStatusPillClass("booked") };
     if (w.spots_left <= 0) return { label: "Full", className: getStatusPillClass("expired") };

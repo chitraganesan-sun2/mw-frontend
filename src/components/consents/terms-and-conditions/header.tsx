@@ -1,4 +1,4 @@
-const createLink = (href: string, text: string) => `<a href="${href}" class="text-blue-500 underline" target="_blank" rel="noopener noreferrer">${text}</a>`;
+const createLink = (href: string, text: string) => `<a href="${href}" class="text-blue-500 underline break-words" target="_blank" rel="noopener noreferrer">${text}</a>`;
 
 const headerContents = [
     "WE WILL POST ANY CHANGES TO THESE TERMS OF SERVICE IN A NOTICE OF THE CHANGE AT THE BOTTOM OF OUR WEB PAGE WITH A HYPERLINK THERETO. WE WILL ALSO SEND YOU AN EMAIL DESCRIBING SUCH CHANGES. PLEASE REGULARLY REVIEW THESE TERMS OF SERVICE. NOTWITHSTANDING IF YOU CONTINUE TO USE OUR SERVICES, YOU ARE BOUND BY ANY CHANGES THAT WE MAKE TO THESE TERMS OF SERVICE.",

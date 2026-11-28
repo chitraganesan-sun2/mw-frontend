@@ -14,12 +14,14 @@ interface SectionCardProps {
     onClick?: () => void;
     /** Unread count; renders nothing when 0/undefined. */
     badge?: number;
+    /** Extra path fragments that also light this link up (a section that spans several pages). */
+    alsoActiveFor?: string[];
 }
 
-const SectionCard = ({ href, role, text, icon, textColor, onClick, badge }: SectionCardProps) => {
+const SectionCard = ({ href, role, text, icon, textColor, onClick, badge, alsoActiveFor }: SectionCardProps) => {
     const hasBadge = typeof badge === "number" && badge > 0;
     const pathname = usePathname();
-    const isActive = pathname.includes(href);
+    const isActive = pathname.includes(href) || Boolean(alsoActiveFor?.some((fragment) => pathname.includes(fragment)));
     // Normalize: strip any leading slash from href so we never produce
     // a double slash like "/learner//community" (which 404s in static export).
     const cleanHref = href.replace(/^\/+/, "");

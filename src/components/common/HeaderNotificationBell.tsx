@@ -10,7 +10,12 @@ import { getCookie } from "@/utils/auth";
 import { useState, useEffect, useRef } from "react";
 import { useApprovalDrawer } from "@/hooks/schedule/useApprovalDrawer";
 
-const HeaderNotificationBell = () => {
+/**
+ * The bell, the new-notification toast, and the Session Requests drawer (which the "Respond" buttons
+ * on My Schedule open too). `hideButton` drops only the bell button itself - My Schedule has its own
+ * "Needs your response" column - but the drawer and the toast must stay mounted, or Respond does nothing.
+ */
+const HeaderNotificationBell = ({ hideButton = false }: { hideButton?: boolean }) => {
     // getCookie reads document.cookie, which isn't available during SSR - reading it
     // directly in render made the server (role undefined -> renders null) differ from
     // the client's first render, triggering a hydration mismatch on every page.
@@ -73,23 +78,27 @@ const HeaderNotificationBell = () => {
 
     return (
         <>
-            <button
-                type="button"
-                aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
-                onClick={openDrawer}
-                className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white p-0 text-black transition-colors hover:bg-gray-50"
-            >
-                <HiOutlineBell size={20} aria-hidden="true" />
-                {unreadCount > 0 && (
-                    <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 min-w-[16px] rounded-full bg-red-600 px-1 text-center text-[10px] font-semibold leading-4 text-white">
-                        {unreadCount > 99 ? "99+" : unreadCount}
+            {!hideButton && (
+                <>
+                    <button
+                        type="button"
+                        aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+                        onClick={openDrawer}
+                        className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white p-0 text-black transition-colors hover:bg-gray-50"
+                    >
+                        <HiOutlineBell size={20} aria-hidden="true" />
+                        {unreadCount > 0 && (
+                            <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 min-w-[16px] rounded-full bg-red-600 px-1 text-center text-[10px] font-semibold leading-4 text-white">
+                                {unreadCount > 99 ? "99+" : unreadCount}
+                            </span>
+                        )}
+                    </button>
+                    {/* The badge is aria-hidden and a changed aria-label is not announced: say it politely. */}
+                    <span role="status" aria-live="polite" className="sr-only">
+                        {unreadCount > 0 ? `${unreadCount} unread notifications` : ""}
                     </span>
-                )}
-            </button>
-            {/* The badge is aria-hidden and a changed aria-label is not announced: say it politely. */}
-            <span role="status" aria-live="polite" className="sr-only">
-                {unreadCount > 0 ? `${unreadCount} unread notifications` : ""}
-            </span>
+                </>
+            )}
 
             {/* Notification toast popup */}
             {showToast && (

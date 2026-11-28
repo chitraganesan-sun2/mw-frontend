@@ -29,9 +29,6 @@ import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
 
 export default function SchedulePage() {
-    const [isOpenSchedule, setIsOpenSchedule] = useState(false);
-    const [isOpenFeedback, setIsOpenFeedback] = useState(false);
-    const [isOpenAddSession, setIsOpenAddSession] = useState(false);
     const queryClient = useQueryClient();
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
@@ -39,16 +36,15 @@ export default function SchedulePage() {
         useAppStore();
     const [modal, setModal] = useQueryState("modal");
     const [view] = useQueryState("view");
-    // The same page backs My Schedule (sessions) and Book for Later (availability + calendar,
-    // /volunteer/book-for-later re-exports it); the path says which.
+    // The same page backs My Schedule (sessions + calendar) and Book for Later (availability and
+    // booking, /volunteer/book-for-later re-exports it); the path says which.
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const isPlanner = pathname.includes("/book-for-later");
-    const basePath = isPlanner ? "/volunteer/book-for-later" : "/volunteer/schedule";
-    const isCalendarView = isPlanner && view === CALENDAR_VIEW;
-    // Older links (?view=calendar on My Schedule) land on the calendar's new home.
+    const isCalendarView = !isPlanner && view === CALENDAR_VIEW;
+    // The calendar belongs to My Schedule; older links (?view=calendar on Book for Later) land there.
     useEffect(() => {
-        if (!isPlanner && view === CALENDAR_VIEW) router.replace(`/volunteer/book-for-later?${searchParams.toString()}`);
+        if (isPlanner && view === CALENDAR_VIEW) router.replace(`/volunteer/schedule?${searchParams.toString()}`);
     }, [isPlanner, view, router, searchParams]);
     const [learnerId, setLearnerId] = useQueryState("learnerId");
     const volunteerId = getCookie("volunteer_id");
@@ -90,9 +86,11 @@ export default function SchedulePage() {
         queryFn: getVolunteerDetails,
     });
 
+    // Closing a modal clears the `modal` param through the same hook that opens it (the view and
+    // month stay in the URL). It used to router.push a fresh URL, which left this hook's own copy
+    // of `modal` stale: the drawer then stayed open, and opening it again did nothing.
     const handleNavigate = () => {
-        // Return to the view the modal was opened from.
-        router.push(`${basePath}?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
+        void setModal(null);
     };
 
     const handleDateSelect = (date: string) => {
@@ -119,11 +117,10 @@ export default function SchedulePage() {
         error: (err) => showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't submit your feedback. Please try again.") }),
     });
 
-    useEffect(() => {
-        setIsOpenSchedule(modal === "my_schedule");
-        setIsOpenFeedback(modal === "feedback");
-        setIsOpenAddSession(modal === "add_new_session");
-    }, [modal]);
+    // Which drawer is open is read straight from the URL param.
+    const isOpenSchedule = modal === "my_schedule";
+    const isOpenFeedback = modal === "feedback";
+    const isOpenAddSession = modal === "add_new_session";
 
     return (
         <>
@@ -133,6 +130,7 @@ export default function SchedulePage() {
                 isCalendarView={isCalendarView}
                 timeZoneLabel={volunteerTimeZone}
                 onScheduleAvailability={() => setModal("my_schedule")}
+                onBookForLater={() => setModal("add_new_session")}
                 onAddDateSlot={handleDateSelect}
                 onOpenProfile={(id) => setLearnerId(id)}
                 events={data}
@@ -158,10 +156,7 @@ export default function SchedulePage() {
                 slow connection it sat open after "Schedule updated." */}
             <MyScheduleModal
                 isOpen={isOpenSchedule}
-                onClose={() => {
-                    setIsOpenSchedule(false);
-                    handleNavigate();
-                }}
+                onClose={handleNavigate}
             />
             <AddNewMeetingModalVolunteer isOpen={isOpenAddSession} onClose={handleNavigate} />
             <FeedbackModal

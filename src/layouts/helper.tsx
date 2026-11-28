@@ -38,6 +38,7 @@ export const getHeaderIcon = (pathname: string) => {
         case "wingtime":
             return <MdOutlineGroups />;
         case "book-for-later":
+        case "book-a-session":
             return <HiOutlineCalendarDays />;
         default:
             return null;

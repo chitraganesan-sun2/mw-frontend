@@ -30,6 +30,30 @@ export function getSessionOrigin(session: ScheduleSessionLike): Origin {
     return "learner_booked_slot";
 }
 
+/** The type chip a session sits under on My Schedule: anything that came from the instant flow
+ * (a learner's request a volunteer accepted, or a volunteer's posting a learner joined) is
+ * "instant"; everything else is a regular "session". */
+export function getSessionKind(session: ScheduleSessionLike): "session" | "instant" {
+    const origin = getSessionOrigin(session);
+    return origin === "learner_posting" || origin === "volunteer_posting" ? "instant" : "session";
+}
+
+/** A few words on how the viewer got this session, shown next to its type tag. */
+export function getSessionOriginNote(session: ScheduleSessionLike, role: ScheduleRole): string {
+    const origin = getSessionOrigin(session);
+    const learner = role === "learner";
+    switch (origin) {
+        case "learner_posting":
+            return learner ? "Your request" : "Learner's request";
+        case "volunteer_posting":
+            return learner ? "Volunteer's posting" : "Your posting";
+        case "volunteer_proposed":
+            return learner ? "Proposed by the volunteer" : "You proposed it";
+        default:
+            return learner ? "You booked it" : "Booked by the learner";
+    }
+}
+
 /** Which My Schedule tab a session belongs to, from the viewer's side. Null = not shown in
  * the tabs (a volunteer's slot bookings live under "Volunteer Slots I'm Offering"). */
 export function getScheduleTab(session: ScheduleSessionLike, role: ScheduleRole): ScheduleTab | null {
@@ -57,7 +81,7 @@ export const SCHEDULE_LABELS = {
     availabilityHeading: "Availability",
     myAvailabilitySchedule: "My Availability Schedule",
     slotsOffering: "Volunteer Slots I'm Offering (accepted by learners)",
-    mySchedule: "My Sessions",
+    mySchedule: "My Schedule",
     scheduleAvailability: "Schedule My Availability",
     viewCalendar: "View my calendar",
 } as const;

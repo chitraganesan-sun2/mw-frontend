@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useComponentStore } from "@/store/useComponenetStore";
-import { IoIosArrowBack } from "react-icons/io";
+import { getHeaderIcon } from "@/layouts/helper";
 import { POST_API, GET_API, PUT_API, DELETE_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { TERMS } from "@/constants/copy";
@@ -46,6 +46,9 @@ import {
 } from "@/utils/sessionDisplay";
 import { safeHref } from "@/utils/safeHref";
 import { timesAgo } from "@/utils/timeFunctions";
+import BookSessionTabs from "@/components/booking/BookSessionTabs";
+import StatusFilter from "@/components/common/StatusFilter";
+import { TIME_BOUND_OPTIONS, matchesTimeBound, type TimeBoundFilter } from "@/utils/statusView";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useNow, useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 
@@ -64,7 +67,11 @@ const SECTION_CONTROL_HEIGHT = "h-10";
 
 
 
-const MY_SESSIONS_STATUS_FILTERS = ["", "open", "accepted", "active", "completed", "cancelled", "expired"];
+// "My Posted Instant Sessions" is filtered by time, not by seven statuses: Upcoming = posted, accepted,
+// in progress; Past = completed, cancelled, expired. The list is fetched once (the server filters by
+// one status only) and filtered / paged here.
+const MY_SESSIONS_FETCH_SIZE = 100;
+const MY_SESSIONS_PAGE_SIZE = 12;
 
 /** Absolute start/end of a session or open post (UTC fields; profile-local fallback). */
 function sessionBounds(session: any, timeZoneLabel?: string) {
@@ -250,7 +257,7 @@ function MySessionCard({
 export default function VolunteerInstantSessionsPage() {
     const { confirm: askConfirm, confirmModal } = useConfirm();
     const { setHeaderOptions } = useComponentStore();
-    const router = useRouter();
+    const pathname = usePathname();
     const queryClient = useQueryClient();
     const [isActionLoading, setIsActionLoading] = useState(false);
     // `isActionLoading` is state and lags a render behind, so a double-click on Accept / Cancel /
@@ -281,16 +288,14 @@ export default function VolunteerInstantSessionsPage() {
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
     const [sessionsPage, setSessionsPage] = useQueryState("sessions_page", { defaultValue: "1" });
-    const [sessionsStatus, setSessionsStatus] = useQueryState("sessions_status", { defaultValue: "" });
+    const [sessionsView, setSessionsView] = useState<TimeBoundFilter>("upcoming");
 
     useEffect(() => {
         setHeaderOptions({
-            title: "Instant Sessions",
-            titleIcon: <IoIosArrowBack className="text-lg" />,
-            titleIconClick: () => router.push(`/${role}/schedule`),
+            title: TERMS.bookSession,
+            titleIcon: getHeaderIcon(pathname),
             searchPlaceholder: "Search",
             showButton: false,
-            showTitleButton: true,
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -332,27 +337,30 @@ export default function VolunteerInstantSessionsPage() {
         isError: isMySessionsError,
         refetch: refetchMySessions,
     } = useQuery({
-        queryKey: ["volunteer-my-instant-sessions", sessionsPage, sessionsStatus, debouncedQuery],
+        queryKey: ["volunteer-my-instant-sessions", debouncedQuery],
         queryFn: async () => {
             const res = await GET_API(
-                endpoints.session.getMyInstantSessions(
-                    Number(sessionsPage) || 1,
-                    12,
-                    debouncedQuery || undefined,
-                    sessionsStatus || undefined
-                )
+                endpoints.session.getMyInstantSessions(1, MY_SESSIONS_FETCH_SIZE, debouncedQuery || undefined, undefined)
             );
             return res?.data;
         },
         refetchInterval: 15000,
         refetchOnWindowFocus: true,
     });
-    const mySessions: any[] = mySessionsData?.items ?? [];
-    const mySessionsTotal: number = mySessionsData?.total ?? 0;
-    const mySessionsHasMore = Number(sessionsPage) * 12 < mySessionsTotal;
+    const allMySessions: any[] = useMemo(() => mySessionsData?.items ?? [], [mySessionsData]);
+    const filteredMySessions = useMemo(
+        () => allMySessions.filter((s) => matchesTimeBound(sessionsView, s.status)),
+        [allMySessions, sessionsView]
+    );
+    const mySessionsTotal = filteredMySessions.length;
+    const mySessions: any[] = filteredMySessions.slice(
+        ((Number(sessionsPage) || 1) - 1) * MY_SESSIONS_PAGE_SIZE,
+        (Number(sessionsPage) || 1) * MY_SESSIONS_PAGE_SIZE
+    );
+    const mySessionsHasMore = Number(sessionsPage) * MY_SESSIONS_PAGE_SIZE < mySessionsTotal;
     usePageClamp({
         page: Number(sessionsPage) || 1,
-        size: 12,
+        size: MY_SESSIONS_PAGE_SIZE,
         total: mySessionsTotal,
         itemCount: mySessions.length,
         setPage: (p) => setSessionsPage(p === 1 ? null : String(p)),
@@ -457,8 +465,10 @@ export default function VolunteerInstantSessionsPage() {
                 </div>
             )}
 
+            {/* Instant Sessions and Book for Later are the two options of the Book a Session section. */}
+            <BookSessionTabs className="mb-4" />
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h1 className="text-2xl font-medium text-gray-900">Instant Sessions</h1>
+                <h2 className="text-2xl font-medium text-gray-900">Instant Sessions</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     Instant sessions happen <strong>today or tomorrow.</strong> Post a session for
                     learners to join, or accept one a learner has requested.
@@ -494,29 +504,22 @@ export default function VolunteerInstantSessionsPage() {
                     <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
                         My Posted Instant Sessions
                     </h2>
-                    <select
-                        aria-label="Filter by status"
-                        className={`${SECTION_CONTROL_HEIGHT} min-w-0 px-3 border border-gray-200 rounded-xl text-sm bg-white`}
-                        value={sessionsStatus || ""}
-                        onChange={(e) => {
-                            setSessionsStatus(e.target.value || null);
-                            setSessionsPage("1");
+                    <StatusFilter
+                        value={sessionsView}
+                        options={TIME_BOUND_OPTIONS}
+                        onChange={(v) => {
+                            setSessionsView(v);
+                            setSessionsPage(null);
                         }}
-                    >
-                        {MY_SESSIONS_STATUS_FILTERS.map((s) => (
-                            <option key={s} value={s}>
-                                {s ? getStatusLabel(s) : "All statuses"}
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
 
                 {isMySessionsError && !mySessionsData ? (
                     <QueryErrorNotice message="Couldn't load your instant sessions." onRetry={() => refetchMySessions()} />
                 ) : mySessions.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                        <div className="text-5xl mb-4">📺</div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Instant Sessions</h3>
+                    <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+                        <div className="text-2xl mb-1">📺</div>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">No Instant Sessions</h3>
                         <p className="text-sm text-gray-500">
                             Sessions you start or accept will show up here.
                         </p>

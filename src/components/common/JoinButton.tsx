@@ -51,7 +51,9 @@ export default function JoinButton({
                         aria-disabled="true"
                         aria-label={`${named} (${JOIN_EARLY_HINT.toLowerCase()})`}
                         onClick={(e) => e.preventDefault()}
-                        className="rounded-full border-0 bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-500 cursor-not-allowed"
+                        // Still in the role colour (learner blue / volunteer orange), just faded: it is
+                        // the thing to press, it only opens a few minutes before the start.
+                        className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold opacity-60 cursor-not-allowed"
                     >
                         {label}
                     </button>

@@ -14,10 +14,12 @@ interface WingTimeCardProps {
     tzLabel?: string | null;
     /** Opens the detail modal, where the actions live (same pattern as the Instant Session cards). */
     onClick: () => void;
+    /** What kind of thing this is (My Schedule's type tag), shown above the title. */
+    typeTag?: React.ReactNode;
 }
 
 /** Compact card - same markup and spacing as the Instant Session card (SessionCard). */
-export default function WingTimeCard({ item, tzLabel, onClick }: WingTimeCardProps) {
+export default function WingTimeCard({ item, tzLabel, onClick, typeTag }: WingTimeCardProps) {
     // Ticks so Join appears 3 minutes before the start without a reload.
     const now = useNow();
     const pill = wingtimePill(item);
@@ -35,6 +37,7 @@ export default function WingTimeCard({ item, tzLabel, onClick }: WingTimeCardPro
         >
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
+                    {typeTag}
                     <h3 className="text-sm font-semibold text-gray-900 truncate">{item.topic}</h3>
                     {!item.is_host && item.host_name && (
                         <p className="text-sm text-gray-700 break-words">

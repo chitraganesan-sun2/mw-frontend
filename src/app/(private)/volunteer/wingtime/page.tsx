@@ -99,7 +99,7 @@ export default function VolunteerWingTimePage() {
             />
 
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h2 className="text-2xl font-medium text-gray-900">WingTime</h2>
+                <h2 className="sr-only">WingTime</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     WingTime sessions are fun <strong>30-minute group sessions</strong> you lead: music, cooking, dance, or anything you
                     enjoy. An admin reviews each one before learners can see it.
@@ -147,9 +147,9 @@ export default function VolunteerWingTimePage() {
                         )}
                     </>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                        <div className="text-5xl mb-4">🎵</div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No WingTimes Yet</h3>
+                    <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+                        <div className="text-2xl mb-1">🎵</div>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">No WingTimes Yet</h3>
                         <p className="text-sm text-gray-500">WingTimes you propose will show up here.</p>
                     </div>
                 )}

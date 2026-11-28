@@ -76,7 +76,9 @@ export default function LearnerWingTimePage() {
     }
 
     const myItems = mine.data?.items ?? [];
-    const openItems = browse.data?.items ?? [];
+    // "My WingTimes" already lists the ones I signed up for, so "Available" leaves them out -
+    // otherwise the same session showed in both columns.
+    const openItems = (browse.data?.items ?? []).filter((w) => !w.is_registered);
     // Looked up by id so the modal always shows the freshest copy after an action.
     const selected = selectedId ? [...myItems, ...openItems].find((w) => w.wingtime_id === selectedId) ?? null : null;
 
@@ -123,9 +125,9 @@ export default function LearnerWingTimePage() {
     };
 
     const emptyCard = (title: string, text: string) => (
-        <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-            <div className="text-5xl mb-4">🎵</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+        <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+            <div className="text-2xl mb-1">🎵</div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">{title}</h3>
             <p className="text-sm text-gray-500">{text}</p>
         </div>
     );
@@ -136,7 +138,7 @@ export default function LearnerWingTimePage() {
             <WingTimeDetailModal item={selected} tzLabel={tzLabel} action={selected ? actionFor(selected) : null} onClose={() => setSelectedId(null)} />
 
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h2 className="text-2xl font-medium text-gray-900">WingTime</h2>
+                <h2 className="sr-only">WingTime</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     WingTime sessions are fun <strong>30-minute group sessions</strong> led by volunteers: music, cooking, dance, and more.
                     Sign up for any you like.
@@ -169,22 +171,27 @@ export default function LearnerWingTimePage() {
                 )}
             </div>
 
-            {/* Upcoming WingTimes - browse and sign up */}
+            {/* Available WingTimes - upcoming ones I have not joined yet: browse and sign up */}
             <div className="min-w-0">
-                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">Upcoming WingTimes</h2>
+                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">Available WingTimes</h2>
                 {browse.isLoading ? (
                     <div className="flex justify-center py-6">
                         <LottieLoader isLoading={true} />
                     </div>
                 ) : browse.isError && !browse.data ? (
                     <QueryErrorNotice message="Couldn't load WingTimes." onRetry={() => browse.refetch()} />
-                ) : openItems.length > 0 ? (
+                ) : openItems.length > 0 || browsePage > 1 || browsePage * PAGE_SIZE < (browse.data?.total ?? 0) ? (
                     <>
-                        <div className="flex flex-col gap-3">
-                            {openItems.map((item) => (
-                                <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
-                            ))}
-                        </div>
+                        {openItems.length > 0 ? (
+                            <div className="flex flex-col gap-3">
+                                {openItems.map((item) => (
+                                    <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
+                                ))}
+                            </div>
+                        ) : (
+                            // A page can hold only sessions I already joined; the pager still reaches the rest.
+                            emptyCard("Nothing New On This Page", "The WingTimes here are ones you have already signed up for.")
+                        )}
                         <Pager page={browsePage} hasMore={browsePage * PAGE_SIZE < (browse.data?.total ?? 0)} onChange={setBrowsePage} />
                     </>
                 ) : (

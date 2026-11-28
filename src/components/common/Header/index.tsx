@@ -10,6 +10,7 @@ import Sidebar from "@/components/common/Sidebar";
 import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { IoIosSearch } from "react-icons/io";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
 
 const CommonHeader: React.FC = () => {
@@ -49,8 +50,7 @@ const CommonHeader: React.FC = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isMobile = InnerWidth() < 768;
-    // Blank on desktop for Instant Sessions, which carries its own page title - then no heading is rendered.
-    const headerTitle = formatString(!pathname?.includes("/instant-sessions") || isMobileOrTabScreen ? (title ?? "") : "");
+    const headerTitle = formatString(title ?? "");
     const isMessagesChatPage =
         (pathname?.includes("/volunteer/messages") || pathname?.includes("/learner/messages")) &&
         searchParams?.get("chatId");
@@ -69,6 +69,8 @@ const CommonHeader: React.FC = () => {
     useEffect(() => {
         setIsSideNavBarOpen(false);
     }, [pathname]);
+
+    usePageTitle(title ? formatString(title) : null);
 
     const handleSearch = (value: string) => {
         setSearchQuery(value === "" ? null : value);
@@ -104,7 +106,7 @@ const CommonHeader: React.FC = () => {
                                 <SideMenuIcon height="22px" width="22px" />
                             </button>
                         )}
-                        {isMobileOrTabScreen && leftButton?.showButton && !pathname?.includes("/instant-sessions") ? (
+                        {isMobileOrTabScreen && leftButton?.showButton ? (
                             <Button
                                 title={leftButton?.buttonTitle}
                                 onClick={leftButton?.buttonOnClick}
@@ -116,7 +118,6 @@ const CommonHeader: React.FC = () => {
                             <>
                                 {titleIcon &&
                                     (showTitleButton || !isMobileOrTabScreen) &&
-                                    (!pathname?.includes("/instant-sessions") || isMobileOrTabScreen) &&
                                     (titleIconClick ? (
                                         <Button
                                             icon={titleIcon}
@@ -134,7 +135,7 @@ const CommonHeader: React.FC = () => {
                                         </span>
                                     ))}
                                 {headerTitle && (
-                                    <h1 className="md:text-lg text-[20px] font-medium">{headerTitle}</h1>
+                                    <h1 className="md:text-lg text-[20px] font-medium normal-case">{headerTitle}</h1>
                                 )}
                             </>
                         )}
@@ -199,7 +200,7 @@ const CommonHeader: React.FC = () => {
                                         btnVariant="tertiary"
                                     />
                                 ) : (
-                            <div className={pathname?.includes("/instant-sessions") ? "!pr-5" : ""}>
+                            <div>
                                 <Input
                                     value={searchQuery ?? ""}
                                     inputType="search"

@@ -48,6 +48,9 @@ import {
     type SessionInstantFields,
 } from "@/utils/sessionDisplay";
 import { safeHref } from "@/utils/safeHref";
+import BookSessionTabs from "@/components/booking/BookSessionTabs";
+import StatusFilter from "@/components/common/StatusFilter";
+import { matchesStatusFilter, statusViewOf, type StatusFilterValue } from "@/utils/statusView";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useNow, useProfileTimeZone, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 
@@ -163,6 +166,10 @@ function mapItemToSession(item: any, date: string): Session {
 
 
 const REQUESTS_PAGE_SIZE = 5;
+// The Status filter needs every request at once (the server filters by one status only, and
+// "Upcoming" is several), so they are fetched in one go and paged here. The server already reads
+// them all to page them; 100 is far beyond what a learner has.
+const REQUESTS_FETCH_SIZE = 100;
 
 function RequestedSessionCard({
     request,
@@ -296,6 +303,9 @@ export default function InstantSessionsPage() {
     const [profileVolunteerId, setProfileVolunteerId] = useQueryState("volunteerId");
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
+    // The "Status" filter above each list. Both open on Upcoming - what is still to come.
+    const [requestsFilter, setRequestsFilter] = useState<StatusFilterValue>("upcoming");
+    const [postedFilter, setPostedFilter] = useState<StatusFilterValue>("upcoming");
     // Deep link from the "new instant session" notification email:
     // /learner/instant-sessions?session=<volunteer_slot_id> -> open that session's detail.
     const [sessionParam, setSessionParam] = useQueryState("session");
@@ -341,12 +351,12 @@ export default function InstantSessionsPage() {
         isError: isMyRequestsError,
         refetch: refetchMyRequests,
     } = useQuery({
-        queryKey: ["learner-my-requests", requestsPage, debouncedQuery],
+        queryKey: ["learner-my-requests", debouncedQuery],
         queryFn: async () => {
             const res = await GET_API(
                 endpoints.session.getLearnerRequests(
-                    Number(requestsPage) || 1,
-                    REQUESTS_PAGE_SIZE,
+                    1,
+                    REQUESTS_FETCH_SIZE,
                     debouncedQuery || undefined,
                     undefined
                 )
@@ -356,8 +366,17 @@ export default function InstantSessionsPage() {
         refetchInterval: 15000,
         refetchOnWindowFocus: true,
     });
-    const myRequests: any[] = myRequestsData?.items ?? [];
-    const myRequestsTotal: number = myRequestsData?.total ?? 0;
+    const allRequests: any[] = useMemo(() => myRequestsData?.items ?? [], [myRequestsData]);
+    // Only the requests under the chosen Status, then the page of those.
+    const filteredRequests = useMemo(
+        () => allRequests.filter((r) => matchesStatusFilter(requestsFilter, statusViewOf(r.status))),
+        [allRequests, requestsFilter]
+    );
+    const myRequestsTotal = filteredRequests.length;
+    const myRequests: any[] = filteredRequests.slice(
+        ((Number(requestsPage) || 1) - 1) * REQUESTS_PAGE_SIZE,
+        (Number(requestsPage) || 1) * REQUESTS_PAGE_SIZE
+    );
     const myRequestsHasMore = Number(requestsPage) * REQUESTS_PAGE_SIZE < myRequestsTotal;
     // Matches exist but this page is empty (stale ?requests_page) -> go to the last page.
     usePageClamp({
@@ -410,6 +429,25 @@ export default function InstantSessionsPage() {
                     : 0
             );
     }, [claimedQueries, browseDates]);
+
+    // Volunteer-posted sessions under the "Status" filter: open ones are upcoming; a booked one is
+    // upcoming until its end time passes, then completed. (The server only returns today's and
+    // tomorrow's postings, so "Cancelled" has nothing to show here.)
+    const postedViewOf = (s: Session) =>
+        statusViewOf(
+            s.status,
+            hasSessionEnded(
+                getSessionInstantBounds(s.instant ?? {}, {
+                    date: s.date,
+                    start: s.start_time_24,
+                    end: s.end_time_24,
+                    timeZoneLabel,
+                }),
+                now
+            )
+        );
+    const shownAvailable = availableSessions.filter((s) => matchesStatusFilter(postedFilter, postedViewOf(s)));
+    const shownClaimed = claimedSessions.filter((s) => matchesStatusFilter(postedFilter, postedViewOf(s)));
 
     const handleSessionClick = (session: Session) => {
         setSelectedSession(session);
@@ -550,7 +588,7 @@ export default function InstantSessionsPage() {
 
     useEffect(() => {
         setHeaderOptions({
-            title: "Instant Sessions",
+            title: TERMS.bookSession,
             titleIcon: getHeaderIcon(pathname),
             searchPlaceholder: "Search sessions",
             showButton: false,
@@ -580,8 +618,10 @@ export default function InstantSessionsPage() {
                 </div>
             )}
 
+            {/* Instant Sessions and Book for Later are the two options of the Book a Session section. */}
+            <BookSessionTabs className="mb-4" />
             <div className="flex flex-col items-center text-center gap-2 mb-8">
-                <h1 className="text-2xl font-medium text-gray-900">Instant Sessions</h1>
+                <h2 className="text-2xl font-medium text-gray-900">Instant Sessions</h2>
                 <p className="text-sm text-gray-500 max-w-2xl">
                     Instant sessions happen <strong>today or tomorrow.</strong> Browse sessions
                     volunteers have posted, or request one at a time and subject that suit you.
@@ -601,9 +641,17 @@ export default function InstantSessionsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My Requested Sessions (the learner-request-for-any-volunteer flow) - shown first */}
             <div className="min-w-0">
-                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
-                    My Requested Instant Sessions
-                </h2>
+                <div className="mb-4 flex items-start justify-between gap-3 lg:min-h-[3.25rem]">
+                    <h2 className="min-w-0 md:text-[20px] text-[16px] font-medium text-[#121212]">My Requested Instant Sessions</h2>
+                    <StatusFilter
+                        withAll
+                        value={requestsFilter}
+                        onChange={(v) => {
+                            setRequestsFilter(v);
+                            setRequestsPage(null);
+                        }}
+                    />
+                </div>
 
                 {isMyRequestsLoading ? (
                     <div className="flex justify-center py-6">
@@ -645,13 +693,15 @@ export default function InstantSessionsPage() {
                         )}
                     </>
                 ) : (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                        <div className="text-5xl mb-4">📋</div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            No Requested Sessions
+                    <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+                        <div className="text-2xl mb-1">📋</div>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                            {requestsFilter !== "all" && allRequests.length > 0 ? `No ${requestsFilter} requests` : "No Requested Sessions"}
                         </h3>
                         <p className="text-sm text-gray-500">
-                            Requests you send will show up here.
+                            {requestsFilter !== "all" && allRequests.length > 0
+                                ? "Choose another Status to see the rest."
+                                : "Requests you send will show up here."}
                         </p>
                     </div>
                 )}
@@ -659,9 +709,10 @@ export default function InstantSessionsPage() {
 
             {/* Available Instant Sessions (volunteer-opened slots, browse + join) */}
             <div className="min-w-0">
-                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">
-                    Instant Sessions Posted by Volunteers
-                </h2>
+                <div className="mb-4 flex items-start justify-between gap-3 lg:min-h-[3.25rem]">
+                    <h2 className="min-w-0 md:text-[20px] text-[16px] font-medium text-[#121212]">Instant Sessions Posted by Volunteers</h2>
+                    <StatusFilter withAll value={postedFilter} onChange={setPostedFilter} />
+                </div>
 
                 {sectionFailed && (
                     <div className="mb-4">
@@ -670,16 +721,16 @@ export default function InstantSessionsPage() {
                 )}
 
                 {/* Open and booked sessions share one vertical list. */}
-                {(availableSessions.length > 0 || claimedSessions.length > 0) && (
+                {(shownAvailable.length > 0 || shownClaimed.length > 0) && (
                     <div className="flex flex-col gap-3">
-                        {availableSessions.map((session) => (
+                        {shownAvailable.map((session) => (
                             <SessionCard
                                 key={session.id}
                                 session={session}
                                 onClick={() => handleSessionClick(session)}
                             />
                         ))}
-                        {claimedSessions.map((session) => (
+                        {shownClaimed.map((session) => (
                             <SessionCard
                                 key={session.id}
                                 session={session}
@@ -689,14 +740,18 @@ export default function InstantSessionsPage() {
                     </div>
                 )}
 
-                {!isPageLoading && !sectionFailed && availableSessions.length === 0 && claimedSessions.length === 0 && (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                        <div className="text-5xl mb-4">🕒</div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                            No Instant Sessions
+                {!isPageLoading && !sectionFailed && shownAvailable.length === 0 && shownClaimed.length === 0 && (
+                    <div className="rounded-lg border border-gray-200 bg-white p-4 text-center">
+                        <div className="text-2xl mb-1">🕒</div>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                            {postedFilter !== "all" && (availableSessions.length > 0 || claimedSessions.length > 0)
+                                ? `No ${postedFilter} Instant Sessions`
+                                : "No Instant Sessions"}
                         </h3>
                         <p className="text-sm text-gray-500">
-                            Sessions volunteers open up for this date will show up here.
+                            {postedFilter !== "all" && (availableSessions.length > 0 || claimedSessions.length > 0)
+                                ? "Choose another Status to see the rest."
+                                : "Sessions volunteers open up for this date will show up here."}
                         </p>
                     </div>
                 )}

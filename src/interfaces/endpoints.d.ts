@@ -32,6 +32,7 @@ export type EndpointProps = {
         signIn: string;
         login: string;
         deleteAccount: string;
+        logout: string;
         emailOtpRequest: string;
         emailOtpVerify: string;
         emailSignup: string;

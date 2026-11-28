@@ -10,13 +10,13 @@ import SideModal from "@/components/common/Modals/MobileSideModal";
 import Sidebar from "@/components/common/Sidebar";
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
-import { HiOutlineArrowLeft, HiOutlineCalendarDays, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
+import { HiOutlineArrowLeft, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
-import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
 import { HELP, TERMS } from "@/constants/copy";
 
-/** ?view=calendar shows the calendar on its own; no param = the schedule (availability +
- * sessions). A URL param, not local state, so the view survives a refresh / can be linked. */
+/** ?view=calendar shows My Schedule as a calendar; no param = the list. A URL param, not local
+ * state, so the view survives a refresh / can be linked. */
 export const CALENDAR_VIEW = "calendar";
 
 const Header = () => {
@@ -38,8 +38,9 @@ const Header = () => {
 
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isVolunteer = role === "volunteer";
-    // Two pages share this header: My Schedule (just the sessions, kept uncluttered) and
-    // Book for Later (booking, availability and the calendar).
+    // Two pages share this header: My Schedule (the list, or the calendar view of it) and
+    // Scheduled Sessions / Book for Later (the second option of Book a Session; its booking and
+    // availability buttons sit in the page itself, under the Book a Session switch).
     const pathname = usePathname();
     const isPlanner = pathname?.includes("/book-for-later");
     const basePath = `/${isVolunteer ? "volunteer" : "learner"}/${isPlanner ? "book-for-later" : "schedule"}`;
@@ -50,7 +51,10 @@ const Header = () => {
     useEffect(() => {
         setIsSideNavBarOpen(false);
     }, [pathname]);
-    const isCalendarView = isPlanner && searchParams.get("view") === CALENDAR_VIEW;
+    const isCalendarView = !isPlanner && searchParams.get("view") === CALENDAR_VIEW;
+
+    const pageTitle = isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookSession : "My Schedule";
+    usePageTitle(pageTitle);
 
     // Keep the current view and month when opening a modal, so closing it returns here.
     const pushWith = (changes: Record<string, string | null>) => {
@@ -60,7 +64,6 @@ const Header = () => {
         router.push(query ? `${basePath}?${query}` : basePath);
     };
 
-    const openAvailability = () => pushWith({ modal: isVolunteer ? "my_schedule" : "my_availability" });
     const openAddSession = () => pushWith({ modal: isVolunteer ? "add_new_session" : "add_new_meeting" });
     const toggleCalendar = () => pushWith({ view: isCalendarView ? null : CALENDAR_VIEW, modal: null });
     // Help lives in Resources (tutorials, guides, the demo) - no separate help content.
@@ -84,7 +87,7 @@ const Header = () => {
                         </button>
                         <h1 className="flex items-center gap-2 text-[20px] md:text-lg font-medium px-2">
                             {!isMobileOrTabScreen && <CalendarIcon aria-hidden="true" />}
-                            {isCalendarView ? "My Calendar" : isPlanner ? TERMS.bookForLater : "My Schedule"}
+                            {pageTitle}
                         </h1>
                         {/* The month only drives the calendar, so it only shows there. */}
                         {isCalendarView && (
@@ -104,40 +107,26 @@ const Header = () => {
                                 <HiOutlineQuestionMarkCircle size={18} aria-hidden="true" />
                                 <span className="max-lg:hidden">Help</span>
                             </button>
-                            <HeaderNotificationBell />
+                            {/* My Schedule lists what needs a reply in its own "Needs your response" column,
+                                so it shows no bell button; Book a Session keeps it. The component stays mounted
+                                either way: it hosts the Session Requests drawer that "Respond" opens. */}
+                            <HeaderNotificationBell hideButton={!isPlanner} />
                         </div>
                     )}
                 </div>
-                {role && isPlanner && (
-                    // Phones: two rows (calendar + availability side by side, Add below)
-                    // instead of three full-width rows.
-                    <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
-                        {isCalendarView && isMobileOrTabScreen && (
-                            <div className="col-span-2">
-                                <MonthYearPicker />
-                            </div>
-                        )}
-                        <button type="button" onClick={toggleCalendar} title={isCalendarView ? undefined : HELP.viewCalendar} className={actionBtn}>
-                            {isCalendarView ? (
-                                <>
-                                    <HiOutlineArrowLeft size={16} aria-hidden="true" />
-                                    Back to {TERMS.bookForLater}
-                                </>
-                            ) : (
-                                <>
-                                    <HiOutlineCalendarDays size={16} aria-hidden="true" />
-                                    {SCHEDULE_LABELS.viewCalendar}
-                                </>
-                            )}
-                        </button>
-                        <button type="button" onClick={openAvailability} title={HELP.scheduleAvailability} className={actionBtn}>
-                            {SCHEDULE_LABELS.scheduleAvailability}
+                {role && isCalendarView && (
+                    // The calendar: back to the list, and the month picker on phones.
+                    <div className="grid grid-cols-1 gap-2 lg:flex lg:items-center">
+                        {isMobileOrTabScreen && <MonthYearPicker />}
+                        <button type="button" onClick={toggleCalendar} className={actionBtn}>
+                            <HiOutlineArrowLeft size={16} aria-hidden="true" />
+                            Back to My Schedule
                         </button>
                         <button
                             type="button"
                             onClick={openAddSession}
                             title={HELP.bookForLater}
-                            className={`${actionBtn} col-span-2 !border-action !bg-action !text-white hover:!bg-action-hover`}
+                            className={`${actionBtn} btn-primary-fill`}
                         >
                             <HiOutlinePlus size={16} aria-hidden="true" />
                             {TERMS.bookForLater}
