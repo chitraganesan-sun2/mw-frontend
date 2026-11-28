@@ -43,7 +43,9 @@ function OptionCard({ href, icon, title, when, description, points, cta, accent 
                     <li key={point}>{point}</li>
                 ))}
             </ul>
-            <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-sm font-semibold text-gray-900 group-hover:underline">
+            {/* The action is the highlighted part of the card: the viewer's role colour (learner blue /
+                volunteer orange), so it reads as the thing to press. */}
+            <span className="btn-primary-fill mt-auto inline-flex w-fit items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold group-hover:opacity-90">
                 {cta}
                 <HiOutlineArrowRight aria-hidden="true" size={16} />
             </span>
@@ -53,7 +55,7 @@ function OptionCard({ href, icon, title, when, description, points, cta, accent 
 
 /**
  * Book a Session: the one entry point for getting a session, with its two options side by side -
- * Instant Sessions (start now) and Book for Later (a date and time you choose). Each opens its own
+ * Instant Sessions (start now) and Scheduled Sessions (Book for Later: a date and time you choose). Each opens its own
  * page, which keeps the same switch at the top. WingTime (group sessions) is a separate section and
  * is only linked to, never mixed in.
  */
@@ -70,6 +72,8 @@ export default function BookSessionHub({ role }: { role: ScheduleRole }) {
     }, [setHeaderOptions, pathname]);
 
     const learner = role === "learner";
+    // Both option icons use the viewer's role tint instead of grey / teal.
+    const accent = learner ? "bg-learner-light text-learner-dark" : "bg-volunteer-light text-volunteer-dark";
 
     return (
         <div className="h-full w-full animate-fadeIn overflow-y-auto p-4 lg:p-6">
@@ -83,7 +87,7 @@ export default function BookSessionHub({ role }: { role: ScheduleRole }) {
                     <OptionCard
                         href={`/${role}/instant-sessions`}
                         icon={<HiOutlineBolt />}
-                        accent="bg-teal-50 text-teal-800"
+                        accent={accent}
                         title={TERMS.instantSessions}
                         when="Today or tomorrow"
                         description={learner ? HELP.instantSessionsLearner : HELP.instantSessionsVolunteer}
@@ -97,8 +101,8 @@ export default function BookSessionHub({ role }: { role: ScheduleRole }) {
                     <OptionCard
                         href={`/${role}/book-for-later`}
                         icon={<HiOutlineCalendarDays />}
-                        accent="bg-slate-100 text-slate-700"
-                        title={TERMS.bookForLater}
+                        accent={accent}
+                        title={TERMS.scheduledSessions}
                         when="Any future date and time"
                         description={learner ? HELP.bookForLaterLearner : HELP.bookForLaterVolunteer}
                         points={

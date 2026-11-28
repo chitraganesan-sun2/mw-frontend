@@ -11,8 +11,12 @@ export const TERMS = {
     bookSession: "Book a Session",
     /** Start a session right now / today or tomorrow. */
     instantSessions: "Instant Sessions",
-    /** Pick one of a volunteer's open times; the volunteer then accepts or declines. */
+    /** Pick one of a volunteer's open times; the volunteer then accepts or declines. This is the
+     * ACTION ("Book for Later" buttons and instructions); the place it lives, and sessions booked
+     * this way, are called "Scheduled Sessions" (headings, tabs, filters). */
     bookForLater: "Book for Later",
+    /** Heading / tab / filter name for Book for Later sessions. */
+    scheduledSessions: "Scheduled Sessions",
     /** Learner asks for a session today/tomorrow; any volunteer can accept. */
     requestInstantSession: "Request an Instant Session",
     /** Volunteer opens a session today/tomorrow; any learner can join. */

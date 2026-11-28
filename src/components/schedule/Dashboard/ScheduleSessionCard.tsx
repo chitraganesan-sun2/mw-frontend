@@ -352,7 +352,7 @@ const ScheduleSessionCard: React.FC<ScheduleSessionCardProps> = ({
                             onClick={handleComplete}
                             disabled={completing}
                             aria-label={`Mark ${session.session_title || "this session"} as completed`}
-                            className="rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="rounded-full btn-primary-fill px-3 py-1 text-xs font-semibold hover:opacity-90 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {completing ? "Saving..." : "Mark as completed"}
                         </button>

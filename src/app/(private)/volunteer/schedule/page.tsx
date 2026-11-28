@@ -133,6 +133,7 @@ export default function SchedulePage() {
                 isCalendarView={isCalendarView}
                 timeZoneLabel={volunteerTimeZone}
                 onScheduleAvailability={() => setModal("my_schedule")}
+                onBookForLater={() => setModal("add_new_session")}
                 onAddDateSlot={handleDateSelect}
                 onOpenProfile={(id) => setLearnerId(id)}
                 events={data}

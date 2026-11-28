@@ -13,7 +13,6 @@ import { useIsFetching } from "@tanstack/react-query";
 import { HiOutlineArrowLeft, HiOutlinePlus, HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import HeaderNotificationBell from "@/components/common/HeaderNotificationBell";
-import { SCHEDULE_LABELS } from "@/components/schedule/Dashboard/scheduleCategories";
 import { HELP, TERMS } from "@/constants/copy";
 
 /** ?view=calendar shows My Schedule as a calendar; no param = the list. A URL param, not local
@@ -40,7 +39,8 @@ const Header = () => {
     const isMobileOrTabScreen = InnerWidth() < 1024;
     const isVolunteer = role === "volunteer";
     // Two pages share this header: My Schedule (the list, or the calendar view of it) and
-    // Book for Later (booking and availability, the second option of Book a Session).
+    // Scheduled Sessions / Book for Later (the second option of Book a Session; its booking and
+    // availability buttons sit in the page itself, under the Book a Session switch).
     const pathname = usePathname();
     const isPlanner = pathname?.includes("/book-for-later");
     const basePath = `/${isVolunteer ? "volunteer" : "learner"}/${isPlanner ? "book-for-later" : "schedule"}`;
@@ -64,7 +64,6 @@ const Header = () => {
         router.push(query ? `${basePath}?${query}` : basePath);
     };
 
-    const openAvailability = () => pushWith({ modal: isVolunteer ? "my_schedule" : "my_availability" });
     const openAddSession = () => pushWith({ modal: isVolunteer ? "add_new_session" : "add_new_meeting" });
     const toggleCalendar = () => pushWith({ view: isCalendarView ? null : CALENDAR_VIEW, modal: null });
     // Help lives in Resources (tutorials, guides, the demo) - no separate help content.
@@ -124,24 +123,7 @@ const Header = () => {
                             type="button"
                             onClick={openAddSession}
                             title={HELP.bookForLater}
-                            className={`${actionBtn} !border-action !bg-action !text-white hover:!bg-action-hover`}
-                        >
-                            <HiOutlinePlus size={16} aria-hidden="true" />
-                            {TERMS.bookForLater}
-                        </button>
-                    </div>
-                )}
-                {role && isPlanner && (
-                    // Book for Later: set availability, and book (learner) / propose (volunteer) a session.
-                    <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
-                        <button type="button" onClick={openAvailability} title={HELP.scheduleAvailability} className={actionBtn}>
-                            {SCHEDULE_LABELS.scheduleAvailability}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={openAddSession}
-                            title={HELP.bookForLater}
-                            className={`${actionBtn} !border-action !bg-action !text-white hover:!bg-action-hover`}
+                            className={`${actionBtn} btn-primary-fill`}
                         >
                             <HiOutlinePlus size={16} aria-hidden="true" />
                             {TERMS.bookForLater}

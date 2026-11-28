@@ -2,12 +2,14 @@
 import type { ReactNode } from "react";
 import LottieLoader from "@/components/common/Loader/Lottie";
 import QueryErrorNotice from "@/components/common/QueryErrorNotice";
+import { HiOutlinePlus } from "react-icons/hi2";
 import BookSessionTabs from "@/components/booking/BookSessionTabs";
+import { HELP, TERMS } from "@/constants/copy";
 import AvailabilitySection from "./AvailabilitySection";
 import CalendarLegend from "./CalendarLegend";
 import MyScheduleSection from "./MyScheduleSection";
 import ProfileNudge from "./ProfileNudge";
-import type { ScheduleRole } from "./scheduleCategories";
+import { SCHEDULE_LABELS, type ScheduleRole } from "./scheduleCategories";
 
 interface ScheduleDashboardLayoutProps {
     role: ScheduleRole;
@@ -17,6 +19,8 @@ interface ScheduleDashboardLayoutProps {
     isCalendarView: boolean;
     timeZoneLabel?: string;
     onScheduleAvailability: () => void;
+    /** Opens the booking form (learner books a volunteer's time / volunteer proposes a session). */
+    onBookForLater: () => void;
     onAddDateSlot?: (date: string) => void;
     onOpenProfile: (userId: string) => void;
     events?: unknown[];
@@ -29,7 +33,7 @@ interface ScheduleDashboardLayoutProps {
 /**
  * The Schedule dashboard (the signed-in landing page), split over two pages:
  * - My Schedule: the activity list, or (?view=calendar) the same activity as a calendar;
- * - Book for Later (one of the two Book a Session options): Availability, and the booking actions in the header.
+ * - Scheduled Sessions / Book for Later (one of the two Book a Session options): the booking actions and Availability.
  */
 const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     role,
@@ -37,6 +41,7 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     isCalendarView,
     timeZoneLabel,
     onScheduleAvailability,
+    onBookForLater,
     onAddDateSlot,
     onOpenProfile,
     events,
@@ -88,11 +93,31 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
         );
     }
 
-    // Book for Later: availability (and the header's booking / calendar actions), under the
+    // Scheduled Sessions (Book for Later): the booking actions and availability, under the
     // Book a Session switch so the other option (Instant Sessions) is one tap away.
     return (
         <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
             <BookSessionTabs />
+            {/* Centred under the switch. Book for Later is the main action, in the role colour. */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                    type="button"
+                    onClick={onScheduleAvailability}
+                    title={HELP.scheduleAvailability}
+                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium leading-tight text-black hover:bg-gray-50 cursor-pointer"
+                >
+                    {SCHEDULE_LABELS.scheduleAvailability}
+                </button>
+                <button
+                    type="button"
+                    onClick={onBookForLater}
+                    title={HELP.bookForLater}
+                    className="btn-primary-fill inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium leading-tight hover:opacity-90 cursor-pointer"
+                >
+                    <HiOutlinePlus size={16} aria-hidden="true" />
+                    {TERMS.bookForLater}
+                </button>
+            </div>
             <div className="min-w-0">
                 <AvailabilitySection
                     role={role}

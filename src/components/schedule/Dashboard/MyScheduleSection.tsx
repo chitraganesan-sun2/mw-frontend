@@ -6,6 +6,7 @@ import QueryErrorNotice from "@/components/common/QueryErrorNotice";
 import PageIntro from "@/components/common/PageIntro";
 import WingTimeCard from "@/components/wingtime/WingTimeCard";
 import { HELP, TERMS } from "@/constants/copy";
+import StatusFilter from "@/components/common/StatusFilter";
 import { HiOutlineCalendarDays, HiOutlinePlus } from "react-icons/hi2";
 import { CALENDAR_VIEW } from "@/components/schedule/Header";
 import { WINGTIME_ENABLED } from "@/config/wingtime";
@@ -16,7 +17,6 @@ import { useNow, useProfileToday } from "@/hooks/schedule/useProfileTimeZone";
 import {
     AGENDA_FILTER_LABEL,
     AGENDA_TAB_HINT,
-    AGENDA_TAB_LABEL,
     countByKind,
     countByTab,
     filterAgenda,
@@ -30,6 +30,7 @@ import ScheduleOpenInstantCard from "./ScheduleOpenInstantCard";
 import ScheduleSessionCard from "./ScheduleSessionCard";
 import ScheduleTypeTag from "./ScheduleTypeTag";
 import NextSessionBanner, { findNextSession } from "./NextSessionBanner";
+import NeedsResponseBoxes from "./NeedsResponseBoxes";
 import { SCHEDULE_LABELS, getSessionOriginNote, type ScheduleRole } from "./scheduleCategories";
 
 interface MyScheduleSectionProps {
@@ -49,14 +50,14 @@ export function SessionListSkeleton({ rows = 2 }: { rows?: number }) {
 }
 
 const FILTERS: AgendaFilter[] = ["all", "session", "instant", "wingtime"];
-const TABS: AgendaTab[] = ["upcoming", "completed", "cancelled"];
 
 /**
  * My Schedule: the one place for everything the viewer has scheduled - Book for Later sessions,
  * Instant Sessions (incl. ones still waiting for the other person) and WingTimes - as a single
- * agenda grouped by date, with a type tag and a status pill on every card. Three views (Upcoming /
- * Completed / Cancelled); filter by type, status and search. A side panel keeps the next session and
- * anything waiting for a reply in sight whichever view is open.
+ * agenda grouped by date, with a type tag and a status pill on every card. The tabs choose WHAT
+ * is shown (All / Scheduled Sessions / Instant Sessions / WingTime); the Status filter on the right
+ * chooses WHEN (Upcoming / Completed / Cancelled, Upcoming by default). A side column keeps the
+ * next session and each request waiting for a reply in sight whichever view is open.
  */
 const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLabel, onOpenProfile }) => {
     const router = useRouter();
@@ -82,7 +83,20 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     );
 
     const tabCounts = useMemo(() => countByTab(entries), [entries]);
-    const inTab = useMemo(() => entries.filter((e) => e.tab === tab), [entries, tab]);
+    // Requests from someone else that are waiting for the viewer. They get their own boxes in the
+    // side column (above the list on narrow screens), so the agenda itself leaves them out.
+    const awaiting = useMemo(
+        () => entries.filter((e) => e.tab === "upcoming" && e.needsResponse && e.data.type === "session"),
+        [entries]
+    );
+    const awaitingSessions = useMemo(
+        () => awaiting.flatMap((e) => (e.data.type === "session" ? [e.data.session] : [])),
+        [awaiting]
+    );
+    const inTab = useMemo(
+        () => entries.filter((e) => e.tab === tab && !(tab === "upcoming" && awaiting.includes(e))),
+        [entries, tab, awaiting]
+    );
     const sorted = useMemo(() => sortAgenda(inTab, when), [inTab, when]);
     const counts = useMemo(() => countByKind(sorted), [sorted]);
     const statuses = useMemo(() => statusOptions(sorted), [sorted]);
@@ -108,50 +122,20 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
     const canShowMore = hasHidden && Boolean(active.hasNextPage);
     const showFilters = sorted.length >= 4 || isFiltering;
     const visibleFilters = FILTERS.filter((f) => f !== "wingtime" || WINGTIME_ENABLED);
-    // Requests from someone else that are waiting for the viewer (the side panel lists them).
-    const awaiting = useMemo(
-        () => entries.filter((e) => e.tab === "upcoming" && e.needsResponse && e.data.type === "session"),
-        [entries]
-    );
-    const showTypeFilters = sorted.length > 0 || kind !== "all";
-    // The panel always has its links, so the wide layout never changes shape between views.
-    const hasPanel = true;
+    // Counts for the Status filter; the past ones are only known once that window has loaded.
+    const statusCounts = {
+        upcoming: `${tabCounts.upcoming}${upcomingSessions.hasNextPage ? "+" : ""}`,
+        ...(pastLoaded
+            ? { completed: `${tabCounts.completed}${pastHasMore ? "+" : ""}`, cancelled: `${tabCounts.cancelled}${pastHasMore ? "+" : ""}` }
+            : {}),
+    };
+    const roleText = role === "learner" ? "text-learner-dark" : "text-volunteer-dark";
 
     const resetFilters = () => {
         setSearch("");
         setStatusFilter("all");
         setKind("all");
     };
-
-    // The same type filter, as chips on narrow screens and a vertical list in the side panel.
-    const typeFilter = (layout: "chips" | "list") => (
-        <div
-            role="group"
-            aria-label="Filter by type"
-            className={layout === "chips" ? "flex flex-wrap gap-2 lg:hidden" : "flex flex-col gap-1"}
-        >
-            {visibleFilters.map((f) => (
-                <button
-                    key={`${layout}-${f}`}
-                    type="button"
-                    aria-pressed={kind === f}
-                    onClick={() => setKind(f)}
-                    className={
-                        layout === "chips"
-                            ? `rounded-full border px-3 py-1 text-xs font-medium cursor-pointer ${
-                                  kind === f ? "border-transparent bg-action text-white" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                              }`
-                            : `flex items-center justify-between rounded-lg px-3 py-1.5 text-sm font-medium cursor-pointer border-0 ${
-                                  kind === f ? "bg-action text-white" : "bg-transparent text-gray-700 hover:bg-gray-100"
-                              }`
-                    }
-                >
-                    <span>{AGENDA_FILTER_LABEL[f]}</span>
-                    <span className={kind === f ? "opacity-90" : "text-gray-500"}>{layout === "chips" ? `(${counts[f]})` : counts[f]}</span>
-                </button>
-            ))}
-        </div>
-    );
 
     return (
         <section aria-labelledby="my-schedule-heading" className="bg-white rounded-xl p-4 flex flex-col gap-3 min-w-0">
@@ -165,7 +149,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 <div className="grid grid-cols-2 gap-2 sm:flex">
                     <Link
                         href={`/${role}/book-a-session`}
-                        className="inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-action bg-action px-3 py-1.5 text-sm font-medium text-white hover:bg-action-hover"
+                        className="btn-primary-fill inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium hover:opacity-90"
                     >
                         <HiOutlinePlus size={16} aria-hidden="true" />
                         {TERMS.bookSession}
@@ -181,51 +165,65 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 </div>
             </div>
 
-            {/* Upcoming / Completed / Cancelled. The past views load the server's past window on first use. */}
-            <div role="tablist" aria-label="Show schedule" className="grid grid-cols-3 border-b border-gray-200 sm:flex sm:gap-1">
-                {TABS.map((t) => {
-                    const known = t === "upcoming" || pastLoaded;
-                    const more = (t === "upcoming" ? Boolean(upcomingSessions.hasNextPage) : pastHasMore) ? "+" : "";
-                    return (
-                        <button
-                            key={t}
-                            id={`schedule-tab-${t}`}
-                            type="button"
-                            role="tab"
-                            aria-selected={tab === t}
-                            aria-controls="schedule-tabpanel"
-                            onClick={() => {
-                                setTab(t);
-                                resetFilters();
-                            }}
-                            className={`-mb-px border-0 border-b-2 bg-transparent px-2 py-2 text-sm font-medium cursor-pointer whitespace-nowrap sm:px-4 ${
-                                tab === t ? "border-b-action text-gray-900" : "border-b-transparent text-gray-600 hover:text-gray-900"
-                            }`}
-                        >
-                            {AGENDA_TAB_LABEL[t]}
-                            {known && <span className="ml-1 font-normal text-gray-500">({tabCounts[t]}{more})</span>}
-                        </button>
-                    );
-                })}
-            </div>
-            <PageIntro className="-mt-1">{AGENDA_TAB_HINT[tab]}</PageIntro>
-
-            {/* Wide screens: the agenda on the left, a panel on the right (next up, what needs a
-                reply, type filters). Narrower screens: one column, banner and chips on top. */}
-            <div
-                id="schedule-tabpanel"
-                role="tabpanel"
-                aria-labelledby={`schedule-tab-${tab}`}
-                className={`grid grid-cols-1 gap-4 ${hasPanel ? "lg:grid-cols-[minmax(0,1fr)_18rem]" : ""} lg:items-start`}
-            >
+            {/* Wide screens: the list on the left, a column on the right (next session, then each
+                request that needs a reply) that starts level with the tabs. Narrower screens: one
+                column, with the same two on top. */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
             <div className="flex min-w-0 flex-col gap-3">
+                {/* What to show (type) on the left, when (Status) on the right. The Status filter
+                    loads the server's past window on first use of Completed / Cancelled. */}
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-200 pb-2">
+                    <div role="tablist" aria-label="Show" className="flex max-w-full gap-1 overflow-x-auto">
+                        {visibleFilters.map((f) => (
+                            <button
+                                key={f}
+                                id={`schedule-tab-${f}`}
+                                type="button"
+                                role="tab"
+                                aria-selected={kind === f}
+                                aria-controls="schedule-tabpanel"
+                                onClick={() => setKind(f)}
+                                className={`flex min-h-9 items-center gap-1 rounded-full border-0 px-3 py-1.5 text-sm font-medium whitespace-nowrap cursor-pointer ${
+                                    kind === f ? "btn-primary-fill" : "bg-transparent text-gray-700 hover:bg-gray-100"
+                                }`}
+                            >
+                                {AGENDA_FILTER_LABEL[f]}
+                                <span className={`font-normal ${kind === f ? "opacity-80" : "text-gray-500"}`}>({counts[f]})</span>
+                            </button>
+                        ))}
+                    </div>
+                    <StatusFilter
+                        value={tab}
+                        onChange={(v) => {
+                            if (v === "all") return;
+                            setTab(v);
+                            setSearch("");
+                            setStatusFilter("all");
+                        }}
+                        counts={statusCounts}
+                    />
+                </div>
+                <PageIntro className="-mt-1">{AGENDA_TAB_HINT[tab]}</PageIntro>
+
+                <div
+                    id="schedule-tabpanel"
+                    role="tabpanel"
+                    aria-labelledby={`schedule-tab-${kind}`}
+                    className="flex min-w-0 flex-col gap-3"
+                >
+                {/* Narrow screens only - on wide ones these sit in the side column. */}
                 {nextSession && (
                     <div className="lg:hidden">
                         <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />
                     </div>
                 )}
-
-                {showTypeFilters && typeFilter("chips")}
+                <NeedsResponseBoxes
+                    className="lg:hidden"
+                    sessions={awaitingSessions}
+                    role={role}
+                    timeZoneLabel={timeZoneLabel}
+                    onRespond={openApprovals}
+                />
 
                 {showFilters && (
                     <div className="flex flex-col gap-2 sm:flex-row">
@@ -241,10 +239,10 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                aria-label="Filter by status"
+                                aria-label="Filter by state"
                                 className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm"
                             >
-                                <option value="all">All statuses</option>
+                                <option value="all">All states</option>
                                 {statuses.map((s) => (
                                     <option key={s.value} value={s.value}>
                                         {s.label}
@@ -299,7 +297,9 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                             </p>
                         ) : (
                             <>
-                                <p className="text-sm text-gray-600">Nothing scheduled yet.</p>
+                                <p className="text-sm text-gray-600">
+                                    {awaitingSessions.length > 0 ? "Nothing else is scheduled yet." : "Nothing scheduled yet."}
+                                </p>
                                 <p className="text-xs text-gray-500">
                                     <Link className="underline" href={`/${role}/book-a-session`}>
                                         {role === "learner" ? "Book a Session" : "Post an Instant Session or plan a session"}
@@ -320,7 +320,7 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                         <div key={group.key} role="group" aria-labelledby={`schedule-group-${group.key}`} className="flex flex-col gap-2">
                             <h3
                                 id={`schedule-group-${group.key}`}
-                                className={`text-[11px] font-semibold uppercase tracking-wide ${group.accent ? "text-amber-700" : "text-gray-500"}`}
+                                className={`text-[11px] font-semibold uppercase tracking-wide ${group.accent ? roleText : "text-gray-500"}`}
                             >
                                 {group.label} <span className="font-normal">({group.items.length})</span>
                             </h3>
@@ -390,43 +390,13 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                         )}
                     </div>
                 )}
+                </div>
             </div>
 
-            {hasPanel && (
-                <aside aria-label="Schedule summary" className="hidden lg:flex lg:sticky lg:top-3 flex-col gap-3">
-                    {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
-
-                    {awaiting.length > 0 && (
-                        <div className="rounded-lg border border-amber-300 bg-amber-50/40 p-3">
-                            <h3 className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">
-                                Needs your response ({awaiting.length})
-                            </h3>
-                            <ul className="mt-1.5 flex flex-col gap-1">
-                                {awaiting.slice(0, 3).map((e) => (
-                                    <li key={e.key} className="truncate text-sm text-gray-800">
-                                        {e.data.type === "session" ? e.data.session.session_title || "Session" : ""}
-                                    </li>
-                                ))}
-                            </ul>
-                            {awaiting.length > 3 && <p className="mt-1 text-xs text-gray-500">and {awaiting.length - 3} more</p>}
-                            <button
-                                type="button"
-                                onClick={openApprovals}
-                                className="mt-2 rounded-full bg-action px-3 py-1 text-xs font-semibold text-white hover:opacity-90 border-0 cursor-pointer"
-                            >
-                                Respond
-                            </button>
-                        </div>
-                    )}
-
-                    {showTypeFilters && (
-                        <div className="rounded-lg border border-gray-200 p-2">
-                            <h3 className="px-1 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Show</h3>
-                            {typeFilter("list")}
-                        </div>
-                    )}
-                </aside>
-            )}
+            <aside aria-label="Schedule summary" className="hidden lg:flex lg:sticky lg:top-3 flex-col gap-3">
+                {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
+                <NeedsResponseBoxes sessions={awaitingSessions} role={role} timeZoneLabel={timeZoneLabel} onRespond={openApprovals} />
+            </aside>
             </div>
         </section>
     );
