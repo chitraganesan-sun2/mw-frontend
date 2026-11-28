@@ -12,7 +12,7 @@ import VolunteerViewModal from "@/components/learners/VolunteerViewModal";
 const Calendar = dynamic(() => import("@/components/schedule/Calender"), { ssr: false });
 import { useAppStore } from "@/store/useAppStore";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { GET_API, POST_API } from "@/api/request";
 import { endpoints } from "@/api/constants";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -29,10 +29,6 @@ import { showToast } from "@/components/common/Toast";
 import { getApiErrorMessage } from "@/utils/apiError";
 
 export default function LearnerSchedulePage() {
-    const [isOpenSchedule, setIsOpenSchedule] = useState(false);
-    const [isOpenFeedback, setIsOpenFeedback] = useState(false);
-    const [isOpenAvailability, setIsOpenAvailability] = useState(false);
-
     const router = useRouter();
     const isMobileOrTabScreen = InnerWidth() < 1024;
 
@@ -46,7 +42,6 @@ export default function LearnerSchedulePage() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const isPlanner = pathname.includes("/book-for-later");
-    const basePath = isPlanner ? "/learner/book-for-later" : "/learner/schedule";
     const isCalendarView = !isPlanner && view === CALENDAR_VIEW;
     // The calendar belongs to My Schedule; older links (?view=calendar on Book for Later) land there.
     useEffect(() => {
@@ -89,9 +84,11 @@ export default function LearnerSchedulePage() {
         queryFn: getLearnerDetails,
     });
 
+    // Closing a modal clears the `modal` param through the same hook that opens it (the view and
+    // month stay in the URL). It used to router.push a fresh URL, which left this hook's own copy
+    // of `modal` stale: the drawer then stayed open, and opening it again did nothing.
     const handleNavigate = () => {
-        // Return to the view the modal was opened from.
-        router.push(`${basePath}?${isCalendarView ? `view=${CALENDAR_VIEW}&` : ""}current_month=${currentMonth}`);
+        void setModal(null);
     };
 
     // Clicking a day on the calendar opens the booking form for that date (on the calendar itself, so
@@ -117,11 +114,10 @@ export default function LearnerSchedulePage() {
         error: (err) => showToast({ type: "error", message: getApiErrorMessage(err, "Couldn't submit your feedback. Please try again.") }),
     });
 
-    useEffect(() => {
-        setIsOpenSchedule(modal === "add_new_meeting");
-        setIsOpenFeedback(modal === "feedback");
-        setIsOpenAvailability(modal === "my_availability");
-    }, [modal]);
+    // Which drawer is open is read straight from the URL param.
+    const isOpenSchedule = modal === "add_new_meeting";
+    const isOpenFeedback = modal === "feedback";
+    const isOpenAvailability = modal === "my_availability";
 
     return (
         <>
@@ -159,13 +155,9 @@ export default function LearnerSchedulePage() {
                 onClose={handleNavigate}
                 initialDate={presetDate}
             />
-            {/* Close the drawer right away instead of waiting for the router.push round trip. */}
             <LearnerScheduleModal
                 isOpen={isOpenAvailability}
-                onClose={() => {
-                    setIsOpenAvailability(false);
-                    handleNavigate();
-                }}
+                onClose={handleNavigate}
             />
             <FeedbackModal
                 mode="create"

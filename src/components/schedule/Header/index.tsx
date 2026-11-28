@@ -107,7 +107,9 @@ const Header = () => {
                                 <HiOutlineQuestionMarkCircle size={18} aria-hidden="true" />
                                 <span className="max-lg:hidden">Help</span>
                             </button>
-                            <HeaderNotificationBell />
+                            {/* My Schedule lists what needs a reply in its own "Needs your response" column,
+                                so it has no bell; Book a Session keeps it. */}
+                            {isPlanner && <HeaderNotificationBell />}
                         </div>
                     )}
                 </div>
