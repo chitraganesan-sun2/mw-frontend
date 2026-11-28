@@ -57,6 +57,7 @@ export const endpoints: EndpointProps = {
         emailLogin: "auth/email/login",
         emailResetPassword: "auth/email/reset-password",
         deleteAccount: "auth/delete-account",
+        logout: "auth/logout",
     },
     learner: {
         update: (id: string) => `learner/${id}`,
