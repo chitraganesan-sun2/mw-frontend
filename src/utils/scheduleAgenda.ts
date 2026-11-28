@@ -35,9 +35,10 @@ export interface AgendaEntry<T = unknown> {
     data: T;
 }
 
-// The names match the booking section: sessions booked for a chosen date are "Book for Later".
+// The names match the booking section: sessions booked for a chosen date (the Book for Later
+// action) are "Scheduled Sessions".
 export const AGENDA_KIND_LABEL: Record<AgendaKind, string> = {
-    session: "Book for Later",
+    session: "Scheduled Session",
     instant: "Instant",
     wingtime: "WingTime",
 };
@@ -71,7 +72,7 @@ export function agendaTabOf(status: string, ended: boolean): AgendaTab {
 /** Filter chip labels. */
 export const AGENDA_FILTER_LABEL: Record<AgendaFilter, string> = {
     all: "All",
-    session: "Book for Later",
+    session: "Scheduled Sessions",
     instant: "Instant Sessions",
     wingtime: "WingTime",
 };

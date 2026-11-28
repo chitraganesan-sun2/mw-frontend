@@ -76,7 +76,9 @@ export default function LearnerWingTimePage() {
     }
 
     const myItems = mine.data?.items ?? [];
-    const openItems = browse.data?.items ?? [];
+    // "My WingTimes" already lists the ones I signed up for, so "Available" leaves them out -
+    // otherwise the same session showed in both columns.
+    const openItems = (browse.data?.items ?? []).filter((w) => !w.is_registered);
     // Looked up by id so the modal always shows the freshest copy after an action.
     const selected = selectedId ? [...myItems, ...openItems].find((w) => w.wingtime_id === selectedId) ?? null : null;
 
@@ -169,22 +171,27 @@ export default function LearnerWingTimePage() {
                 )}
             </div>
 
-            {/* Upcoming WingTimes - browse and sign up */}
+            {/* Available WingTimes - upcoming ones I have not joined yet: browse and sign up */}
             <div className="min-w-0">
-                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">Upcoming WingTimes</h2>
+                <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212] mb-4">Available WingTimes</h2>
                 {browse.isLoading ? (
                     <div className="flex justify-center py-6">
                         <LottieLoader isLoading={true} />
                     </div>
                 ) : browse.isError && !browse.data ? (
                     <QueryErrorNotice message="Couldn't load WingTimes." onRetry={() => browse.refetch()} />
-                ) : openItems.length > 0 ? (
+                ) : openItems.length > 0 || browsePage > 1 || browsePage * PAGE_SIZE < (browse.data?.total ?? 0) ? (
                     <>
-                        <div className="flex flex-col gap-3">
-                            {openItems.map((item) => (
-                                <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
-                            ))}
-                        </div>
+                        {openItems.length > 0 ? (
+                            <div className="flex flex-col gap-3">
+                                {openItems.map((item) => (
+                                    <WingTimeCard key={item.wingtime_id} item={item} tzLabel={tzLabel} onClick={() => setSelectedId(item.wingtime_id)} />
+                                ))}
+                            </div>
+                        ) : (
+                            // A page can hold only sessions I already joined; the pager still reaches the rest.
+                            emptyCard("Nothing New On This Page", "The WingTimes here are ones you have already signed up for.")
+                        )}
                         <Pager page={browsePage} hasMore={browsePage * PAGE_SIZE < (browse.data?.total ?? 0)} onChange={setBrowsePage} />
                     </>
                 ) : (

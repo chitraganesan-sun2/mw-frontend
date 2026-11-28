@@ -8,11 +8,11 @@ import { TERMS } from "@/constants/copy";
 /** The two ways to get a session, in the order they are shown everywhere in the booking section. */
 export const BOOKING_OPTIONS = [
     { slug: "instant-sessions", label: TERMS.instantSessions, tagline: "Start now" },
-    { slug: "book-for-later", label: TERMS.bookForLater, tagline: "Pick a date and time" },
+    { slug: "book-for-later", label: TERMS.scheduledSessions, tagline: "Pick a date and time" },
 ] as const;
 
 /**
- * The switch between the booking section's two options (Instant Sessions / Book for Later), shown at
+ * The switch between the booking section's two options (Instant Sessions / Scheduled Sessions), shown at
  * the top of both pages so it is always clear which one you are in and one tap reaches the other.
  * Links, not local state: each option is its own page, so refresh, back and shared links all work.
  */
@@ -35,8 +35,10 @@ export default function BookSessionTabs({ className = "" }: { className?: string
                             <Link
                                 href={`/${role}/${option.slug}`}
                                 aria-current={active ? "page" : undefined}
+                                // The selected option is in the viewer's role colour (learner blue /
+                                // volunteer orange), not grey.
                                 className={`flex min-h-9 items-center justify-center rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap ${
-                                    active ? "bg-action text-white" : "text-gray-700 hover:bg-gray-100"
+                                    active ? "btn-primary-fill" : "text-gray-700 hover:bg-gray-100"
                                 }`}
                             >
                                 {option.label}

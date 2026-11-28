@@ -15,7 +15,8 @@ interface ScheduleOpenInstantCardProps {
 
 /** An instant session nobody has taken yet: a learner's request waiting for a volunteer, or a
  * volunteer's posting waiting for a learner. Once someone accepts / claims it, it becomes a
- * regular session card. Cancelling / withdrawing stays on the Instant Sessions page. */
+ * regular session card. The link only opens the Instant Sessions page (where it can be cancelled
+ * or withdrawn), so it says "View", not "Manage". */
 const ScheduleOpenInstantCard: React.FC<ScheduleOpenInstantCardProps> = ({ row, role, timeZoneLabel, typeTag }) => {
     const when = formatSessionWhen({ date: row.date, start: row.start, end: row.end, timeZoneLabel });
     return (
@@ -35,10 +36,10 @@ const ScheduleOpenInstantCard: React.FC<ScheduleOpenInstantCardProps> = ({ row, 
             <div className="flex justify-end pt-0.5">
                 <Link
                     href={`/${role}/instant-sessions`}
-                    aria-label={`Manage ${row.title} on the Instant Sessions page`}
+                    aria-label={`View ${row.title} on the Instant Sessions page`}
                     className="text-xs font-medium text-gray-600 underline underline-offset-2 hover:text-gray-900"
                 >
-                    Manage
+                    View
                 </Link>
             </div>
         </article>

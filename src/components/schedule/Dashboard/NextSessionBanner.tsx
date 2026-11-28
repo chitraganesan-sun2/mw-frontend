@@ -13,7 +13,8 @@ import {
 import type { ScheduleSession } from "@/hooks/schedule/useScheduleSessions";
 import type { ScheduleRole } from "./scheduleCategories";
 
-function localTimes(session: ScheduleSession, role: ScheduleRole) {
+/** The viewer's own local date/time fields (the API stores both participants' local copies). */
+export function localTimes(session: ScheduleSession, role: ScheduleRole) {
     return role === "volunteer"
         ? { date: session.volunteer_start_date, start: session.volunteer_start_time, end: session.volunteer_end_time }
         : { date: session.learner_start_date, start: session.learner_start_time, end: session.learner_end_time };
@@ -70,10 +71,12 @@ const NextSessionBanner: React.FC<NextSessionBannerProps> = ({ session, role, ti
         <div
             role="region"
             aria-label="Next session"
-            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
+            className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg border px-3 py-2 ${
+                role === "learner" ? "border-learner/40 bg-learner-light/60" : "border-volunteer/40 bg-volunteer-light/60"
+            }`}
         >
             <div className="min-w-0 text-sm">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                <p className={`text-[11px] font-semibold uppercase tracking-wide ${role === "learner" ? "text-learner-dark" : "text-volunteer-dark"}`}>
                     Next session{countdown && <span className="ml-2 normal-case tracking-normal text-gray-700">· {countdown}</span>}
                 </p>
                 <p className="font-semibold text-gray-900 truncate">

@@ -106,7 +106,9 @@ export function calculateLearnerCompletion(data: any): { percentage: number; mis
         { value: personalInfo?.learner_contact_details?.country, label: "Country" },
         { value: personalInfo?.learner_contact_details?.timezone, label: "Time Zone" },
         { value: data?.profile_picture, label: "Profile Picture" },
-        { value: data?.parent_info?.parent_first_name, label: "Guardian Info" },
+        // Guardian info only exists for learners a parent or guardian enrolled (the only learners
+        // asked for it); counting it for everyone kept self-enrolled adults below 100% for good.
+        ...(data?.enrolled_by === "parent" ? [{ value: data?.parent_info?.parent_first_name, label: "Guardian Info" }] : []),
         {
             value: [
                 ...(data?.learner_goals?.academic_skills_to_learn || []),
