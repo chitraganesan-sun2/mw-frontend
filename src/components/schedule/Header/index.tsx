@@ -108,8 +108,9 @@ const Header = () => {
                                 <span className="max-lg:hidden">Help</span>
                             </button>
                             {/* My Schedule lists what needs a reply in its own "Needs your response" column,
-                                so it has no bell; Book a Session keeps it. */}
-                            {isPlanner && <HeaderNotificationBell />}
+                                so it shows no bell button; Book a Session keeps it. The component stays mounted
+                                either way: it hosts the Session Requests drawer that "Respond" opens. */}
+                            <HeaderNotificationBell hideButton={!isPlanner} />
                         </div>
                     )}
                 </div>
