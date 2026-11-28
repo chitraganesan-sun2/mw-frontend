@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { matchesStatusFilter, statusViewOf, statusViewOptions } from "../../src/utils/statusView.ts";
+import { TIME_BOUND_OPTIONS, isPastStatus, matchesStatusFilter, matchesTimeBound, statusViewOf, statusViewOptions } from "../../src/utils/statusView.ts";
 
 test("waiting, arranged and open items are upcoming", () => {
     for (const s of ["pending", "accepted", "active", "open", "available", "claimed", "booked", ""]) {
@@ -29,4 +29,19 @@ test("the filter lists All only where asked", () => {
     assert.equal(matchesStatusFilter("all", "cancelled"), true);
     assert.equal(matchesStatusFilter("upcoming", "cancelled"), false);
     assert.equal(matchesStatusFilter("completed", "completed"), true);
+});
+
+test("the volunteer's time-bound filter splits posted/accepted/in progress from completed/cancelled/expired", () => {
+    for (const s of ["open", "pending", "accepted", "active"]) {
+        assert.equal(isPastStatus(s), false, s);
+        assert.equal(matchesTimeBound("upcoming", s), true, s);
+        assert.equal(matchesTimeBound("past", s), false, s);
+    }
+    for (const s of ["completed", "cancelled", "expired", "Cancelled"]) {
+        assert.equal(isPastStatus(s), true, s);
+        assert.equal(matchesTimeBound("past", s), true, s);
+        assert.equal(matchesTimeBound("upcoming", s), false, s);
+    }
+    assert.equal(matchesTimeBound("all", "expired"), true);
+    assert.deepEqual(TIME_BOUND_OPTIONS.map((o) => o.value), ["all", "upcoming", "past"]);
 });

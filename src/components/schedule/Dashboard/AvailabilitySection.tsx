@@ -327,14 +327,15 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
             <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold">{SCHEDULE_LABELS.myAvailabilitySchedule}</h3>
-                    {/* The header's "Schedule my availability" opens the same editor. */}
+                    {/* The one way into the weekly availability editor (add new hours or change them). */}
                     <button
                         type="button"
                         onClick={onScheduleAvailability}
-                        aria-label="Edit My Recurring Availability"
-                        className="text-xs font-medium underline bg-transparent border-0 p-0 cursor-pointer"
+                        aria-label="Add or edit my recurring availability"
+                        title={HELP.scheduleAvailability}
+                        className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-900 hover:bg-gray-50 cursor-pointer"
                     >
-                        Edit Recurring
+                        Add / Edit Recurring
                     </button>
                 </div>
                 {isLoading ? (
@@ -428,7 +429,7 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                         onSubmit={(e) => {
                             e.preventDefault();
                             if (!newDate || newDate < today) {
-                                showToast({ type: "error", message: "Please pick today or a future date." });
+                                showToast({ type: "error", message: newDate ? "Please pick today or a future date." : "Pick a date first, then choose the times." });
                                 return;
                             }
                             onAddDateSlot(newDate);
@@ -447,8 +448,9 @@ const AvailabilitySection: React.FC<AvailabilitySectionProps> = ({
                         </label>
                         <button
                             type="submit"
-                            className="h-9 rounded-full btn-primary-fill px-4 text-xs font-semibold disabled:opacity-50"
-                            disabled={!newDate}
+                            // Not disabled while the date is empty: a greyed-out button gave no hint why it
+                            // did nothing. Pressing it without a date says what is missing.
+                            className="h-9 rounded-full btn-primary-fill px-4 text-xs font-semibold cursor-pointer"
                         >
                             Choose times
                         </button>

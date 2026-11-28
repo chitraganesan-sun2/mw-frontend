@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -47,6 +47,8 @@ import {
 import { safeHref } from "@/utils/safeHref";
 import { timesAgo } from "@/utils/timeFunctions";
 import BookSessionTabs from "@/components/booking/BookSessionTabs";
+import StatusFilter from "@/components/common/StatusFilter";
+import { TIME_BOUND_OPTIONS, matchesTimeBound, type TimeBoundFilter } from "@/utils/statusView";
 import { invalidateScheduleViews } from "@/hooks/schedule/invalidateScheduleViews";
 import { useNow, useProfileTimeZone } from "@/hooks/schedule/useProfileTimeZone";
 
@@ -65,7 +67,11 @@ const SECTION_CONTROL_HEIGHT = "h-10";
 
 
 
-const MY_SESSIONS_STATUS_FILTERS = ["", "open", "accepted", "active", "completed", "cancelled", "expired"];
+// "My Posted Instant Sessions" is filtered by time, not by seven statuses: Upcoming = posted, accepted,
+// in progress; Past = completed, cancelled, expired. The list is fetched once (the server filters by
+// one status only) and filtered / paged here.
+const MY_SESSIONS_FETCH_SIZE = 100;
+const MY_SESSIONS_PAGE_SIZE = 12;
 
 /** Absolute start/end of a session or open post (UTC fields; profile-local fallback). */
 function sessionBounds(session: any, timeZoneLabel?: string) {
@@ -282,7 +288,7 @@ export default function VolunteerInstantSessionsPage() {
     const [debouncedQuery] = useDebounce(query, 400);
     const [requestsPage, setRequestsPage] = useQueryState("requests_page", { defaultValue: "1" });
     const [sessionsPage, setSessionsPage] = useQueryState("sessions_page", { defaultValue: "1" });
-    const [sessionsStatus, setSessionsStatus] = useQueryState("sessions_status", { defaultValue: "" });
+    const [sessionsView, setSessionsView] = useState<TimeBoundFilter>("upcoming");
 
     useEffect(() => {
         setHeaderOptions({
@@ -331,27 +337,30 @@ export default function VolunteerInstantSessionsPage() {
         isError: isMySessionsError,
         refetch: refetchMySessions,
     } = useQuery({
-        queryKey: ["volunteer-my-instant-sessions", sessionsPage, sessionsStatus, debouncedQuery],
+        queryKey: ["volunteer-my-instant-sessions", debouncedQuery],
         queryFn: async () => {
             const res = await GET_API(
-                endpoints.session.getMyInstantSessions(
-                    Number(sessionsPage) || 1,
-                    12,
-                    debouncedQuery || undefined,
-                    sessionsStatus || undefined
-                )
+                endpoints.session.getMyInstantSessions(1, MY_SESSIONS_FETCH_SIZE, debouncedQuery || undefined, undefined)
             );
             return res?.data;
         },
         refetchInterval: 15000,
         refetchOnWindowFocus: true,
     });
-    const mySessions: any[] = mySessionsData?.items ?? [];
-    const mySessionsTotal: number = mySessionsData?.total ?? 0;
-    const mySessionsHasMore = Number(sessionsPage) * 12 < mySessionsTotal;
+    const allMySessions: any[] = useMemo(() => mySessionsData?.items ?? [], [mySessionsData]);
+    const filteredMySessions = useMemo(
+        () => allMySessions.filter((s) => matchesTimeBound(sessionsView, s.status)),
+        [allMySessions, sessionsView]
+    );
+    const mySessionsTotal = filteredMySessions.length;
+    const mySessions: any[] = filteredMySessions.slice(
+        ((Number(sessionsPage) || 1) - 1) * MY_SESSIONS_PAGE_SIZE,
+        (Number(sessionsPage) || 1) * MY_SESSIONS_PAGE_SIZE
+    );
+    const mySessionsHasMore = Number(sessionsPage) * MY_SESSIONS_PAGE_SIZE < mySessionsTotal;
     usePageClamp({
         page: Number(sessionsPage) || 1,
-        size: 12,
+        size: MY_SESSIONS_PAGE_SIZE,
         total: mySessionsTotal,
         itemCount: mySessions.length,
         setPage: (p) => setSessionsPage(p === 1 ? null : String(p)),
@@ -495,21 +504,14 @@ export default function VolunteerInstantSessionsPage() {
                     <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">
                         My Posted Instant Sessions
                     </h2>
-                    <select
-                        aria-label="Filter by status"
-                        className={`${SECTION_CONTROL_HEIGHT} min-w-0 px-3 border border-gray-200 rounded-xl text-sm bg-white`}
-                        value={sessionsStatus || ""}
-                        onChange={(e) => {
-                            setSessionsStatus(e.target.value || null);
-                            setSessionsPage("1");
+                    <StatusFilter
+                        value={sessionsView}
+                        options={TIME_BOUND_OPTIONS}
+                        onChange={(v) => {
+                            setSessionsView(v);
+                            setSessionsPage(null);
                         }}
-                    >
-                        {MY_SESSIONS_STATUS_FILTERS.map((s) => (
-                            <option key={s} value={s}>
-                                {s ? getStatusLabel(s) : "All statuses"}
-                            </option>
-                        ))}
-                    </select>
+                    />
                 </div>
 
                 {isMySessionsError && !mySessionsData ? (

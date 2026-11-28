@@ -37,3 +37,23 @@ export function statusViewOf(status: string | undefined, ended = false): StatusV
 export function matchesStatusFilter(filter: StatusFilterValue, view: StatusView): boolean {
     return filter === "all" || filter === view;
 }
+
+/** The volunteer's "My Posted Instant Sessions" filter is time-bound instead of one option per status. */
+export type TimeBoundFilter = "all" | "upcoming" | "past";
+
+export const TIME_BOUND_OPTIONS: { value: TimeBoundFilter; label: string }[] = [
+    { value: "all", label: "All" },
+    { value: "upcoming", label: "Upcoming" },
+    { value: "past", label: "Past" },
+];
+
+/** Past = it has happened or never will (completed, cancelled, expired); everything else (posted / open,
+ * accepted, in progress) is still ahead. */
+export function isPastStatus(status: string | undefined): boolean {
+    const s = (status ?? "").toLowerCase();
+    return s === "completed" || NEVER_HAPPENS.has(s);
+}
+
+export function matchesTimeBound(filter: TimeBoundFilter, status: string | undefined): boolean {
+    return filter === "all" || (filter === "past") === isPastStatus(status);
+}

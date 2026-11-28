@@ -9,7 +9,7 @@ import AvailabilitySection from "./AvailabilitySection";
 import CalendarLegend from "./CalendarLegend";
 import MyScheduleSection from "./MyScheduleSection";
 import ProfileNudge from "./ProfileNudge";
-import { SCHEDULE_LABELS, type ScheduleRole } from "./scheduleCategories";
+import type { ScheduleRole } from "./scheduleCategories";
 
 interface ScheduleDashboardLayoutProps {
     role: ScheduleRole;
@@ -98,21 +98,17 @@ const ScheduleDashboardLayout: React.FC<ScheduleDashboardLayoutProps> = ({
     return (
         <div className="w-full animate-fadeIn p-3 lg:p-5 grid gap-4 grid-cols-1 items-start">
             <BookSessionTabs />
-            {/* Centred under the switch. Book for Later is the main action, in the role colour. */}
-            <div className="flex flex-wrap items-center justify-center gap-2">
-                <button
-                    type="button"
-                    onClick={onScheduleAvailability}
-                    title={HELP.scheduleAvailability}
-                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium leading-tight text-black hover:bg-gray-50 cursor-pointer"
-                >
-                    {SCHEDULE_LABELS.scheduleAvailability}
-                </button>
+            {/* Explained and centred like the Instant Sessions page: what this is, and its one action. */}
+            <div className="flex flex-col items-center gap-2 text-center">
+                <h2 className="text-2xl font-medium text-gray-900">{TERMS.scheduledSessions}</h2>
+                <p className="max-w-2xl text-sm text-gray-500">
+                    {role === "learner" ? HELP.bookForLaterLearner : HELP.bookForLaterVolunteer}
+                </p>
                 <button
                     type="button"
                     onClick={onBookForLater}
                     title={HELP.bookForLater}
-                    className="btn-primary-fill inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium leading-tight hover:opacity-90 cursor-pointer"
+                    className="btn-primary-fill mt-2 inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-xl px-5 text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
                 >
                     <HiOutlinePlus size={16} aria-hidden="true" />
                     {TERMS.bookForLater}

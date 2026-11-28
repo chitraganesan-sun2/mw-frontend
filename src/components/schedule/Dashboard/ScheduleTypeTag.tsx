@@ -2,9 +2,10 @@ import React from "react";
 import { AGENDA_KIND_LABEL, type AgendaKind } from "@/utils/scheduleAgenda";
 
 // One quiet colour per kind. Not blue or orange: those mean Learner and Volunteer across the app,
-// and the status pills already own green / amber / rose / gray.
+// and the status pills already own green / amber / rose / gray. Scheduled sessions are pink so no
+// kind falls back to grey (instant = teal/green, WingTime = violet).
 const KIND_CLASS: Record<AgendaKind, string> = {
-    session: "bg-slate-100 text-slate-700",
+    session: "bg-pink-100 text-pink-800",
     instant: "bg-teal-50 text-teal-800",
     wingtime: "bg-violet-50 text-violet-800",
 };

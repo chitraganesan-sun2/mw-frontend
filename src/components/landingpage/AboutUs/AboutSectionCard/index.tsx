@@ -9,9 +9,9 @@ function AboutSectionCard() {
     // background of its own (that doubled the space around it). The story reads as one column of
     // text with even gaps; left-aligned, because justified text with a wide letter-spacing left
     // large uneven gaps between words.
-    <div className="w-full flex flex-col gap-6 md:gap-8">
-      <div className="w-full flex gap-6 lg:gap-10 lg:items-start max-lg:flex-col max-md:border-b max-md:pb-6" >
-        <div className="lg:w-[22%] flex justify-center lg:justify-start">
+    <div className="w-full flex flex-col gap-4 md:gap-5">
+      <div className="w-full flex gap-6 lg:gap-10 lg:items-center max-lg:flex-col max-md:border-b max-md:pb-6" >
+        <div className="lg:w-[22%] flex justify-center">
           <Image src={AboutMe} alt="About Us" className='!h-[300px] lg:!h-fit  max-lg:w-auto object-contain rounded-lg' />
         </div>
         <div className="lg:w-[78%]">

@@ -195,7 +195,6 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                     <StatusFilter
                         value={tab}
                         onChange={(v) => {
-                            if (v === "all") return;
                             setTab(v);
                             setSearch("");
                             setStatusFilter("all");
