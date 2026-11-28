@@ -641,8 +641,8 @@ export default function InstantSessionsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 items-start">
             {/* My Requested Sessions (the learner-request-for-any-volunteer flow) - shown first */}
             <div className="min-w-0">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">My Requested Instant Sessions</h2>
+                <div className="mb-4 flex items-start justify-between gap-3 lg:min-h-[3.25rem]">
+                    <h2 className="min-w-0 md:text-[20px] text-[16px] font-medium text-[#121212]">My Requested Instant Sessions</h2>
                     <StatusFilter
                         withAll
                         value={requestsFilter}
@@ -709,8 +709,8 @@ export default function InstantSessionsPage() {
 
             {/* Available Instant Sessions (volunteer-opened slots, browse + join) */}
             <div className="min-w-0">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                    <h2 className="md:text-[20px] text-[16px] font-medium text-[#121212]">Instant Sessions Posted by Volunteers</h2>
+                <div className="mb-4 flex items-start justify-between gap-3 lg:min-h-[3.25rem]">
+                    <h2 className="min-w-0 md:text-[20px] text-[16px] font-medium text-[#121212]">Instant Sessions Posted by Volunteers</h2>
                     <StatusFilter withAll value={postedFilter} onChange={setPostedFilter} />
                 </div>
 
