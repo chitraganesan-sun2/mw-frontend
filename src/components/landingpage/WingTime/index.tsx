@@ -80,19 +80,21 @@ const WingTimePill = ({ wingtime }: { wingtime: PublicWingTime }) => {
         : null;
 
     return (
-        <div className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100 flex items-center justify-between gap-3 hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 text-sm text-gray-700 flex-shrink-0">
+        // Phone: two rows (when, then topic + spots left) so nothing is squeezed or pushed off the screen.
+        // From sm up: one row, as before.
+        <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm border border-gray-100 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3 hover:shadow-md transition-shadow">
+            <div className="flex min-w-0 items-center gap-2 text-sm text-gray-700 sm:flex-shrink-0">
                 <TimeIcon />
-                <span className="font-medium whitespace-nowrap">
+                <span className="font-medium sm:whitespace-nowrap">
                     {describeWhen(wingtime)}
                 </span>
             </div>
-            <div className="flex items-center gap-3 flex-1 justify-end">
-                <h3 className="text-base font-semibold text-gray-900 line-clamp-1 text-right">
+            <div className="flex min-w-0 items-center justify-between gap-3 sm:flex-1 sm:justify-end">
+                <h3 className="min-w-0 text-base font-semibold text-gray-900 line-clamp-2 break-words sm:line-clamp-1 sm:text-right">
                     {wingtime.topic}
                 </h3>
                 {spotsLeft !== null && spotsLeft > 0 && (
-                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                    <span className="shrink-0 text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
                         {spotsLeft} {spotsLeft === 1 ? 'spot' : 'spots'} left
                     </span>
                 )}
