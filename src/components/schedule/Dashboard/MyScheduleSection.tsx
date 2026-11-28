@@ -393,7 +393,12 @@ const MyScheduleSection: React.FC<MyScheduleSectionProps> = ({ role, timeZoneLab
                 </div>
             </div>
 
-            <aside aria-label="Schedule summary" className="hidden lg:flex lg:sticky lg:top-3 flex-col gap-3">
+            {/* Sticky, but never taller than the screen: with many requests waiting the column scrolls
+                on its own instead of its lower boxes being cut off. */}
+            <aside
+                aria-label="Schedule summary"
+                className="hidden lg:flex lg:sticky lg:top-3 lg:max-h-[calc(100dvh-1.5rem)] lg:overflow-y-auto flex-col gap-3"
+            >
                 {nextSession && <NextSessionBanner session={nextSession} role={role} timeZoneLabel={timeZoneLabel} now={now} />}
                 <NeedsResponseBoxes sessions={awaitingSessions} role={role} timeZoneLabel={timeZoneLabel} onRespond={openApprovals} />
             </aside>
