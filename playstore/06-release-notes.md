@@ -1,3 +1,35 @@
+# Release notes — v1.9.0 (versionCode 25)
+
+## "What's new" text  *(Play limit: 500 chars per language)*
+
+```
+What's new in 1.9.0
+
+• New Book a Session section: Instant Sessions and Book for Later in one place
+• My Schedule is now one agenda of your sessions, instant sessions and WingTimes
+• Withdraw a pending request or cancel an accepted session right from My Schedule
+• Filter your sessions by status
+• Log Out now signs you out everywhere
+• Booking times load much faster
+• Small layout and colour fixes
+```
+
+---
+
+## Internal changelog — v1.9.0 (versionCode 25)
+
+Web changes from the 2026-11-27/28 UAT feedback rounds and pre-production end-to-end pass, now baked into the app bundle
+(all already live on the web): Book a Session section (Instant Sessions + Book for Later), My Schedule as the one
+activity hub (agenda of sessions, instant sessions and WingTimes, Status filters, side panel on wide screens), withdraw a
+pending request / cancel an accepted session from My Schedule, Respond drawer fixes, consistent page headers and role
+colours, landing WingTime list that fits a phone, and Log Out now calls the server (`POST /auth/logout`) so the token
+stops working everywhere. Backend changes (slot-lookup speedup, token revocation, hardening) are already live and reach
+every installed version.
+
+No native or permission changes.
+
+---
+
 # Release notes — v1.8.7 (versionCode 24)
 
 ## "What's new" text  *(Play limit: 500 chars per language)*
